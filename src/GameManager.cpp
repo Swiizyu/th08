@@ -279,6 +279,12 @@ ZunBool GameManager::IsPhantasmUnlocked()
     return FALSE;
 }
 
+// STUB: th08 0x43c322
+ZunBool GameManager::IsReplayPractice()
+{
+    return FALSE;
+}
+
 void GameManager::CutChain()
 {
     g_Chain.Cut(&g_GameManagerCalcChain);

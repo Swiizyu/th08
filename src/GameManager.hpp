@@ -28,10 +28,8 @@ struct GameManagerFlags
     u32 unk2 : 1;
     u32 isReplay : 1;
     u32 unk4 : 1;
-    u32 unk5 : 1;
-    u32 unk6 : 1;
-    u32 unk7 : 1;
-    u32 unk8 : 1;
+    u32 unk5 : 2;
+    u32 unk7 : 2;
     u32 unk9 : 1;
     u32 unk10 : 1;
     u32 isGoingToFinalB : 2; // why 2 bits?
@@ -145,6 +143,7 @@ struct GameManager
     void AddToYoukaiGauge(u16 param_1, i32 param_2);
 
     ZunBool IsPhantasmUnlocked();
+    ZunBool IsReplayPractice();
 
     /* I know it's dumb but this is the only way to get it matching */
     void SetIsReplayWeird(ZunBool value)
@@ -305,6 +304,11 @@ struct GameManager
         this->UpdateAntiTamper();
     }
 
+    void AddScore(int amount)
+    {
+        this->globals->score += amount / 10;
+    }
+
     void InitArcadeRegionParams();
 
     ZunBool IsUnknown()
@@ -372,12 +376,12 @@ struct GameManager
     u32 unk3de08;
     u32 unk3de0c;
     u32 unk3de10;
-    u32 unk3de14;
+    i32 unk3de14;
     u32 unk3de18;
     u32 unk3de1c;
-    u32 unk3de20;
-    u32 unk3de24;
-    u32 unk3de28;
+    i32 unk3de20;
+    i32 unk3de24;
+    i32 unk3de28;
 
     i32 rank;
     i32 maxRank;

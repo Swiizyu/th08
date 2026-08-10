@@ -27,6 +27,11 @@ struct Spellcard
 
     SpellcardFlags flags;
 
+    ZunBool IsActive()
+    {
+        return this->flags.isActive;
+    }
+
     ZunBool IsCaptured()
     {
         return this->flags.isCaptured;

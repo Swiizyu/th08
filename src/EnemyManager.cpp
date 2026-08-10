@@ -10,6 +10,12 @@ DIFFABLE_STATIC(ChainElem, g_EnemyManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerDrawChainHighPrio);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerDrawChainLowPrio);
 
+// STUB: th08 0x41fd40
+i32 Enemy::GetFamiliarCount()
+{
+    return 0;
+}
+
 // STUB: th08 0x429e00
 void EnemyManager::Initialize()
 {

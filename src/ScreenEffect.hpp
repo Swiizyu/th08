@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Global.hpp"
+#include "ZunMath.hpp"
 #include "inttypes.hpp"
 #include "utils.hpp"
 #include <d3dx8.h>
