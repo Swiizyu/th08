@@ -625,12 +625,18 @@ struct AnmManager
         this->color.d3dColor = color;
     }
 
-    void RequestCapture(i32 captureSurfaceIdx, i32 srcX, i32 srcY, i32 srcW, i32 srcH, i32 dstX, i32 dstY, i32 dstW,
+    // This function exists according to PoFV
+    IDirect3DSurface8 *GetSurface(i32 surfaceIdx)
+    {
+        return this->surfaces[surfaceIdx];
+    }
+
+    ZunResult SetSurfaceCaptureParams(i32 captureSurfaceIdx, i32 srcX, i32 srcY, i32 srcW, i32 srcH, i32 dstX, i32 dstY, i32 dstW,
                         i32 dstH)
     {
         if (this->captureSurfaceIdx >= 0)
         {
-            return;
+            return ZUN_ERROR;
         }
 
         this->captureSurfaceIdx = captureSurfaceIdx;
@@ -642,6 +648,29 @@ struct AnmManager
         this->surfaceCaptureDstY = dstY;
         this->surfaceCaptureDstW = dstW;
         this->surfaceCaptureDstH = dstH;
+
+        return ZUN_SUCCESS;
+    }
+
+    ZunResult SetTextureCaptureParams(i32 idx, i32 srcX, i32 srcY, i32 srcW, i32 srcH, i32 dstX, i32 dstY, i32 dstW,
+                        i32 dstH)
+    {
+        if (this->captureAnmIdx >= 0)
+        {
+            return ZUN_ERROR;
+        }
+
+        this->captureAnmIdx = idx;
+        this->textureCaptureSrcX = srcX;
+        this->textureCaptureSrcY = srcY;
+        this->textureCaptureSrcW = srcW;
+        this->textureCaptureSrcH = srcH;
+        this->textureCaptureDstX = dstX;
+        this->textureCaptureDstY = dstY;
+        this->textureCaptureDstW = dstW;
+        this->textureCaptureDstH = dstH;
+
+        return ZUN_SUCCESS;
     }
 
     void ReplaceSurface(i32 destIndex, i32 srcIndex)

@@ -1389,7 +1389,7 @@ void Supervisor::SetupLoadingVmsAndInitCapture(Float3 *position)
         g_SupervisorLoadingVms[2].pos = *position;
     }
 
-    g_AnmManager->RequestCapture(8, 0, 0, 640, 480, 0, 0, 640, 480);
+    g_AnmManager->SetSurfaceCaptureParams(8, 0, 0, 640, 480, 0, 0, 640, 480);
 }
 
 void Supervisor::StartEffect(i32 idx)
