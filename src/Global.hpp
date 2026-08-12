@@ -151,8 +151,12 @@ int WriteDataToFile(LPCSTR path, LPVOID data, size_t size);
 class GameErrorContext
 {
   public:
-    GameErrorContext();
-    ~GameErrorContext();
+    GameErrorContext()
+    {
+        this->bufferEnd = this->buffer;
+        this->bufferEnd[0] = '\0';
+        this->showMessageBox = false;
+    }
 
     void ResetContext()
     {
@@ -235,8 +239,23 @@ class Rng
 class ZunMemory
 {
   public:
-    ZunMemory();
-    ~ZunMemory();
+    ZunMemory()
+    {
+        this->bRegistryInUse = FALSE;
+    }
+    ~ZunMemory()
+    {
+        if (this->bRegistryInUse)
+        {
+            for (i32 i = 0; i < ARRAY_SIZE_SIGNED(this->registry); i++)
+            {
+                if (this->registry[i] != NULL)
+                {
+                    free(this->registry[i]);
+                }
+            }
+        }
+    }
 
     // NOTE: the default parameter for debugText is probably just __FILE__
     void *Alloc(size_t size, const char *debugText = "d:\\cygwin\\home\\zun\\prog\\th08\\global.h")
@@ -356,6 +375,88 @@ struct ZunGlobals
 };
 
 C_ASSERT(sizeof(ZunGlobals) == 0xe4);
+
+/* ZUN name: FVector */
+struct Float3
+{
+    Float3()
+    {
+    }
+
+    Float3(float x, float y, float z);
+
+    void FromAngleMagnitude(float angle, float magnitude)
+    {
+        __asm
+        {
+            mov eax, this
+            fld angle
+            fsincos
+            fmul [magnitude]
+            fstp [eax] /* this->x */
+            fmul [magnitude]
+            fstp [eax + 4] /* this->y */
+        }
+    }
+
+    void FromRotatedVec2(float angle, float vecX, float vecY)
+    {
+        __asm
+        {
+            mov eax, this
+            fld angle
+            fsincos
+            fmul [vecX]
+            fstp [eax] /* this->x */
+            fmul [vecY]
+            fstp [eax + 4] /* this->y */
+        }
+    }
+
+    // FUNCTION: th08 0x40b460 FOLDED
+    operator float *()
+    {
+        return (float *) this;
+    }
+
+    Float3 *operator+=(const Float3 &other)
+    {
+        this->x += other.x;
+        this->y += other.y;
+        this->z += other.z;
+
+        return this;
+    }
+
+    Float3 *operator-=(const Float3 &other)
+    {
+        this->x -= other.x;
+        this->y -= other.y;
+        this->z -= other.z;
+
+        return this;
+    }
+
+    float x, y, z;
+};
+
+/* ZUN name: FVector2 */
+struct Float2
+{
+    float x;
+    float y;
+};
+
+struct ZunRect
+{
+    f32 left;
+    f32 top;
+    f32 right;
+    f32 bottom;
+};
+
+f32 AddNormalizeAngle(f32 a, f32 b);
+void Rotate(Float3 *outVector, Float3 *point, f32 angle);
 
 DIFFABLE_EXTERN(Rng, g_Rng);
 DIFFABLE_EXTERN(u16, g_CurFrameInput);

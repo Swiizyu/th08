@@ -5,6 +5,7 @@
 #include "MusicRoom.hpp"
 #include "SoundPlayer.hpp"
 #include "i18n.hpp"
+#include "ZunMath.hpp"
 
 namespace th08
 {

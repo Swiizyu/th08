@@ -4,6 +4,7 @@
 #include "Ending.hpp"
 #include "GameManager.hpp"
 #include "ZunColor.hpp"
+#include "ZunMath.hpp"
 #include "i18n.hpp"
 #include <cstdlib>
 

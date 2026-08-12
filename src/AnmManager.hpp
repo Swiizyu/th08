@@ -1,7 +1,6 @@
 #pragma once
 #include "Supervisor.hpp"
 #include "ZunColor.hpp"
-#include "ZunMath.hpp"
 #include "ZunResult.hpp"
 #include "diffbuild.hpp"
 #include "dxutil.hpp"
@@ -475,10 +474,6 @@ struct AnmManager
     AnmManager();
     void SetupVertexBuffer();
 
-    // FUNCTION: th08 0x43ef40 FOLDED
-    ~AnmManager()
-    {
-    }
     ZunBool ExecuteScript(AnmVm *vm);
     void ExecuteScriptArray(AnmVm *sprites, int count);
     void SetRenderStateForVm(AnmVm *vm);

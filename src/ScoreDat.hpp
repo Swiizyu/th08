@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SpellCard.hpp"
+#include "SpellCardNumbers.hpp"
 #include "Supervisor.hpp"
 #include "utils.hpp"
 #include <windows.h>

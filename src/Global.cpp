@@ -1227,34 +1227,4 @@ void Rotate(Float3 *outVector, Float3 *point, f32 angle)
     outVector->y = cosOut * point->y + sinOut * point->x;
 }
 
-ZunMemory::ZunMemory()
-{
-    this->bRegistryInUse = FALSE;
-}
-
-ZunMemory::~ZunMemory()
-{
-    if (this->bRegistryInUse)
-    {
-        for (i32 i = 0; i < ARRAY_SIZE_SIGNED(this->registry); i++)
-        {
-            if (this->registry[i] != NULL)
-            {
-                free(this->registry[i]);
-            }
-        }
-    }
-}
-
-GameErrorContext::GameErrorContext()
-{
-    this->bufferEnd = this->buffer;
-    this->bufferEnd[0] = '\0';
-    this->showMessageBox = false;
-}
-
-GameErrorContext::~GameErrorContext()
-{
-}
-
 }; // namespace th08

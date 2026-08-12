@@ -1,11 +1,13 @@
 #include "th_pch.h"
 
 #include "AsciiManager.hpp"
+#include "Spellcard.hpp"
 #include "Config.hpp"
 #include "GameManager.hpp"
 #include "ResultScreen.hpp"
 #include "ScreenEffect.hpp"
 #include "SoundPlayer.hpp"
+#include "ZunMath.hpp"
 #include "pbg/Lzss.hpp"
 
 #include "i18n.hpp"

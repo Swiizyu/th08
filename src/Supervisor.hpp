@@ -8,7 +8,6 @@
 #include "Global.hpp"
 #include "Midi.hpp"
 #include "ZunBool.hpp"
-#include "ZunMath.hpp"
 #include "diffbuild.hpp"
 #include "inttypes.hpp"
 #include "utils.hpp"
@@ -181,6 +180,11 @@ struct Supervisor
         return this->flags.speedhackDetected;
     }
 
+    ZunBool IsSoftwareTexturing()
+    {
+        return this->cfg.opts.disableColorCompositing | this->cfg.opts.useSwTextureBlending;
+    }
+
     ZunBool ShouldForceBackbufferClear()
     {
         return this->cfg.opts.clearBackBufferOnRefresh | this->cfg.opts.displayMinimumGraphics;
@@ -234,11 +238,6 @@ struct Supervisor
     ZunBool IsWindowed()
     {
         return this->cfg.windowed;
-    }
-
-    ZunBool IsSoftwareTexturing()
-    {
-        return this->cfg.opts.disableColorCompositing | this->cfg.opts.useSwTextureBlending;
     }
 
     ZunBool IsSubthreadRunning()
@@ -350,6 +349,34 @@ struct ZunTimer
         this->subFrame = 0.0;
     }
 
+    void SetCurrent(i32 value)
+    {
+        this->current = value;
+        this->subFrame = 0.0;
+        this->previous = -999;
+    }
+
+    void Tick()
+    {
+        this->previous = this->current;
+        g_Supervisor.TickTimer(&this->current, &this->subFrame);
+    }
+
+    void operator=(i32 value)
+    {
+        SetCurrent(value);
+    }
+
+    void operator++(int)
+    {
+        Tick();
+    }
+
+    void operator--(int)
+    {
+        this->Decrement(1);
+    }
+
     operator int()
     {
         return this->current;
@@ -360,36 +387,6 @@ struct ZunTimer
         return (float)this->current + (float)this->subFrame;
     }
 
-    void operator++(int)
-    {
-        Tick();
-    }
-
-    void Tick()
-    {
-        this->previous = this->current;
-        g_Supervisor.TickTimer(&this->current, &this->subFrame);
-    }
-
-    void operator--(int)
-    {
-        this->Decrement(1);
-    }
-
-    ZunBool operator==(int value)
-    {
-        return this->current == value;
-    }
-
-    ZunBool operator+=(int value)
-    {
-        this->Increment(value);
-    }
-
-    ZunBool operator-=(int value)
-    {
-        this->Decrement(value);
-    }
 
     ZunBool operator<(int value)
     {
@@ -411,19 +408,22 @@ struct ZunTimer
         return this->current >= value;
     }
 
+    ZunBool operator==(int value)
+    {
+        return this->current == value;
+    }
+
+    ZunBool operator+=(int value)
+    {
+        this->Increment(value);
+    }
+
+    ZunBool operator-=(int value)
+    {
+        this->Decrement(value);
+    }
+
     void Increment(i32 value);
     void Decrement(i32 value);
-
-    void operator=(i32 value)
-    {
-        SetCurrent(value);
-    }
-
-    void SetCurrent(i32 value)
-    {
-        this->current = value;
-        this->previous = -999;
-        this->subFrame = 0.0;
-    }
 };
 }; // namespace th08
