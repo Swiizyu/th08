@@ -1,12 +1,17 @@
 #pragma once
 
 #include "Global.hpp"
+#include "AnmManager.hpp"
+
+#include "utils.hpp"
 
 namespace th08
 {
 
 struct PlayerRawShtFile
 {
+    unknown_fields(0x0, 0x4);       // 0x0
+    float bombCount;                // 0x4
 };
 
 enum PlayerState
@@ -18,7 +23,6 @@ enum PlayerState
 
 struct Player
 {
-    i8 playerState;
 
     static ZunResult RegisterChain(u32 param);
     static ChainCallbackResult OnUpdate(Player *player);
@@ -29,6 +33,38 @@ struct Player
     static void CutChain();
 
     static ZunResult LoadShtFile(PlayerRawShtFile **header, const char *path);
+
+    i8 playerState;                     // 0x0
+    unknown_fields(0x1, 0x2);           // 0x1
+    u8 isFocus;                         // 0x3
+    unknown_fields(0x4, 0x1);           // 0x4
+    u8 isYoukai;                        // 0x5
+    unknown_fields(0x6, 0x2);           // 0x6
+    i32 timeFocused;                    // 0x8
+    AnmLoaded *playerAnm;               // 0xC
+    AnmVm playerSprite;                 // 0x10
+
+    Float3 position;                    // 0x2B4
+    Float3 unk0x2C0;                    // 0x2C0
+    Float3 unk0x2CC[16];                // 0x2CC
+    Float3 unk0x38C;                    // 0x38C
+    Float3 unk0x398;                    // 0x398
+    Float3 unk0x3A4;                    // 0x3A4
+    Float3 unk0x3B0;                    // 0x3B0
+    Float3 unk0x3BC;                    // 0x3BC
+    Float3 unk0x3C8;                    // 0x3C8
+    Float3 unk0x3D4;                    // 0x3D4
+    Float3 unk0x3E0;                    // 0x3E0
+    Float3 unk0x3EC;                    // 0x3EC
+
+    Float3 velocity;                    // 0x3F8
+    float horizontalSpeedMultiplier;    // 0x404
+    float verticalSpeedMultiplier;      // 0x408
+
+    unknown_fields(0x40C, 0xE2667);     // 0x40C
+
+    PlayerRawShtFile *player1ShtFile;   // 0xE2A74
+    PlayerRawShtFile *player2ShtFile;   // 0xE2A78
 };
 
 DIFFABLE_EXTERN(Player, g_Player);
