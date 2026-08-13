@@ -508,8 +508,8 @@ ZunResult Ending::AddedCallback(Ending *ending)
 
         stageBit = (g_GameManager.currentStage != STAGE6B) ? SPELL_PRACTICE_UNLOCKED_FLAG : EXTRA_UNLOCKED_FLAG;
 
-        g_GameManager.plst.playDataByDifficulty[g_GameManager.difficulty].clears++;
-        g_GameManager.plst.playDataTotals.clears++;
+        g_GameManager.plst.playData[g_GameManager.difficulty].clears++;
+        g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].clears++;
 
         ending->hasSeenEnding = false;
         ending->unk2a5c = 0;

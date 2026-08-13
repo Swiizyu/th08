@@ -97,11 +97,11 @@ C_ASSERT(sizeof(Th8k) == 0xC);
 struct PlstPlayCounts
 {
     u32 attemptsTotal;
-    i32 attemptsPerCharacter[SHOT_ALL];
+    u32 attemptsPerCharacter[SHOT_ALL];
     unknown_fields(0x34, 0x4);
-    i32 clears;
-    i32 continues;
-    i32 practices;
+    u32 clears;
+    u32 continues;
+    u32 practices;
 };
 C_ASSERT(sizeof(PlstPlayCounts) == 0x44);
 
@@ -116,8 +116,7 @@ struct Plst
     u32 gameMinutes;
     u32 gameSeconds;
     u32 gameMilliseconds;
-    PlstPlayCounts playDataByDifficulty[MAX_DIFFICULTIES + 1];
-    PlstPlayCounts playDataTotals;
+    PlstPlayCounts playData[MAX_DIFFICULTIES + 2];
     i8 bgmUnlocked[32];
 };
 

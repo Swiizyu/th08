@@ -1814,12 +1814,12 @@ i32 ResultScreen::HandleOtherStatsScreen()
                 vm->pos = pos;
 
                 g_AnmManager->DrawTextLeft(vm, COLOR_TEXT_WHITE, 0, "%s %6d %6d %6d %6d %6d %6d", g_CharacterList[i],
-                                           g_GameManager.plst.playDataByDifficulty[EASY].attemptsPerCharacter[i],
-                                           g_GameManager.plst.playDataByDifficulty[NORMAL].attemptsPerCharacter[i],
-                                           g_GameManager.plst.playDataByDifficulty[HARD].attemptsPerCharacter[i],
-                                           g_GameManager.plst.playDataByDifficulty[LUNATIC].attemptsPerCharacter[i],
-                                           g_GameManager.plst.playDataByDifficulty[EXTRA].attemptsPerCharacter[i],
-                                           g_GameManager.plst.playDataTotals.attemptsPerCharacter[i]);
+                                                                                                  g_GameManager.plst.playData[EASY].attemptsPerCharacter[i],
+                                                                                                  g_GameManager.plst.playData[NORMAL].attemptsPerCharacter[i],
+                                                                                                  g_GameManager.plst.playData[HARD].attemptsPerCharacter[i],
+                                                                                                  g_GameManager.plst.playData[LUNATIC].attemptsPerCharacter[i],
+                                                                                                  g_GameManager.plst.playData[EXTRA].attemptsPerCharacter[i],
+                                                                                                  g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].attemptsPerCharacter[i]);
             }
 
             vm++;
@@ -1827,47 +1827,44 @@ i32 ResultScreen::HandleOtherStatsScreen()
             vm->pos = pos;
 
             g_AnmManager->DrawTextLeft(vm, COLOR_TEXT_WHITE, 0, "%s %6d %6d %6d %6d %6d %6d", g_CharacterList[SHOT_ALL],
-                                       g_GameManager.plst.playDataByDifficulty[EASY].attemptsTotal,
-                                       g_GameManager.plst.playDataByDifficulty[NORMAL].attemptsTotal,
-                                       g_GameManager.plst.playDataByDifficulty[HARD].attemptsTotal,
-                                       g_GameManager.plst.playDataByDifficulty[LUNATIC].attemptsTotal,
-                                       g_GameManager.plst.playDataByDifficulty[EXTRA].attemptsTotal,
-                                       g_GameManager.plst.playDataTotals.attemptsTotal);
+                                                                                              g_GameManager.plst.playData[EASY].attemptsTotal,
+                                                                                              g_GameManager.plst.playData[NORMAL].attemptsTotal,
+                                                                                              g_GameManager.plst.playData[HARD].attemptsTotal,
+                                                                                              g_GameManager.plst.playData[LUNATIC].attemptsTotal,
+                                                                                              g_GameManager.plst.playData[EXTRA].attemptsTotal,
+                                                                                              g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].attemptsTotal);
 
             vm++;
             pos.y += 34.0f;
             vm->pos = pos;
 
-            g_AnmManager->DrawTextLeft(
-                vm, COLOR_TEXT_WHITE, 0, TH_RESULT_CLEAR_COUNT, g_GameManager.plst.playDataByDifficulty[EASY].clears,
-                g_GameManager.plst.playDataByDifficulty[NORMAL].clears,
-                g_GameManager.plst.playDataByDifficulty[HARD].clears,
-                g_GameManager.plst.playDataByDifficulty[LUNATIC].clears,
-                g_GameManager.plst.playDataByDifficulty[EXTRA].clears, g_GameManager.plst.playDataTotals.clears);
+            g_AnmManager->DrawTextLeft(vm, COLOR_TEXT_WHITE, 0, TH_RESULT_CLEAR_COUNT, g_GameManager.plst.playData[EASY].clears,
+                                                                                       g_GameManager.plst.playData[NORMAL].clears,
+                                                                                       g_GameManager.plst.playData[HARD].clears,
+                                                                                       g_GameManager.plst.playData[LUNATIC].clears,
+                                                                                       g_GameManager.plst.playData[EXTRA].clears,
+                                                                                       g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].clears);
 
             vm++;
             pos.y += 17.0f;
             vm->pos = pos;
 
-            g_AnmManager->DrawTextLeft(vm, COLOR_TEXT_WHITE, 0, TH_RESULT_CONTINUE_COUNT,
-                                       g_GameManager.plst.playDataByDifficulty[EASY].continues,
-                                       g_GameManager.plst.playDataByDifficulty[NORMAL].continues,
-                                       g_GameManager.plst.playDataByDifficulty[HARD].continues,
-                                       g_GameManager.plst.playDataByDifficulty[LUNATIC].continues,
-                                       g_GameManager.plst.playDataByDifficulty[EXTRA].continues,
-                                       g_GameManager.plst.playDataByDifficulty[MAX_DIFFICULTIES]
-                                           .continues); // ?! why not playDataTotals.continues?
+            g_AnmManager->DrawTextLeft(vm, COLOR_TEXT_WHITE, 0, TH_RESULT_CONTINUE_COUNT, g_GameManager.plst.playData[EASY].continues,
+                                                                                          g_GameManager.plst.playData[NORMAL].continues,
+                                                                                          g_GameManager.plst.playData[HARD].continues,
+                                                                                          g_GameManager.plst.playData[LUNATIC].continues,
+                                                                                          g_GameManager.plst.playData[EXTRA].continues,
+                                                                                          g_GameManager.plst.playData[MAX_DIFFICULTIES].continues); // ?! why not playData[MAX_DIFFICULTIES + 1].continues?
             vm++;
             pos.y += 17.0f;
             vm->pos = pos;
 
-            g_AnmManager->DrawTextLeft(vm, COLOR_TEXT_WHITE, 0, TH_RESULT_PRACTICE_COUNT,
-                                       g_GameManager.plst.playDataByDifficulty[EASY].practices,
-                                       g_GameManager.plst.playDataByDifficulty[NORMAL].practices,
-                                       g_GameManager.plst.playDataByDifficulty[HARD].practices,
-                                       g_GameManager.plst.playDataByDifficulty[LUNATIC].practices,
-                                       g_GameManager.plst.playDataByDifficulty[EXTRA].practices,
-                                       g_GameManager.plst.playDataTotals.practices);
+            g_AnmManager->DrawTextLeft(vm, COLOR_TEXT_WHITE, 0, TH_RESULT_PRACTICE_COUNT, g_GameManager.plst.playData[EASY].practices,
+                                                                                          g_GameManager.plst.playData[NORMAL].practices,
+                                                                                          g_GameManager.plst.playData[HARD].practices,
+                                                                                          g_GameManager.plst.playData[LUNATIC].practices,
+                                                                                          g_GameManager.plst.playData[EXTRA].practices,
+                                                                                          g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].practices);
 
             vm++;
             pos.y += 17.0f;
@@ -2807,16 +2804,17 @@ ZunResult ResultScreen::AddedCallback(ResultScreen *result)
     result->updateSpellcardResults = FALSE;
     result->unk_10ef8.activeSpriteIndex = -1;
 
-    g_GameManager.plst.playDataTotals.continues = g_GameManager.plst.playDataByDifficulty[EASY].continues +
-                                                  g_GameManager.plst.playDataByDifficulty[NORMAL].continues +
-                                                  g_GameManager.plst.playDataByDifficulty[HARD].continues +
-                                                  g_GameManager.plst.playDataByDifficulty[LUNATIC].continues +
-                                                  g_GameManager.plst.playDataByDifficulty[EXTRA].continues;
+    g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].continues = g_GameManager.plst.playData[EASY].continues
+                                                                + g_GameManager.plst.playData[NORMAL].continues
+                                                                + g_GameManager.plst.playData[HARD].continues
+                                                                + g_GameManager.plst.playData[LUNATIC].continues
+                                                                + g_GameManager.plst.playData[EXTRA].continues;
 
-    g_GameManager.plst.playDataTotals.clears =
-        g_GameManager.plst.playDataByDifficulty[EASY].clears + g_GameManager.plst.playDataByDifficulty[NORMAL].clears +
-        g_GameManager.plst.playDataByDifficulty[HARD].clears + g_GameManager.plst.playDataByDifficulty[LUNATIC].clears +
-        g_GameManager.plst.playDataByDifficulty[EXTRA].clears;
+    g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].clears = g_GameManager.plst.playData[EASY].clears
+                                                               + g_GameManager.plst.playData[NORMAL].clears
+                                                               + g_GameManager.plst.playData[HARD].clears
+                                                               + g_GameManager.plst.playData[LUNATIC].clears
+                                                               + g_GameManager.plst.playData[EXTRA].clears;
 
     if (result->currentState == RESULT_SCREEN_STATE_INITIAL_SCORE_SAVE)
     {
