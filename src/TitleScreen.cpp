@@ -878,7 +878,7 @@ ChainCallbackResult TitleScreen::OnUpdateOptions()
                 {
                     g_Supervisor.cfg.musicVolume = 0;
                 }
-                g_SoundPlayer.QueueSetVolumeCommand();
+                g_SoundPlayer.SetVolume();
                 break;
             case TITLE_MENU_ITEM_OPTION_SE_VOL:
                 g_Supervisor.cfg.sfxVolume -= 4;
@@ -886,7 +886,7 @@ ChainCallbackResult TitleScreen::OnUpdateOptions()
                 {
                     g_Supervisor.cfg.sfxVolume = 0;
                 }
-                g_SoundPlayer.QueueSetVolumeCommand();
+                g_SoundPlayer.SetVolume();
                 break;
             }
         }
@@ -901,7 +901,7 @@ ChainCallbackResult TitleScreen::OnUpdateOptions()
                 {
                     g_Supervisor.cfg.musicVolume = 100;
                 }
-                g_SoundPlayer.QueueSetVolumeCommand();
+                g_SoundPlayer.SetVolume();
                 break;
             case TITLE_MENU_ITEM_OPTION_SE_VOL:
                 g_Supervisor.cfg.sfxVolume += 4;
@@ -909,7 +909,7 @@ ChainCallbackResult TitleScreen::OnUpdateOptions()
                 {
                     g_Supervisor.cfg.sfxVolume = 100;
                 }
-                g_SoundPlayer.QueueSetVolumeCommand();
+                g_SoundPlayer.SetVolume();
                 break;
             }
         }
@@ -924,14 +924,14 @@ ChainCallbackResult TitleScreen::OnUpdateOptions()
                 {
                     g_Supervisor.cfg.musicVolume--;
                 }
-                g_SoundPlayer.QueueSetVolumeCommand();
+                g_SoundPlayer.SetVolume();
                 break;
             case TITLE_MENU_ITEM_OPTION_SE_VOL:
                 if (g_Supervisor.cfg.sfxVolume > 0)
                 {
                     g_Supervisor.cfg.sfxVolume--;
                 }
-                g_SoundPlayer.QueueSetVolumeCommand();
+                g_SoundPlayer.SetVolume();
                 break;
             }
         }
@@ -945,14 +945,14 @@ ChainCallbackResult TitleScreen::OnUpdateOptions()
                 {
                     g_Supervisor.cfg.musicVolume++;
                 }
-                g_SoundPlayer.QueueSetVolumeCommand();
+                g_SoundPlayer.SetVolume();
                 break;
             case TITLE_MENU_ITEM_OPTION_SE_VOL:
                 if (g_Supervisor.cfg.sfxVolume < 100)
                 {
                     g_Supervisor.cfg.sfxVolume++;
                 }
-                g_SoundPlayer.QueueSetVolumeCommand();
+                g_SoundPlayer.SetVolume();
                 break;
             }
         }
@@ -3908,7 +3908,7 @@ ZunResult TitleScreen::RegisterChain(int param)
     g_TitleScreen = titleScreen;
 
     memset(titleScreen, 0, sizeof(TitleScreen));
-    g_GameManager.isInGameMenu = FALSE;
+    g_GameManager.showPauseMenu = FALSE;
 
     titleScreen->calcChain = g_Chain.CreateElem((ChainCallback)TitleScreen::OnUpdate);
     titleScreen->calcChain->arg = titleScreen;

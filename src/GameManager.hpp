@@ -174,6 +174,31 @@ struct GameManager
         return this->flags.isPracticeMode;
     }
 
+    i32 GetYoukaiGauge()
+    {
+        return this->globals->youkaiGauge;
+    }
+
+    ZunBool IsGaugeExtremelyHuman()
+    {
+        return this->globals->youkaiGauge <= this->youkaiGaugeHumanEffectsThreshold;
+    }
+
+    ZunBool IsGaugeModeratelyHuman()
+    {
+        return this->globals->youkaiGauge <= this->youkaiGaugeHumanTintThreshold;
+    }
+
+    ZunBool IsGaugeExtremelyYoukai()
+    {
+        return this->globals->youkaiGauge >= this->youkaiGaugeYoukaiEffectsThreshold;
+    }
+
+    ZunBool IsGaugeModeratelyYoukai()
+    {
+        return this->globals->youkaiGauge >= this->youkaiGaugeYoukaiTintThreshold;
+    }
+
     i8 GetClockTime()
     {
         return this->globals->clockTime;
@@ -315,7 +340,7 @@ struct GameManager
     u8 unk3dbaa;
     GameManagerFlags flags;
     i16 currentSpellCardNumber;
-    u8 isInGameMenu;
+    u8 showPauseMenu;
     u8 showRetryMenu;
     u8 currentDemoReplay;
     u8 replayMode;

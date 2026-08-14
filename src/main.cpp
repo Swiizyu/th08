@@ -403,7 +403,7 @@ void GameWindow::Present()
         }
     }
 
-    if (g_Supervisor.unk174 != 0 && !g_GameManager.isInGameMenu)
+    if (g_Supervisor.unk174 != 0 && !g_GameManager.showPauseMenu)
     {
         g_Supervisor.unk174--;
     }

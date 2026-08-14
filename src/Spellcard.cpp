@@ -9,6 +9,8 @@ namespace th08
 // clang-format off
 // TODO: stop clang-format from fucking with whitespace formatting
 
+DIFFABLE_STATIC(Spellcard, g_Spellcard);
+
 DIFFABLE_STATIC_ARRAY_ASSIGN(i32, 42, g_SpellcardNumbersEasy) = {
     // Stage 1
     SPELLCARD_ST1_BOSS_1E,    SPELLCARD_ST1_BOSS_2E,

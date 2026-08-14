@@ -296,6 +296,11 @@ struct AnmVmBase
         return this->visible;
     }
 
+    void SetInvisible()
+    {
+        this->visible = FALSE;
+    }
+
     void SetInterrupt(i16 interrupt)
     {
         this->pendingInterrupt = interrupt;
@@ -414,8 +419,9 @@ struct AnmLoaded
     int numberEntriesToBeLoaded;
 
     void LoadSprite(i32 spriteIdx, AnmLoadedSprite *loadedSprite);
+    ZunResult SetSprite(AnmVm *vm, i32 spriteIdx);
 
-    void ExecuteAnmIdx(AnmVm *vm, int scriptIdx)
+    void ExecuteAnmIdx(AnmVm *vm, i32 scriptIdx)
     {
         vm->scriptIndex = scriptIdx;
 
@@ -428,7 +434,7 @@ struct AnmLoaded
         this->SetAndExecuteScript(vm, this->scripts[scriptIdx]);
     }
 
-    AnmLoadedSprite *GetSprite(int sprite)
+    AnmLoadedSprite *GetSprite(u32 sprite)
     {
         return &this->sprites[sprite];
     }
@@ -440,7 +446,7 @@ struct AnmLoaded
         this->SetSprite(vm, sprite);
     }
 
-    void SetAndExecuteScriptIdx(AnmVm *vm, int scriptIdx)
+    void SetAndExecuteScriptIdx(AnmVm *vm, i32 scriptIdx)
     {
         vm->anmFile = this;
         vm->scriptIndex = scriptIdx;
@@ -448,7 +454,6 @@ struct AnmLoaded
     }
 
     void ExecuteAnmIdxArray(AnmVm *vm, i32 scriptIdx, i32 count);
-    ZunResult SetSprite(AnmVm *vm, int spriteIdx);
     void SetAndExecuteScript(AnmVm *vm, AnmRawInstr *beginningOfScript);
 };
 

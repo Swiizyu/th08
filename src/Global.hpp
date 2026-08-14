@@ -348,7 +348,7 @@ struct ZunGlobals
     i32 grazeInStage;
     u32 score;
     i32 graze;
-    i32 unk0x10;
+    i32 scoreIncrement;
     u32 displayedHighScore;
     u8 continuesUsedInHighScore;
     /* 3 bytes pad */
@@ -356,7 +356,7 @@ struct ZunGlobals
     i16 youkaiGaugeCopy;
     i16 youkaiGauge;
     i32 pointItemValue;
-    u8 clockTime;
+    i8 clockTime;
     u8 numRetries;
     /* 2 bytes pad */
     i32 pointItemsCollectedInStage;
