@@ -627,7 +627,7 @@ ZunBool GameWindow::InitD3DRendering()
     presentParams.AutoDepthStencilFormat = D3DFMT_D16;
     presentParams.Flags = D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
 
-    g_Supervisor.flags.unk1 = true;
+    g_Supervisor.flags.lockableBackbuffer = true;
     g_Supervisor.couldSetRefreshRate = true;
     failedToSetFramerate = false;
 

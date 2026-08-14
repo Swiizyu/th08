@@ -85,7 +85,7 @@ struct GameConfiguration
 struct SupervisorFlags
 {
     u32 usingHardwareTL : 1;
-    u32 unk1 : 1; // Unconditionally set in InitD3DRendering. Never cleared?
+    u32 lockableBackbuffer : 1; // Unconditionally set in InitD3DRendering. Never cleared?
     u32 using32BitGraphics : 1;
     u32 speedhackDetected : 1; // Leftover from PCB. Is never set in IN, but is used.
     u32 d3dDevDisconnectFlag : 1;
