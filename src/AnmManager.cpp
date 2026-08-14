@@ -1253,6 +1253,99 @@ ZunResult AnmManager::Draw2D(AnmVm *vm)
     return this->DrawInner(vm, 0);
 }
 
+// Has the effect of Draw2D, but does not round vertex positions if
+// the rotation is 0 (DrawNoRotation rounds the vertex positions)
+#pragma var_order(sine, rotation, cosine, x, y, yOffset, xOffset, spriteHalfWidth, spriteHalfHeight)
+ZunResult AnmManager::Draw2DNoRound(AnmVm *vm)
+{
+    float sine, cosine, rotation, xOffset, yOffset, x, y, spriteHalfWidth, spriteHalfHeight;
+
+    if (!vm->IsVisible())
+    {
+        return ZUN_ERROR;
+    }
+
+    if (!vm->flag1)
+    {
+        return ZUN_ERROR;
+    }
+
+    if (vm->color1.a == 0)
+    {
+        return ZUN_ERROR;
+    }
+
+    rotation = vm->rotation.z;
+
+    if (rotation != 0.0f)
+    {
+        sincos(rotation, sine, cosine);
+
+        xOffset = vm->pos.x;
+        yOffset = vm->pos.y;
+
+        x = (vm->spriteSize.x * vm->scale.x) / 2.0f;
+        y = (vm->spriteSize.y * vm->scale.y) / 2.0f;
+
+        this->TranslateRotation(&g_QuadVertices[0], -x, -y, sine, cosine, xOffset, yOffset);
+        this->TranslateRotation(&g_QuadVertices[1], x, -y, sine, cosine, xOffset, yOffset);
+        this->TranslateRotation(&g_QuadVertices[2], -x, y, sine, cosine, xOffset, yOffset);
+        this->TranslateRotation(&g_QuadVertices[3], x, y, sine, cosine, xOffset, yOffset);
+
+        g_QuadVertices[0].pos.z = g_QuadVertices[1].pos.z = g_QuadVertices[2].pos.z = g_QuadVertices[3].pos.z = vm->pos.z;
+
+        if (vm->anchor & 1)
+        {
+            g_QuadVertices[0].pos.x += x;
+            g_QuadVertices[1].pos.x += x;
+            g_QuadVertices[2].pos.x += x;
+            g_QuadVertices[3].pos.x += x;
+        }
+
+        if (vm->anchor & 2)
+        {
+            g_QuadVertices[0].pos.y += y;
+            g_QuadVertices[1].pos.y += y;
+            g_QuadVertices[2].pos.y += y;
+            g_QuadVertices[3].pos.y += y;
+        }
+    }
+    else
+    {
+        spriteHalfWidth = (vm->spriteSize.x * vm->scale.x) / 2.0f;
+        spriteHalfHeight = (vm->spriteSize.y * vm->scale.y) / 2.0f;
+
+        if ((vm->anchor & 1) == 0)
+        {
+            g_QuadVertices[0].pos.x = g_QuadVertices[2].pos.x = vm->pos.x - spriteHalfWidth;
+            g_QuadVertices[1].pos.x = g_QuadVertices[3].pos.x = spriteHalfWidth + vm->pos.x;
+        }
+        else
+        {
+            g_QuadVertices[0].pos.x = g_QuadVertices[2].pos.x = vm->pos.x;
+            g_QuadVertices[1].pos.x = g_QuadVertices[3].pos.x = spriteHalfWidth + vm->pos.x + spriteHalfWidth;
+        }
+
+        if ((vm->anchor & 2) == 0)
+        {
+            g_QuadVertices[0].pos.y = g_QuadVertices[1].pos.y = vm->pos.y - spriteHalfHeight;
+            g_QuadVertices[2].pos.y = g_QuadVertices[3].pos.y = spriteHalfHeight + vm->pos.y;
+        }
+        else
+        {
+            g_QuadVertices[0].pos.y = g_QuadVertices[1].pos.y = vm->pos.y;
+            g_QuadVertices[2].pos.y = g_QuadVertices[3].pos.y = spriteHalfHeight + vm->pos.y + spriteHalfHeight;
+        }
+
+        // Huh? So vertex Z is undefined if the Z rotation is 0? This
+        // appears to be a bug.
+
+        //g_QuadVertices[0].pos.z = g_QuadVertices[1].pos.z = g_QuadVertices[2].pos.z = g_QuadVertices[3].pos.z = vm->pos.z;
+    }
+
+    return this->DrawInner(vm, 0);
+}
+
 /* This is identical to DrawNoRotation except for 0 being passed to DrawInner,
  * which doesn't round and subtract 0.5 from each vertex.
  */

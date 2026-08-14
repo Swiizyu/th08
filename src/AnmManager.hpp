@@ -483,6 +483,7 @@ struct AnmManager
     void TranslateRotation(VertexTex1DiffuseXyzrhw *vertex, float x, float y, float sine, float cosine, float xOffset,
                            float yOffset);
     ZunResult Draw2D(AnmVm *vm);
+    ZunResult Draw2DNoRound(AnmVm *vm);
     ZunResult DrawNoRotationNoRound(AnmVm *vm);
     ZunResult DrawTriangleFan(AnmVm *vm, VertexDiffuseXyzrhw *vertices, i32 vertexCount);
     ZunResult CreateTextureFromFile(IDirect3DTexture8 **outTexture, i32 format, i32 colorKey);
