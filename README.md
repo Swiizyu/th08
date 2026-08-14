@@ -77,6 +77,8 @@ ninja on it.
 
 ### Diffing
 
+Please read our [Code of Conduct](CODE_OF_CONDUCT.md).
+
 In order to contribute to the decompilation, you are going to need reccmp
 ([Instructions](https://github.com/isledecomp/reccmp/tree/master?tab=readme-ov-file#getting-started)).
 
