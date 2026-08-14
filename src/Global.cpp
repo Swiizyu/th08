@@ -1173,7 +1173,7 @@ const char *GameErrorContext::Fatal(const char *fmt, ...)
 u16 Rng::GetRandomU16(void)
 {
     u16 temp = (this->seed ^ 0x9630) - 0x6553;
-    this->seed = (((temp & 0xc000) >> 14) + temp * 4) & 0xffff;
+    this->seed = (((temp & 0xc000) >> 14) + (temp << 2)) & 0xffff;
     this->generationCount++;
     return this->seed;
 }
