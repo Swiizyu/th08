@@ -1,5 +1,6 @@
 #include "th_pch.h"
 
+#include "SpellCard.hpp"
 #include "GameManager.hpp"
 #include "Global.hpp"
 #include "Gui.hpp"
@@ -11,6 +12,72 @@ namespace th08
 DIFFABLE_STATIC(GameManager, g_GameManager);
 DIFFABLE_STATIC(ChainElem, g_GameManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_GameManagerDrawChain);
+
+struct SpellcardMusicEntry
+{
+    i32 spellcardNumber;
+    i32 songNumber;
+    const char *songPath;
+    i32 songNameSpriteIdx;
+    ZunBool musicPausesInSpellPractice;
+};
+
+SpellcardMusicEntry g_SpellcardMusicInfo[] =
+{
+    { 1, 1,  "th08_00.mid", 0, FALSE },
+    { 12, 2, "th08_03.mid", 1, FALSE },
+    { 16, 3, "th08_04.mid", 0, FALSE },
+    { 31, 4, "th08_05.mid", 1, FALSE },
+    { 35, 5, "th08_06.mid", 0, FALSE },
+    { 53, 6, "th08_07.mid", 1, FALSE },
+    { 76, 8, "th08_09.mid", 1, FALSE },
+    { 99, 9, "th08_10.mid", 1, FALSE },
+    { 118, 11, "th08_12.mid", 1, FALSE },
+    { 122, 12, "th08_13.mid", 0, FALSE },
+    { 142, 13, "th08_14.mid", 1, FALSE },
+    { 146, 15, "th08_13b.mid", 2, TRUE },
+    { 150, 12, "th08_13.mid", 0, FALSE },
+    { 170, 14, "th08_15.mid", 1, FALSE },
+    { 190, 15, "th08_13b.mid", 2, TRUE },
+    { 193, 16, "th08_18.mid", 0, FALSE },
+    { 204, 17, "th08_19.mid", 1, FALSE },
+    { 222, 20, "th08_20.mid", 2, FALSE },
+    { -1, 0, " ", 0, FALSE }
+};
+
+ZunBool GameManager::ShouldPauseMusicInSpellPractice(i32 spellcardNumber)
+{
+    i32 i = 0;
+
+    while (g_SpellcardMusicInfo[i].spellcardNumber >= 0)
+    {
+        if (g_GameManager.currentSpellCardNumber <= g_SpellcardMusicInfo[i].spellcardNumber)
+        {
+            return g_SpellcardMusicInfo[i].musicPausesInSpellPractice;
+        }
+
+        i++;
+    }
+
+    return FALSE;
+}
+
+i32 GameManager::GetSongNameSpriteIdx(i32 spellcardNumber)
+{
+    i32 i = 0;
+
+    while (g_SpellcardMusicInfo[i].spellcardNumber >= 0)
+    {
+        if (g_GameManager.currentSpellCardNumber <= g_SpellcardMusicInfo[i].spellcardNumber)
+        {
+            return g_SpellcardMusicInfo[i].songNameSpriteIdx;
+        }
+
+        i++;
+    }
+
+    return FALSE;
+}
 
 // STUB: th08 0x4399ac
 ZunBool GameManager::IsWithinPlayfield()
