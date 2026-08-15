@@ -1173,7 +1173,7 @@ const char *GameErrorContext::Fatal(const char *fmt, ...)
 u16 Rng::GetRandomU16(void)
 {
     u16 temp = (this->seed ^ 0x9630) - 0x6553;
-    this->seed = (((temp & 0xc000) >> 14) + temp * 4) & 0xffff;
+    this->seed = (((temp & 0xc000) >> 14) + (temp << 2)) & 0xffff;
     this->generationCount++;
     return this->seed;
 }
@@ -1225,36 +1225,6 @@ void Rotate(Float3 *outVector, Float3 *point, f32 angle)
     f32 cosOut = cosf(angle);
     outVector->x = cosOut * point->x - sinOut * point->y;
     outVector->y = cosOut * point->y + sinOut * point->x;
-}
-
-ZunMemory::ZunMemory()
-{
-    this->bRegistryInUse = FALSE;
-}
-
-ZunMemory::~ZunMemory()
-{
-    if (this->bRegistryInUse)
-    {
-        for (i32 i = 0; i < ARRAY_SIZE_SIGNED(this->registry); i++)
-        {
-            if (this->registry[i] != NULL)
-            {
-                free(this->registry[i]);
-            }
-        }
-    }
-}
-
-GameErrorContext::GameErrorContext()
-{
-    this->bufferEnd = this->buffer;
-    this->bufferEnd[0] = '\0';
-    this->showMessageBox = false;
-}
-
-GameErrorContext::~GameErrorContext()
-{
 }
 
 }; // namespace th08

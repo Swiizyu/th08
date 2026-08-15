@@ -32,6 +32,17 @@ namespace th08
     g_ZunMemory.Free(p);                                                                                               \
     p = NULL;
 
+#define WINDOW_WIDTH 640
+#define WINDOW_HEIGHT 480
+
+#define ARCADE_LEFT 32
+#define ARCADE_TOP 16
+#define ARCADE_WIDTH 384
+#define ARCADE_HEIGHT 448
+
+#define ARCADE_RIGHT (ARCADE_LEFT + ARCADE_WIDTH)
+#define ARCADE_BOTTOM (ARCADE_TOP + ARCADE_HEIGHT)
+
 enum ChainCallbackResult
 {
     CHAIN_CALLBACK_RESULT_CONTINUE_AND_REMOVE_JOB = (unsigned int)0,
@@ -151,8 +162,12 @@ int WriteDataToFile(LPCSTR path, LPVOID data, size_t size);
 class GameErrorContext
 {
   public:
-    GameErrorContext();
-    ~GameErrorContext();
+    GameErrorContext()
+    {
+        this->bufferEnd = this->buffer;
+        this->bufferEnd[0] = '\0';
+        this->showMessageBox = false;
+    }
 
     void ResetContext()
     {
@@ -235,8 +250,23 @@ class Rng
 class ZunMemory
 {
   public:
-    ZunMemory();
-    ~ZunMemory();
+    ZunMemory()
+    {
+        this->bRegistryInUse = FALSE;
+    }
+    ~ZunMemory()
+    {
+        if (this->bRegistryInUse)
+        {
+            for (i32 i = 0; i < ARRAY_SIZE_SIGNED(this->registry); i++)
+            {
+                if (this->registry[i] != NULL)
+                {
+                    free(this->registry[i]);
+                }
+            }
+        }
+    }
 
     // NOTE: the default parameter for debugText is probably just __FILE__
     void *Alloc(size_t size, const char *debugText = "d:\\cygwin\\home\\zun\\prog\\th08\\global.h")
@@ -318,7 +348,7 @@ struct ZunGlobals
     i32 grazeInStage;
     u32 score;
     i32 graze;
-    i32 unk0x10;
+    i32 scoreIncrement;
     u32 displayedHighScore;
     u8 continuesUsedInHighScore;
     /* 3 bytes pad */
@@ -326,7 +356,7 @@ struct ZunGlobals
     i16 youkaiGaugeCopy;
     i16 youkaiGauge;
     i32 pointItemValue;
-    u8 clockTime;
+    i8 clockTime;
     u8 numRetries;
     /* 2 bytes pad */
     i32 pointItemsCollectedInStage;
@@ -356,6 +386,88 @@ struct ZunGlobals
 };
 
 C_ASSERT(sizeof(ZunGlobals) == 0xe4);
+
+/* ZUN name: FVector */
+struct Float3
+{
+    Float3()
+    {
+    }
+
+    Float3(float x, float y, float z);
+
+    void FromAngleMagnitude(float angle, float magnitude)
+    {
+        __asm
+        {
+            mov eax, this
+            fld angle
+            fsincos
+            fmul [magnitude]
+            fstp [eax] /* this->x */
+            fmul [magnitude]
+            fstp [eax + 4] /* this->y */
+        }
+    }
+
+    void FromRotatedVec2(float angle, float vecX, float vecY)
+    {
+        __asm
+        {
+            mov eax, this
+            fld angle
+            fsincos
+            fmul [vecX]
+            fstp [eax] /* this->x */
+            fmul [vecY]
+            fstp [eax + 4] /* this->y */
+        }
+    }
+
+    // FUNCTION: th08 0x40b460 FOLDED
+    operator float *()
+    {
+        return (float *)this;
+    }
+
+    Float3 *operator+=(const Float3 &other)
+    {
+        this->x += other.x;
+        this->y += other.y;
+        this->z += other.z;
+
+        return this;
+    }
+
+    Float3 *operator-=(const Float3 &other)
+    {
+        this->x -= other.x;
+        this->y -= other.y;
+        this->z -= other.z;
+
+        return this;
+    }
+
+    float x, y, z;
+};
+
+/* ZUN name: FVector2 */
+struct Float2
+{
+    float x;
+    float y;
+};
+
+struct ZunRect
+{
+    f32 left;
+    f32 top;
+    f32 right;
+    f32 bottom;
+};
+
+f32 AddNormalizeAngle(f32 a, f32 b);
+void Rotate(Float3 *outVector, Float3 *point, f32 angle);
 
 DIFFABLE_EXTERN(Rng, g_Rng);
 DIFFABLE_EXTERN(u16, g_CurFrameInput);

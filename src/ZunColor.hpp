@@ -18,7 +18,7 @@
 #define COLOR_COMBINE_ALPHA(color, alpha) (((alpha) & COLOR_ALPHA_MASK) | COLOR_RGB(color))
 
 union ZunColor {
-    u32 d3dColor;
+    i32 d3dColor;
     struct
     {
         u8 b;

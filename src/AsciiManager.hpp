@@ -1,4 +1,5 @@
 #pragma once
+
 #include "AnmManager.hpp"
 #include "Global.hpp"
 #include "Supervisor.hpp"
@@ -20,7 +21,7 @@ namespace th08
 struct PauseMenu
 {
     i32 OnUpdate();
-    i32 OnDraw();
+    void OnDraw();
 
     u32 curState;
     i32 numFrames;
@@ -33,7 +34,7 @@ C_ASSERT(sizeof(PauseMenu) == 0x1d14);
 struct RetryMenu
 {
     i32 OnUpdate();
-    i32 OnDraw();
+    void OnDraw();
 
     u32 curState;
     i32 numFrames;
@@ -174,7 +175,7 @@ struct AsciiManager
 
     i32 gaugeInterrupt;
     i32 spaceWidth;
-    u32 unk_8284;
+    u32 frameTimer;
 
     AnmLoaded *asciiAnm;
     AnmLoaded *captureAnm;
@@ -193,10 +194,10 @@ struct AsciiManager
     AsciiManagerPopup scorePopups[ASCII_MAX_SCORE_POPUPS + ASCII_MAX_PLAYER_POPUPS];
     AsciiManagerPopup timePopups[ASCII_MAX_TIME_POPUPS];
 
-    f32 unk_16f04;
-    i32 unk_16f08;
-
-    AnmVm unk_16f0c;
+    // Mystia Night blindness
+    f32 nightBlindnessRadius;
+    ZunColor nightBlindnessColor;
+    AnmVm nightBlindnessSprite;
 };
 
 C_ASSERT(sizeof(AsciiManager) == 0x171b0);

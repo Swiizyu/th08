@@ -167,10 +167,31 @@ class CStreamingSound : public CSound
     HRESULT UpdateFadeIn();
     HRESULT UpdatePartialFadeIn();
     HRESULT UpdatePartialFadeOut();
+
     void FadeOut(f32 seconds)
     {
         m_iFadeType = 1;
         m_iTotalFade = m_iCurFadeProgress = seconds * 60;
+    }
+
+    void FadeIn(f32 seconds)
+    {
+        m_iFadeType = 2;
+        m_iTotalFade = m_iCurFadeProgress = seconds * 60.0f;
+        SetVolume(-10000);
+    }
+
+    void PartialFadeOut(f32 seconds)
+    {
+        m_iFadeType = 4;
+        m_iTotalFade = m_iCurFadeProgress = seconds * 60.0f;
+    }
+
+    void PartialFadeIn(f32 seconds)
+    {
+        m_iFadeType = 3;
+        m_iTotalFade = m_iCurFadeProgress = seconds * 60.0f;
+        SetVolume(-1000);
     }
 };
 

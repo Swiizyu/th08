@@ -44,6 +44,11 @@ void Gui::CutChain()
 {
 }
 
+// STUB: th08 0x438f58
+void Gui::CaptureArcade()
+{
+}
+
 // STUB: th08 0x4390ee
 ZunResult Gui::ActualAddedCallback()
 {

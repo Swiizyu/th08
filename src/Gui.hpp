@@ -35,6 +35,7 @@ struct Gui
     static void CutChain();
 
     ZunResult ActualAddedCallback();
+    void CaptureArcade();
     ZunResult LoadMsg(const char *path);
     void FreeMsgFile();
 

@@ -1,7 +1,6 @@
 #pragma once
 #include "Supervisor.hpp"
 #include "ZunColor.hpp"
-#include "ZunMath.hpp"
 #include "ZunResult.hpp"
 #include "diffbuild.hpp"
 #include "dxutil.hpp"
@@ -297,6 +296,11 @@ struct AnmVmBase
         return this->visible;
     }
 
+    void SetInvisible()
+    {
+        this->visible = FALSE;
+    }
+
     void SetInterrupt(i16 interrupt)
     {
         this->pendingInterrupt = interrupt;
@@ -415,8 +419,9 @@ struct AnmLoaded
     int numberEntriesToBeLoaded;
 
     void LoadSprite(i32 spriteIdx, AnmLoadedSprite *loadedSprite);
+    ZunResult SetSprite(AnmVm *vm, i32 spriteIdx);
 
-    void ExecuteAnmIdx(AnmVm *vm, int scriptIdx)
+    void ExecuteAnmIdx(AnmVm *vm, i32 scriptIdx)
     {
         vm->scriptIndex = scriptIdx;
 
@@ -429,7 +434,7 @@ struct AnmLoaded
         this->SetAndExecuteScript(vm, this->scripts[scriptIdx]);
     }
 
-    AnmLoadedSprite *GetSprite(int sprite)
+    AnmLoadedSprite *GetSprite(u32 sprite)
     {
         return &this->sprites[sprite];
     }
@@ -441,7 +446,7 @@ struct AnmLoaded
         this->SetSprite(vm, sprite);
     }
 
-    void SetAndExecuteScriptIdx(AnmVm *vm, int scriptIdx)
+    void SetAndExecuteScriptIdx(AnmVm *vm, i32 scriptIdx)
     {
         vm->anmFile = this;
         vm->scriptIndex = scriptIdx;
@@ -449,7 +454,6 @@ struct AnmLoaded
     }
 
     void ExecuteAnmIdxArray(AnmVm *vm, i32 scriptIdx, i32 count);
-    ZunResult SetSprite(AnmVm *vm, int spriteIdx);
     void SetAndExecuteScript(AnmVm *vm, AnmRawInstr *beginningOfScript);
 };
 
@@ -475,10 +479,6 @@ struct AnmManager
     AnmManager();
     void SetupVertexBuffer();
 
-    // FUNCTION: th08 0x43ef40 FOLDED
-    ~AnmManager()
-    {
-    }
     ZunBool ExecuteScript(AnmVm *vm);
     void ExecuteScriptArray(AnmVm *sprites, int count);
     void SetRenderStateForVm(AnmVm *vm);
@@ -488,6 +488,7 @@ struct AnmManager
     void TranslateRotation(VertexTex1DiffuseXyzrhw *vertex, float x, float y, float sine, float cosine, float xOffset,
                            float yOffset);
     ZunResult Draw2D(AnmVm *vm);
+    ZunResult Draw2DNoRound(AnmVm *vm);
     ZunResult DrawNoRotationNoRound(AnmVm *vm);
     ZunResult DrawTriangleFan(AnmVm *vm, VertexDiffuseXyzrhw *vertices, i32 vertexCount);
     ZunResult CreateTextureFromFile(IDirect3DTexture8 **outTexture, i32 format, i32 colorKey);
@@ -625,12 +626,18 @@ struct AnmManager
         this->color.d3dColor = color;
     }
 
-    void RequestCapture(i32 captureSurfaceIdx, i32 srcX, i32 srcY, i32 srcW, i32 srcH, i32 dstX, i32 dstY, i32 dstW,
-                        i32 dstH)
+    // This function exists according to PoFV
+    IDirect3DSurface8 *GetSurface(i32 surfaceIdx)
+    {
+        return this->surfaces[surfaceIdx];
+    }
+
+    ZunResult SetSurfaceCaptureParams(i32 captureSurfaceIdx, i32 srcX, i32 srcY, i32 srcW, i32 srcH, i32 dstX, i32 dstY,
+                                      i32 dstW, i32 dstH)
     {
         if (this->captureSurfaceIdx >= 0)
         {
-            return;
+            return ZUN_ERROR;
         }
 
         this->captureSurfaceIdx = captureSurfaceIdx;
@@ -642,6 +649,29 @@ struct AnmManager
         this->surfaceCaptureDstY = dstY;
         this->surfaceCaptureDstW = dstW;
         this->surfaceCaptureDstH = dstH;
+
+        return ZUN_SUCCESS;
+    }
+
+    ZunResult SetTextureCaptureParams(i32 idx, i32 srcX, i32 srcY, i32 srcW, i32 srcH, i32 dstX, i32 dstY, i32 dstW,
+                                      i32 dstH)
+    {
+        if (this->captureAnmIdx >= 0)
+        {
+            return ZUN_ERROR;
+        }
+
+        this->captureAnmIdx = idx;
+        this->textureCaptureSrcX = srcX;
+        this->textureCaptureSrcY = srcY;
+        this->textureCaptureSrcW = srcW;
+        this->textureCaptureSrcH = srcH;
+        this->textureCaptureDstX = dstX;
+        this->textureCaptureDstY = dstY;
+        this->textureCaptureDstW = dstW;
+        this->textureCaptureDstH = dstH;
+
+        return ZUN_SUCCESS;
     }
 
     void ReplaceSurface(i32 destIndex, i32 srcIndex)

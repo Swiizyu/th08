@@ -15,6 +15,7 @@
 #include "Supervisor.hpp"
 #include "TextHelper.hpp"
 #include "TitleScreen.hpp"
+#include "ZunMath.hpp"
 #include "i18n.hpp"
 #include "utils.hpp"
 #include <WinBase.h>
@@ -333,15 +334,40 @@ ChainCallbackResult Supervisor::DrawFpsCounter(Supervisor *s)
 
 ChainCallbackResult Supervisor::OnDraw2(Supervisor *s)
 {
-    if (s->loadingVmsHaveBeenSetup > 2)
+    if (s->loadingVmsHaveBeenSetup >= 2)
     {
         s->loadingVmsHaveBeenSetup++;
-        if (s->loadingVmsHaveBeenSetup > 5)
+        if (s->loadingVmsHaveBeenSetup >= 5)
         {
-            if (s->loadingVmsHaveBeenSetup > 35)
+            Float3 pos;
+
+            pos.x = 288.0f;
+            pos.y = 454.0f;
+            pos.z = 0.0f;
+
+            g_AsciiManager.SetScale(0.5f, 0.5f);
+
+            if (s->loadingVmsHaveBeenSetup < 35)
             {
+                i32 alpha = 255 - ((s->loadingVmsHaveBeenSetup - 5) * 128) / 30;
+
+                g_AsciiManager.color.a = alpha;
             }
-            if (s->loadingVmsHaveBeenSetup > 64)
+            else
+            {
+                i32 alpha = 255 - ((65 - s->loadingVmsHaveBeenSetup) * 128) / 30;
+
+                g_AsciiManager.color.a = alpha;
+            }
+
+            g_AsciiManager.AddFormatText(&pos, "Press Shot Button");
+
+            g_AsciiManager.SetScale(1.0f, 1.0f);
+
+            g_AsciiManager.OnDrawLowPrioImpl();
+            g_AsciiManager.ResetStrings();
+
+            if (s->loadingVmsHaveBeenSetup >= 65)
             {
                 s->loadingVmsHaveBeenSetup = 5;
             }
@@ -354,7 +380,7 @@ ChainCallbackResult Supervisor::OnDraw2(Supervisor *s)
     else
     {
         /* ZUN bloat: no need to check because ReleaseSurface does that already. */
-        if (g_AnmManager->surfaces[8] != NULL)
+        if (g_AnmManager->GetSurface(8) != NULL)
         {
             g_AnmManager->ReleaseSurface(8);
         }
@@ -1389,7 +1415,7 @@ void Supervisor::SetupLoadingVmsAndInitCapture(Float3 *position)
         g_SupervisorLoadingVms[2].pos = *position;
     }
 
-    g_AnmManager->RequestCapture(8, 0, 0, 640, 480, 0, 0, 640, 480);
+    g_AnmManager->SetSurfaceCaptureParams(8, 0, 0, 640, 480, 0, 0, 640, 480);
 }
 
 void Supervisor::StartEffect(i32 idx)

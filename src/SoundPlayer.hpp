@@ -121,7 +121,41 @@ class SoundPlayer
         }
     }
 
-    void QueueSetVolumeCommand()
+    void FadeIn(float seconds)
+    {
+        if (this->bgm != NULL)
+        {
+            this->bgm->FadeIn(seconds);
+        }
+    }
+
+    void PartialFadeOut(float seconds)
+    {
+        if (this->bgm != NULL)
+        {
+            this->bgm->PartialFadeOut(seconds);
+        }
+    }
+
+    void PartialFadeIn(float seconds)
+    {
+        if (this->bgm != NULL)
+        {
+            this->bgm->PartialFadeIn(seconds);
+        }
+    }
+
+    void Pause()
+    {
+        this->QueueCommand(6, 0, "Pause");
+    }
+
+    void Unpause()
+    {
+        this->QueueCommand(7, 0, "UnPause");
+    }
+
+    void SetVolume()
     {
         this->QueueCommand(8, 0, "SetVol");
     }
