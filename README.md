@@ -1,7 +1,6 @@
 # 東方永夜抄　～ Imperishable Night
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="resources/progress_dark.svg">
   <img alt="Decomp Progress" src="resources/progress.svg">
 </picture>
 
