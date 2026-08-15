@@ -1,8 +1,8 @@
 #pragma once
 #include "inttypes.hpp"
 
-#include <math.h>
 #include <d3dx8math.h>
+#include <math.h>
 
 #include "Float3.hpp"
 
@@ -30,4 +30,4 @@ inline void IncrementIfBelow(u32 *value, u32 threshold)
     }
 }
 
-}
+} // namespace th08

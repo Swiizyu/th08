@@ -32,16 +32,16 @@ namespace th08
     g_ZunMemory.Free(p);                                                                                               \
     p = NULL;
 
-#define WINDOW_WIDTH     640
-#define WINDOW_HEIGHT    480
+#define WINDOW_WIDTH 640
+#define WINDOW_HEIGHT 480
 
-#define ARCADE_LEFT      32
-#define ARCADE_TOP       16
-#define ARCADE_WIDTH     384
-#define ARCADE_HEIGHT    448
+#define ARCADE_LEFT 32
+#define ARCADE_TOP 16
+#define ARCADE_WIDTH 384
+#define ARCADE_HEIGHT 448
 
-#define ARCADE_RIGHT     (ARCADE_LEFT + ARCADE_WIDTH)
-#define ARCADE_BOTTOM    (ARCADE_TOP + ARCADE_HEIGHT)
+#define ARCADE_RIGHT (ARCADE_LEFT + ARCADE_WIDTH)
+#define ARCADE_BOTTOM (ARCADE_TOP + ARCADE_HEIGHT)
 
 enum ChainCallbackResult
 {
@@ -427,7 +427,7 @@ struct Float3
     // FUNCTION: th08 0x40b460 FOLDED
     operator float *()
     {
-        return (float *) this;
+        return (float *)this;
     }
 
     Float3 *operator+=(const Float3 &other)

@@ -1292,7 +1292,8 @@ ZunResult AnmManager::Draw2DNoRound(AnmVm *vm)
         this->TranslateRotation(&g_QuadVertices[2], -x, y, sine, cosine, xOffset, yOffset);
         this->TranslateRotation(&g_QuadVertices[3], x, y, sine, cosine, xOffset, yOffset);
 
-        g_QuadVertices[0].pos.z = g_QuadVertices[1].pos.z = g_QuadVertices[2].pos.z = g_QuadVertices[3].pos.z = vm->pos.z;
+        g_QuadVertices[0].pos.z = g_QuadVertices[1].pos.z = g_QuadVertices[2].pos.z = g_QuadVertices[3].pos.z =
+            vm->pos.z;
 
         if (vm->anchor & 1)
         {
@@ -1340,7 +1341,8 @@ ZunResult AnmManager::Draw2DNoRound(AnmVm *vm)
         // Huh? So vertex Z is undefined if the Z rotation is 0? This
         // appears to be a bug.
 
-        //g_QuadVertices[0].pos.z = g_QuadVertices[1].pos.z = g_QuadVertices[2].pos.z = g_QuadVertices[3].pos.z = vm->pos.z;
+        // g_QuadVertices[0].pos.z = g_QuadVertices[1].pos.z = g_QuadVertices[2].pos.z = g_QuadVertices[3].pos.z =
+        // vm->pos.z;
     }
 
     return this->DrawInner(vm, 0);

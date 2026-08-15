@@ -1,8 +1,8 @@
 #pragma once
 
+#include "AnmManager.hpp"
 #include "Global.hpp"
 #include "Supervisor.hpp"
-#include "AnmManager.hpp"
 #include "ZunColor.hpp"
 #include "ZunResult.hpp"
 #include "diffbuild.hpp"

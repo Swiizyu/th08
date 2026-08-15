@@ -387,7 +387,6 @@ struct ZunTimer
         return (float)this->current + (float)this->subFrame;
     }
 
-
     ZunBool operator<(int value)
     {
         return this->current < value;

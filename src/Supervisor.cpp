@@ -15,9 +15,9 @@
 #include "Supervisor.hpp"
 #include "TextHelper.hpp"
 #include "TitleScreen.hpp"
+#include "ZunMath.hpp"
 #include "i18n.hpp"
 #include "utils.hpp"
-#include "ZunMath.hpp"
 #include <WinBase.h>
 #include <d3dx8.h>
 #include <direct.h>
@@ -352,7 +352,6 @@ ChainCallbackResult Supervisor::OnDraw2(Supervisor *s)
                 i32 alpha = 255 - ((s->loadingVmsHaveBeenSetup - 5) * 128) / 30;
 
                 g_AsciiManager.color.a = alpha;
-
             }
             else
             {

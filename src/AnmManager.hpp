@@ -632,8 +632,8 @@ struct AnmManager
         return this->surfaces[surfaceIdx];
     }
 
-    ZunResult SetSurfaceCaptureParams(i32 captureSurfaceIdx, i32 srcX, i32 srcY, i32 srcW, i32 srcH, i32 dstX, i32 dstY, i32 dstW,
-                        i32 dstH)
+    ZunResult SetSurfaceCaptureParams(i32 captureSurfaceIdx, i32 srcX, i32 srcY, i32 srcW, i32 srcH, i32 dstX, i32 dstY,
+                                      i32 dstW, i32 dstH)
     {
         if (this->captureSurfaceIdx >= 0)
         {
@@ -654,7 +654,7 @@ struct AnmManager
     }
 
     ZunResult SetTextureCaptureParams(i32 idx, i32 srcX, i32 srcY, i32 srcW, i32 srcH, i32 dstX, i32 dstY, i32 dstW,
-                        i32 dstH)
+                                      i32 dstH)
     {
         if (this->captureAnmIdx >= 0)
         {

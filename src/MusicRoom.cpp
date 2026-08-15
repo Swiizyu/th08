@@ -4,8 +4,8 @@
 #include "GameManager.hpp"
 #include "MusicRoom.hpp"
 #include "SoundPlayer.hpp"
-#include "i18n.hpp"
 #include "ZunMath.hpp"
+#include "i18n.hpp"
 
 namespace th08
 {

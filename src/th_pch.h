@@ -5,6 +5,6 @@
 #include <windows.h>
 
 #include "AnmManager.hpp"
-#include "SoundPlayer.hpp"
-#include "GameManager.hpp"
 #include "AsciiManager.hpp"
+#include "GameManager.hpp"
+#include "SoundPlayer.hpp"

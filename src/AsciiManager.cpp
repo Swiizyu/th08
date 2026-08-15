@@ -1,12 +1,12 @@
 #include "th_pch.h"
 
 #include "AsciiManager.hpp"
+#include "Gui.hpp"
+#include "Player.hpp"
+#include "ResultScreen.hpp"
+#include "ScreenEffect.hpp"
 #include "SpellCard.hpp"
 #include "ZunMath.hpp"
-#include "ScreenEffect.hpp"
-#include "Player.hpp"
-#include "Gui.hpp"
-#include "ResultScreen.hpp"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -20,95 +20,95 @@ DIFFABLE_STATIC(ChainElem, g_AsciiManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_AsciiManagerDrawChainHighPrio);
 
 // Sprite indices
-#define ASCII_SPRITE_SMALL_SCORE_0          0
-#define ASCII_SPRITE_EXCLAMATION_POINT      32
-#define ASCII_SPRITE_BEGIN_TEXT             ASCII_SPRITE_EXCLAMATION_POINT
-#define ASCII_SPRITE_PERCENTAGE_0           136
-#define ASCII_SPRITE_PERCENTAGE_PERIOD      147
-#define ASCII_SPRITE_PERCENTAGE_DASH        148
+#define ASCII_SPRITE_SMALL_SCORE_0 0
+#define ASCII_SPRITE_EXCLAMATION_POINT 32
+#define ASCII_SPRITE_BEGIN_TEXT ASCII_SPRITE_EXCLAMATION_POINT
+#define ASCII_SPRITE_PERCENTAGE_0 136
+#define ASCII_SPRITE_PERCENTAGE_PERIOD 147
+#define ASCII_SPRITE_PERCENTAGE_DASH 148
 
 // Script indices
-#define ASCII_SCRIPT_PERCENTAGE_TEXT        4
-#define ASCII_SCRIPT_YOUKAI_GAUGE           5
-#define ASCII_SCRIPT_YOUKAI_GAUGE_HUMAN     6
-#define ASCII_SCRIPT_YOUKAI_GAUGE_YOUKAI    7
-#define ASCII_SCRIPT_YOUKAI_GAUGE_CURSOR    8
-#define ASCII_SCRIPT_CHERRY_BORDER          9
-#define ASCII_SCRIPT_BOSS_MARKER            10
-#define ASCII_SCRIPT_DEMO                   11
-#define ASCII_SCRIPT_PAUSE                  12
-#define ASCII_SCRIPT_RETURN_TO_GAME         13
-#define ASCII_SCRIPT_QUIT                   14
-#define ASCII_SCRIPT_RESTART                15
-#define ASCII_SCRIPT_CONFIRM                16
-#define ASCII_SCRIPT_YES                    17
-#define ASCII_SCRIPT_NO                     18
-#define ASCII_SCRIPT_DIFFICULTY             19
-#define ASCII_SCRIPT_PRACTICE               20
-#define ASCII_SCRIPT_SLOW_MODE              21
-#define ASCII_SCRIPT_RETRY                  22
-#define ASCII_SCRIPT_RETRY_YES              23
-#define ASCII_SCRIPT_RETRY_NO               24
-#define ASCII_SCRIPT_HUD_DIFFICULTY         25
-#define ASCII_SCRIPT_NULLIFY                26
+#define ASCII_SCRIPT_PERCENTAGE_TEXT 4
+#define ASCII_SCRIPT_YOUKAI_GAUGE 5
+#define ASCII_SCRIPT_YOUKAI_GAUGE_HUMAN 6
+#define ASCII_SCRIPT_YOUKAI_GAUGE_YOUKAI 7
+#define ASCII_SCRIPT_YOUKAI_GAUGE_CURSOR 8
+#define ASCII_SCRIPT_CHERRY_BORDER 9
+#define ASCII_SCRIPT_BOSS_MARKER 10
+#define ASCII_SCRIPT_DEMO 11
+#define ASCII_SCRIPT_PAUSE 12
+#define ASCII_SCRIPT_RETURN_TO_GAME 13
+#define ASCII_SCRIPT_QUIT 14
+#define ASCII_SCRIPT_RESTART 15
+#define ASCII_SCRIPT_CONFIRM 16
+#define ASCII_SCRIPT_YES 17
+#define ASCII_SCRIPT_NO 18
+#define ASCII_SCRIPT_DIFFICULTY 19
+#define ASCII_SCRIPT_PRACTICE 20
+#define ASCII_SCRIPT_SLOW_MODE 21
+#define ASCII_SCRIPT_RETRY 22
+#define ASCII_SCRIPT_RETRY_YES 23
+#define ASCII_SCRIPT_RETRY_NO 24
+#define ASCII_SCRIPT_HUD_DIFFICULTY 25
+#define ASCII_SCRIPT_NULLIFY 26
 
-#define CAPTURE_SCRIPT_MENU_BACKGROUND      0
+#define CAPTURE_SCRIPT_MENU_BACKGROUND 0
 
 // Interrupts
-#define ASCII_INTERRUPT_SHOW                1
-#define ASCII_INTERRUPT_HIDE                2
+#define ASCII_INTERRUPT_SHOW 1
+#define ASCII_INTERRUPT_HIDE 2
 
-#define ASCII_INTERRUPT_BACKGROUND_HIDE     1
+#define ASCII_INTERRUPT_BACKGROUND_HIDE 1
 
-#define ASCII_INTERRUPT_CLOCKTIME_FLIP      1
+#define ASCII_INTERRUPT_CLOCKTIME_FLIP 1
 
-#define PAUSE_SPRITE(i)                     (i - ASCII_SCRIPT_PAUSE)
+#define PAUSE_SPRITE(i) (i - ASCII_SCRIPT_PAUSE)
 
-#define PAUSE_SPRITE_PAUSED                 PAUSE_SPRITE(ASCII_SCRIPT_PAUSE)
-#define PAUSE_SPRITE_RETURN_TO_GAME         PAUSE_SPRITE(ASCII_SCRIPT_RETURN_TO_GAME)
-#define PAUSE_SPRITE_QUIT                   PAUSE_SPRITE(ASCII_SCRIPT_QUIT)
-#define PAUSE_SPRITE_RESTART                PAUSE_SPRITE(ASCII_SCRIPT_RESTART)
-#define PAUSE_SPRITE_CONFIRM                PAUSE_SPRITE(ASCII_SCRIPT_CONFIRM)
+#define PAUSE_SPRITE_PAUSED PAUSE_SPRITE(ASCII_SCRIPT_PAUSE)
+#define PAUSE_SPRITE_RETURN_TO_GAME PAUSE_SPRITE(ASCII_SCRIPT_RETURN_TO_GAME)
+#define PAUSE_SPRITE_QUIT PAUSE_SPRITE(ASCII_SCRIPT_QUIT)
+#define PAUSE_SPRITE_RESTART PAUSE_SPRITE(ASCII_SCRIPT_RESTART)
+#define PAUSE_SPRITE_CONFIRM PAUSE_SPRITE(ASCII_SCRIPT_CONFIRM)
 
-#define PAUSE_SPRITE_YES                    PAUSE_SPRITE(ASCII_SCRIPT_YES)
-#define PAUSE_SPRITE_NO                     PAUSE_SPRITE(ASCII_SCRIPT_NO)
+#define PAUSE_SPRITE_YES PAUSE_SPRITE(ASCII_SCRIPT_YES)
+#define PAUSE_SPRITE_NO PAUSE_SPRITE(ASCII_SCRIPT_NO)
 
-#define PAUSE_SPRITE_DIFFICULTY             PAUSE_SPRITE(ASCII_SCRIPT_DIFFICULTY)
-#define PAUSE_SPRITE_PRACTICE_MODE          PAUSE_SPRITE(ASCII_SCRIPT_PRACTICE)
-#define PAUSE_SPRITE_SLOW_MODE              PAUSE_SPRITE(ASCII_SCRIPT_SLOW_MODE)
+#define PAUSE_SPRITE_DIFFICULTY PAUSE_SPRITE(ASCII_SCRIPT_DIFFICULTY)
+#define PAUSE_SPRITE_PRACTICE_MODE PAUSE_SPRITE(ASCII_SCRIPT_PRACTICE)
+#define PAUSE_SPRITE_SLOW_MODE PAUSE_SPRITE(ASCII_SCRIPT_SLOW_MODE)
 
-#define RETRY_SPRITE(i)                     (i - ASCII_SCRIPT_RETRY)
+#define RETRY_SPRITE(i) (i - ASCII_SCRIPT_RETRY)
 
-#define RETRY_SPRITE_RETRY                  RETRY_SPRITE(ASCII_SCRIPT_RETRY)
-#define RETRY_SPRITE_YES                    RETRY_SPRITE(ASCII_SCRIPT_RETRY_YES)
-#define RETRY_SPRITE_NO                     RETRY_SPRITE(ASCII_SCRIPT_RETRY_NO)
-#define RETRY_SPRITE_CLOCKTIME              3
+#define RETRY_SPRITE_RETRY RETRY_SPRITE(ASCII_SCRIPT_RETRY)
+#define RETRY_SPRITE_YES RETRY_SPRITE(ASCII_SCRIPT_RETRY_YES)
+#define RETRY_SPRITE_NO RETRY_SPRITE(ASCII_SCRIPT_RETRY_NO)
+#define RETRY_SPRITE_CLOCKTIME 3
 
-#define COLOR_MENU_ITEM_SELECTED            0xffff8080
-#define COLOR_MENU_ITEM_NORMAL              0xff505050
+#define COLOR_MENU_ITEM_SELECTED 0xffff8080
+#define COLOR_MENU_ITEM_NORMAL 0xff505050
 
 enum
 {
-    PAUSE_MENU_STATE_INIT                           = 0,
-    PAUSE_MENU_STATE_RETURN_TO_GAME_SELECTED        = 1,
-    PAUSE_MENU_STATE_RETURN_TO_TITLE_SELECTED       = 2,
-    PAUSE_MENU_STATE_RETRY_SELECTED                 = 3,
-    PAUSE_MENU_STATE_CLOSING                        = 4,
-    PAUSE_MENU_STATE_RETURN_TO_GAME_YES_SELECTED    = 5,
-    PAUSE_MENU_STATE_RETURN_TO_GAME_NO_SELECTED     = 6,
-    PAUSE_MENU_STATE_RETURN_TO_TITLE_YES_SELECTED   = 7,
-    PAUSE_MENU_STATE_RETURN_TO_TITLE_NO_SELECTED    = 8,
-    PAUSE_MENU_STATE_EXIT_TO_TITLE                  = 9,
-    PAUSE_MENU_STATE_RESTART_GAME                   = 10
+    PAUSE_MENU_STATE_INIT = 0,
+    PAUSE_MENU_STATE_RETURN_TO_GAME_SELECTED = 1,
+    PAUSE_MENU_STATE_RETURN_TO_TITLE_SELECTED = 2,
+    PAUSE_MENU_STATE_RETRY_SELECTED = 3,
+    PAUSE_MENU_STATE_CLOSING = 4,
+    PAUSE_MENU_STATE_RETURN_TO_GAME_YES_SELECTED = 5,
+    PAUSE_MENU_STATE_RETURN_TO_GAME_NO_SELECTED = 6,
+    PAUSE_MENU_STATE_RETURN_TO_TITLE_YES_SELECTED = 7,
+    PAUSE_MENU_STATE_RETURN_TO_TITLE_NO_SELECTED = 8,
+    PAUSE_MENU_STATE_EXIT_TO_TITLE = 9,
+    PAUSE_MENU_STATE_RESTART_GAME = 10
 };
 
 enum
 {
-    RETRY_MENU_STATE_INIT           = 0,
-    RETRY_MENU_STATE_YES_SELECTED   = 1,
-    RETRY_MENU_STATE_NO_SELECTED    = 2,
-    RETRY_MENU_STATE_RETRY          = 3,
-    RETRY_MENU_STATE_EXIT_TO_TITLE  = 4,
+    RETRY_MENU_STATE_INIT = 0,
+    RETRY_MENU_STATE_YES_SELECTED = 1,
+    RETRY_MENU_STATE_NO_SELECTED = 2,
+    RETRY_MENU_STATE_RETRY = 3,
+    RETRY_MENU_STATE_EXIT_TO_TITLE = 4,
 };
 
 #pragma var_order(i, popup)
@@ -819,7 +819,8 @@ i32 PauseMenu::OnUpdate()
         }
         else
         {
-            g_AsciiManager.asciiAnm->SetSprite(&this->menuSprites[PAUSE_SPRITE_DIFFICULTY], g_GameManager.difficulty + 283);
+            g_AsciiManager.asciiAnm->SetSprite(&this->menuSprites[PAUSE_SPRITE_DIFFICULTY],
+                                               g_GameManager.difficulty + 283);
         }
 
         if (!g_GameManager.IsPracticeMode())
@@ -845,11 +846,7 @@ i32 PauseMenu::OnUpdate()
             g_AsciiManager.captureAnm->SetAndExecuteScriptIdx(&this->menuBackground, CAPTURE_SCRIPT_MENU_BACKGROUND);
 
             // Seemingly intentionally the width and height are switched?
-            if (g_AnmManager->SetTextureCaptureParams(3,
-                                                      ARCADE_LEFT,
-                                                      ARCADE_TOP,
-                                                      ARCADE_WIDTH,
-                                                      ARCADE_HEIGHT,
+            if (g_AnmManager->SetTextureCaptureParams(3, ARCADE_LEFT, ARCADE_TOP, ARCADE_WIDTH, ARCADE_HEIGHT,
                                                       this->menuBackground.loadedSprite->startPixelInclusive.x,
                                                       this->menuBackground.loadedSprite->startPixelInclusive.y,
                                                       this->menuBackground.loadedSprite->heightPx,
@@ -870,10 +867,12 @@ i32 PauseMenu::OnUpdate()
         // fallthrough
     case PAUSE_MENU_STATE_RETURN_TO_GAME_SELECTED:
         this->menuSprites[PAUSE_SPRITE_RETURN_TO_GAME].color1.d3dColor = COLOR_WHITE;
-        this->menuSprites[PAUSE_SPRITE_QUIT].color1.d3dColor = this->menuSprites[PAUSE_SPRITE_RESTART].color1.d3dColor = COLOR_MENU_ITEM_NORMAL;
+        this->menuSprites[PAUSE_SPRITE_QUIT].color1.d3dColor = this->menuSprites[PAUSE_SPRITE_RESTART].color1.d3dColor =
+            COLOR_MENU_ITEM_NORMAL;
 
         this->menuSprites[PAUSE_SPRITE_RETURN_TO_GAME].pos2 = Float3(-4.0f, -4.0f, 0.0f);
-        this->menuSprites[PAUSE_SPRITE_QUIT].pos2 = this->menuSprites[PAUSE_SPRITE_RESTART].pos2 = Float3(0.0f, 0.0f, 0.0f);
+        this->menuSprites[PAUSE_SPRITE_QUIT].pos2 = this->menuSprites[PAUSE_SPRITE_RESTART].pos2 =
+            Float3(0.0f, 0.0f, 0.0f);
 
         if (this->numFrames >= 4)
         {
@@ -913,10 +912,12 @@ i32 PauseMenu::OnUpdate()
         }
         break;
     case PAUSE_MENU_STATE_RETURN_TO_TITLE_SELECTED:
-        this->menuSprites[PAUSE_SPRITE_RETURN_TO_GAME].color1.d3dColor = this->menuSprites[PAUSE_SPRITE_RESTART].color1.d3dColor = COLOR_MENU_ITEM_NORMAL;
+        this->menuSprites[PAUSE_SPRITE_RETURN_TO_GAME].color1.d3dColor =
+            this->menuSprites[PAUSE_SPRITE_RESTART].color1.d3dColor = COLOR_MENU_ITEM_NORMAL;
         this->menuSprites[PAUSE_SPRITE_QUIT].color1.d3dColor = COLOR_WHITE;
 
-        this->menuSprites[PAUSE_SPRITE_RETURN_TO_GAME].pos2 = this->menuSprites[PAUSE_SPRITE_RESTART].pos2 = Float3(0.0f, 0.0f, 0.0f);
+        this->menuSprites[PAUSE_SPRITE_RETURN_TO_GAME].pos2 = this->menuSprites[PAUSE_SPRITE_RESTART].pos2 =
+            Float3(0.0f, 0.0f, 0.0f);
         this->menuSprites[PAUSE_SPRITE_QUIT].pos2 = Float3(-4.0f, -4.0f, 0.0f);
 
         if (this->numFrames >= 4)
@@ -960,10 +961,12 @@ i32 PauseMenu::OnUpdate()
         }
         break;
     case PAUSE_MENU_STATE_RETRY_SELECTED:
-        this->menuSprites[PAUSE_SPRITE_RETURN_TO_GAME].color1.d3dColor = this->menuSprites[PAUSE_SPRITE_QUIT].color1.d3dColor = COLOR_MENU_ITEM_NORMAL;
+        this->menuSprites[PAUSE_SPRITE_RETURN_TO_GAME].color1.d3dColor =
+            this->menuSprites[PAUSE_SPRITE_QUIT].color1.d3dColor = COLOR_MENU_ITEM_NORMAL;
         this->menuSprites[PAUSE_SPRITE_RESTART].color1.d3dColor = COLOR_WHITE;
 
-        this->menuSprites[PAUSE_SPRITE_RETURN_TO_GAME].pos2 = this->menuSprites[PAUSE_SPRITE_QUIT].pos2 = Float3(0.0f, 0.0f, 0.0f);
+        this->menuSprites[PAUSE_SPRITE_RETURN_TO_GAME].pos2 = this->menuSprites[PAUSE_SPRITE_QUIT].pos2 =
+            Float3(0.0f, 0.0f, 0.0f);
         this->menuSprites[PAUSE_SPRITE_RESTART].pos2 = Float3(-4.0f, -4.0f, 0.0f);
 
         if (this->numFrames >= 4)
@@ -1127,7 +1130,8 @@ i32 PauseMenu::OnUpdate()
     case PAUSE_MENU_STATE_RESTART_GAME:
         if (this->numFrames >= 20)
         {
-            if (!g_GameManager.IsSpellPractice() && !g_GameManager.IsPracticeMode() && g_GameManager.difficulty != EXTRA)
+            if (!g_GameManager.IsSpellPractice() && !g_GameManager.IsPracticeMode() &&
+                g_GameManager.difficulty != EXTRA)
             {
                 this->curState = PAUSE_MENU_STATE_INIT;
                 g_Supervisor.curState = SupervisorState_GameManagerRestartFromBeginning;
@@ -1136,7 +1140,8 @@ i32 PauseMenu::OnUpdate()
             }
             else
             {
-                if (g_GameManager.IsSpellPractice() && !GameManager::ShouldPauseMusicInSpellPractice(g_GameManager.currentSpellCardNumber))
+                if (g_GameManager.IsSpellPractice() &&
+                    !GameManager::ShouldPauseMusicInSpellPractice(g_GameManager.currentSpellCardNumber))
                 {
                     g_SoundPlayer.Unpause();
                     g_SoundPlayer.FadeIn(2.0f);
@@ -1232,8 +1237,8 @@ i32 RetryMenu::OnUpdate()
     case RETRY_MENU_STATE_INIT:
         if (this->numFrames == 0)
         {
-            if (!g_GameManager.IsSpellPractice() && g_GameManager.difficulty < EXTRA
-                && (g_GameManager.GetClockTime() >= 11 || g_GameManager.currentStage == STAGE6B))
+            if (!g_GameManager.IsSpellPractice() && g_GameManager.difficulty < EXTRA &&
+                (g_GameManager.GetClockTime() >= 11 || g_GameManager.currentStage == STAGE6B))
             {
                 g_GameManager.showRetryMenu = FALSE;
                 g_GameManager.globals->displayScore = g_GameManager.globals->score;
@@ -1251,7 +1256,8 @@ i32 RetryMenu::OnUpdate()
                 return 1;
             }
 
-            if (g_GameManager.IsSpellPractice() && !GameManager::ShouldPauseMusicInSpellPractice(g_GameManager.currentSpellCardNumber))
+            if (g_GameManager.IsSpellPractice() &&
+                !GameManager::ShouldPauseMusicInSpellPractice(g_GameManager.currentSpellCardNumber))
             {
                 g_SoundPlayer.PartialFadeOut(1.0f);
             }
@@ -1274,11 +1280,7 @@ i32 RetryMenu::OnUpdate()
                 g_AsciiManager.captureAnm->SetAndExecuteScriptIdx(&this->menuBackground, 0);
 
                 // Seemingly intentionally the width and height are switched?
-                if (g_AnmManager->SetTextureCaptureParams(3,
-                                                          ARCADE_LEFT,
-                                                          ARCADE_TOP,
-                                                          ARCADE_WIDTH,
-                                                          ARCADE_HEIGHT,
+                if (g_AnmManager->SetTextureCaptureParams(3, ARCADE_LEFT, ARCADE_TOP, ARCADE_WIDTH, ARCADE_HEIGHT,
                                                           this->menuBackground.loadedSprite->startPixelInclusive.x,
                                                           this->menuBackground.loadedSprite->startPixelInclusive.y,
                                                           this->menuBackground.loadedSprite->heightPx,
@@ -1313,8 +1315,8 @@ i32 RetryMenu::OnUpdate()
         else
         {
             this->curState += !g_Spellcard.IsCaptured() && g_GameManager.IsSpellPractice()
-                              ? RETRY_MENU_STATE_YES_SELECTED
-                              : RETRY_MENU_STATE_NO_SELECTED;
+                                  ? RETRY_MENU_STATE_YES_SELECTED
+                                  : RETRY_MENU_STATE_NO_SELECTED;
         }
 
         this->numFrames = 0;
@@ -1350,8 +1352,8 @@ i32 RetryMenu::OnUpdate()
                 }
                 else
                 {
-                    if (g_GameManager.IsSpellPractice()
-                        && !GameManager::ShouldPauseMusicInSpellPractice(g_GameManager.currentSpellCardNumber))
+                    if (g_GameManager.IsSpellPractice() &&
+                        !GameManager::ShouldPauseMusicInSpellPractice(g_GameManager.currentSpellCardNumber))
                     {
                         g_GameManager.showRetryMenu = FALSE;
                         g_SoundPlayer.Unpause();
@@ -1373,7 +1375,7 @@ i32 RetryMenu::OnUpdate()
         }
         break;
     case RETRY_MENU_STATE_NO_SELECTED:
-selected_no:
+    selected_no:
         this->menuSprites[RETRY_SPRITE_NO].color1.d3dColor = COLOR_MENU_ITEM_SELECTED;
         this->menuSprites[RETRY_SPRITE_YES].color1.d3dColor = COLOR_MENU_ITEM_NORMAL;
         this->menuSprites[RETRY_SPRITE_NO].pos2 = Float3(-4.0f, -4.0f, 0.0f);
@@ -1476,8 +1478,12 @@ selected_no:
 
             IncrementIfBelow(&g_GameManager.plst.playData[g_GameManager.difficulty].attemptsTotal, 999999);
             IncrementIfBelow(&g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].attemptsTotal, 999999);
-            IncrementIfBelow(&g_GameManager.plst.playData[g_GameManager.difficulty].attemptsPerCharacter[g_GameManager.shotType], 999999);
-            IncrementIfBelow(&g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].attemptsPerCharacter[g_GameManager.shotType], 999999);
+            IncrementIfBelow(
+                &g_GameManager.plst.playData[g_GameManager.difficulty].attemptsPerCharacter[g_GameManager.shotType],
+                999999);
+            IncrementIfBelow(
+                &g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].attemptsPerCharacter[g_GameManager.shotType],
+                999999);
             IncrementIfBelow(&g_GameManager.plst.playData[g_GameManager.difficulty].continues, 999999);
             IncrementIfBelow(&g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].continues, 999999);
 
@@ -1601,7 +1607,7 @@ void AsciiManager::OnDrawHighPrioImpl()
         this->smallScoreText.scale.x = this->scaleX;
         this->smallScoreText.scale.y = this->scaleY;
 
-        curChar = (u8 *) popup->text + (popup->characterCount - 1);
+        curChar = (u8 *)popup->text + (popup->characterCount - 1);
 
         for (charIdx = popup->characterCount; charIdx > 0; charIdx--)
         {
@@ -1639,7 +1645,8 @@ void AsciiManager::OnDrawHighPrioImpl()
 
         rect.left = ARCADE_LEFT;
         rect.top = ARCADE_TOP;
-        rect.right = ((g_Player.position.x + ARCADE_LEFT) - this->nightBlindnessRadius) + g_AnmManager->screenShakeOffset.x;
+        rect.right =
+            ((g_Player.position.x + ARCADE_LEFT) - this->nightBlindnessRadius) + g_AnmManager->screenShakeOffset.x;
         rect.bottom = ARCADE_TOP + ARCADE_HEIGHT;
 
         if (rect.right > rect.left)
@@ -1647,7 +1654,8 @@ void AsciiManager::OnDrawHighPrioImpl()
             ScreenEffect::DrawSquare(&rect, color.d3dColor);
         }
 
-        rect.left = ((g_Player.position.x + ARCADE_LEFT) + this->nightBlindnessRadius) + g_AnmManager->screenShakeOffset.x;
+        rect.left =
+            ((g_Player.position.x + ARCADE_LEFT) + this->nightBlindnessRadius) + g_AnmManager->screenShakeOffset.x;
         rect.top = ARCADE_TOP;
         rect.right = ARCADE_LEFT + ARCADE_WIDTH;
         rect.bottom = ARCADE_TOP + ARCADE_HEIGHT;
@@ -1657,7 +1665,8 @@ void AsciiManager::OnDrawHighPrioImpl()
             ScreenEffect::DrawSquare(&rect, color.d3dColor);
         }
 
-        rect.left = ((g_Player.position.x + ARCADE_LEFT) - this->nightBlindnessRadius) + g_AnmManager->screenShakeOffset.x;
+        rect.left =
+            ((g_Player.position.x + ARCADE_LEFT) - this->nightBlindnessRadius) + g_AnmManager->screenShakeOffset.x;
 
         if (rect.left < ARCADE_LEFT)
         {
@@ -1665,21 +1674,24 @@ void AsciiManager::OnDrawHighPrioImpl()
         }
 
         rect.top = ARCADE_TOP;
-        rect.right = ((g_Player.position.x + ARCADE_LEFT) + this->nightBlindnessRadius) + g_AnmManager->screenShakeOffset.x;
+        rect.right =
+            ((g_Player.position.x + ARCADE_LEFT) + this->nightBlindnessRadius) + g_AnmManager->screenShakeOffset.x;
 
         if (rect.right > ARCADE_LEFT + ARCADE_WIDTH)
         {
             rect.right = ARCADE_LEFT + ARCADE_WIDTH;
         }
 
-        rect.bottom = ((g_Player.position.y + ARCADE_TOP) - this->nightBlindnessRadius) + g_AnmManager->screenShakeOffset.y;
+        rect.bottom =
+            ((g_Player.position.y + ARCADE_TOP) - this->nightBlindnessRadius) + g_AnmManager->screenShakeOffset.y;
 
         if (rect.bottom > rect.top)
         {
             ScreenEffect::DrawSquare(&rect, color.d3dColor);
         }
 
-        rect.top = ((g_Player.position.y + ARCADE_TOP) + this->nightBlindnessRadius) + g_AnmManager->screenShakeOffset.y;
+        rect.top =
+            ((g_Player.position.y + ARCADE_TOP) + this->nightBlindnessRadius) + g_AnmManager->screenShakeOffset.y;
         rect.bottom = ARCADE_TOP + ARCADE_HEIGHT;
 
         if (rect.bottom > rect.top)
@@ -1737,7 +1749,7 @@ void AsciiManager::OnDrawHighPrioImpl()
         this->popupText.scale.x = popup->scaleX;
         this->popupText.scale.y = popup->scaleY;
 
-        curChar = (u8 *) popup->text + (popup->characterCount - 1);
+        curChar = (u8 *)popup->text + (popup->characterCount - 1);
 
         for (charIdx = popup->characterCount; charIdx > 0; charIdx--)
         {
@@ -1755,10 +1767,12 @@ void AsciiManager::OnDrawHighPrioImpl()
 
     if (this->youkaiGauge.IsVisible())
     {
-        this->youkaiGaugeCursor.pos.x = (((g_GameManager.GetYoukaiGauge() * 112.0f) / 2.0f) / 10000.0f) + this->youkaiGauge.pos.x + 64.0f;
+        this->youkaiGaugeCursor.pos.x =
+            (((g_GameManager.GetYoukaiGauge() * 112.0f) / 2.0f) / 10000.0f) + this->youkaiGauge.pos.x + 64.0f;
         g_AnmManager->Draw2DNoRound(&this->youkaiGaugeCursor);
 
-        this->percentageText.pos.x = (((g_GameManager.GetYoukaiGauge() * 80.0f) / 2.0f) / 10000.0f) + this->youkaiGauge.pos.x + 64.0f;
+        this->percentageText.pos.x =
+            (((g_GameManager.GetYoukaiGauge() * 80.0f) / 2.0f) / 10000.0f) + this->youkaiGauge.pos.x + 64.0f;
         this->percentageText.pos.y = this->youkaiGaugeCursor.pos.y - 7.0f;
         this->percentageText.pos.z = this->youkaiGaugeCursor.pos.z;
         this->percentageText.color1.a = this->youkaiGauge.color1.a;
@@ -1800,7 +1814,8 @@ void AsciiManager::OnDrawHighPrioImpl()
         g_AnmManager->DrawNoRotation(&this->youkaiGaugeHumanIcon);
         g_AnmManager->DrawNoRotation(&this->youkaiGaugeYoukaiIcon);
 
-        this->DrawPercentage(&this->percentageText.pos, g_GameManager.GetYoukaiGauge(), this->percentageText.color1.d3dColor);
+        this->DrawPercentage(&this->percentageText.pos, g_GameManager.GetYoukaiGauge(),
+                             this->percentageText.color1.d3dColor);
 
         score = 10000000;
         charIdx = g_GameManager.globals->pointItemValue;
@@ -1964,7 +1979,7 @@ void AsciiManager::DrawPercentage(Float3 *position, i32 percentage, D3DCOLOR col
         this->percentageText.pos.x += 7.0f;
     }
 
-    this->percentageText.scale.x = this->percentageText.scale.y =  1.0f;
+    this->percentageText.scale.x = this->percentageText.scale.y = 1.0f;
     this->percentageText.pos.y -= 2.0f;
     this->asciiAnm->SetSprite(&this->percentageText, 146);
     g_AnmManager->DrawNoRotation(&this->percentageText);
