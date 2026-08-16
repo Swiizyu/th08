@@ -2,7 +2,11 @@
 
 #include "Gui.hpp"
 
+#include "Background.hpp"
+#include "BulletManager.hpp"
 #include "EnemyManager.hpp"
+#include "ItemManager.hpp"
+#include "ReplayManager.hpp"
 #include "ScoreDat.hpp"
 #include "ScreenEffect.hpp"
 #include "Spellcard.hpp"
@@ -71,13 +75,20 @@ C_ASSERT(sizeof(GuiImpl) == 0x230b8);
 DIFFABLE_STATIC(Gui, g_Gui);
 DIFFABLE_STATIC(ChainElem, g_GuiCalcChain);
 DIFFABLE_STATIC(ChainElem, g_GuiDrawChain);
-AnmLoaded *g_PortraitAnms[4];
+
+// These are all exactly the same??????? Wtf???????????
+COLORREF g_GuiTextColors[][4] = {{0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0}, {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0},
+                                 {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0}, {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0},
+                                 {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0}, {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0},
+                                 {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0}, {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0},
+                                 {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0}, {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0},
+                                 {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0}, {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0}};
 D3DCOLOR g_SpellcardTimeColors[] = {0xa0d0ff, 0xa080ff, 0xe080c0, 0xff4040};
 const char *g_AmPmStrings[] = {"AM", "PM"};
-const char *g_LoadingPortraitAnms[] = {"loading00.anm",  "loading01.anm",  "loading02.anm",  "loading03.anm",
-                                       "loading00h.anm", "loading00a.anm", "loading01h.anm", "loading01a.anm",
-                                       "loading02h.anm", "loading02a.anm", "loading03h.anm", "loading03a.anm"};
-const char *g_StgTxtAnmFiles[] = {
+const char *g_LoadingAnms[] = {"loading00.anm",  "loading01.anm",  "loading02.anm",  "loading03.anm",
+                               "loading00h.anm", "loading00a.anm", "loading01h.anm", "loading01a.anm",
+                               "loading02h.anm", "loading02a.anm", "loading03h.anm", "loading03a.anm"};
+const char *g_StageTextAnms[] = {
     "stg1txt.anm", "stg2txt.anm", "stg3txt.anm", "stg4atxt.anm", "stg4btxt.anm",
     "stg5txt.anm", "stg6txt.anm", "stg7txt.anm", "stg8txt.anm",
 };
@@ -130,9 +141,134 @@ ChainCallbackResult Gui::OnDraw(Gui *gui)
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
-// STUB: th08 0x43396d
 void GuiImpl::MsgRead(i32 msgIdx)
 {
+    // \n\r? What?
+    utils::GuiDebugPrint("msg start %d\n\r", msgIdx);
+    MsgRawHeader *file = this->msg.msgFile;
+    memset(&this->msg, 0, sizeof(GuiMsgVm));
+    this->msg.msgFile = file;
+    if (msgIdx == 0)
+    {
+        switch (g_GameManager.currentStage)
+        {
+        case STAGE5:
+            Gui::CopyEnemyNameTexture(22);
+            break;
+        case STAGE6A:
+            g_Background.unk_b34 = 2;
+            break;
+        case STAGE6B: {
+            AnmLoaded *enemyFaceAnm = g_Spellcard.enemyFaceAnm;
+            g_Spellcard.enemyFaceAnm = g_Spellcard.enemyFaceAnm2;
+            g_Spellcard.enemyFaceAnm2 = enemyFaceAnm;
+            g_Background.unk_b34 = 2;
+            Gui::CopyEnemyNameTexture(24);
+            break;
+        }
+        case EXTRASTAGE: {
+            AnmLoaded *enemyFaceAnm = g_Spellcard.enemyFaceAnm;
+            g_Spellcard.enemyFaceAnm = g_Spellcard.enemyFaceAnm2;
+            g_Spellcard.enemyFaceAnm2 = enemyFaceAnm;
+            g_Background.unk_b34 = 2;
+            Gui::CopyEnemyNameTexture(25);
+            break;
+        }
+        }
+    }
+    else if (msgIdx == 10)
+    {
+        switch (g_GameManager.currentStage)
+        {
+        case STAGE5:
+            if (g_GameManager.globals->numRetries > 0)
+            {
+                msgIdx = 1;
+                this->msg.selectedOption = 0;
+            }
+            else if (!g_GameManager.IsReplay())
+            {
+                if (g_GameManager.IsStageClearedWithoutRetries(STAGE6B, g_GameManager.shotType, EASY) ||
+                    g_GameManager.IsStageClearedWithoutRetries(STAGE6B, g_GameManager.shotType, NORMAL) ||
+                    g_GameManager.IsStageClearedWithoutRetries(STAGE6B, g_GameManager.shotType, HARD) ||
+                    g_GameManager.IsStageClearedWithoutRetries(STAGE6B, g_GameManager.shotType, LUNATIC) ||
+                    g_GameManager.shotType > SHOT_YOUMU_YUYUKO)
+                {
+                    msgIdx = 3;
+                    this->msg.selectedOption = 1;
+                }
+                else if (g_GameManager.IsStageClearedWithRetries(STAGE6A, g_GameManager.shotType, EASY) ||
+                         g_GameManager.IsStageClearedWithRetries(STAGE6A, g_GameManager.shotType, NORMAL) ||
+                         g_GameManager.IsStageClearedWithRetries(STAGE6A, g_GameManager.shotType, HARD) ||
+                         g_GameManager.IsStageClearedWithRetries(STAGE6A, g_GameManager.shotType, LUNATIC))
+                {
+                    msgIdx = 2;
+                    this->msg.selectedOption = 1;
+                }
+                else
+                {
+                    msgIdx = 1;
+                    this->msg.selectedOption = 0;
+                }
+            }
+            else
+            {
+                if (g_ReplayManager->replayData->clearState == 2)
+                {
+                    msgIdx = 3;
+                    this->msg.selectedOption = 1;
+                }
+                else if (g_ReplayManager->replayData->clearState == 1)
+                {
+                    msgIdx = 2;
+                    this->msg.selectedOption = 1;
+                }
+                else
+                {
+                    msgIdx = 1;
+                    this->msg.selectedOption = 0;
+                }
+            }
+            g_GameManager.flags.isGoingToFinalB = this->msg.selectedOption;
+        default:
+            break;
+        }
+    }
+    else if (msgIdx >= 6)
+    {
+        switch (g_GameManager.currentStage)
+        {
+        case STAGE6B:
+            if (g_GameManager.GetClockTime() >= 12)
+            {
+                msgIdx = 5;
+            }
+            break;
+        }
+    }
+    this->msg.currentMsgIdx = msgIdx;
+    this->msg.currentInstr = (&this->msg.msgFile->instrs)[msgIdx];
+    this->msg.dialogueLines[0].scriptIndex = -1;
+    this->msg.dialogueLines[1].scriptIndex = -1;
+    this->msg.isTextBoxVisible = true;
+    this->msg.fontSize = 15;
+    this->msg.textColorsA[0] = g_GuiTextColors[g_GameManager.shotType][0];
+    this->msg.textColorsA[1] = g_GuiTextColors[g_GameManager.shotType][1];
+    this->msg.textColorsA[2] = g_GuiTextColors[g_GameManager.shotType][2];
+    this->msg.textColorsA[3] = g_GuiTextColors[g_GameManager.shotType][3];
+    this->msg.textColorsB[0] = 0;
+    this->msg.textColorsB[1] = 0;
+    this->msg.textColorsB[2] = 0;
+    this->msg.textColorsB[3] = 0;
+    this->msg.dialogueSkippable = true;
+    this->msg.unk_1c = 6;
+    this->msg.textColorIdx = 0;
+    this->msg.unk_156a = true;
+    this->msg.unk_156b = 0;
+    this->msg.unk_156c = 255;
+    g_BulletManager.FUN_00415c60();
+    g_EnemyManager.DespawnAllEnemies(0, 0);
+    g_ItemManager.AutoCollectAllItems();
 }
 
 // STUB: th08 0x433db3
@@ -1260,7 +1396,7 @@ ZunResult Gui::ActualAddedCallback()
         {
             return ZUN_ERROR;
         }
-        this->loadingPortraitAnm = g_AnmManager->PreloadAnm(12, g_LoadingPortraitAnms[g_GameManager.shotType]);
+        this->loadingPortraitAnm = g_AnmManager->PreloadAnm(12, g_LoadingAnms[g_GameManager.shotType]);
         if (!this->loadingPortraitAnm)
         {
             return ZUN_ERROR;
@@ -1313,7 +1449,7 @@ ZunResult Gui::ActualAddedCallback()
     {
         if (!g_GameManager.flags.isSpellPractice || g_GameManager.currentSpellCardNumber < 205)
         {
-            this->stageTextAnm = g_AnmManager->PreloadAnm(13, g_StgTxtAnmFiles[g_GameManager.currentStage]);
+            this->stageTextAnm = g_AnmManager->PreloadAnm(13, g_StageTextAnms[g_GameManager.currentStage]);
             if (!this->stageTextAnm)
             {
                 return ZUN_ERROR;
@@ -1321,7 +1457,7 @@ ZunResult Gui::ActualAddedCallback()
         }
         else
         {
-            this->stageTextAnm = g_AnmManager->PreloadAnm(13, g_StgTxtAnmFiles[8]);
+            this->stageTextAnm = g_AnmManager->PreloadAnm(13, g_StageTextAnms[8]);
             if (!this->stageTextAnm)
             {
                 return ZUN_ERROR;
@@ -1395,7 +1531,7 @@ ZunResult Gui::LoadMsg(const char *path)
     for (i32 i = 0; i < this->impl->msg.msgFile->numInstrs; i++)
     {
         (&this->impl->msg.msgFile->instrs)[i] =
-            (MsgRawInstr *)((i32)(&this->impl->msg.msgFile->instrs)[i] + (i32) & this->impl->msg.msgFile->numInstrs);
+            (MsgRawInstr *)((i32)(&this->impl->msg.msgFile->instrs)[i] + (i32)this->impl->msg.msgFile);
     }
     return ZUN_SUCCESS;
 }

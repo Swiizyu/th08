@@ -68,4 +68,10 @@ void EnemyManager::CutChain()
 {
 }
 
+// STUB: th08 0x42efb0
+i32 EnemyManager::DespawnAllEnemies(i32 param_1, i32 param_2)
+{
+    return 0;
+}
+
 } /* namespace th08 */

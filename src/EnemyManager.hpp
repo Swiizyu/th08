@@ -29,6 +29,8 @@ struct EnemyManager
     static ZunResult DeletedCallback(EnemyManager *enemyManager);
     static void CutChain();
 
+    i32 DespawnAllEnemies(i32 param_1, i32 param_2);
+
     Enemy enemyTemplate;
     Enemy enemies[481];
     Enemy *bossIds[8];

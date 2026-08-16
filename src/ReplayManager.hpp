@@ -89,7 +89,7 @@ struct ReplayData
     unknown_fields(0xf0, 0x28);
 
     float slowDownRate;
-    u8 clearState;
+    i8 clearState;
 
     i32 unk0x120;
     i32 exeSize;
@@ -103,6 +103,9 @@ struct ReplayManager
 {
     static void SaveReplay(const char *replayPath, const char *replayName);
     static ReplayData *LoadReplayData(void *replayData, int fileSize);
+
+    unknown_fields(0x0, 0x8);
+    ReplayData *replayData;
 };
 
 DIFFABLE_EXTERN(ReplayManager *, g_ReplayManager);

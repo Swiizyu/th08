@@ -31,7 +31,9 @@ struct Background
 
     unknown_fields(0x0, 0xb20);
     u8 skyFogNeedsSetup; // Leftover from earlier games. Never checked in IN
-    unknown_fields(0xb21, 0x5adf);
+    unknown_fields(0xb21, 0x13);
+    i32 unk_b34;
+    unknown_fields(0xb38, 0x5ac8);
 };
 C_ASSERT(sizeof(Background) == 0x6600);
 
