@@ -10,8 +10,116 @@
 namespace th08
 {
 
+enum MsgOpcode
+{
+    MsgOpcode_MsgDelete,
+    MsgOpcode_PortraitAnmScript,
+    MsgOpcode_PortraitAnmSprite,
+    MsgOpcode_TextDialogue,
+    MsgOpcode_Wait,
+    MsgOpcode_AnmInterrupt,
+    MsgOpcode_EclResume,
+    MsgOpcode_Music,
+    MsgOpcode_TextIntro,
+    MsgOpcode_StageResults,
+    MsgOpcode_MsgHalt,
+    MsgOpcode_StageEnd,
+    MsgOpcode_MusicFadeOut,
+    MsgOpcode_WaitSkippable,
+    MsgOpcode_ScreenFade,
+    MsgOpcode_PortraitConfigureAll,
+    MsgOpcode_TextSpeakerDialogue,
+    MsgOpcode_PortraitConfigure,
+    MsgOpcode_TextboxVisible,
+    MsgOpcode_TextTopLine,
+    MsgOpcode_TextBottomLine,
+    MsgOpcode_SelectionBox,
+    MsgOpcode_ReadSelected,
+};
+
+struct MsgRawInstrArgPortraitConfigureAll
+{
+    i32 portraitIndex;
+    i32 playerHumanFaceSpriteIndex;
+    i32 playerYoukaiFaceSpriteIndex;
+    i32 enemyFaceSpriteIndex;
+    i32 enemyFace2SpriteIndex;
+};
+
+struct MsgRawInstrArgPortraitConfigure
+{
+    i32 portraitIndex;
+    i32 faceSpriteIndex;
+};
+
+struct MsgRawInstrArgPortraitAnmScript
+{
+    i16 portraitIndex;
+    i16 anmScriptIndex;
+};
+
+struct MsgRawInstrArgPortraitAnmSprite
+{
+    i16 portraitIndex;
+    i16 anmScriptIndex;
+};
+
+struct MsgRawInstrArgTextDialogue
+{
+    i16 textColor;
+    i16 textLine;
+    char text[1];
+};
+
+struct MsgRawInstrArgTextSpeakerDialogue
+{
+    char text[1];
+};
+
+struct MsgRawInstrArgSelectionBox
+{
+    i32 wait;
+};
+
+struct MsgRawInstrArgWait
+{
+    i32 wait;
+};
+
+struct MsgRawInstrArgAnmInterrupt
+{
+    i16 portraitIndex;
+    u8 interrupt;
+};
+
+struct MsgRawInstrArgMusic
+{
+    i32 musicIndex;
+};
+
+struct MsgRawInstrArgWaitSkippable
+{
+    bool skippable;
+};
+
+struct MsgRawInstrArgTextboxVisible
+{
+    bool visible;
+};
+
 union MsgRawInstrArgs {
-    // TODO: probably fill this in for starters
+    MsgRawInstrArgPortraitConfigureAll portraitConfigureAll;
+    MsgRawInstrArgPortraitConfigure portraitConfigure;
+    MsgRawInstrArgPortraitAnmScript portraitAnmScript;
+    MsgRawInstrArgPortraitAnmSprite portraitAnmSprite;
+    MsgRawInstrArgTextDialogue textDialogue;
+    MsgRawInstrArgTextSpeakerDialogue textSpeakerDialogue;
+    MsgRawInstrArgSelectionBox selectionBox;
+    MsgRawInstrArgWait wait;
+    MsgRawInstrArgAnmInterrupt anmInterrupt;
+    MsgRawInstrArgMusic music;
+    MsgRawInstrArgWaitSkippable waitSkippable;
+    MsgRawInstrArgTextboxVisible textboxVisible;
 };
 
 struct MsgRawInstr
@@ -45,16 +153,16 @@ struct GuiMsgVm
     u32 ignoreWaitCounter;
     bool dialogueSkippable;
     u8 textColorIdx;
-    bool unk_156a;
-    u8 unk_156b;
-    u8 unk_156c;
+    bool resetDialogueLines;
+    u8 dialogueLineIndex;
+    u8 currentPortraitIndex;
     bool isTextBoxVisible;
     u8 selectedOption;
-    u8 unk_156f;
+    /* 1 byte pad */
 };
 C_ASSERT(sizeof(GuiMsgVm) == 0x1570);
 
-typedef enum GuiDisplayArg
+enum GuiDisplayArg
 {
     GUI_DISPLAY_HIDDEN = 0,
     GUI_DISPLAY_SHOWN = 1,
@@ -64,7 +172,7 @@ typedef enum GuiDisplayArg
     GUI_DISPLAY_BORDER_BONUS = 4,
     GUI_DISPLAY_SPELL_BONUS_FAILED = 5,
     GUI_DISPLAY_LAST_SPELL_FAILED = 6,
-} GuiDisplayArg;
+};
 
 struct GuiFormattedText
 {

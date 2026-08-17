@@ -14,6 +14,8 @@ namespace th08
 #define IS_PRESSED(key) (g_CurFrameInput & (key))
 #define IS_PRESSED_REPLAY(key) (g_ReplayCurFrameInput & (key))
 #define WAS_PRESSED(key) (((g_CurFrameInput & (key)) != 0) && (g_CurFrameInput & (key)) != (g_LastFrameInput & (key)))
+#define WAS_PRESSED_REPLAY(key)                                                                                        \
+    (((g_ReplayCurFrameInput & (key)) != 0) && (g_ReplayCurFrameInput & (key)) != (g_ReplayLastFrameInput & (key)))
 #define WAS_PRESSED_SCROLLING(key)                                                                                     \
     (WAS_PRESSED(key) || (((g_CurFrameInput & (key)) != 0) && (g_IsEighthFrameOfHeldInput != 0)))
 

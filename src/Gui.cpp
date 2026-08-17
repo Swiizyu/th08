@@ -1,20 +1,18 @@
 #include "th_pch.h"
 
-#include "Gui.hpp"
-
 #include "Background.hpp"
 #include "BulletManager.hpp"
 #include "EnemyManager.hpp"
+#include "Gui.hpp"
 #include "ItemManager.hpp"
+#include "Player.hpp"
 #include "ReplayManager.hpp"
 #include "ScoreDat.hpp"
 #include "ScreenEffect.hpp"
 #include "Spellcard.hpp"
 #include "ZunResult.hpp"
-#include "utils.hpp"
-
 #include "i18n.hpp"
-
+#include "utils.hpp"
 #include <stdio.h>
 
 namespace th08
@@ -76,6 +74,7 @@ DIFFABLE_STATIC(Gui, g_Gui);
 DIFFABLE_STATIC(ChainElem, g_GuiCalcChain);
 DIFFABLE_STATIC(ChainElem, g_GuiDrawChain);
 
+i32 g_ClearStageBonuses[] = {1000000, 1500000, 2000000, 2500000, 2500000, 3000000, 4000000, 6000000, 6660000};
 // These are all exactly the same??????? Wtf???????????
 COLORREF g_GuiTextColors[][4] = {{0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0}, {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0},
                                  {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0}, {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0},
@@ -83,6 +82,9 @@ COLORREF g_GuiTextColors[][4] = {{0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0}, {0xe8
                                  {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0}, {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0},
                                  {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0}, {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0},
                                  {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0}, {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0}};
+i32 g_StageBgmIndices[][3] = {
+    {1, 2, 0}, {3, 4, 0}, {5, 6, 0}, {7, 8, 0}, {7, 9, 0}, {10, 11, 0}, {12, 13, 15}, {12, 14, 15}, {16, 17, 0},
+};
 D3DCOLOR g_SpellcardTimeColors[] = {0xa0d0ff, 0xa080ff, 0xe080c0, 0xff4040};
 const char *g_AmPmStrings[] = {"AM", "PM"};
 const char *g_LoadingAnms[] = {"loading00.anm",  "loading01.anm",  "loading02.anm",  "loading03.anm",
@@ -143,7 +145,7 @@ ChainCallbackResult Gui::OnDraw(Gui *gui)
 
 void GuiImpl::MsgRead(i32 msgIdx)
 {
-    // \n\r? What?
+    // \n\r?
     utils::GuiDebugPrint("msg start %d\n\r", msgIdx);
     MsgRawHeader *file = this->msg.msgFile;
     memset(&this->msg, 0, sizeof(GuiMsgVm));
@@ -263,19 +265,469 @@ void GuiImpl::MsgRead(i32 msgIdx)
     this->msg.dialogueSkippable = true;
     this->msg.unk_1c = 6;
     this->msg.textColorIdx = 0;
-    this->msg.unk_156a = true;
-    this->msg.unk_156b = 0;
-    this->msg.unk_156c = 255;
+    this->msg.resetDialogueLines = true;
+    this->msg.dialogueLineIndex = 0;
+    this->msg.currentPortraitIndex = 255;
     g_BulletManager.FUN_00415c60();
     g_EnemyManager.DespawnAllEnemies(0, 0);
     g_ItemManager.AutoCollectAllItems();
 }
 
-// STUB: th08 0x433db3
 ZunResult GuiImpl::RunMsg()
 {
-    DecryptDialogue(NULL, NULL);
-    return ZUN_ERROR;
+    MsgRawInstrArgs *args;
+
+    if (this->msg.currentMsgIdx < 0)
+    {
+        return ZUN_ERROR;
+    }
+
+    if (this->msg.ignoreWaitCounter > 0)
+    {
+        this->msg.ignoreWaitCounter--;
+    }
+
+    if (this->msg.dialogueSkippable && IS_PRESSED_REPLAY(TH_BUTTON_SKIP))
+    {
+        this->msg.timer = this->msg.currentInstr->time;
+    }
+
+    if (g_Player.playerState != PLAYER_STATE_DEAD)
+    {
+        g_ItemManager.AutoCollectAllItems();
+    }
+
+    while (this->msg.timer >= (i32)this->msg.currentInstr->time)
+    {
+        switch (this->msg.currentInstr->opcode)
+        {
+        case MsgOpcode_MsgDelete:
+            this->msg.currentMsgIdx = -1;
+            return ZUN_ERROR;
+#pragma var_order(i, args)
+        case MsgOpcode_PortraitConfigureAll: {
+            u32 i;
+            MsgRawInstrArgs *args = &this->msg.currentInstr->args;
+            if (this->msg.currentPortraitIndex != args->portraitConfigureAll.portraitIndex)
+            {
+                for (i = 0; i < 4; i++)
+                {
+                    if (this->msg.currentPortraitIndex == i)
+                    {
+                        if (this->msg.currentPortraitIndex / 2 != args->portraitConfigureAll.portraitIndex / 2)
+                        {
+                            this->msg.portraits[i].pendingInterrupt = 6;
+                        }
+                        else
+                        {
+                            this->msg.portraits[i].pendingInterrupt = 4;
+                        }
+                    }
+                    else
+                    {
+                        this->msg.portraits[i].pendingInterrupt = 4;
+                    }
+                }
+            }
+            this->msg.portraits[args->portraitConfigureAll.portraitIndex].pendingInterrupt = 3;
+            this->msg.currentPortraitIndex = (u8)args->portraitConfigureAll.portraitIndex;
+            if (args->portraitConfigureAll.playerHumanFaceSpriteIndex >= 0)
+            {
+                g_Spellcard.playerHumanFaceAnm->SetSprite(&this->msg.portraits[0],
+                                                          args->portraitConfigureAll.playerHumanFaceSpriteIndex);
+            }
+            if (args->portraitConfigureAll.playerYoukaiFaceSpriteIndex >= 0)
+            {
+                g_Spellcard.playerYoukaiFaceAnm->SetSprite(&this->msg.portraits[1],
+                                                           args->portraitConfigureAll.playerYoukaiFaceSpriteIndex);
+            }
+            if (args->portraitConfigureAll.enemyFaceSpriteIndex >= 0)
+            {
+                g_Spellcard.enemyFaceAnm->SetSprite(&this->msg.portraits[2],
+                                                    args->portraitConfigureAll.enemyFaceSpriteIndex);
+            }
+            if (args->portraitConfigureAll.enemyFace2SpriteIndex >= 0)
+            {
+                g_Spellcard.enemyFaceAnm2->SetSprite(&this->msg.portraits[3],
+                                                     args->portraitConfigureAll.enemyFace2SpriteIndex);
+            }
+            this->msg.textColorIdx = (u8)args->portraitConfigureAll.portraitIndex;
+            this->msg.resetDialogueLines = true;
+            break;
+        }
+#pragma var_order(i, args)
+        case MsgOpcode_PortraitConfigure: {
+            u32 i;
+            MsgRawInstrArgs *args = &this->msg.currentInstr->args;
+            if (this->msg.currentPortraitIndex != args->portraitConfigure.portraitIndex)
+            {
+                for (i = 0; i < 4; i++)
+                {
+                    if (this->msg.currentPortraitIndex == i)
+                    {
+                        if (this->msg.currentPortraitIndex / 2 != args->portraitConfigure.portraitIndex / 2)
+                        {
+                            this->msg.portraits[i].pendingInterrupt = 6;
+                        }
+                        else
+                        {
+                            this->msg.portraits[i].pendingInterrupt = 4;
+                        }
+                    }
+                    else
+                    {
+                        this->msg.portraits[i].pendingInterrupt = 4;
+                    }
+                }
+            }
+            this->msg.portraits[args->portraitConfigure.portraitIndex].pendingInterrupt = 3;
+            this->msg.currentPortraitIndex = (u8)args->portraitConfigure.portraitIndex;
+            if (args->portraitConfigure.faceSpriteIndex >= 0)
+            {
+                switch (args->portraitConfigure.portraitIndex)
+                {
+                case 0:
+                    g_Spellcard.playerHumanFaceAnm->SetSprite(&this->msg.portraits[0],
+                                                              args->portraitConfigure.faceSpriteIndex);
+                    break;
+                case 1:
+                    g_Spellcard.playerYoukaiFaceAnm->SetSprite(&this->msg.portraits[1],
+                                                               args->portraitConfigure.faceSpriteIndex);
+                    break;
+                case 2:
+                    g_Spellcard.enemyFaceAnm->SetSprite(&this->msg.portraits[2],
+                                                        args->portraitConfigure.faceSpriteIndex);
+                    break;
+                case 3:
+                    g_Spellcard.enemyFaceAnm2->SetSprite(&this->msg.portraits[3],
+                                                         args->portraitConfigure.faceSpriteIndex);
+                    break;
+                }
+            }
+            this->msg.textColorIdx = (u8)args->portraitConfigure.portraitIndex;
+            this->msg.resetDialogueLines = true;
+            break;
+        }
+        case MsgOpcode_PortraitAnmScript:
+            args = &this->msg.currentInstr->args;
+            switch (args->portraitAnmScript.portraitIndex)
+            {
+            case 0:
+                g_Spellcard.playerHumanFaceAnm->SetAndExecuteScriptIdx(&this->msg.portraits[0],
+                                                                       args->portraitAnmScript.anmScriptIndex);
+                break;
+            case 1:
+                g_Spellcard.playerYoukaiFaceAnm->SetAndExecuteScriptIdx(&this->msg.portraits[1],
+                                                                        args->portraitAnmScript.anmScriptIndex);
+                break;
+            case 2:
+                g_Spellcard.enemyFaceAnm->SetAndExecuteScriptIdx(&this->msg.portraits[2],
+                                                                 args->portraitAnmScript.anmScriptIndex);
+                break;
+            case 3:
+                g_Spellcard.enemyFaceAnm2->SetAndExecuteScriptIdx(&this->msg.portraits[3],
+                                                                  args->portraitAnmScript.anmScriptIndex);
+                break;
+            }
+            if (this->msg.portraits[args->portraitAnmScript.portraitIndex].loadedSprite->widthPx > 128.0f)
+            {
+                this->msg.portraits[args->portraitAnmScript.portraitIndex].pos2.x = -112.0f;
+            }
+            else
+            {
+                this->msg.portraits[args->portraitAnmScript.portraitIndex].pos2.x = 0.0f;
+            }
+            break;
+        case MsgOpcode_PortraitAnmSprite:
+            args = &this->msg.currentInstr->args;
+            switch (args->portraitAnmSprite.portraitIndex)
+            {
+            case 0:
+                g_Spellcard.playerHumanFaceAnm->SetSprite(&this->msg.portraits[0],
+                                                          args->portraitAnmSprite.anmScriptIndex);
+                break;
+            case 1:
+                g_Spellcard.playerYoukaiFaceAnm->SetSprite(&this->msg.portraits[1],
+                                                           args->portraitAnmSprite.anmScriptIndex);
+                break;
+            case 2:
+                g_Spellcard.enemyFaceAnm->SetSprite(&this->msg.portraits[2], args->portraitAnmSprite.anmScriptIndex);
+                break;
+            case 3:
+                g_Spellcard.enemyFaceAnm2->SetSprite(&this->msg.portraits[3], args->portraitAnmSprite.anmScriptIndex);
+                break;
+            }
+            if (this->msg.portraits[args->portraitAnmSprite.portraitIndex].loadedSprite->widthPx > 256.0f)
+            {
+                this->msg.portraits[args->portraitAnmSprite.portraitIndex].pos2.x = -208.0f;
+                this->msg.portraits[args->portraitAnmSprite.portraitIndex].pos2.y = -50.0f;
+            }
+            else if (this->msg.portraits[args->portraitAnmSprite.portraitIndex].loadedSprite->widthPx > 128.0f)
+            {
+                this->msg.portraits[args->portraitAnmSprite.portraitIndex].pos2.x = -80.0f;
+            }
+            else
+            {
+                this->msg.portraits[args->portraitAnmSprite.portraitIndex].pos2.x = 0.0f;
+            }
+            break;
+        case MsgOpcode_TextDialogue: {
+            char decryptedText[64];
+
+            args = &this->msg.currentInstr->args;
+            if (args->textDialogue.textLine == 0 && this->msg.dialogueLines[1].scriptIndex >= 0)
+            {
+                g_AnmManager->DrawTextLeft(&this->msg.dialogueLines[1],
+                                           this->msg.textColorsA[args->textDialogue.textColor],
+                                           this->msg.textColorsB[args->textDialogue.textColor], " ");
+            }
+            g_Supervisor.textAnm->SetAndExecuteScriptIdx(&this->msg.dialogueLines[args->textDialogue.textLine],
+                                                         args->textDialogue.textLine);
+            this->msg.dialogueLines[args->textDialogue.textLine].fontWidth =
+                this->msg.dialogueLines[args->textDialogue.textLine].fontHeight = this->msg.fontSize;
+            DecryptDialogue(decryptedText, args->textDialogue.text);
+            g_AnmManager->DrawTextLeft(&this->msg.dialogueLines[args->textDialogue.textLine],
+                                       this->msg.textColorsA[args->textDialogue.textColor],
+                                       this->msg.textColorsB[args->textDialogue.textColor], decryptedText);
+            this->msg.framesElapsedDuringPause = 0;
+            break;
+        }
+        case MsgOpcode_TextSpeakerDialogue: {
+            char decryptedText[64];
+
+            args = &this->msg.currentInstr->args;
+            if (this->msg.resetDialogueLines)
+            {
+                if (this->msg.dialogueLines[1].scriptIndex >= 0)
+                {
+                    g_AnmManager->DrawTextLeft(&this->msg.dialogueLines[1],
+                                               this->msg.textColorsA[this->msg.textColorIdx],
+                                               this->msg.textColorsB[this->msg.textColorIdx], " ");
+                }
+                this->msg.dialogueLineIndex = 0;
+            }
+            g_Supervisor.textAnm->SetAndExecuteScriptIdx(&this->msg.dialogueLines[this->msg.dialogueLineIndex],
+                                                         this->msg.dialogueLineIndex);
+            this->msg.dialogueLines[this->msg.dialogueLineIndex].fontWidth =
+                this->msg.dialogueLines[this->msg.dialogueLineIndex].fontHeight = this->msg.fontSize;
+            DecryptDialogue(decryptedText, args->textSpeakerDialogue.text);
+            g_AnmManager->DrawTextLeft(&this->msg.dialogueLines[this->msg.dialogueLineIndex],
+                                       this->msg.textColorsA[this->msg.textColorIdx],
+                                       this->msg.textColorsB[this->msg.textColorIdx], decryptedText);
+            this->msg.framesElapsedDuringPause = 0;
+            this->msg.resetDialogueLines = false;
+            this->msg.dialogueLineIndex++;
+            break;
+        }
+        case MsgOpcode_TextTopLine: {
+            char decryptedText[64];
+
+            args = &this->msg.currentInstr->args;
+            g_Supervisor.textAnm->SetAndExecuteScriptIdx(&this->msg.dialogueLines[0], 0);
+            this->msg.dialogueLines[0].fontWidth = this->msg.dialogueLines[0].fontHeight = this->msg.fontSize;
+            DecryptDialogue(decryptedText, args->textSpeakerDialogue.text);
+            g_AnmManager->DrawTextLeft(&this->msg.dialogueLines[0], this->msg.textColorsA[0], this->msg.textColorsB[0],
+                                       decryptedText);
+            this->msg.framesElapsedDuringPause = 0;
+            break;
+        }
+        case MsgOpcode_TextBottomLine: {
+            char decryptedText[64];
+
+            args = &this->msg.currentInstr->args;
+            g_Supervisor.textAnm->SetAndExecuteScriptIdx(&this->msg.dialogueLines[1], 1);
+            this->msg.dialogueLines[1].fontWidth = this->msg.dialogueLines[1].fontHeight = this->msg.fontSize;
+            DecryptDialogue(decryptedText, args->textSpeakerDialogue.text);
+            g_AnmManager->DrawTextLeft(&this->msg.dialogueLines[1], this->msg.textColorsA[0], this->msg.textColorsB[0],
+                                       decryptedText);
+            this->msg.framesElapsedDuringPause = 0;
+            break;
+        }
+        case MsgOpcode_SelectionBox:
+            if (WAS_PRESSED_REPLAY(TH_BUTTON_UP))
+            {
+                if (this->msg.selectedOption == 1)
+                {
+                    g_SoundPlayer.PlaySoundByIdx(SOUND_MOVE_MENU, 0);
+                }
+                this->msg.selectedOption = 0;
+            }
+            if (WAS_PRESSED_REPLAY(TH_BUTTON_DOWN))
+            {
+                if (this->msg.selectedOption == 0)
+                {
+                    g_SoundPlayer.PlaySoundByIdx(SOUND_MOVE_MENU, 0);
+                }
+                this->msg.selectedOption = 1;
+            }
+            this->msg.dialogueLines[this->msg.selectedOption].color1.d3dColor = 0xffffffff;
+            this->msg.dialogueLines[1 - this->msg.selectedOption].color1.d3dColor = 0xe0606060;
+            if (!WAS_PRESSED_REPLAY(TH_BUTTON_SHOOT) || this->msg.framesElapsedDuringPause < 60)
+            {
+                if (this->msg.framesElapsedDuringPause >= this->msg.currentInstr->args.selectionBox.wait)
+                {
+                    this->msg.resetDialogueLines = true;
+                    this->msg.unk_1c = 30;
+                    break;
+                }
+                this->msg.framesElapsedDuringPause++;
+                goto SKIP_TIME_INCREMENT;
+            }
+            else
+            {
+                g_SoundPlayer.PlaySoundByIdx(SOUND_SELECT, 0);
+            }
+            break;
+        case MsgOpcode_ReadSelected:
+            g_GameManager.flags.isGoingToFinalB = this->msg.selectedOption;
+            g_Gui.MsgRead(this->msg.selectedOption + 1);
+            continue;
+        case MsgOpcode_Wait:
+            if (!this->msg.dialogueSkippable || !IS_PRESSED_REPLAY(TH_BUTTON_SKIP))
+            {
+                if (!WAS_PRESSED_REPLAY(TH_BUTTON_SHOOT) || this->msg.framesElapsedDuringPause < this->msg.unk_1c)
+                {
+                    if (this->msg.framesElapsedDuringPause >= this->msg.currentInstr->args.wait.wait)
+                    {
+                        this->msg.resetDialogueLines = true;
+                        this->msg.unk_1c = 30;
+                        break;
+                    }
+                    this->msg.framesElapsedDuringPause++;
+                    goto SKIP_TIME_INCREMENT;
+                }
+                this->msg.resetDialogueLines = true;
+                this->msg.unk_1c = 8;
+            }
+            break;
+        case MsgOpcode_AnmInterrupt:
+            args = &this->msg.currentInstr->args;
+            this->msg.portraits[args->anmInterrupt.portraitIndex].pendingInterrupt = args->anmInterrupt.interrupt;
+            break;
+        case MsgOpcode_EclResume:
+            this->msg.ignoreWaitCounter++;
+            break;
+        case MsgOpcode_Music:
+            if (this->msg.currentInstr->args.music.musicIndex < 0)
+            {
+                g_Supervisor.StopAudio();
+            }
+            else
+            {
+                g_Gui.stageTextAnm->SetAndExecuteScriptIdx(&this->stageTextSprites[3], 3);
+                g_Gui.stageTextAnm->SetSprite(&this->stageTextSprites[3],
+                                              this->msg.currentInstr->args.music.musicIndex + 3);
+                if (g_Supervisor.PlayMusic(
+                        this->msg.currentInstr->args.music.musicIndex,
+                        g_StageBgmIndices[g_GameManager.currentStage][this->msg.currentInstr->args.music.musicIndex]))
+                {
+                    g_Supervisor.PlayAudio(
+                        g_Background.stdData->songPaths[this->msg.currentInstr->args.music.musicIndex],
+                        g_StageBgmIndices[g_GameManager.currentStage][this->msg.currentInstr->args.music.musicIndex]);
+                }
+            }
+            break;
+        case MsgOpcode_TextIntro:
+            args = &this->msg.currentInstr->args;
+            g_Spellcard.enemyFaceAnm->SetAndExecuteScriptIdx(&this->msg.introLines[0], 1);
+            this->msg.framesElapsedDuringPause = 0;
+            break;
+        case MsgOpcode_StageResults:
+            this->clearBonusPower = g_GameManager.GetPower();
+            this->clearBonusPointItems = g_GameManager.globals->pointItemsCollectedInStage;
+            this->clearBonusTime = g_GameManager.GetTimeOrbs();
+            this->clearBonusGraze = g_GameManager.globals->grazeInStage;
+            this->clearScreenClockTimeOld = g_GameManager.GetClockTime() * 30 + 660;
+            this->clockTimeIncrement = g_GameManager.GetClockTimeIncrement();
+            g_GameManager.AddToClockTime(this->clockTimeIncrement);
+            this->clearBonusStage = g_ClearStageBonuses[g_GameManager.currentStage];
+            this->clearScreenClockTime = g_GameManager.GetClockTime() * 30 + 660;
+            this->clearScreenDisplayedClockTime = this->clearScreenClockTimeOld;
+            this->clearScreenClockTimeUpdateDelayCounter = 0;
+            this->stageClearScreenCounter = 1;
+            g_GameManager.flags.unk9 = 1;
+            if (g_GameManager.currentStage != STAGE6A && g_GameManager.currentStage != STAGE6B &&
+                g_GameManager.currentStage != EXTRASTAGE)
+            {
+                g_AsciiManager.asciiAnm->SetAndExecuteScriptIdx(&this->stageRankSprite, 3);
+                g_AsciiManager.asciiAnm->SetSprite(&this->stageRankSprite, this->clockTimeIncrement + 128);
+            }
+            else
+            {
+                this->stageRankSprite.currentInstruction = NULL;
+            }
+            this->stageRankSprite.SetInterrupt(1);
+            if (g_GameManager.currentStage != STAGE6A && g_GameManager.currentStage != STAGE6B &&
+                g_GameManager.currentStage != EXTRASTAGE)
+            {
+                g_Gui.loadingPortraitAnm->SetAndExecuteScriptIdx(&this->loadingPortraitSprite, 0);
+                g_AsciiManager.captureAnm->SetAndExecuteScriptIdx(&this->arcadeZoneSprite, 1);
+                g_AnmManager->SetTextureCaptureParams(
+                    3, 32, 16, 384, 448, this->arcadeZoneSprite.loadedSprite->startPixelInclusive.x,
+                    this->arcadeZoneSprite.loadedSprite->startPixelInclusive.y,
+                    this->arcadeZoneSprite.loadedSprite->widthPx, this->arcadeZoneSprite.loadedSprite->heightPx);
+                for (u32 i = 0; i < ARRAY_SIZE(this->arcadeZoneMotionBlurSprites); i++)
+                {
+                    g_AsciiManager.captureAnm->SetAndExecuteScriptIdx(&this->arcadeZoneMotionBlurSprites[i], 2);
+                    this->arcadeZoneMotionBlurSprites[i].counterVar0 = i * 4 + 3;
+                    this->arcadeZoneMotionBlurSprites[i].color1.a = 64 - i * 2;
+                }
+            }
+            else
+            {
+                g_GameManager.globals->pointItemExtendsSoFar = -1;
+            }
+            if (g_GameManager.currentStage != STAGE6B && g_GameManager.currentStage != STAGE6A &&
+                g_GameManager.currentStage != EXTRASTAGE && g_GameManager.GetBombsRemaining() < 3 &&
+                (g_GameManager.shotType == SHOT_YOUMU_YUYUKO || g_GameManager.shotType == SHOT_YOUMU ||
+                 g_GameManager.shotType == SHOT_YUYUKO))
+            {
+                g_GameManager.AddToBombCount(1);
+                g_SoundPlayer.PlaySoundByIdx(SOUND_SPELL_CAPTURE, 0);
+                g_Gui.flags.bombDisplayUpdateFrames = 2;
+            }
+            break;
+        case MsgOpcode_MsgHalt:
+            goto SKIP_TIME_INCREMENT;
+        case MsgOpcode_MusicFadeOut:
+            g_Supervisor.FadeOutMusic(4.0f);
+            break;
+        case MsgOpcode_ScreenFade:
+            ScreenEffect::RegisterChain(SCREEN_EFFECT_FULL_FADE_OUT, 442, 0xffffff, 0, 0, 21);
+            g_Supervisor.unk174 = 442;
+            break;
+        case MsgOpcode_StageEnd:
+            if (g_GameManager.currentStage == STAGE6A || g_GameManager.currentStage == STAGE6B ||
+                g_GameManager.currentStage == EXTRASTAGE)
+            {
+                g_GameManager.flags.unk5 = 2;
+            }
+            goto SKIP_TIME_INCREMENT;
+        case MsgOpcode_WaitSkippable:
+            this->msg.dialogueSkippable = this->msg.currentInstr->args.waitSkippable.skippable;
+            break;
+        case MsgOpcode_TextboxVisible:
+            this->msg.isTextBoxVisible = this->msg.currentInstr->args.textboxVisible.visible;
+            break;
+        }
+        this->msg.currentInstr =
+            (MsgRawInstr *)((u8 *)&this->msg.currentInstr->args + this->msg.currentInstr->instructionSize);
+    }
+    this->msg.timer++;
+SKIP_TIME_INCREMENT:
+    g_AnmManager->ExecuteScript(&this->msg.portraits[0]);
+    g_AnmManager->ExecuteScript(&this->msg.portraits[1]);
+    g_AnmManager->ExecuteScript(&this->msg.portraits[2]);
+    g_AnmManager->ExecuteScript(&this->msg.portraits[3]);
+    g_AnmManager->ExecuteScript(&this->msg.dialogueLines[0]);
+    g_AnmManager->ExecuteScript(&this->msg.dialogueLines[1]);
+    g_AnmManager->ExecuteScript(&this->msg.introLines[0]);
+    g_AnmManager->ExecuteScript(&this->msg.introLines[1]);
+    if (this->msg.timer < 60 && this->msg.dialogueSkippable && IS_PRESSED_REPLAY(TH_BUTTON_SKIP))
+    {
+        this->msg.timer = 60;
+    }
+    return ZUN_SUCCESS;
 }
 
 #pragma var_order(height, dialogueBg)
@@ -465,7 +917,24 @@ void Gui::UpdateStageElements()
     g_AnmManager->ExecuteScript(&this->impl->clockTimeSprite);
     if (this->impl->clockTimeSprite.color1.a != 0)
     {
-        // TODO: implementing this requires the position of Player
+        if (g_Player.position.x >= 64.0f && g_Player.position.y < 128.0f)
+        {
+            if (this->impl->clockTimeSprite.color1.a > 64)
+            {
+                this->impl->clockTimeSprite.color1.a -= 4;
+            }
+        }
+        else if (this->impl->clockTimeSprite.color1.a < 255)
+        {
+            if (this->impl->clockTimeSprite.color1.a <= 251)
+            {
+                this->impl->clockTimeSprite.color1.a += 4;
+            }
+            else
+            {
+                this->impl->clockTimeSprite.color1.a = 255;
+            }
+        }
     }
     g_AnmManager->ExecuteScript(&this->impl->nullifySprite);
     g_AnmManager->ExecuteScript(&this->impl->difficultySprite);
@@ -479,7 +948,7 @@ void Gui::UpdateStageElements()
         {
             this->impl->arcadeZoneSprite.activeSpriteIndex = -1;
         }
-        for (u32 i = 0; i < 8; i += 1)
+        for (u32 i = 0; i < 8; i++)
         {
             g_AnmManager->ExecuteScript(&this->impl->arcadeZoneMotionBlurSprites[i]);
         }
@@ -487,7 +956,7 @@ void Gui::UpdateStageElements()
     if (this->impl->stageTransitionActiveScriptCount != 0)
     {
         i32 activeCount = ARRAY_SIZE_SIGNED(this->impl->stageTransitionSprites);
-        for (i32 i = 0; i < ARRAY_SIZE_SIGNED(this->impl->stageTransitionSprites); i += 1)
+        for (i32 i = 0; i < ARRAY_SIZE_SIGNED(this->impl->stageTransitionSprites); i++)
         {
             if (g_AnmManager->ExecuteScript(&this->impl->stageTransitionSprites[i]))
             {
@@ -606,7 +1075,7 @@ void Gui::UpdateStageElements()
                 {
                     this->impl->clearScreenDisplayedClockTime += 3;
                 }
-                if (this->impl->clearScreenClockTime < this->impl->clearScreenDisplayedClockTime)
+                if (this->impl->clearScreenDisplayedClockTime > this->impl->clearScreenClockTime)
                 {
                     this->impl->clearScreenDisplayedClockTime = this->impl->clearScreenClockTime;
                 }

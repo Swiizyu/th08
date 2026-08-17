@@ -26,7 +26,9 @@ struct Spellcard
     static i32 GetDifficultyFromSpellCard(i32 spellcardNumber);
 
     SpellcardFlags flags;
-    unknown_fields(0x4, 0x2628);
+    unknown_fields(0x4, 0x2620);
+    AnmLoaded *playerHumanFaceAnm;
+    AnmLoaded *playerYoukaiFaceAnm;
     AnmLoaded *enemyFaceAnm;
     AnmLoaded *enemyFaceAnm2;
     unknown_fields(0x2634, 0xc);
