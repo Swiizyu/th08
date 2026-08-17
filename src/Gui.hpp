@@ -221,8 +221,8 @@ struct Gui
     void DrawAsciiText();
     void CaptureArcade();
     static ZunBool IsInitialStageLoad();
-    static ZunBool IsResourceReleaseDisabled();
-    static ZunBool IsResourceReloadDisabled();
+    static ZunBool ReleaseResourcesOnRestart();
+    static ZunBool KeepStageResources();
     i32 ShowClockTime();
     i32 FlashClockTimeSlow();
     i32 FlashClockTimeFast();

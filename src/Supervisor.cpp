@@ -200,7 +200,7 @@ ChainCallbackResult Supervisor::OnUpdate(Supervisor *s)
                 break;
             case SupervisorState_SpellcardPracticeRestart:
                 g_Supervisor.curState = SupervisorState_GameManagerReInit;
-                g_Supervisor.disableResourceReload = TRUE;
+                g_Supervisor.keepStageResources = TRUE;
 
                 GameManager::CutChain();
 

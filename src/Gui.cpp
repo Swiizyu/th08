@@ -1482,12 +1482,12 @@ ZunResult Gui::AddedCallback(Gui *gui)
 
 ZunResult Gui::DeletedCallback(Gui *gui)
 {
-    if (!IsResourceReloadDisabled())
+    if (!KeepStageResources())
     {
         g_AnmManager->ReleaseAnm(13);
     }
     gui->FreeMsgFile();
-    if (IsResourceReleaseDisabled())
+    if (ReleaseResourcesOnRestart())
     {
         g_AnmManager->ReleaseAnm(10);
         g_AnmManager->ReleaseAnm(12);
@@ -1806,17 +1806,17 @@ void Gui::CaptureArcade()
 
 ZunBool Gui::IsInitialStageLoad()
 {
-    return g_Supervisor.initialStageLoad;
+    return g_Supervisor.isInitialStageLoad;
 }
 
-ZunBool Gui::IsResourceReleaseDisabled()
+ZunBool Gui::ReleaseResourcesOnRestart()
 {
-    return g_Supervisor.initialStageRelease;
+    return g_Supervisor.releaseResourcesOnRestart;
 }
 
-ZunBool Gui::IsResourceReloadDisabled()
+ZunBool Gui::KeepStageResources()
 {
-    return g_Supervisor.disableResourceReload;
+    return g_Supervisor.keepStageResources;
 }
 
 i32 Gui::ShowClockTime()
@@ -1914,7 +1914,7 @@ ZunResult Gui::ActualAddedCallback()
     {
         return ZUN_ERROR;
     }
-    if (!IsResourceReloadDisabled())
+    if (!KeepStageResources())
     {
         if (!g_GameManager.flags.isSpellPractice || g_GameManager.currentSpellCardNumber < 205)
         {
@@ -1952,7 +1952,7 @@ ZunResult Gui::ActualAddedCallback()
     }
     else
     {
-        if (!IsResourceReloadDisabled() ||
+        if (!KeepStageResources() ||
             GameManager::ShouldPauseMusicInSpellPractice(g_GameManager.currentSpellCardNumber) != 0)
         {
             this->stageTextAnm->ExecuteAnmIdxArray(this->impl->stageTextSprites, 3, 1);

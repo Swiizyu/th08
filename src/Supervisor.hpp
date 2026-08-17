@@ -285,9 +285,9 @@ struct Supervisor
     i32 wantedState;
     i32 curState;
     i32 wantedState2;
-    ZunBool initialStageLoad;
-    ZunBool initialStageRelease;
-    ZunBool disableResourceReload;
+    ZunBool isInitialStageLoad;
+    ZunBool releaseResourcesOnRestart;
+    ZunBool keepStageResources;
     i32 unk170;
     i32 unk174; // Commonly set for screen transitions and decremented once per frame, but never actually used for
                 // anything
