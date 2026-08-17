@@ -8,6 +8,19 @@
 
 namespace th08
 {
+
+struct StdRawHeader
+{
+    i16 nbObjects;
+    i16 nbQuads;
+    u32 quadsOffset;
+    u32 scriptOffset;
+    i32 unk_c;
+    char stageName[128];
+    char songNames[4][128];
+    char songPaths[4][128];
+};
+
 struct Background
 {
     Background();
@@ -29,9 +42,13 @@ struct Background
     {
     }
 
-    unknown_fields(0x0, 0xb20);
+    unknown_fields(0x0, 0x7f4);
+    StdRawHeader *stdData;
+    unknown_fields(0x7f8, 0x325);
     u8 skyFogNeedsSetup; // Leftover from earlier games. Never checked in IN
-    unknown_fields(0xb21, 0x5adf);
+    unknown_fields(0xb21, 0x13);
+    i32 unk_b34;
+    unknown_fields(0xb38, 0x5ac8);
 };
 C_ASSERT(sizeof(Background) == 0x6600);
 

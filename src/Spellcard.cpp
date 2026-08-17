@@ -369,4 +369,5 @@ i32 Spellcard::GetDifficultyFromSpellCard(i32 spellCardNumber)
     }
     return MAX_DIFFICULTIES;
 }
+
 } /* namespace th08 */

@@ -22,6 +22,11 @@ struct BulletManager
 {
     void Initialize();
 
+    // STUB: th08 0x415c60
+    void FUN_00415c60()
+    {
+    }
+
     static ZunResult RegisterChain();
     static ChainCallbackResult OnUpdate(BulletManager *bulletManager);
     static ChainCallbackResult OnDraw(BulletManager *bulletManager);

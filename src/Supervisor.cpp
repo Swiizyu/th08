@@ -200,7 +200,7 @@ ChainCallbackResult Supervisor::OnUpdate(Supervisor *s)
                 break;
             case SupervisorState_SpellcardPracticeRestart:
                 g_Supervisor.curState = SupervisorState_GameManagerReInit;
-                g_Supervisor.unk16c = 1;
+                g_Supervisor.keepStageResources = TRUE;
 
                 GameManager::CutChain();
 
@@ -1082,7 +1082,7 @@ ZunBool Supervisor::LoadMusic(int param_1, char *path)
     return TRUE;
 }
 
-ZunBool Supervisor::PlayMusic(int param_1, char *param_2)
+ZunBool Supervisor::PlayMusic(i32 param_1, i32 param_2)
 {
     if (g_Supervisor.cfg.musicMode == MIDI)
     {
@@ -1092,10 +1092,10 @@ ZunBool Supervisor::PlayMusic(int param_1, char *param_2)
         g_SoundPlayer.QueueCommand(2, param_1, "dummy");
     }
 
-    return 0;
+    return TRUE;
 }
 
-ZunResult Supervisor::PlayAudio(char *path, int param_2)
+ZunResult Supervisor::PlayAudio(char *path, i32 param_2)
 {
     char wavPathBuf[256];
     char *periodLoc;

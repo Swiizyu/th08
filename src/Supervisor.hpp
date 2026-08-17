@@ -138,7 +138,7 @@ struct Supervisor
 
     ZunResult LoadConfig(char *configFile);
     ZunBool LoadMusic(int param_1, char *param_2);
-    ZunBool PlayMusic(int param_1, char *param_2);
+    ZunBool PlayMusic(i32 param_1, i32 param_2);
     ZunResult PlayAudio(char *path, int param_2);
     ZunResult StopAudio();
     ZunBool IsSlowModeEnabled();
@@ -205,6 +205,11 @@ struct Supervisor
         return this->cfg.opts.force16bitTextures;
     }
 
+    ZunBool IsMinimumGraphicsMode()
+    {
+        return this->cfg.opts.displayMinimumGraphics;
+    }
+
     ZunBool IsDepthTestDisabled()
     {
         return this->cfg.opts.disableDepthTest;
@@ -220,7 +225,7 @@ struct Supervisor
         return this->cfg.opts.disableFog;
     }
 
-    ZunBool Supervisor::IsHUDRedrawEnabled()
+    ZunBool IsHUDRedrawEnabled()
     {
         return this->cfg.opts.redrawHUDEveryFrame;
     }
@@ -280,9 +285,9 @@ struct Supervisor
     i32 wantedState;
     i32 curState;
     i32 wantedState2;
-    i32 unk164;
-    i32 unk168;
-    i32 unk16c;
+    ZunBool isInitialStageLoad;
+    ZunBool releaseResourcesOnRestart;
+    ZunBool keepStageResources;
     i32 unk170;
     i32 unk174; // Commonly set for screen transitions and decremented once per frame, but never actually used for
                 // anything
@@ -425,4 +430,20 @@ struct ZunTimer
     void Increment(i32 value);
     void Decrement(i32 value);
 };
+
+inline ZunBool IsInitialStageLoad()
+{
+    return g_Supervisor.isInitialStageLoad;
+}
+
+inline ZunBool ReleaseResourcesOnRestart()
+{
+    return g_Supervisor.releaseResourcesOnRestart;
+}
+
+inline ZunBool KeepStageResources()
+{
+    return g_Supervisor.keepStageResources;
+}
+
 }; // namespace th08

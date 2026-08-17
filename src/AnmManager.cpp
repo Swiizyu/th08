@@ -1402,6 +1402,32 @@ ZunResult AnmManager::DrawNoRotationNoRound(AnmVm *vm)
     return this->DrawInner(vm, 0);
 }
 
+// STUB: th08 0x463d60
+void AnmManager::TransformVerticesWorld(AnmVm *vm)
+{
+}
+
+ZunResult AnmManager::DrawWorld(AnmVm *vm)
+{
+    if (!vm->IsVisible())
+    {
+        return ZUN_ERROR;
+    }
+
+    if (!vm->flag1)
+    {
+        return ZUN_ERROR;
+    }
+
+    if (vm->color1.a == 0)
+    {
+        return ZUN_ERROR;
+    }
+
+    TransformVerticesWorld(vm);
+    return DrawInner(vm, 0);
+}
+
 ZunResult AnmManager::DrawTriangleFan(AnmVm *vm, VertexDiffuseXyzrhw *vertices, i32 vertexCount)
 {
     if (this->spritesToDraw != 0)

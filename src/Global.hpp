@@ -12,7 +12,10 @@ namespace th08
 {
 
 #define IS_PRESSED(key) (g_CurFrameInput & (key))
+#define IS_PRESSED_REPLAY(key) (g_ReplayCurFrameInput & (key))
 #define WAS_PRESSED(key) (((g_CurFrameInput & (key)) != 0) && (g_CurFrameInput & (key)) != (g_LastFrameInput & (key)))
+#define WAS_PRESSED_REPLAY(key)                                                                                        \
+    (((g_ReplayCurFrameInput & (key)) != 0) && (g_ReplayCurFrameInput & (key)) != (g_ReplayLastFrameInput & (key)))
 #define WAS_PRESSED_SCROLLING(key)                                                                                     \
     (WAS_PRESSED(key) || (((g_CurFrameInput & (key)) != 0) && (g_IsEighthFrameOfHeldInput != 0)))
 
@@ -471,7 +474,9 @@ void Rotate(Float3 *outVector, Float3 *point, f32 angle);
 
 DIFFABLE_EXTERN(Rng, g_Rng);
 DIFFABLE_EXTERN(u16, g_CurFrameInput);
+DIFFABLE_EXTERN(u16, g_ReplayCurFrameInput);
 DIFFABLE_EXTERN(u16, g_LastFrameInput);
+DIFFABLE_EXTERN(u16, g_ReplayLastFrameInput);
 DIFFABLE_EXTERN(u16, g_NumOfFramesInputsWereHeld);
 DIFFABLE_EXTERN(u16, g_IsEighthFrameOfHeldInput);
 DIFFABLE_EXTERN(GameErrorContext, g_GameErrorContext);

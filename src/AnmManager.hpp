@@ -301,6 +301,11 @@ struct AnmVmBase
         this->visible = FALSE;
     }
 
+    ZunBool IsStopped()
+    {
+        return this->stopped;
+    }
+
     void SetInterrupt(i16 interrupt)
     {
         this->pendingInterrupt = interrupt;
@@ -490,6 +495,8 @@ struct AnmManager
     ZunResult Draw2D(AnmVm *vm);
     ZunResult Draw2DNoRound(AnmVm *vm);
     ZunResult DrawNoRotationNoRound(AnmVm *vm);
+    void TransformVerticesWorld(AnmVm *vm);
+    ZunResult DrawWorld(AnmVm *vm);
     ZunResult DrawTriangleFan(AnmVm *vm, VertexDiffuseXyzrhw *vertices, i32 vertexCount);
     ZunResult CreateTextureFromFile(IDirect3DTexture8 **outTexture, i32 format, i32 colorKey);
     ZunResult CreateTextureFromAnm(IDirect3DTexture8 **outTexture, AnmTextureHeader *textureData, i32 format);

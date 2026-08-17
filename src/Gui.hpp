@@ -4,11 +4,182 @@
 #include "Global.hpp"
 #include "utils.hpp"
 
+#define TRANSITION_SPRITE_ROWS 14
+#define TRANSITION_SPRITE_COLS 12
+
 namespace th08
 {
 
-struct GuiImpl
+enum MsgOpcode
 {
+    MsgOpcode_MsgDelete,
+    MsgOpcode_PortraitAnmScript,
+    MsgOpcode_PortraitAnmSprite,
+    MsgOpcode_TextDialogue,
+    MsgOpcode_Wait,
+    MsgOpcode_AnmInterrupt,
+    MsgOpcode_EclResume,
+    MsgOpcode_Music,
+    MsgOpcode_TextIntro,
+    MsgOpcode_StageResults,
+    MsgOpcode_MsgHalt,
+    MsgOpcode_StageEnd,
+    MsgOpcode_MusicFadeOut,
+    MsgOpcode_WaitSkippable,
+    MsgOpcode_ScreenFade,
+    MsgOpcode_PortraitConfigureAll,
+    MsgOpcode_TextSpeakerDialogue,
+    MsgOpcode_PortraitConfigure,
+    MsgOpcode_TextboxVisible,
+    MsgOpcode_TextTopLine,
+    MsgOpcode_TextBottomLine,
+    MsgOpcode_SelectionBox,
+    MsgOpcode_ReadSelected,
+};
+
+struct MsgRawInstrArgPortraitConfigureAll
+{
+    i32 portraitIndex;
+    i32 playerHumanFaceSpriteIndex;
+    i32 playerYoukaiFaceSpriteIndex;
+    i32 enemyFaceSpriteIndex;
+    i32 enemyFace2SpriteIndex;
+};
+
+struct MsgRawInstrArgPortraitConfigure
+{
+    i32 portraitIndex;
+    i32 faceSpriteIndex;
+};
+
+struct MsgRawInstrArgPortraitAnmScript
+{
+    i16 portraitIndex;
+    i16 anmScriptIndex;
+};
+
+struct MsgRawInstrArgPortraitAnmSprite
+{
+    i16 portraitIndex;
+    i16 anmScriptIndex;
+};
+
+struct MsgRawInstrArgTextDialogue
+{
+    i16 textColor;
+    i16 textLine;
+    char text[1];
+};
+
+struct MsgRawInstrArgTextSpeakerDialogue
+{
+    char text[1];
+};
+
+struct MsgRawInstrArgSelectionBox
+{
+    i32 wait;
+};
+
+struct MsgRawInstrArgWait
+{
+    i32 wait;
+};
+
+struct MsgRawInstrArgAnmInterrupt
+{
+    i16 portraitIndex;
+    u8 interrupt;
+};
+
+struct MsgRawInstrArgMusic
+{
+    i32 musicIndex;
+};
+
+struct MsgRawInstrArgWaitSkippable
+{
+    bool skippable;
+};
+
+struct MsgRawInstrArgTextboxVisible
+{
+    bool visible;
+};
+
+union MsgRawInstrArgs {
+    MsgRawInstrArgPortraitConfigureAll portraitConfigureAll;
+    MsgRawInstrArgPortraitConfigure portraitConfigure;
+    MsgRawInstrArgPortraitAnmScript portraitAnmScript;
+    MsgRawInstrArgPortraitAnmSprite portraitAnmSprite;
+    MsgRawInstrArgTextDialogue textDialogue;
+    MsgRawInstrArgTextSpeakerDialogue textSpeakerDialogue;
+    MsgRawInstrArgSelectionBox selectionBox;
+    MsgRawInstrArgWait wait;
+    MsgRawInstrArgAnmInterrupt anmInterrupt;
+    MsgRawInstrArgMusic music;
+    MsgRawInstrArgWaitSkippable waitSkippable;
+    MsgRawInstrArgTextboxVisible textboxVisible;
+};
+
+struct MsgRawInstr
+{
+    u16 time;
+    u8 opcode;
+    u8 instructionSize;
+    MsgRawInstrArgs args;
+};
+
+struct MsgRawHeader
+{
+    i32 numInstrs;
+    MsgRawInstr *instrs;
+};
+
+struct GuiMsgVm
+{
+    MsgRawHeader *msgFile;
+    MsgRawInstr *currentInstr;
+    i32 currentMsgIdx;
+    ZunTimer timer;
+    i32 framesElapsedDuringPause;
+    i32 unk_1c;
+    AnmVm portraits[4];
+    AnmVm dialogueLines[2];
+    AnmVm introLines[2];
+    COLORREF textColorsA[4];
+    COLORREF textColorsB[4];
+    u32 fontSize;
+    u32 ignoreWaitCounter;
+    bool dialogueSkippable;
+    u8 textColorIdx;
+    bool resetDialogueLines;
+    u8 dialogueLineIndex;
+    u8 currentPortraitIndex;
+    bool isTextBoxVisible;
+    u8 selectedOption;
+    /* 1 byte pad */
+};
+C_ASSERT(sizeof(GuiMsgVm) == 0x1570);
+
+enum GuiDisplayArg
+{
+    GUI_DISPLAY_HIDDEN = 0,
+    GUI_DISPLAY_SHOWN = 1,
+    GUI_DISPLAY_FULL_POWER = 1,
+    GUI_DISPLAY_BORDER = 2,
+    GUI_DISPLAY_CHERRY_MAX = 3,
+    GUI_DISPLAY_BORDER_BONUS = 4,
+    GUI_DISPLAY_SPELL_BONUS_FAILED = 5,
+    GUI_DISPLAY_LAST_SPELL_FAILED = 6,
+};
+
+struct GuiFormattedText
+{
+    Float3 pos;
+    i32 fmtArg;
+    i32 displayArg;
+    ZunTimer timer;
 };
 
 struct GuiFlags
@@ -34,14 +205,34 @@ struct Gui
     static ZunResult RegisterChain();
     static void CutChain();
 
-    ZunResult ActualAddedCallback();
+    i32 MsgWait();
+    i32 IsDialoguePresent();
+    void UpdateStageElements();
+    void DrawGameScene();
+    void DrawStageElements();
+    ZunBool IsStageFinished();
+    ZunBool IsDialogueSkippable();
+    void ShowBonusScore(i32 score);
+    void ShowPopupText(i32 fmtArg, i32 popupType);
+    void ShowSpellcardBonus(i32 bonus);
+    static void CopyEnemyNameTexture(i32 param_1);
+    static void FUN_00438046();
+    void DrawStageClearScreen();
+    void DrawAsciiText();
     void CaptureArcade();
+    i32 ShowClockTime();
+    i32 FlashClockTimeSlow();
+    i32 FlashClockTimeFast();
+    i32 HideClockTime();
+    ZunResult ActualAddedCallback();
+    void InitStageClearScreen();
     ZunResult LoadMsg(const char *path);
     void FreeMsgFile();
+    void MsgRead(i32 msgIdx);
 
-    u32 unk_0;
+    u32 frameCounter;
     GuiFlags flags;
-    GuiImpl *impl;
+    struct GuiImpl *impl;
     AnmLoaded *frontAnm;
     AnmLoaded *stageTextAnm;
     AnmLoaded *timesAnm;
