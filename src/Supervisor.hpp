@@ -430,4 +430,20 @@ struct ZunTimer
     void Increment(i32 value);
     void Decrement(i32 value);
 };
+
+inline ZunBool IsInitialStageLoad()
+{
+    return g_Supervisor.isInitialStageLoad;
+}
+
+inline ZunBool ReleaseResourcesOnRestart()
+{
+    return g_Supervisor.releaseResourcesOnRestart;
+}
+
+inline ZunBool KeepStageResources()
+{
+    return g_Supervisor.keepStageResources;
+}
+
 }; // namespace th08

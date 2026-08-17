@@ -1804,21 +1804,6 @@ void Gui::CaptureArcade()
         this->impl->arcadeZoneSprite.loadedSprite->widthPx, this->impl->arcadeZoneSprite.loadedSprite->heightPx);
 }
 
-ZunBool Gui::IsInitialStageLoad()
-{
-    return g_Supervisor.isInitialStageLoad;
-}
-
-ZunBool Gui::ReleaseResourcesOnRestart()
-{
-    return g_Supervisor.releaseResourcesOnRestart;
-}
-
-ZunBool Gui::KeepStageResources()
-{
-    return g_Supervisor.keepStageResources;
-}
-
 i32 Gui::ShowClockTime()
 {
     this->timesAnm->ExecuteAnmIdx(&this->impl->clockTimeSprite, 2);
