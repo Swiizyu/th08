@@ -4,6 +4,7 @@
 #include "inttypes.hpp"
 #include "utils.hpp"
 
+#include "Global.hpp"
 #include "ScoreDat.hpp"
 
 #include <windows.h>
@@ -101,12 +102,51 @@ C_ASSERT(sizeof(ReplayData) == 0x134);
 
 struct ReplayManager
 {
+    ReplayManager();
+
+    static ZunResult RegisterChain(i32 isDemo, char *replayFile);
+    static ChainCallbackResult OnUpdateLowPrio(ReplayManager *mgr);
+    static ChainCallbackResult OnUpdateHighPrio(ReplayManager *mgr);
+    static ChainCallbackResult OnUpdateHighPrioDemo(ReplayManager *mgr);
+    static ZunResult AddedCallback(ReplayManager *mgr);
+    static ZunResult AddedCallbackDemo(ReplayManager *mgr);
+    static ZunResult DeletedCallback(ReplayManager *mgr);
     static void SaveReplay(const char *replayPath, const char *replayName);
     static ReplayData *LoadReplayData(void *replayData, int fileSize);
 
-    unknown_fields(0x0, 0x8);
+    i32 frameId;
+    i32 unk4;
     ReplayData *replayData;
+    void *unk0xc;
+    i32 isDemo;
+    char *replayFile;
+
+    Float3 unk18;
+    Float3 unk24;
+    Float3 unk30;
+    Float3 unk3c;
+
+    unknown_fields(0x48, 6);
+    u16 unk4e;
+
+    u8 *recordingCursor;
+    u8 *recordingStageBookmarks[MAX_STAGES];
+    u8 *recordingCursor2;
+
+    unknown_fields(0x7c, 0x24);
+
+    u8 *fpsCursor;
+    u8 *fpsStageBookmarks[MAX_STAGES];
+
+    ChainElem *calcChain;
+    i32 unk0xcc;
+    ChainElem *altCalcChain;
+    ChainElem *lowPrioCalcChain;
+    u16 rngSeed;
+    u16 inputFlags;
 };
+
+C_ASSERT(sizeof(ReplayManager) == 0xdc);
 
 DIFFABLE_EXTERN(ReplayManager *, g_ReplayManager);
 

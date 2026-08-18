@@ -203,6 +203,11 @@ struct GameManager
         return this->globals->clockTime;
     }
 
+    void SetClockTime(i8 time)
+    {
+        this->globals->clockTime = time;
+    }
+
     void AddToClockTime(i8 amount)
     {
         this->globals->clockTime += amount;
