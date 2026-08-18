@@ -5,6 +5,18 @@
 namespace th08
 {
 
+// FUNCTION: th08 0x40bc20
+ZunBool Player::IsHuman()
+{
+    return this->isYoukai == 0;
+}
+
+// FUNCTION: th08 0x40bc40
+ZunBool Player::IsYoukai()
+{
+    return this->isYoukai;
+}
+
 DIFFABLE_STATIC(Player, g_Player);
 DIFFABLE_STATIC(ChainElem *, g_PlayerCalcChain);
 DIFFABLE_STATIC(ChainElem *, g_PlayerDrawChainHighPrio);

@@ -47,6 +47,8 @@ C_ASSERT(sizeof(RetryMenu) == 0x1284);
 
 struct AsciiManagerString
 {
+    AsciiManagerString();
+
     char text[64];
     Float3 position;
     D3DCOLOR color;

@@ -18,6 +18,11 @@
 namespace th08
 {
 
+// FUNCTION: th08 0x437d45
+GuiFormattedText::GuiFormattedText()
+{
+}
+
 struct GuiImpl
 {
     void MsgRead(i32 msgIdx);
@@ -2005,3 +2010,38 @@ void Gui::MsgRead(i32 msgIdx)
 }
 
 } /* namespace th08 */
+
+// FUNCTION: th08 0x4338b0
+u32 FUN_004338b0()
+{
+    return *(u32 *)((u8 *)&th08::g_Supervisor + 356);
+}
+
+// FUNCTION: th08 0x438fe9
+u32 FUN_00438fe9()
+{
+    return *(u32 *)((u8 *)&th08::g_Supervisor + 356);
+}
+
+// FUNCTION: th08 0x438ff3
+u32 FUN_00438ff3()
+{
+    return *(u32 *)((u8 *)&th08::g_Supervisor + 360);
+}
+
+// FUNCTION: th08 0x438ffd
+namespace th08
+{
+u32 IsDisableResourceReload();
+}
+
+u32 th08::IsDisableResourceReload()
+{
+    return *(u32 *)((u8 *)&th08::g_Supervisor + 364);
+}
+
+// FUNCTION: th08 0x437dc7
+i32 FUN_00437dc7(th08::Gui *gui)
+{
+    return *(u8 *)((u8 *)gui->impl + 0x22d7c);
+}

@@ -176,6 +176,8 @@ enum GuiDisplayArg
 
 struct GuiFormattedText
 {
+    GuiFormattedText();
+
     Float3 pos;
     i32 fmtArg;
     i32 displayArg;

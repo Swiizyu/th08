@@ -5,6 +5,8 @@
 #include "dxutil.hpp"
 #include "i18n.hpp"
 
+
+
 namespace th08
 {
 DIFFABLE_STATIC(IDirect3DSurface8 *, g_TextBufferSurface)

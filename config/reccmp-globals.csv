@@ -115,7 +115,9 @@ th08::g_JoystickCaps,0x164d388,global
 th08::g_FocusButtonConflictState,0x164d51c,global
 th08::g_Rng,0x164d520,global
 th08::g_CurFrameInput,0x164d528,global
+th08::g_ReplayCurFrameInput,0x164d52c,global
 th08::g_LastFrameInput,0x164d530,global
+th08::g_ReplayLastFrameInput,0x164d534,global
 th08::g_IsEighthFrameOfHeldInput,0x164d538,global
 th08::g_NumOfFramesInputsWereHeld,0x164d53c,global
 th08::g_GameErrorContext,0x164d540,global

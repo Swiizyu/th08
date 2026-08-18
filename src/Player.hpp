@@ -34,6 +34,9 @@ struct Player
 
     static ZunResult LoadShtFile(PlayerRawShtFile **header, const char *path);
 
+    ZunBool IsHuman();
+    ZunBool IsYoukai();
+
     i8 playerState;           // 0x0
     unknown_fields(0x1, 0x2); // 0x1
     u8 isFocus;               // 0x3

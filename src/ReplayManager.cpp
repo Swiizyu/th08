@@ -24,14 +24,10 @@ static const char *g_ReplayDifficultyNames[6] = {"Easy", "Normal", "Hard", "Luna
 
 } // namespace th08
 
-// Working copies of the current/previous frame inputs, used by the replay
-// system. They live right behind g_CurFrameInput/g_LastFrameInput in memory.
-#define g_CurFrameInputWork (((u16 *)&th08::g_CurFrameInput)[2])
-#define g_LastFrameInputWork (((u16 *)&th08::g_LastFrameInput)[2])
-
 extern "C" int __cdecl vsprintf(char *buffer, const char *format, va_list args);
 
 i32 FUN_00453cc0(th08::ReplayManager *mgr);
+i32 FUN_00437dc7(th08::Gui *gui);
 void FUN_004531a0(void);
 th08::ChainCallbackResult FUN_00452490(th08::ReplayManager *mgr);
 th08::ChainCallbackResult FUN_004526c0(th08::ReplayManager *mgr);
@@ -54,8 +50,8 @@ char *sprintf(char *dst, const char *fmt, ...)
     do
     {
         byte = *cur;
-        cur++;
-    } while (byte != 0);
+        cur = cur + 1;
+    } while (byte);
     len = cur - next;
     return dst + len;
 }
@@ -75,12 +71,6 @@ i32 FUN_0042f1f0(th08::EnemyManager *enemyManager)
     return 0;
 }
 
-// FUNCTION: th08 0x437dc7
-i32 FUN_00437dc7(th08::Gui *gui)
-{
-    return *(u8 *)((u8 *)gui->impl + 0x22d7c);
-}
-
 namespace th08
 {
 
@@ -94,8 +84,8 @@ ZunResult ReplayManager::RegisterChain(i32 isDemo, char *replayFile)
 {
     ReplayManager *replayMgr;
 
-    g_LastFrameInputWork = 0;
-    g_CurFrameInputWork = 0;
+    g_ReplayLastFrameInput = 0;
+    g_ReplayCurFrameInput = 0;
 
     if (g_ReplayManager == NULL)
     {
@@ -172,11 +162,11 @@ ChainCallbackResult ReplayManager::OnUpdateLowPrio(ReplayManager *mgr)
     mgr->inputFlags = 0;
     mgr->rngSeed = g_Rng.GetSeed();
     g_Rng.ResetGenerationCount();
-    if (*(u32 *)((u8 *)&g_GameManager + 0x3b98) != 0)
+    if (*(u32 *)((u8 *)&g_GameManager + 0x3db98) != 0)
     {
         mgr->inputFlags |= 0x100;
     }
-    *(u32 *)((u8 *)&g_GameManager + 0x3b98) = 0;
+    *(u32 *)((u8 *)&g_GameManager + 0x3db98) = 0;
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
@@ -184,15 +174,14 @@ ChainCallbackResult ReplayManager::OnUpdateLowPrio(ReplayManager *mgr)
 ChainCallbackResult ReplayManager::OnUpdateHighPrio(ReplayManager *mgr)
 {
     i32 stage;
-    u16 input;
 
     if (g_GameManager.flags.unk2 == 0)
     {
         return CHAIN_CALLBACK_RESULT_CONTINUE;
     }
 
-    g_LastFrameInputWork = g_CurFrameInputWork;
-    g_CurFrameInputWork = g_CurFrameInput;
+    g_ReplayLastFrameInput = g_ReplayCurFrameInput;
+    g_ReplayCurFrameInput = g_CurFrameInput;
 
     if (g_GameManager.cfg->slowMode != 0)
     {
@@ -213,8 +202,8 @@ ChainCallbackResult ReplayManager::OnUpdateHighPrio(ReplayManager *mgr)
     }
 
     stage = g_GameManager.currentStage2;
-    input = g_CurFrameInput;
-    g_CurFrameInputWork = input;
+    u16 input = g_CurFrameInput;
+    g_ReplayCurFrameInput = input;
 
     mgr->recordingCursor += 2;
     mgr->recordingStageBookmarks[stage] = mgr->recordingCursor + 2;
@@ -252,12 +241,12 @@ ChainCallbackResult ReplayManager::OnUpdateHighPrioDemo(ReplayManager *mgr)
 
     unused = 0;
 
-    g_LastFrameInputWork = g_CurFrameInputWork;
-    g_CurFrameInputWork = *(u16 *)mgr->recordingCursor;
+    g_ReplayLastFrameInput = g_ReplayCurFrameInput;
+    g_ReplayCurFrameInput = *(u16 *)mgr->recordingCursor;
     mgr->recordingCursor += 2;
 
     g_IsEighthFrameOfHeldInput = 0;
-    if (g_LastFrameInputWork == g_CurFrameInputWork)
+    if (g_ReplayLastFrameInput == g_ReplayCurFrameInput)
     {
         if (g_NumOfFramesInputsWereHeld >= 30)
         {
@@ -725,7 +714,7 @@ void ReplayManager::SaveReplay(const char *replayPath, const char *replayName)
             *dstCursor = copiedByte;
             srcCursor++;
             dstCursor++;
-        } while (copiedByte != 0);
+        } while (copiedByte);
     }
 
     ResultScreen::FormatDate(replayDataCopy.date);
@@ -810,12 +799,12 @@ cutChain:
 ReplayData *ReplayManager::LoadReplayData(void *data, int fileSize)
 {
     u8 *obfuscateCursor;
-    u8 obfuscateOffset;
     u8 *checksumCursor;
     u32 checksum;
     i32 i;
     ReplayData *decodedReplay;
     ReplayData *replayData = (ReplayData *)data;
+    u8 obfuscateOffset;
 
     if (replayData == NULL)
     {
@@ -941,12 +930,12 @@ th08::ChainCallbackResult FUN_004526c0(th08::ReplayManager *mgr)
 
     unused = 0;
 
-    g_LastFrameInputWork = g_CurFrameInputWork;
-    g_CurFrameInputWork = *(u16 *)mgr->recordingCursor2;
+    g_ReplayLastFrameInput = g_ReplayCurFrameInput;
+    g_ReplayCurFrameInput = *(u16 *)mgr->recordingCursor2;
     mgr->recordingCursor2 += 6;
 
     g_IsEighthFrameOfHeldInput = 0;
-    if (g_LastFrameInputWork == g_CurFrameInputWork)
+    if (g_ReplayLastFrameInput == g_ReplayCurFrameInput)
     {
         if (g_NumOfFramesInputsWereHeld >= 30)
         {

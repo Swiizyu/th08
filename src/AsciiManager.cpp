@@ -19,6 +19,11 @@ DIFFABLE_STATIC(AsciiManager, g_AsciiManager);
 DIFFABLE_STATIC(ChainElem, g_AsciiManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_AsciiManagerDrawChainHighPrio);
 
+// FUNCTION: th08 0x402130
+AsciiManagerString::AsciiManagerString()
+{
+}
+
 // Sprite indices
 #define ASCII_SPRITE_SMALL_SCORE_0 0
 #define ASCII_SPRITE_EXCLAMATION_POINT 32
