@@ -32,6 +32,9 @@ static const char *g_ReplayDifficultyNames[6] = {"Easy", "Normal", "Hard", "Luna
 extern "C" int __cdecl vsprintf(char *buffer, const char *format, va_list args);
 
 i32 FUN_00453cc0(th08::ReplayManager *mgr);
+void FUN_004531a0(void);
+th08::ChainCallbackResult FUN_00452490(th08::ReplayManager *mgr);
+th08::ChainCallbackResult FUN_004526c0(th08::ReplayManager *mgr);
 
 // FUNCTION: th08 0x453b80
 char *sprintf(char *dst, const char *fmt, ...)
@@ -39,6 +42,7 @@ char *sprintf(char *dst, const char *fmt, ...)
     va_list args;
     char *cur;
     char *next;
+    u8 byte;
     i32 len;
 
     va_start(args, fmt);
@@ -47,9 +51,11 @@ char *sprintf(char *dst, const char *fmt, ...)
 
     cur = dst;
     next = cur + 1;
-    while (*cur++ != 0)
+    do
     {
-    }
+        byte = *cur;
+        cur++;
+    } while (byte != 0);
     len = cur - next;
     return dst + len;
 }
@@ -572,10 +578,8 @@ void ReplayManager::SaveReplay(const char *replayPath, const char *replayName)
     char *strlenNext;
     i32 strlenOut;
 
-    if (g_ReplayManager == NULL)
+    if (g_ReplayManager != NULL)
     {
-        return;
-    }
     mgr = g_ReplayManager;
 
     if (::FUN_00453cc0(mgr) != 0)
@@ -642,7 +646,7 @@ void ReplayManager::SaveReplay(const char *replayPath, const char *replayName)
     }
 
     clampedSlowRate = (g_Supervisor.lagNumerator / g_Supervisor.lagDenominator - 0.5f) * 2.0f;
-    if (clampedSlowRate <= 0.0f)
+    if (clampedSlowRate < 0.0f)
     {
         clampedSlowRate = 0.0f;
     }
@@ -690,10 +694,10 @@ void ReplayManager::SaveReplay(const char *replayPath, const char *replayName)
     textCursor = sprintf(textCursor, "\x83\x7b\x83\x80\x89\xf1\x90\x94\t%d\r\n", g_GameManager.GetBombsUsed());
     textCursor = sprintf(textCursor, "\x8f\x88\x97\x9d\x97\x8e\x82\xbf\x97\xa6\t%f%%\r\n", replayDataCopy.slowDownRate);
 
-    *(i32 *)((u8 *)&g_GameManager + 0x3ab0) =
+    *(i32 *)((u8 *)&g_GameManager + 0x3dab0) =
         (i32)((f32)g_GameManager.unk3DBA0 / (f32)g_GameManager.unk3DBA4 * 10000.0f);
-    textCursor = sprintf(textCursor, "\x90\x6c\x8a\xd4\x97\xa6\t\t%3.2f\r\n",
-                         (f32) * (i32 *)((u8 *)&g_GameManager + 0x3ab0) / 100.0f);
+    textCursor = sprintf(textCursor, "\x90\x6c\x8a\xd4\x97\xa6\t\t%3.2f\x81\x93\r\n",
+                         (f32) * (i32 *)((u8 *)&g_GameManager + 0x3dab0) / 100.0f);
     textCursor = sprintf(textCursor, "\x83\x51\x81\x5b\x83\x80\x82\xcc\x83\x6f\x81\x5b\x83\x57\x83\x87\x83\x93\t%d.%.2d%c\r\n",
                          1, 0, 'd');
 
@@ -711,7 +715,7 @@ void ReplayManager::SaveReplay(const char *replayPath, const char *replayName)
     {
         char *srcCursor;
         char *dstCursor;
-        char copiedByte;
+        u8 copiedByte;
 
         srcCursor = (char *)replayName;
         dstCursor = replayDataCopy.playerName;
@@ -781,7 +785,7 @@ void ReplayManager::SaveReplay(const char *replayPath, const char *replayName)
     CloseHandle(fileHandle);
 
     utils::DebugPrint("info : Size %d -> %d\r\n", encodeCursor, compressedSize + 0x68);
-    free(compressedData);
+    GlobalFree(compressedData);
 
 abortSave:
     for (i = 0; i < MAX_STAGES; i++)
@@ -798,6 +802,95 @@ abortSave:
 
 cutChain:
     g_Chain.Cut(g_ReplayManager->calcChain);
+    }
+}
+
+// FUNCTION: th08 0x451d90
+#pragma var_order(decodedReplay, i, replayData, obfuscateOffset, obfuscateCursor, checksum, checksumCursor)
+ReplayData *ReplayManager::LoadReplayData(void *data, int fileSize)
+{
+    u8 *obfuscateCursor;
+    u8 obfuscateOffset;
+    u8 *checksumCursor;
+    u32 checksum;
+    i32 i;
+    ReplayData *decodedReplay;
+    ReplayData *replayData = (ReplayData *)data;
+
+    if (replayData == NULL)
+    {
+        goto err1;
+    }
+
+    if (replayData->header.magic != *(u32 *)REPLAY_MAGIC)
+    {
+        goto err1;
+    }
+
+    if (replayData->header.version != REPLAY_VERSION)
+    {
+        goto err1;
+    }
+
+    obfuscateCursor = (u8 *)&replayData->header.compressedSize;
+    obfuscateOffset = replayData->header.value1;
+
+    for (i = 0; i < replayData->header.fileSize - (i32)offsetof(ReplayDataHeader, compressedSize);
+         i++, obfuscateCursor++)
+    {
+        *obfuscateCursor -= obfuscateOffset;
+        obfuscateOffset += 7;
+    }
+
+    checksumCursor = &replayData->header.value1;
+    checksum = REPLAY_OBFUSCATION_VALUE;
+
+    for (i = 0; i < replayData->header.fileSize - (i32)offsetof(ReplayDataHeader, value1); i++, checksumCursor++)
+    {
+        checksum += *checksumCursor;
+    }
+
+    if (checksum != replayData->header.checksum)
+    {
+        goto err1;
+    }
+
+    decodedReplay = (ReplayData *)g_ZunMemory.Alloc(replayData->header.decompressedSize + sizeof(ReplayDataHeader) +
+                                                    (fileSize - replayData->header.fileSize));
+
+    memcpy(&decodedReplay->header, data, sizeof(ReplayDataHeader));
+
+    Lzss::Decode((u8 *)replayData + sizeof(ReplayDataHeader), replayData->header.compressedSize,
+                 (u8 *)decodedReplay + sizeof(ReplayDataHeader), replayData->header.decompressedSize);
+
+    memcpy((u8 *)decodedReplay + sizeof(ReplayDataHeader) + replayData->header.decompressedSize,
+           (u8 *)data + replayData->header.fileSize, fileSize - replayData->header.fileSize);
+
+    replayData = decodedReplay;
+
+    if (replayData->gameConfiguration.slowMode != 0)
+    {
+        goto err2;
+    }
+
+    if (g_Supervisor.CheckVersion(replayData->exeVersion, replayData->exeSize, replayData->exeChecksum) != ZUN_SUCCESS)
+    {
+        goto err2;
+    }
+
+    g_ZunMemory.Free(data);
+
+    return decodedReplay;
+
+err1:
+    g_ZunMemory.Free(data);
+    return NULL;
+
+err2:
+    g_ZunMemory.Free(data);
+    g_ZunMemory.Free(decodedReplay);
+
+    return NULL;
 }
 
 } // namespace th08
