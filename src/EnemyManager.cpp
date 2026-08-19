@@ -83,8 +83,8 @@ DIFFABLE_STATIC_ARRAY_ASSIGN(EffectTemplate, 66, g_EffectTemplates) = {
     {49, NULL, NULL},
     {50, NULL, NULL},
     {88, &Effect::FUN_00427990, &Effect::FUN_004272e0},
-    {88, NULL, NULL},
-    {92, NULL, NULL},
+    {88, NULL, &Effect::FUN_00411720},
+    {92, NULL, &Effect::FUN_00411a80},
     {71, NULL, NULL},
     {76, &Effect::FUN_00427990, &Effect::FUN_004272e0},
     {81, &Effect::FUN_004279d0, &Effect::FUN_004272e0},
@@ -366,6 +366,81 @@ i32 Effect::FUN_00410bb0()
     *(i32 *)((u8 *)this + 0x324) = 12;
     *(f32 *)((u8 *)this + 0x320) = 32.0f;
     return 1;
+}
+
+// FUNCTION: th08 0x4114e0
+#pragma var_order(factor)
+i32 Effect::FUN_004114e0()
+{
+    f32 factor;
+
+    *(u8 *)((u8 *)this + 0x356) = 1;
+    if (this->timer <= 40)
+    {
+        factor = 1.0f - (f32)this->timer.AsFrames() / 40.0f;
+        *(f32 *)((u8 *)this + 0x320) = ZUN_PI - g_Rng.GetRandomF32() * (2.0f * ZUN_PI) / 40.0f;
+        *(f32 *)((u8 *)this + 0x314) = 64.0f - 64.0f * factor * factor;
+        (*(i32 *)((u8 *)this + 0x324))--;
+    }
+    else
+    {
+        this->active = 0;
+    }
+    return 1;
+}
+
+// FUNCTION: th08 0x4117b0
+#pragma var_order(factor, angle)
+i32 Effect::FUN_004117b0()
+{
+    f32 angle;
+    f32 factor;
+
+    angle = *(f32 *)((u8 *)this + 0x318) +
+            ((*(i32 *)((u8 *)this + 0x328) & 1) ? 0.039269908f : -0.039269908f);
+    *(f32 *)((u8 *)this + 0x318) = sin(angle) * 1.5707964f;
+    *(u8 *)((u8 *)this + 0x356) = 1;
+    if (this->timer <= 50)
+    {
+        factor = 1.0f - (f32)this->timer.AsFrames() / 50.0f;
+        angle = ((f32)(*(i32 *)((u8 *)this + 0x328) - 4) * 0.4f) + 1.0f;
+        *(f32 *)((u8 *)this + 0x320) = ZUN_PI - g_Rng.GetRandomF32() * (2.0f * ZUN_PI) / 50.0f;
+        *(f32 *)((u8 *)this + 0x314) = 64.0f +
+                                              (f32)(*(i32 *)((u8 *)this + 0x328) - 4) * 0.4f -
+                                              angle * factor * factor;
+        (*(i32 *)((u8 *)this + 0x324))--;
+    }
+    else
+    {
+        this->active = 0;
+    }
+    return 1;
+}
+
+// FUNCTION: th08 0x411720
+#pragma var_order(pos2, pos)
+i32 Effect::FUN_00411720()
+{
+    Float3 pos = this->position;
+    Float3 pos2 = this->custom;
+    g_EffectManager.SpawnSpecialEffect2(35, &pos, &pos2, *(i32 *)((u8 *)this + 0x328), 1, -1);
+    this->updateCallback = &Effect::FUN_004114e0;
+    *(i32 *)((u8 *)this + 0x324) = 44;
+    *(f32 *)((u8 *)this + 0x320) = 4.0f;
+    return 0;
+}
+
+// FUNCTION: th08 0x411a80
+#pragma var_order(pos2, pos)
+i32 Effect::FUN_00411a80()
+{
+    Float3 pos = this->position;
+    Float3 pos2 = this->custom;
+    g_EffectManager.SpawnSpecialEffect2(35, &pos, &pos2, *(i32 *)((u8 *)this + 0x328), 1, -1);
+    this->updateCallback = &Effect::FUN_004117b0;
+    *(i32 *)((u8 *)this + 0x324) = 54;
+    *(f32 *)((u8 *)this + 0x320) = 6.0f;
+    return 0;
 }
 
 // FUNCTION: th08 0x413070
