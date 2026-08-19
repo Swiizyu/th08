@@ -959,6 +959,195 @@ i32 __fastcall Player::FUN_0044ea40(PlayerUnkStruct0x2ec *data)
     return 0;
 }
 
+struct PlayerShotData
+{
+    i16 interval;
+    i16 phase;
+    f32 offsetX;
+    f32 offsetY;
+    f32 hitboxX;
+    f32 hitboxY;
+    f32 angle;
+    f32 speed;
+    i16 damage;
+    i16 unknown0x1e;
+    i16 option;
+    i16 unknown0x22;
+    i16 anmScript;
+    i16 sound;
+};
+C_ASSERT(sizeof(PlayerShotData) == 0x28);
+
+// FUNCTION: th08 0x44fb70
+#pragma var_order(positionComponent, positionComponent2)
+void __fastcall Player::FUN_0044fb70(u8 *data, void *shotData)
+{
+    PlayerShotData *shot = (PlayerShotData *)shotData;
+    Float3 *position = (Float3 *)(data + 0x2a4);
+
+    if (shot->option == 0)
+    {
+        *position = this->position;
+    }
+    else
+    {
+        *position = *(Float3 *)((u8 *)this + 0x6b0 + (shot->option - 1) * 0x2f4);
+    }
+    position->x += shot->offsetX;
+    position->y += shot->offsetY;
+    position->z = 0.495f;
+    *(f32 *)(data + 0x430) = shot->hitboxX;
+    *(f32 *)(data + 0x434) = shot->hitboxY;
+    *(f32 *)(data + 0x438) = 1.0f;
+    *(f32 *)(data + 0x450) = shot->angle;
+    *(f32 *)(data + 0x44c) = shot->speed;
+    ((Float3 *)(data + 0x43c))->FromAngleMagnitude(shot->angle, shot->speed);
+    ((ZunTimer *)(data + 0x454))->SetCurrent(0);
+    *(u8 *)(data + 0x46c) = *(u8 *)((u8 *)this + 3);
+    *(i16 *)(data + 0x464) = shot->unknown0x22;
+    *(i16 *)(data + 0x460) = shot->damage;
+    *(i16 *)(data + 0x46e) = shot->anmScript;
+    if (shot->sound >= 0)
+    {
+        g_SoundPlayer.PlaySoundPositionedByIdx((SoundIdx)shot->sound, this->position.x);
+    }
+    this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)data, shot->anmScript + 10);
+    *(u8 *)(data + 0x470) = 0;
+    if (g_GameManager.GaugeIsExtremelyYoukai() && shot->unknown0x1e > 0)
+    {
+        *(u8 *)(data + 0x470) = 1;
+    }
+}
+
+// FUNCTION: th08 0x44fd80
+i32 __fastcall Player::FUN_0044fd80(u8 *data, i32 frame, void *shotData)
+{
+    PlayerShotData *shot = (PlayerShotData *)shotData;
+    if (frame % shot->interval == shot->phase)
+    {
+        this->FUN_0044fb70(data, shot);
+        return 1;
+    }
+    return 0;
+}
+
+// FUNCTION: th08 0x44fdd0
+i32 __fastcall Player::FUN_0044fdd0(u8 *data, i32 frame, void *shotData)
+{
+    PlayerShotData *shot = (PlayerShotData *)shotData;
+    if (*(i32 *)((u8 *)this + 0xfdc) == 0 && frame % shot->interval == shot->phase)
+    {
+        this->FUN_0044fb70(data, shot);
+        return 1;
+    }
+    return 0;
+}
+
+// FUNCTION: th08 0x44ffa0
+#pragma var_order(speed, angle)
+i32 __fastcall Player::FUN_0044ffa0(u8 *data, i32 frame, void *shotData)
+{
+    PlayerShotData *shot = (PlayerShotData *)shotData;
+    f32 angle;
+    f32 speed;
+
+    if (frame % shot->interval != shot->phase)
+    {
+        return 0;
+    }
+    this->FUN_0044fb70(data, shot);
+    if (*(f32 *)((u8 *)this + 0xe2ab0) >= -100.0f)
+    {
+        angle = AddNormalizeAngle(atan2f(*(f32 *)((u8 *)this + 0xe2ab4) - *(f32 *)(data + 0x2a8),
+                                         *(f32 *)((u8 *)this + 0xe2ab0) - *(f32 *)(data + 0x2a4)),
+                                  shot->angle + ZUN_PI / 2.0f);
+        speed = shot->speed * 1.5f;
+        ((Float3 *)(data + 0x43c))->FromAngleMagnitude(angle, speed);
+        *(f32 *)(data + 0x450) = angle;
+    }
+    return 1;
+}
+
+// FUNCTION: th08 0x450080
+#pragma var_order(speed, angle)
+i32 __fastcall Player::FUN_00450080(u8 *data, i32 frame, void *shotData)
+{
+    PlayerShotData *shot = (PlayerShotData *)shotData;
+    f32 angle;
+    f32 speed;
+
+    if (frame % shot->interval != shot->phase)
+    {
+        return 0;
+    }
+    this->FUN_0044fb70(data, shot);
+    angle = AddNormalizeAngle(*(f32 *)((u8 *)this + 0xe2b0c), shot->angle + ZUN_PI / 2.0f);
+    speed = shot->speed;
+    ((Float3 *)(data + 0x43c))->FromAngleMagnitude(angle, speed);
+    *(f32 *)(data + 0x450) = angle;
+    return 1;
+}
+
+// FUNCTION: th08 0x450110
+#pragma var_order(speed, angle)
+i32 __fastcall Player::FUN_00450110(u8 *data, i32 frame, void *shotData)
+{
+    PlayerShotData *shot = (PlayerShotData *)shotData;
+    f32 angle;
+    f32 speed;
+
+    if (*(i32 *)((u8 *)this + 0xfdc) != 0 || frame % shot->interval != shot->phase)
+    {
+        return 0;
+    }
+    this->FUN_0044fb70(data, shot);
+    angle = AddNormalizeAngle(*(f32 *)((u8 *)this + 0xcd0), shot->angle);
+    speed = shot->speed;
+    ((Float3 *)(data + 0x43c))->FromAngleMagnitude(angle, speed);
+    *(f32 *)(data + 0x450) = angle;
+    return 1;
+}
+
+// FUNCTION: th08 0x4501b0
+i32 __fastcall Player::FUN_004501b0(u8 *data, i32 frame, void *shotData)
+{
+    PlayerShotData *shot = (PlayerShotData *)shotData;
+    if (frame % shot->interval != shot->phase)
+    {
+        return 0;
+    }
+    this->FUN_0044fb70(data, shot);
+    *(f32 *)(data + 0x450) = g_Rng.GetRandomF32Signed() * ZUN_PI / 48.0f - ZUN_PI / 2.0f;
+    ((Float3 *)(data + 0x43c))->FromAngleMagnitude(*(f32 *)(data + 0x450), shot->speed);
+    return 1;
+}
+
+// FUNCTION: th08 0x450240
+#pragma var_order(speed, angle)
+i32 __fastcall Player::FUN_00450240(u8 *data, i32 frame, void *shotData)
+{
+    PlayerShotData *shot = (PlayerShotData *)shotData;
+    f32 angle;
+    f32 speed;
+
+    if (frame % shot->interval != shot->phase)
+    {
+        return 0;
+    }
+    this->FUN_0044fb70(data, shot);
+    if (*(void **)((u8 *)this + 0xe2abc) != NULL)
+    {
+        u8 *enemy = *(u8 **)((u8 *)this + 0xe2abc);
+        angle = AddNormalizeAngle(atan2f(*(f32 *)(enemy + 0x2d38) - *(f32 *)(data + 0x2a8),
+                                         *(f32 *)(enemy + 0x2d34) - *(f32 *)(data + 0x2a4)),
+                                  shot->angle + ZUN_PI / 2.0f);
+        speed = shot->speed * 1.5f;
+        ((Float3 *)(data + 0x43c))->FromAngleMagnitude(angle, speed);
+        *(f32 *)(data + 0x450) = angle;
+    }
+    return 1;
+}
+
 // FUNCTION: th08 0x450ee0
 #pragma var_order(spawnPosition)
 i32 __fastcall Player::FUN_00450ee0(Effect *effect, Float3 *position)
