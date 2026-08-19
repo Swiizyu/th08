@@ -2006,6 +2006,50 @@ void Enemy::FUN_0041f0e0(i32 value)
     ((EnemyFlags *)this)->flag11 = value;
 }
 
+// FUNCTION: th08 0x421bd0
+void __fastcall Enemy::FUN_00421bd0(void *instruction, i16 timelineIndex)
+{
+    EclTimelineContext *context = *(EclTimelineContext **)((u8 *)this + 0x2ca0);
+    context->timeline = (u8 *)instruction + *(i16 *)((u8 *)instruction + 6);
+    if ((*(u32 *)((u8 *)this + 0x3324) & 0x4000000) == 0)
+    {
+        i16 index = *(i16 *)((u8 *)this + 0x2cea);
+        memcpy((u8 *)*(void **)((u8 *)this + 0x2ca4) + index * sizeof(EclTimelineContext),
+               context, sizeof(EclTimelineContext));
+    }
+    g_EclManager.FUN_00418450(context, timelineIndex);
+    memcpy((u8 *)context + 0x70, (u8 *)&g_EclManager + 0x168, 0x20);
+    if ((*(u32 *)((u8 *)this + 0x3324) & 0x4000000) == 0 &&
+        *(i16 *)((u8 *)this + 0x2cea) < 15)
+    {
+        (*(i16 *)((u8 *)this + 0x2cea))++;
+    }
+}
+
+// FUNCTION: th08 0x421cb0
+i32 __fastcall Enemy::FUN_00421cb0(void *)
+{
+    i16 *index = (i16 *)((u8 *)this + 0x2cea);
+    (*index)--;
+    if (*index < 0)
+    {
+        EclTimelineContext *context = *(EclTimelineContext **)((u8 *)this + 0x2ca0);
+        i32 slot = context->timelineIndex - 1;
+        if (slot >= 0)
+        {
+            *(void **)((u8 *)this + 0x3384 + slot * 4) = NULL;
+        }
+        *(void **)((u8 *)this + 0x2ca4) = (u8 *)this + 0xa20;
+        *(void **)((u8 *)this + 0x2ca0) = (u8 *)this + 0x7f8;
+        *index = *(i16 *)((u8 *)this + 0x2ce8);
+        return 1;
+    }
+    memcpy(*(void **)((u8 *)this + 0x2ca0),
+           (u8 *)*(void **)((u8 *)this + 0x2ca4) + *index * sizeof(EclTimelineContext),
+           sizeof(EclTimelineContext));
+    return 0;
+}
+
 // FUNCTION: th08 0x421de0
 void Enemy::FUN_00421de0(i16 a, i16 b, i16 c, i16 d, i16 e, i16 f)
 {

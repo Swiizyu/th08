@@ -701,6 +701,119 @@ void Player::FUN_0044d420()
     *(i32 *)((u8 *)this + 0xe2ac0) = 0;
 }
 
+// FUNCTION: th08 0x44aec0
+void Player::FUN_0044aec0()
+{
+    u16 input = g_CurFrameInput;
+    i32 direction = 0;
+    if ((input & 0x50) == 0x50) direction = 5;
+    else if ((input & 0x60) == 0x60) direction = 7;
+    else if ((input & 0x90) == 0x90) direction = 6;
+    else if ((input & 0xa0) == 0xa0) direction = 8;
+    else if (input & 0x20) direction = 2;
+    else if (input & 0x10) direction = 1;
+    else if (input & 0x40) direction = 3;
+    else if (input & 0x80) direction = 4;
+    *(i32 *)((u8 *)this + 0xe2a98) = direction;
+
+    this->isFocus = (*(i32 *)((u8 *)this + 0xfdc) != 0)
+                        ? (*(i32 *)((u8 *)this + 0xfe0) & 1) != 0
+                        : (input & 4) != 0;
+    if (this->playerState != PLAYER_STATE_ALIVE)
+    {
+        return;
+    }
+    f32 speed = this->isFocus ? 2.0f : 4.0f;
+    f32 diagonal = speed * 0.70710677f;
+    switch (direction)
+    {
+    case 1: this->position.y -= speed * this->verticalSpeedMultiplier; break;
+    case 2: this->position.y += speed * this->verticalSpeedMultiplier; break;
+    case 3: this->position.x -= speed * this->horizontalSpeedMultiplier; break;
+    case 4: this->position.x += speed * this->horizontalSpeedMultiplier; break;
+    case 5:
+        this->position.x -= diagonal * this->horizontalSpeedMultiplier;
+        this->position.y -= diagonal * this->verticalSpeedMultiplier;
+        break;
+    case 6:
+        this->position.x += diagonal * this->horizontalSpeedMultiplier;
+        this->position.y -= diagonal * this->verticalSpeedMultiplier;
+        break;
+    case 7:
+        this->position.x -= diagonal * this->horizontalSpeedMultiplier;
+        this->position.y += diagonal * this->verticalSpeedMultiplier;
+        break;
+    case 8:
+        this->position.x += diagonal * this->horizontalSpeedMultiplier;
+        this->position.y += diagonal * this->verticalSpeedMultiplier;
+        break;
+    }
+    if (this->position.x < 8.0f) this->position.x = 8.0f;
+    if (this->position.x > 376.0f) this->position.x = 376.0f;
+    if (this->position.y < 16.0f) this->position.y = 16.0f;
+    if (this->position.y > 432.0f) this->position.y = 432.0f;
+}
+
+// FUNCTION: th08 0x44c650
+void Player::FUN_0044c650()
+{
+    if (*(i32 *)((u8 *)this + 0xe2a6c) > 0)
+    {
+        (*(i32 *)((u8 *)this + 0xe2a6c))--;
+    }
+    if (this->playerState == PLAYER_STATE_DEAD)
+    {
+        this->FUN_0044cbf0();
+        return;
+    }
+    if (this->playerState == PLAYER_STATE_SPAWNING)
+    {
+        this->FUN_0044d180();
+        return;
+    }
+    this->FUN_0044c5b0();
+    if (*(i32 *)((u8 *)this + 0xe2a68) > 0)
+    {
+        this->FUN_0044cbf0();
+    }
+}
+
+// FUNCTION: th08 0x44cbf0
+void Player::FUN_0044cbf0()
+{
+    i32 *deathCounter = (i32 *)((u8 *)this + 0xe2a68);
+    ZunTimer *timer = (ZunTimer *)((u8 *)this + 0xe2af4);
+
+    if (*deathCounter > 0)
+    {
+        (*deathCounter)--;
+        *(u8 *)((u8 *)this + 4) = 1;
+        if (*deathCounter == 0)
+        {
+            Effect *effect = *(Effect **)((u8 *)this + 0xe2b28);
+            if (effect != NULL)
+            {
+                effect->active = 0;
+                *(Effect **)((u8 *)this + 0xe2b28) = NULL;
+            }
+            g_EffectManager.SpawnEffect(12, &this->position, 3, 0xff4040ff);
+            g_EffectManager.SpawnEffect(6, &this->position, 16, -1);
+            g_SoundPlayer.PlaySoundPositionedByIdx((SoundIdx)15, this->position.x);
+            this->playerState = PLAYER_STATE_DEAD;
+            timer->SetCurrent(0);
+            this->FUN_0044d150();
+        }
+        return;
+    }
+    timer->Tick();
+    f32 factor = (f32)timer->AsFrames() / 30.0f;
+    this->playerSprite.scale.x = 1.0f - factor;
+    this->playerSprite.scale.y = factor * 2.0f + 1.0f;
+    i32 alpha = 255 - timer->AsFrames() * 255 / 30;
+    if (alpha < 0) alpha = 0;
+    this->playerSprite.color1.d3dColor = (alpha << 24) | 0xffffff;
+}
+
 // FUNCTION: th08 0x44c5b0
 #pragma var_order(i, collision)
 void Player::FUN_0044c5b0()
@@ -2098,6 +2211,55 @@ i32 Player::FUN_00451500()
         timer->SetCurrent(-1);
     }
     return 0;
+}
+
+// FUNCTION: th08 0x451670
+#pragma var_order(i, data, damage)
+i32 Player::FUN_00451670(Float3 *center, Float3 *size, i32 hitType, i32 *hitCount)
+{
+    if (this->playerState != PLAYER_STATE_ALIVE)
+    {
+        return 0;
+    }
+    if (hitCount != NULL)
+    {
+        *hitCount = 0;
+    }
+    Float3 targetMin;
+    Float3 targetMax;
+    FUN_00451ce0(&targetMin, &targetMax, center, size);
+    i32 damage = 0;
+    u8 *data = (u8 *)this + 0xbe838;
+    for (i32 i = 0; i < 128; i++, data += 0x484)
+    {
+        if (*(i16 *)(data + 0x462) == 0 ||
+            (*(i16 *)(data + 0x462) != 1 && *(i16 *)(data + 0x464) != 3))
+        {
+            continue;
+        }
+        Float3 shotMin;
+        Float3 shotMax;
+        FUN_00451ce0(&shotMin, &shotMax, (Float3 *)(data + 0x2a4), (Float3 *)(data + 0x430));
+        if (shotMax.x < targetMin.x || shotMin.x > targetMax.x ||
+            shotMax.y < targetMin.y || shotMin.y > targetMax.y)
+        {
+            continue;
+        }
+        damage += *(i16 *)(data + 0x460);
+        if (hitCount != NULL)
+        {
+            (*hitCount)++;
+        }
+        if (*(void **)(data + 0x47c) != NULL)
+        {
+            ((void(__fastcall *)(Player *, u8 *, i32))*(void **)(data + 0x47c))(this, data, hitType);
+        }
+        if (*(i16 *)(data + 0x464) != 4 && *(i16 *)(data + 0x464) != 5)
+        {
+            *(i16 *)(data + 0x462) = 0;
+        }
+    }
+    return damage;
 }
 
 // FUNCTION: th08 0x44c230

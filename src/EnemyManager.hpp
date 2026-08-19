@@ -90,6 +90,8 @@ struct Enemy
     void FUN_0041f0b0(i32 value);
     void FUN_0041f0e0(i32 value);
     void FUN_00421de0(i16 a, i16 b, i16 c, i16 d, i16 e, i16 f);
+    void __fastcall FUN_00421bd0(void *instruction, i16 timelineIndex);
+    i32 __fastcall FUN_00421cb0(void *instruction);
     ZunBool FUN_0041fd20();
     ZunBool FUN_0041fd90();
     void FUN_0042b2f0();

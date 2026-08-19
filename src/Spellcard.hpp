@@ -37,6 +37,8 @@ struct Spellcard
     void spellcard_fun_00416130();
     void spellcard_fun_00416160();
     void FUN_00415d10(const char *name, void *owner);
+    void FUN_00415d60(i32 face, const char *name, i32 script);
+    void FUN_00415f00(i32 faceScript, const char *name, i32 script);
     void EndSpell();
     void FUN_00416af0();
     void FUN_00416b10(i32 amount);

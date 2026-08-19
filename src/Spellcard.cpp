@@ -138,6 +138,55 @@ void Spellcard::FUN_00415d10(const char *, void *)
     *(u32 *)this &= ~0x10;
 }
 
+// FUNCTION: th08 0x415d60
+void Spellcard::FUN_00415d60(i32 face, const char *name, i32 script)
+{
+    AnmLoaded *playerFaceAnm = face == 0 ? *(AnmLoaded **)((u8 *)this + 0x2624)
+                                             : *(AnmLoaded **)((u8 *)this + 0x2628);
+    if (playerFaceAnm != NULL)
+    {
+        playerFaceAnm->SetAndExecuteScriptIdx((AnmVm *)((u8 *)this + 0x120), 0);
+        g_AnmManager->ExecuteScript((AnmVm *)((u8 *)this + 0x120));
+    }
+    AnmLoaded *enemyFaceAnm = *(AnmLoaded **)((u8 *)this + 0x2634);
+    if (enemyFaceAnm != NULL)
+    {
+        enemyFaceAnm->SetAndExecuteScriptIdx((AnmVm *)((u8 *)this + 0x668), 0);
+        enemyFaceAnm->SetAndExecuteScriptIdx((AnmVm *)((u8 *)this + 0xbb0), 2);
+        g_AnmManager->ExecuteScript((AnmVm *)((u8 *)this + 0x668));
+        g_AnmManager->ExecuteScript((AnmVm *)((u8 *)this + 0xbb0));
+    }
+    *(f32 *)((u8 *)this + 0x2618) = strlen(name) * 15.0f / 2.0f + 64.0f;
+    ((AnmVm *)((u8 *)this + 0x1b88))->SetInterrupt(1);
+    *(i32 *)((u8 *)this + 0x260c) = script;
+}
+
+// FUNCTION: th08 0x415f00
+void Spellcard::FUN_00415f00(i32 faceScript, const char *name, i32 script)
+{
+    AnmLoaded *faceAnm = *(AnmLoaded **)((u8 *)this + 0x262c);
+    if (faceScript >= 0 && faceAnm != NULL)
+    {
+        faceAnm->SetAndExecuteScriptIdx((AnmVm *)((u8 *)this + 0x3c4), faceScript);
+        g_AnmManager->ExecuteScript((AnmVm *)((u8 *)this + 0x3c4));
+    }
+    AnmLoaded *enemyFaceAnm = *(AnmLoaded **)((u8 *)this + 0x2634);
+    if (enemyFaceAnm != NULL)
+    {
+        enemyFaceAnm->SetAndExecuteScriptIdx((AnmVm *)((u8 *)this + 0x668), 1);
+        enemyFaceAnm->SetAndExecuteScriptIdx((AnmVm *)((u8 *)this + 0xbb0), 3);
+        g_AnmManager->ExecuteScript((AnmVm *)((u8 *)this + 0x668));
+        g_AnmManager->ExecuteScript((AnmVm *)((u8 *)this + 0xbb0));
+    }
+    *(f32 *)((u8 *)this + 0x261c) = strlen(name) * 15.0f / 2.0f + 64.0f;
+    ((AnmVm *)((u8 *)this + 0x1e2c))->SetInterrupt(1);
+    if ((*(u32 *)this & 0x400) == 0)
+    {
+        ((AnmVm *)((u8 *)this + 0x2374))->SetInterrupt(1);
+    }
+    *(i32 *)((u8 *)this + 0x2610) = script;
+}
+
 // FUNCTION: th08 0x4161b0
 void Spellcard::EndSpell()
 {

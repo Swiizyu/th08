@@ -143,6 +143,9 @@ struct Player
     void Die();
     f32 AngleToPlayer(Float3 *position);
     i32 CalcItemBoxCollision(Float3 *position, Float3 *hitbox);
+    void FUN_0044aec0();
+    void FUN_0044c650();
+    void FUN_0044cbf0();
     void FUN_0044cba0();
     void FUN_0044c5b0();
     void FUN_0044d150();
@@ -183,6 +186,7 @@ struct Player
     void FUN_00451400();
     i32 FUN_00451500();
     void FUN_00451640();
+    i32 FUN_00451670(Float3 *center, Float3 *size, i32 hitType, i32 *hitCount);
 
     i8 playerState;           // 0x0
     unknown_fields(0x1, 0x2); // 0x1
