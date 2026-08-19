@@ -1008,6 +1008,8 @@ ZunResult Supervisor::DeletedCallback(Supervisor *s)
 
 #pragma var_order(fps, elapsedTimeInSecs, curTime, targetFps, curPerfCounter, fpsCounterPos,        \
                   replayFpsCounterPos)
+#pragma var_order(fps, elapsedTimeInSecs, curTime, targetFps, curPerfCounter, \
+                  fpsCounterPos, replayFpsCounterPos)
 // FUNCTION: th08 0x446f53
 void Supervisor::CalculateFps(ZunBool shouldDraw)
 {
@@ -1209,6 +1211,8 @@ void Supervisor::TickTimer(int *frames, float *subframes)
 #pragma var_order(bmfh, bitmapData, bitmapInfo, backBuffer, stride, srcPixel, dstPixel, y, x,        \
                   bytesPerRow, lockedRect, bytesWritten, bitmapFile)
 // FUNCTION: th08 0x44748f
+#pragma var_order(bmfh, bitmapData, bitmapInfo, backBuffer, stride, srcPixel, \
+                  dstPixel, y, x, bytesPerRow, lockedRect, bytesWritten, bitmapFile)
 ZunBool Supervisor::TakeSnapshot(const char *filePath)
 {
     HANDLE bitmapFile;
