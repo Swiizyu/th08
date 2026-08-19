@@ -38,9 +38,10 @@ struct EclExIns
 
 struct EclTimelineHeader
 {
-    u8 magic[6];
+    u32 magic;
     i16 timelineCount;
-    EclTimeline *timelines[1];
+    i16 subCount;
+    EclTimeline *timelines[16];
 };
 
 struct EclTimelineContext
@@ -66,6 +67,7 @@ struct EclManagerSub
 struct EclManager
 {
     EclManager();
+    ZunResult Load(const char *path);
     void FUN_00418420();
     i32 FUN_00418450(EclTimelineContext *context, i16 timelineIndex);
     i32 GetTimelineCount();

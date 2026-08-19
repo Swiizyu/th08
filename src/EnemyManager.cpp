@@ -11,6 +11,7 @@
 #include "Player.hpp"
 #include "ReplayManager.hpp"
 
+u32 FUN_004338b0();
 u32 FUN_004338c0();
 
 namespace th08
@@ -22,6 +23,18 @@ DIFFABLE_STATIC(EnemyManager, g_EnemyManager);
 DIFFABLE_STATIC(EclManager, g_EclManager);
 DIFFABLE_STATIC(i32, g_EnemyManagerUnknown);
 DIFFABLE_STATIC(EffectManager, g_EffectManager);
+DIFFABLE_STATIC_ARRAY_ASSIGN(const char *, 9, g_StageEnemyAnms) = {
+    "stg1enm.anm", "stg2enm.anm", "stg3enm.anm", "stg4aenm.anm", "stg4benm.anm",
+    "stg5enm.anm", "stg6enm.anm", "stg7enm.anm", "stg8enm.anm",
+};
+DIFFABLE_STATIC_ARRAY_ASSIGN(const char *, 9, g_StageEclFiles) = {
+    "ecldata1.ecl", "ecldata2.ecl", "ecldata3.ecl", "ecldata4a.ecl", "ecldata4b.ecl",
+    "ecldata5.ecl", "ecldata6.ecl", "ecldata7.ecl", "ecldata8.ecl",
+};
+DIFFABLE_STATIC_ARRAY_ASSIGN(const char *, 9, g_StageSpellEclFiles) = {
+    "ecldata1sp.ecl", "ecldata2sp.ecl", "ecldata3sp.ecl", "ecldata4asp.ecl", "ecldata4bsp.ecl",
+    "ecldata5sp.ecl", "ecldata6sp.ecl", "ecldata7sp.ecl", "ecldata8sp.ecl",
+};
 
 struct EffectTemplate
 {
@@ -449,6 +462,36 @@ EclManager::EclManager()
 // FUNCTION: th08 0x418300
 EclManagerSub::EclManagerSub()
 {
+}
+
+// FUNCTION: th08 0x418330
+#pragma var_order(i)
+ZunResult EclManager::Load(const char *path)
+{
+    i32 i;
+
+    this->timelineFile = (EclTimelineHeader *)FileSystem::OpenFile(path, NULL, FALSE);
+    if (this->timelineFile == NULL)
+    {
+        g_GameErrorContext.Log("\x93\x47\x83\x66\x81\x5b\x83\x5e\x82\xcc\x93\xc7\x82\xdd\x8d\x9e\x82\xdd\x82\xc9\x8e\xb8\x94\x73\x82\xb5\x82\xdc\x82\xb5\x82\xbd\x81\x41\x83\x66\x81\x5b\x83\x5e\x82\xaa\x89\xf3\x82\xea\x82\xc4\x82\xe9\x82\xa9\x8e\xb8\x82\xed\x82\xea\x82\xc4\x82\xa2\x82\xdc\x82\xb7\r\n");
+        return ZUN_ERROR;
+    }
+    if (this->timelineFile->magic != 0x800)
+    {
+        g_GameErrorContext.Log("\x93\x47\x83\x66\x81\x5b\x83\x5e\x82\xcc\x83\x6f\x81\x5b\x83\x57\x83\x87\x83\x93\x82\xaa\x88\xe1\x82\xa2\x82\xdc\x82\xb7\r\n");
+        return ZUN_ERROR;
+    }
+    for (i = 0; i < 16; i++)
+    {
+        this->timelineFile->timelines[i] =
+            (EclTimeline *)((u8 *)this->timelineFile->timelines[i] + (u32)this->timelineFile);
+    }
+    this->unknown = this->timelineFile + 1;
+    for (i = 0; i < this->timelineFile->subCount; i++)
+    {
+        ((void **)this->unknown)[i] = (u8 *)((void **)this->unknown)[i] + (u32)this->timelineFile;
+    }
+    return ZUN_SUCCESS;
 }
 
 // FUNCTION: th08 0x418420
@@ -978,10 +1021,75 @@ ChainCallbackResult EnemyManager::OnDrawLowPrio(EnemyManager *enemyManager)
     return result;
 }
 
-// STUB: th08 0x42ebf0
+// FUNCTION: th08 0x42ebf0
+#pragma var_order(enemy, position)
 ZunResult EnemyManager::AddedCallback(EnemyManager *enemyManager)
 {
-    return ZUN_ERROR;
+    Enemy *enemy;
+    Float3 position;
+    EclTimelineHeader *timelineFile;
+    void *subTable;
+
+    enemy = &enemyManager->enemies[0];
+    if (FUN_004338b0())
+    {
+        *(AnmLoaded **)((u8 *)enemyManager + 0x9dceec) = g_AnmManager->PreloadAnm(7, "enemy.anm");
+        if (*(AnmLoaded **)((u8 *)enemyManager + 0x9dceec) == NULL)
+        {
+            return ZUN_ERROR;
+        }
+    }
+    else
+    {
+        *(AnmLoaded **)((u8 *)enemyManager + 0x9dceec) = g_AnmManager->GetAnm(7);
+    }
+
+    if (!IsDisableResourceReload())
+    {
+        *(AnmLoaded **)((u8 *)enemyManager + 0x9dcef0) =
+            g_AnmManager->PreloadAnm(8, g_StageEnemyAnms[g_GameManager.currentStage]);
+        if (*(AnmLoaded **)((u8 *)enemyManager + 0x9dcef0) == NULL)
+        {
+            return ZUN_ERROR;
+        }
+    }
+    else
+    {
+        *(AnmLoaded **)((u8 *)enemyManager + 0x9dcef0) = g_AnmManager->GetAnm(8);
+    }
+
+    if (!IsDisableResourceReload())
+    {
+        memset(&g_EclManager, 0, sizeof(g_EclManager));
+        if (!g_GameManager.IsSpellPractice())
+        {
+            if (g_EclManager.Load(g_StageEclFiles[g_GameManager.currentStage]) != ZUN_SUCCESS)
+            {
+                return ZUN_ERROR;
+            }
+        }
+        else if (g_EclManager.Load(g_StageSpellEclFiles[g_GameManager.currentStage]) != ZUN_SUCCESS)
+        {
+            return ZUN_ERROR;
+        }
+    }
+    else
+    {
+        timelineFile = g_EclManager.timelineFile;
+        subTable = g_EclManager.unknown;
+        memset(&g_EclManager, 0, sizeof(g_EclManager));
+        g_EclManager.timelineFile = timelineFile;
+        g_EclManager.unknown = subTable;
+    }
+
+    *(i16 *)((u8 *)enemyManager + 0x9dcdc0) = g_Rng.GetRandomU16InRange(3);
+    *(i16 *)((u8 *)enemyManager + 0x9dcdc2) = g_Rng.GetRandomU16InRange(8);
+    position = Float3(-999.0f, -999.0f, -999.0f);
+    g_AsciiManager.SetBossMarkerPosition(0, &position);
+    g_AsciiManager.SetBossMarkerPosition(1, &position);
+    g_AsciiManager.SetBossMarkerPosition(2, &position);
+    g_AsciiManager.SetBossMarkerPosition(3, &position);
+    return ZUN_SUCCESS;
 }
 
 // FUNCTION: th08 0x42ee80
