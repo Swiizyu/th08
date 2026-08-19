@@ -8,6 +8,7 @@
 #include "EclManager.hpp"
 #include "Spellcard.hpp"
 #include "ScreenEffect.hpp"
+#include "SoundPlayer.hpp"
 #include "ItemManager.hpp"
 #include "Gui.hpp"
 #include "Player.hpp"
@@ -1202,6 +1203,87 @@ void __fastcall EclExIns::FUN_00424a00(void *instruction)
 void __fastcall EclExIns::FUN_004233d0(void *)
 {
     ScreenEffect::RegisterChain(SCREEN_EFFECT_FULL_FADE_OUT, 60, 1, -1, 0, 21);
+}
+
+// FUNCTION: th08 0x4244f0
+void Enemy::FUN_004244f0(void *)
+{
+    u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
+    i32 group = *(i32 *)(context + 0x60);
+    i32 count = 0;
+    Enemy *first = NULL;
+    Enemy *enemy = this;
+    while (*(Enemy **)((u8 *)enemy + 8) != NULL)
+    {
+        enemy = *(Enemy **)((u8 *)enemy + 8);
+        u8 *enemyContext = *(u8 **)((u8 *)enemy + 0x2ca0);
+        if (*(i32 *)(enemyContext + 0x60) != group)
+        {
+            continue;
+        }
+        *(i32 *)(enemyContext + 0x5c) = count;
+        if (first == NULL) first = enemy;
+        count++;
+    }
+    *(i32 *)(context + 0x2c) = 0;
+    if (*(i32 *)(context + 0x30) != count)
+    {
+        if (*(i32 *)(context + 0x30) != 0) *(i32 *)(context + 0x2c) = 1;
+        *(i32 *)(context + 0x30) = count;
+    }
+    i32 ordinal = *(i32 *)(context + 0x5c);
+    (*(i32 *)(context + 0x34))++;
+    if (first != NULL && ordinal != 0 && count != 0)
+    {
+        f32 offset = (f32)ordinal * ZUN_2PI / count;
+        *(f32 *)((u8 *)this + 0x2d9c) = AddNormalizeAngle(*(f32 *)((u8 *)first + 0x2d9c), offset);
+    }
+}
+
+// FUNCTION: th08 0x424e50
+void Enemy::FUN_00424e50(void *)
+{
+    for (i32 i = 0; i < MAX_BULLETS; i++)
+    {
+        Bullet *bullet = &g_BulletManager.bullets[i];
+        if (bullet->state == 0 || (bullet->flags & 0x100000) == 0)
+        {
+            continue;
+        }
+        Enemy *enemy = this;
+        while (*(Enemy **)((u8 *)enemy + 8) != NULL)
+        {
+            enemy = *(Enemy **)((u8 *)enemy + 8);
+            u8 *context = *(u8 **)((u8 *)enemy + 0x2ca0);
+            if (*(i32 *)(context + 0x60) == 0)
+            {
+                Float3 delta = bullet->position - enemy->position0x2d34;
+                if (delta.x * delta.x + delta.y * delta.y + delta.z * delta.z <= 4096.0f)
+                {
+                    *(i32 *)(context + 0x60) = 60;
+                    *(i32 *)(context + 0x34) = *(i32 *)((u8 *)*(void **)((u8 *)this + 0x2ca0) + 0x34);
+                }
+            }
+        }
+    }
+}
+
+// FUNCTION: th08 0x4250d0
+void Enemy::FUN_004250d0(void *)
+{
+    u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
+    for (i32 i = 0; i < MAX_BULLETS; i++)
+    {
+        Bullet *bullet = &g_BulletManager.bullets[i];
+        if (bullet->state == 0 || (bullet->flags & 0x100000) == 0)
+        {
+            continue;
+        }
+        *(f32 *)(context + 0x38) = bullet->angle;
+        g_EnemyManager.FUN_0042a680((i16)*(i32 *)(context + 0x60), &bullet->position, 800, -2, 10,
+                                    context + 0x18);
+        bullet->flags &= ~0x100000;
+    }
 }
 
 // FUNCTION: th08 0x424a20
@@ -2509,6 +2591,64 @@ void Enemy::FUN_0042bc90()
     }
 }
 
+// FUNCTION: th08 0x42bcf0
+void Enemy::FUN_0042bcf0()
+{
+    u32 *flags = (u32 *)((u8 *)this + 0x3324);
+    if (((*flags >> 20) & 7) == 0)
+    {
+        *flags &= ~1;
+    }
+    if (*(i32 *)((u8 *)this + 0x53c0) != 0)
+    {
+        this->FUN_0042a820();
+    }
+    if (*(AnmVm **)((u8 *)this + 0x53c8) != NULL)
+    {
+        (*(AnmVm **)((u8 *)this + 0x53c8))->SetInterrupt(3);
+        *(AnmVm **)((u8 *)this + 0x53c8) = NULL;
+    }
+    for (i32 i = 0; i < 4; i++)
+    {
+        *(i32 *)((u8 *)this + 0x3358 + i * 4) = -1;
+    }
+    *(i32 *)((u8 *)this + 0x3378) = -1;
+    this->FUN_0042bc90();
+}
+
+// FUNCTION: th08 0x42c420
+void Enemy::FUN_0042c420()
+{
+    ZunBool isYoukai = g_Player.IsYoukai();
+    u32 *flags = (u32 *)((u8 *)this + 0x3324);
+    if ((*flags & 0x800) == 0)
+    {
+        if (isYoukai)
+        {
+            g_EffectManager.SpawnEffect(31, &this->position0x2d88, 1, 0x80303080);
+            if (*(AnmVm **)((u8 *)this + 0x53c8) != NULL)
+                (*(AnmVm **)((u8 *)this + 0x53c8))->SetInterrupt(2);
+            g_SoundPlayer.PlaySoundByIdx((SoundIdx)40, 0);
+            *(u8 *)((u8 *)this + 0x332f) = 0;
+        }
+        if ((*(u32 *)((u8 *)this + 0x3328) & 2) != 0 && this->timer0x2e14.FUN_0040ebc0(2))
+        {
+            g_EffectManager.SpawnEffect(38, &this->position0x2d88, 1, -1);
+        }
+    }
+    else if (!isYoukai)
+    {
+        g_EffectManager.SpawnEffect(30, &this->position0x2d88, 1, 0x80803030);
+        if (*(AnmVm **)((u8 *)this + 0x53c8) != NULL)
+            (*(AnmVm **)((u8 *)this + 0x53c8))->SetInterrupt(1);
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)39, 0);
+        *(u8 *)((u8 *)this + 0x332f) = 2;
+    }
+    if (isYoukai) *flags |= 0x800;
+    else *flags &= ~0x800;
+    *(u8 *)((u8 *)this + 0x3330) = isYoukai ? 64 : 32;
+}
+
 // FUNCTION: th08 0x42c180
 void Enemy::FUN_0042c180()
 {
@@ -2625,6 +2765,51 @@ i32 Enemy::GetFamiliarCount()
         }
     }
     return count;
+}
+
+// FUNCTION: th08 0x42a4e0
+Enemy *EnemyManager::FUN_0042a4e0(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08, i32 flag)
+{
+    Enemy *enemy = NULL;
+    i32 index;
+    for (index = 0; index < 480; index++)
+    {
+        if ((*(u32 *)((u8 *)&this->enemies[index] + 0x3324) & 1) == 0)
+        {
+            enemy = &this->enemies[index];
+            break;
+        }
+    }
+    *(i32 *)((u8 *)this + 0x9dcef8) = enemy == NULL;
+    if (enemy == NULL)
+    {
+        return NULL;
+    }
+    memcpy(enemy, &this->enemyTemplate, sizeof(Enemy));
+    *(i32 *)((u8 *)enemy + 0x2e0c) = index;
+    if (flag & 1) *(u32 *)((u8 *)enemy + 0x3324) |= 0x40000;
+    else *(u32 *)((u8 *)enemy + 0x3324) &= ~0x40000;
+    if (health >= 0) *(i32 *)((u8 *)enemy + 0x2dfc) = health;
+    enemy->position0x2d34 = *position;
+    g_EclManager.FUN_00418450((EclTimelineContext *)&enemy->unk0x7f8, timeline);
+    *(i32 *)((u8 *)enemy + 0x2e20) = enemy->vm.type;
+    *(i32 *)((u8 *)enemy + 0x3304) = arg4;
+    if (field2e08 >= 0) *(i32 *)((u8 *)enemy + 0x2e08) = field2e08;
+    *(i32 *)((u8 *)enemy + 0x2e00) = *(i32 *)((u8 *)enemy + 0x2dfc);
+    *(i32 *)((u8 *)enemy + 0x2e04) = *(i32 *)((u8 *)enemy + 0x2e00);
+    return enemy;
+}
+
+// FUNCTION: th08 0x42a680
+Enemy *EnemyManager::FUN_0042a680(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08,
+                                   void *eclData)
+{
+    Enemy *enemy = this->FUN_0042a4e0(timeline, position, health, arg4, field2e08, 0);
+    if (enemy != NULL && eclData != NULL)
+    {
+        memcpy((u8 *)enemy + 0x810, eclData, 0x78);
+    }
+    return enemy;
 }
 
 // FUNCTION: th08 0x429e00
