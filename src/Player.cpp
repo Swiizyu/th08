@@ -180,7 +180,7 @@ struct PlayerCollisionObject
 C_ASSERT(sizeof(PlayerCollisionObject) == 0x40);
 
 // FUNCTION: th08 0x449ff0
-#pragma var_order(rectMax, collision, delta, rotated, i, deltaX, deltaY, halfWidth, halfHeight)
+#pragma var_order(halfSize, deltaY, deltaX, i, rotated, delta, collision, rectMax)
 i32 Player::FUN_00449ff0(Float3 *position, Float3 *hitbox)
 {
     PlayerCollisionObject *collision;
@@ -189,8 +189,7 @@ i32 Player::FUN_00449ff0(Float3 *position, Float3 *hitbox)
     f32 deltaY;
     Float3 delta;
     Float3 rotated;
-    f32 halfWidth;
-    f32 halfHeight;
+    Float3 halfSize;
     Float3 rectMax;
 
     collision = (PlayerCollisionObject *)((u8 *)this + 0xbb834);
@@ -215,33 +214,33 @@ i32 Player::FUN_00449ff0(Float3 *position, Float3 *hitbox)
             delta.x = position->x - collision->position.x;
             delta.y = position->y - collision->position.y;
             Rotate(&rotated, &delta, -collision->rotation);
-            halfWidth = collision->width / 2.0f;
-            halfHeight = collision->height / 2.0f;
-            if (rotated.x >= -halfWidth && rotated.x <= halfWidth && rotated.y >= -halfHeight &&
-                rotated.y <= halfHeight)
+            halfSize.x = collision->width / 2.0f;
+            halfSize.y = collision->height / 2.0f;
+            if (rotated.x >= -halfSize.x && rotated.x <= halfSize.x && rotated.y >= -halfSize.y &&
+                rotated.y <= halfSize.y)
             {
                 goto collided;
             }
             continue;
         }
 
-        halfWidth = collision->position.x - collision->width / 2.0f;
-        halfHeight = collision->position.y - collision->height / 2.0f;
+        halfSize.x = collision->position.x - collision->width / 2.0f;
+        halfSize.y = collision->position.y - collision->height / 2.0f;
         rectMax.x = collision->position.x + collision->width / 2.0f;
         rectMax.y = collision->position.y + collision->height / 2.0f;
-        if (position->x > halfWidth && position->x < rectMax.x && position->y > halfHeight &&
+        if (position->x > halfSize.x && position->x < rectMax.x && position->y > halfSize.y &&
             position->y < rectMax.y)
         {
             goto collided;
         }
         continue;
-
-    collided:
-        *(i32 *)((u8 *)this + 0xe2a90) = collision->itemType;
-        collision->collisionCount++;
-        return 2;
     }
     return 0;
+
+collided:
+    *(i32 *)((u8 *)this + 0xe2a90) = collision->itemType;
+    collision->collisionCount++;
+    return 2;
 }
 
 // FUNCTION: th08 0x4512f0
