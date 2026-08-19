@@ -6,6 +6,17 @@
 #include "SoundPlayer.hpp"
 #include "SpellCard.hpp"
 
+struct RankParams
+{
+    i32 rank;
+    i32 minRank;
+    i32 maxRank;
+};
+
+DIFFABLE_STATIC_ARRAY_ASSIGN(RankParams, 6, g_RankParams) = {
+    {10, 8, 16}, {10, 8, 16}, {8, 8, 12}, {8, 8, 12}, {16, 15, 16}, {16, 15, 16},
+};
+
 namespace th08
 {
 
@@ -16,6 +27,14 @@ void __fastcall IncrementTruncate(u32 *value, i32)
     {
         (*value)++;
     }
+}
+
+// FUNCTION: th08 0x43b936
+void GameManager::InitRankParams()
+{
+    this->rank = ::g_RankParams[g_GameManager.difficulty].rank;
+    this->minRank = ::g_RankParams[g_GameManager.difficulty].minRank;
+    this->maxRank = ::g_RankParams[g_GameManager.difficulty].maxRank;
 }
 
 DIFFABLE_STATIC(GameManager, g_GameManager);

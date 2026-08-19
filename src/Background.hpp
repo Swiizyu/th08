@@ -21,6 +21,19 @@ struct StdRawHeader
     char songPaths[4][128];
 };
 
+struct BackgroundUnkVectors
+{
+    BackgroundUnkVectors();
+
+    Float3 vector0;
+    Float3 vector1;
+    Float3 vector2;
+    Float3 vector3;
+    Float3 vector4;
+    Float3 vector5;
+};
+C_ASSERT(sizeof(BackgroundUnkVectors) == 0x48);
+
 struct Background
 {
     Background();

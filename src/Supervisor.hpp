@@ -134,6 +134,7 @@ struct Supervisor
     static ChainCallbackResult OnDraw2(Supervisor *s);
     static ChainCallbackResult DrawLoadingVms(Supervisor *s);
     static void CalculateFps(ZunBool shouldDraw);
+    void FUN_00448972();
     ZunResult CheckVersion(const char *version, i32 exeSize, i32 exeChecksum);
 
     ZunResult LoadConfig(char *configFile);
@@ -425,10 +426,7 @@ struct ZunTimer
     i32 operator%(i32 value);
     ZunBool operator!=(i32 value);
 
-    ZunBool operator+=(int value)
-    {
-        this->Increment(value);
-    }
+    void operator+=(int value);
 
     ZunBool operator-=(int value)
     {

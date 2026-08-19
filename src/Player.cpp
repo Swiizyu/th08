@@ -5,6 +5,70 @@
 namespace th08
 {
 
+// FUNCTION: th08 0x441850
+void GameManager::AddPower(i32 power)
+{
+    if (this->IsTampered())
+    {
+        CRASH_GAME();
+    }
+    this->globals->playerPower += power;
+    this->UpdateAntiTamper();
+}
+
+// FUNCTION: th08 0x44e260
+void GameManager::AddToDeaths(i32 amount)
+{
+    if (this->IsTampered())
+    {
+        CRASH_GAME();
+    }
+    this->globals->deaths += amount;
+    this->globals->deathInStage += amount;
+    (*(i32 *)((u8 *)this + 0x3da9c))++;
+    this->UpdateAntiTamper();
+}
+
+// FUNCTION: th08 0x44e2e0
+void GameManager::AddToBombsUsed(i32 amount)
+{
+    if (this->IsTampered())
+    {
+        CRASH_GAME();
+    }
+    this->globals->bombsUsed += amount;
+    this->globals->bombsUsedInStage += amount;
+    this->UpdateAntiTamper();
+}
+
+// FUNCTION: th08 0x44e0f0
+void AnmVm::FUN_0044e0f0()
+{
+    this->blendMode = 1;
+}
+
+// FUNCTION: th08 0x44e120
+void AnmVm::FUN_0044e120()
+{
+    this->blendMode = 0;
+}
+
+// FUNCTION: th08 0x44d150
+void Player::FUN_0044d150()
+{
+    *(u32 *)this &= ~4;
+    *(i32 *)((u8 *)this + 0xfc) = 0;
+}
+
+// FUNCTION: th08 0x451640
+void Player::FUN_00451640()
+{
+    if ((i32)*(ZunTimer *)((u8 *)this + 0xe2ac4) < 0)
+    {
+        *(ZunTimer *)((u8 *)this + 0xe2ac4) = 0;
+    }
+}
+
 // FUNCTION: th08 0x441830
 ZunBool ZunTimer::operator!=(i32 value)
 {

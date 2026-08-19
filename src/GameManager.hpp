@@ -67,9 +67,7 @@ struct GameManager
     static ZunResult AddedCallback(GameManager *gameManager);
     static void GameplaySetupThread();
 
-    void InitRankParams()
-    {
-    }
+    void InitRankParams();
 
     static void InitializeAntiTamper();
 
@@ -302,15 +300,9 @@ struct GameManager
         this->UpdateAntiTamper();
     }
 
-    void AddPower(int power)
-    {
-        if (this->IsTampered())
-        {
-            CRASH_GAME();
-        }
-        this->globals->playerPower += power;
-        this->UpdateAntiTamper();
-    }
+    void AddPower(int power);
+    void AddToDeaths(int amount);
+    void AddToBombsUsed(int amount);
 
     void AddToBombCount(int amount)
     {

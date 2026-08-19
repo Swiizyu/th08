@@ -31,6 +31,13 @@ void Spellcard::spellcard_fun_00416160()
     }
 }
 
+// FUNCTION: th08 0x416af0
+void Spellcard::FUN_00416af0()
+{
+    this->flags.isActive = 0;
+    this->spellcard_fun_00416160();
+}
+
 // FUNCTION: th08 0x414540
 ZunBool Spellcard::IsLastSpell(i32 spellcardNumber)
 {

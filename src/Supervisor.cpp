@@ -30,6 +30,24 @@ DIFFABLE_STATIC(ScreenEffect *, g_SupervisorScreenEffect);
 DIFFABLE_STATIC(Supervisor, g_Supervisor);
 DIFFABLE_STATIC_ARRAY(AnmVm, 3, g_SupervisorLoadingVms);
 
+// FUNCTION: th08 0x448972
+void Supervisor::FUN_00448972()
+{
+    if (*(i32 *)((u8 *)this + 0x2fc) == 1)
+    {
+        g_SupervisorLoadingVms[0].pendingInterrupt = 2;
+        g_SupervisorLoadingVms[1].pendingInterrupt = 2;
+        g_SupervisorLoadingVms[2].pendingInterrupt = 2;
+        *(i32 *)((u8 *)this + 0x2fc) = 2;
+    }
+
+    if (g_SupervisorScreenEffect != NULL)
+    {
+        ScreenEffect::FUN_0045c160(g_SupervisorScreenEffect);
+        g_SupervisorScreenEffect = NULL;
+    }
+}
+
 ChainCallbackResult Supervisor::OnUpdate(Supervisor *s)
 {
     if (s->flags.receivedCloseMsg && !s->IsSubthreadRunning())

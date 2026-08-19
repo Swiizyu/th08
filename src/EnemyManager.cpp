@@ -1,6 +1,7 @@
 #include "th_pch.h"
 
 #include "EnemyManager.hpp"
+#include "AsciiManager.hpp"
 #include "EffectManager.hpp"
 #include "EclManager.hpp"
 
@@ -14,6 +15,12 @@ DIFFABLE_STATIC(ChainElem, g_EffectManagerDrawChain);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerDrawChainHighPrio);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerDrawChainLowPrio);
+
+// FUNCTION: th08 0x41fdf0
+void ZunTimer::operator+=(i32 value)
+{
+    this->Increment(value);
+}
 
 // FUNCTION: th08 0x42a450
 EnemyUnkStruct2::EnemyUnkStruct2()
@@ -43,6 +50,23 @@ void Float3::FromAngleMagnitude(float angle, float magnitude)
         fmul [magnitude]
         fstp [eax + 4]
     }
+}
+
+// FUNCTION: th08 0x423390
+void __fastcall EclExIns::MystiaNightBlindness(void *)
+{
+    *(i32 *)((u8 *)&g_AsciiManager + 93960) = *(i32 *)((u8 *)this->enemyData + 0x18);
+    *(i32 *)((u8 *)&g_AsciiManager + 93956) = *(i32 *)((u8 *)this->enemyData + 0x38);
+}
+
+// FUNCTION: th08 0x4182e0
+EclManager::EclManager()
+{
+}
+
+// FUNCTION: th08 0x418300
+EclManagerSub::EclManagerSub()
+{
 }
 
 // FUNCTION: th08 0x449f50

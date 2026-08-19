@@ -47,6 +47,8 @@ struct Player
     ZunBool IsHuman();
     ZunBool IsYoukai();
     ZunBool FUN_00451d50();
+    void FUN_0044d150();
+    void FUN_00451640();
 
     i8 playerState;           // 0x0
     unknown_fields(0x1, 0x2); // 0x1

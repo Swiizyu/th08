@@ -13,6 +13,26 @@ namespace th08
 DIFFABLE_STATIC(AnmManager *, g_AnmManager);
 DIFFABLE_STATIC_ARRAY(VertexTex1DiffuseXyzrhw, 4, g_QuadVertices);
 
+// FUNCTION: th08 0x464070
+ZunResult AnmManager::FUN_00464070(AnmVm *vm)
+{
+    if (!vm->IsVisible())
+    {
+        return ZUN_ERROR;
+    }
+    if (!vm->flag1)
+    {
+        return ZUN_ERROR;
+    }
+    if (*(u8 *)((u8 *)vm + 0x1f3) == 0)
+    {
+        return ZUN_ERROR;
+    }
+
+    this->TransformVerticesWorld(vm);
+    return this->DrawInner(vm, 0);
+}
+
 // FUNCTION: th08 0x40baf0
 void AnmManager::Draw2DAndFlush(AnmVm *vm)
 {

@@ -32,6 +32,7 @@ struct Spellcard
     ZunBool spellcard_fun_004178a0();
     void spellcard_fun_00416130();
     void spellcard_fun_00416160();
+    void FUN_00416af0();
     i32 FUN_0041fdd0();
     ZunBool FUN_0042dff0();
 

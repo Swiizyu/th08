@@ -9,6 +9,17 @@ DIFFABLE_STATIC(BulletManager, g_BulletManager);
 DIFFABLE_STATIC(ChainElem, g_BulletManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_BulletManagerDrawChain);
 
+// FUNCTION: th08 0x42f420
+BulletManager::BulletManager()
+{
+    this->Initialize();
+}
+
+// FUNCTION: th08 0x42f500
+Bullet::Bullet()
+{
+}
+
 // FUNCTION: th08 0x42f4a0
 BulletTypeSprites::BulletTypeSprites()
 {
@@ -22,6 +33,25 @@ Laser::Laser()
 // FUNCTION: th08 0x42f5c0
 BulletExState::BulletExState()
 {
+}
+
+// FUNCTION: th08 0x432170
+void Bullet::FUN_00432170()
+{
+    this->unk0xdb8 = 0;
+    this->timer1 = 0;
+    this->timer2 = 0;
+}
+
+// FUNCTION: th08 0x4321b0
+void BulletManager::FUN_004321b0()
+{
+    this->unknown[5] = 0;
+    this->unknown[4] = 0;
+    this->unknown[3] = 0;
+    this->unknown[2] = 0;
+    this->unknown[1] = 0;
+    this->unknown[0] = 0;
 }
 
 // STUB: th08 0x42f360

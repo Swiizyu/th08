@@ -6,6 +6,23 @@ namespace th08
 {
 DIFFABLE_STATIC(Background, g_Background);
 
+// FUNCTION: th08 0x4031e0
+f32 FUN_004031e0(f32 value)
+{
+    return fabs(value);
+}
+
+// FUNCTION: th08 0x40c7b0
+f32 FUN_0040c7b0(f32 value, f32 exponent)
+{
+    return pow(value, exponent);
+}
+
+// FUNCTION: th08 0x4073b0
+BackgroundUnkVectors::BackgroundUnkVectors()
+{
+}
+
 // FUNCTION: th08 0x409080
 Float3 Float3::operator+(const Float3 &other)
 {

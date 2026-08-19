@@ -403,6 +403,8 @@ struct AnmVm : AnmVmBase
     }
 
     void SetZRotation(f32 rotation);
+    void FUN_0044e0f0();
+    void FUN_0044e120();
 
     Float3 pos;
     i16 activeSpriteIndex;
@@ -523,6 +525,7 @@ struct AnmManager
     void ExecuteScriptArray(AnmVm *sprites, int count);
     void SetRenderStateForVm(AnmVm *vm);
     ZunResult DrawInner(AnmVm *vm, i32 flags);
+    ZunResult FUN_00464070(AnmVm *vm);
     ZunResult AddSpriteToDrawBuffer(VertexTex1DiffuseXyzrhw *vertices);
     ZunResult DrawNoRotation(AnmVm *vm);
     void TranslateRotation(VertexTex1DiffuseXyzrhw *vertex, float x, float y, float sine, float cosine, float xOffset,
