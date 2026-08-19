@@ -137,6 +137,54 @@ void Player::FUN_0040e780()
     UpdateBombPattern(this, 35, 0xffffd0d0, 380, 10);
 }
 
+// FUNCTION: th08 0x40ee10
+void Player::FUN_0040ee10()
+{
+    UpdateBombPattern(this, 4, 0xffc080ff, 420, 14);
+}
+
+// FUNCTION: th08 0x40f570
+void Player::FUN_0040f570()
+{
+    UpdateBombPattern(this, 5, 0xffff80c0, 420, 14);
+}
+
+// FUNCTION: th08 0x40fcd0
+void Player::FUN_0040fcd0()
+{
+    UpdateBombPattern(this, 6, 0xff80ffff, 300, 10);
+}
+
+// FUNCTION: th08 0x4103f0
+void Player::FUN_004103f0()
+{
+    UpdateBombPattern(this, 7, 0xffffff80, 300, 10);
+}
+
+// FUNCTION: th08 0x410c40
+void Player::FUN_00410c40()
+{
+    UpdateBombPattern(this, 8, 0xff80c0ff, 260, 8);
+}
+
+// FUNCTION: th08 0x410fe0
+void Player::FUN_00410fe0()
+{
+    UpdateBombPattern(this, 9, 0xffffc080, 260, 8);
+}
+
+// FUNCTION: th08 0x411b10
+void Player::FUN_00411b10()
+{
+    UpdateBombPattern(this, 10, 0xffc0c0ff, 360, 12);
+}
+
+// FUNCTION: th08 0x4123d0
+void Player::FUN_004123d0()
+{
+    UpdateBombPattern(this, 11, 0xffffc0c0, 360, 12);
+}
+
 // FUNCTION: th08 0x40bf00
 #pragma var_order(effect)
 void Player::FUN_0040bf00()
