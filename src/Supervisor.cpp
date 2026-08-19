@@ -1114,15 +1114,15 @@ LAB_004471e4:
 
             if (g_Supervisor.unk0x33c)
             {
-                g_AsciiManager.color = 0xffff4040;
+                g_AsciiManager.color.d3dColor = 0xffff4040;
             }
             else
             {
-                g_AsciiManager.color = 0xffffffd0;
+                g_AsciiManager.color.d3dColor = 0xffffffd0;
             }
 
             g_AsciiManager.AddString(&replayFpsCounterPos, g_ReplayFpsBuffer);
-            g_AsciiManager.color = 0xffffffff;
+            g_AsciiManager.color.d3dColor = 0xffffffff;
         }
     }
 }
