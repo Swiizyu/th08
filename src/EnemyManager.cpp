@@ -1218,6 +1218,12 @@ void __fastcall EclExIns::FUN_00424fc0(void *)
     *(i32 *)((u8 *)this->enemyData + 0x18) = g_GameManager.currentSpellCardNumber;
 }
 
+// FUNCTION: th08 0x424ff0
+void __fastcall EclExIns::FUN_00424ff0(void *)
+{
+    g_Spellcard.FUN_00415d10("\x81\x75\x83\x8a\x83\x55\x83\x8c\x83\x4e\x83\x56\x83\x87\x83\x93\x81\x76", this);
+}
+
 // FUNCTION: th08 0x425020
 void __fastcall EclExIns::FUN_00425020(void *)
 {

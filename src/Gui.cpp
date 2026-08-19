@@ -1843,6 +1843,7 @@ void Gui::DrawAsciiText()
     g_AsciiManager.SetIsGuiMode(FALSE);
 }
 
+// FUNCTION: th08 0x438f58
 void Gui::CaptureArcade()
 {
     g_AsciiManager.captureAnm->SetAndExecuteScriptIdx(&this->impl->arcadeZoneSprite, 1);
@@ -2081,12 +2082,12 @@ u32 FUN_00438ff3()
     return *(u32 *)((u8 *)&th08::g_Supervisor + 360);
 }
 
-// FUNCTION: th08 0x438ffd
 namespace th08
 {
 u32 IsDisableResourceReload();
 }
 
+// FUNCTION: th08 0x438ffd
 u32 th08::IsDisableResourceReload()
 {
     return *(u32 *)((u8 *)&th08::g_Supervisor + 364);

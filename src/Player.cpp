@@ -382,6 +382,7 @@ laser_collision:
     {
         return 0;
     }
+    g_GameManager.RandomizeAntiTamper();
     this->Die();
     return 1;
 }

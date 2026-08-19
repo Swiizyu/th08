@@ -81,6 +81,7 @@ SpellcardMusicEntry g_SpellcardMusicInfo[] = {{1, 1, "th08_00.mid", 0, FALSE},
                                               {222, 20, "th08_20.mid", 2, FALSE},
                                               {-1, 0, " ", 0, FALSE}};
 
+// FUNCTION: th08 0x439916
 ZunBool GameManager::ShouldPauseMusicInSpellPractice(i32 spellcardNumber)
 {
     i32 i = 0;
@@ -98,6 +99,7 @@ ZunBool GameManager::ShouldPauseMusicInSpellPractice(i32 spellcardNumber)
     return FALSE;
 }
 
+// FUNCTION: th08 0x439961
 i32 GameManager::GetSongNameSpriteIdx(i32 spellcardNumber)
 {
     i32 i = 0;
@@ -113,6 +115,19 @@ i32 GameManager::GetSongNameSpriteIdx(i32 spellcardNumber)
     }
 
     return FALSE;
+}
+
+// FUNCTION: th08 0x44e160
+void GameManager::RandomizeAntiTamper()
+{
+    this->globals->rng1[0] = g_Rng.GetRandomU32InRange(ANTITAMPER_RNG_RANGE) + ANTITAMPER_RNG_ADD;
+    this->globals->rng1[1] = g_Rng.GetRandomU32InRange(ANTITAMPER_RNG_RANGE) + ANTITAMPER_RNG_ADD;
+    this->globals->rng1[2] = g_Rng.GetRandomU32InRange(ANTITAMPER_RNG_RANGE) + ANTITAMPER_RNG_ADD;
+    this->globals->rng1[3] = g_Rng.GetRandomU32InRange(ANTITAMPER_RNG_RANGE) + ANTITAMPER_RNG_ADD;
+    this->globals->rng1[4] = g_Rng.GetRandomU32InRange(ANTITAMPER_RNG_RANGE) + ANTITAMPER_RNG_ADD;
+    this->globals->rng4[0] = g_Rng.GetRandomF32InRange(ANTITAMPER_RNG_RANGE) + ANTITAMPER_RNG_ADD;
+    this->globals->rng4[1] = g_Rng.GetRandomF32InRange(ANTITAMPER_RNG_RANGE) + ANTITAMPER_RNG_ADD;
+    this->globals->rng4[2] = g_Rng.GetRandomF32InRange(ANTITAMPER_RNG_RANGE) + ANTITAMPER_RNG_ADD;
 }
 
 // FUNCTION: th08 0x418220

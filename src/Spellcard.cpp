@@ -82,6 +82,14 @@ i32 ZunTimer::operator%(i32 value)
     return this->current % value;
 }
 
+// FUNCTION: th08 0x415d10
+void Spellcard::FUN_00415d10(const char *, void *)
+{
+    *(u32 *)this |= 0x400;
+    *(u32 *)this &= ~1;
+    *(u32 *)this &= ~0x10;
+}
+
 // FUNCTION: th08 0x405260
 ZunBool Spellcard::FUN_00405260()
 {
