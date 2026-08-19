@@ -561,6 +561,11 @@ ZunResult ReplayManager::DeletedCallback(ReplayManager *mgr)
 }
 
 // FUNCTION: th08 0x4531f0
+#pragma var_order(i, mgr, textCursor, writtenBytes, compressedData, clampedSlowRate, compressedSize, stageInputLen, \
+                  encodedData, replayDataCopy, userSectionText, fileHandle, userSectionPad, userSectionSize, \
+                  userSectionMagic, encodeCursor, timeInfo, timeValue, timeString, checksum, checksumCursor, \
+                  obfuscateOffset, obfuscateCursor, replayPath, replayName, stageName, strlenCursor, strlenNext, \
+                  strlenOut)
 void ReplayManager::SaveReplay(const char *replayPath, const char *replayName)
 {
     ReplayManager *mgr;
@@ -574,7 +579,6 @@ void ReplayManager::SaveReplay(const char *replayPath, const char *replayName)
     u8 *checksumCursor;
     u8 obfuscateOffset;
     u8 *obfuscateCursor;
-    f32 slowRate;
     f32 clampedSlowRate;
     i32 writtenBytes;
     HANDLE fileHandle;
@@ -582,20 +586,22 @@ void ReplayManager::SaveReplay(const char *replayPath, const char *replayName)
 
     u8 userSectionMagic[4];
     i32 userSectionSize;
-    u8 userSectionPad[8];
+    u8 userSectionPad[4];
     char userSectionText[0x400];
 
     char *textCursor;
     const char *stageName;
-    time_t timeValue;
+    long timeValue;
     struct tm *timeInfo;
-    char timeString[20];
+    char timeString[0xfc];
     char *strlenCursor;
     char *strlenNext;
     i32 strlenOut;
 
-    if (g_ReplayManager != NULL)
+    if (g_ReplayManager == NULL)
     {
+        return;
+    }
     mgr = g_ReplayManager;
 
     if (::FUN_00453cc0(mgr) != 0)
@@ -679,9 +685,9 @@ void ReplayManager::SaveReplay(const char *replayPath, const char *replayName)
     textCursor = userSectionText;
     textCursor = sprintf(textCursor, "\x83\x76\x83\x8c\x83\x43\x83\x84\x81\x5b\x96\xbc\t%s\r\n", replayName);
 
-    time(&timeValue);
-    timeInfo = localtime(&timeValue);
-    strftime(timeString, sizeof(timeString), "%Y/%m/%d %H:%M:%S", timeInfo);
+    time((time_t *)&timeValue);
+    timeInfo = localtime((time_t *)&timeValue);
+    strftime(timeString, 20, "%Y/%m/%d %H:%M:%S", timeInfo);
     textCursor = sprintf(textCursor, "\x83\x76\x83\x8c\x83\x43\x8e\x9e\x8d\x8f\t%s\r\n", timeString);
     textCursor = sprintf(textCursor, "\x83\x4c\x83\x83\x83\x89\x96\xbc\t%s\r\n",
                          ResultScreen::GetCharacterName(g_GameManager.shotType));
@@ -760,22 +766,22 @@ void ReplayManager::SaveReplay(const char *replayPath, const char *replayName)
     g_ZunMemory.Free(encodedData);
     compressedSize = replayDataCopy.header.compressedSize;
 
-    obfuscateCursor = &replayDataCopy.header.value1;
+    checksumCursor = &replayDataCopy.header.value1;
     checksum = REPLAY_OBFUSCATION_VALUE;
-    for (i = 0; i < 0x53; i++, obfuscateCursor++)
+    for (i = 0; (u32)i < 0x53; i++, checksumCursor++)
     {
-        checksum += *obfuscateCursor;
+        checksum += *checksumCursor;
     }
-    obfuscateCursor = compressedData;
-    for (i = 0; i < compressedSize; i++, obfuscateCursor++)
+    checksumCursor = compressedData;
+    for (i = 0; i < compressedSize; i++, checksumCursor++)
     {
-        checksum += *obfuscateCursor;
+        checksum += *checksumCursor;
     }
     replayDataCopy.header.checksum = checksum;
 
     obfuscateCursor = (u8 *)&replayDataCopy.header.compressedSize;
     obfuscateOffset = replayDataCopy.header.value1;
-    for (i = 0; i < 0x50; i++, obfuscateCursor++)
+    for (i = 0; (u32)i < 0x50; i++, obfuscateCursor++)
     {
         *obfuscateCursor += obfuscateOffset;
         obfuscateOffset += 7;
@@ -818,7 +824,6 @@ abortSave:
 
 cutChain:
     g_Chain.Cut(g_ReplayManager->calcChain);
-    }
 }
 
 // FUNCTION: th08 0x451d90

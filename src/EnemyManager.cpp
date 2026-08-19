@@ -2,8 +2,10 @@
 
 #include "EnemyManager.hpp"
 #include "AsciiManager.hpp"
+#include "Background.hpp"
 #include "EffectManager.hpp"
 #include "EclManager.hpp"
+#include "Spellcard.hpp"
 
 namespace th08
 {
@@ -50,6 +52,66 @@ void Float3::FromAngleMagnitude(float angle, float magnitude)
         fmul [magnitude]
         fstp [eax + 4]
     }
+}
+
+// FUNCTION: th08 0x4230c0
+void EclExIns::FUN_004230c0(i32 value)
+{
+    *(i32 *)((u8 *)this + 0x30) = value;
+}
+
+// FUNCTION: th08 0x4230e0
+void EclExIns::FUN_004230e0(i32 index, i32 value0, i32 value1)
+{
+    *(i32 *)((u8 *)this + index * 4 + 0x5c) = value0;
+    *(i32 *)((u8 *)this + index * 4 + 0x3c) = value1;
+}
+
+// FUNCTION: th08 0x423110
+void EclExIns::FUN_00423110(i32 index, i32 value)
+{
+    *(i32 *)((u8 *)this + index * 4 + 0x7c) = value;
+}
+
+// FUNCTION: th08 0x423130
+void EclExIns::FUN_00423130(i32 value)
+{
+    *(i32 *)((u8 *)this + 0x20) = value;
+}
+
+// FUNCTION: th08 0x424e00
+void __fastcall EclExIns::FUN_00424e00(void *)
+{
+    g_Background.FUN_00409160(0xffc03030);
+}
+
+// FUNCTION: th08 0x424f90
+void __fastcall EclExIns::FUN_00424f90(void *instruction)
+{
+    i32 divisor;
+    f32 result;
+
+    divisor = *(i32 *)((u8 *)instruction + 0x10);
+    result = 1.0f / divisor;
+    *(f32 *)((u8 *)&g_Supervisor + 0x188) = result;
+}
+
+// FUNCTION: th08 0x424fc0
+void __fastcall EclExIns::FUN_00424fc0(void *)
+{
+    *(i32 *)((u8 *)this->enemyData + 0x18) = g_GameManager.currentSpellCardNumber;
+}
+
+// FUNCTION: th08 0x425020
+void __fastcall EclExIns::FUN_00425020(void *)
+{
+    g_Spellcard.spellcard_fun_00416160();
+}
+
+// FUNCTION: th08 0x425040
+void __fastcall EclExIns::FUN_00425040(void *)
+{
+    *(i32 *)((u8 *)this->enemyData + 0x18) = g_GameManager.globals->spellcardsCaptured;
 }
 
 // FUNCTION: th08 0x423390

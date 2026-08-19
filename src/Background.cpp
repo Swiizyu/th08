@@ -23,6 +23,29 @@ BackgroundUnkVectors::BackgroundUnkVectors()
 {
 }
 
+// FUNCTION: th08 0x409160
+void Background::FUN_00409160(u32 color)
+{
+    u32 colorCopy;
+
+    if (*(u8 *)((u8 *)this + 0x646b) == 0)
+    {
+        *(u32 *)((u8 *)this + 0x6468) = color;
+    }
+    else
+    {
+        colorCopy = color;
+        *(u8 *)((u8 *)this + 0x646a) =
+            (u32)(((u8 *)&colorCopy)[2] + *(u8 *)((u8 *)this + 0x646a)) >> 1;
+        *(u8 *)((u8 *)this + 0x6469) =
+            (u32)(((u8 *)&colorCopy)[1] + *(u8 *)((u8 *)this + 0x6469)) >> 1;
+        *(u8 *)((u8 *)this + 0x6468) =
+            (u32)(((u8 *)&colorCopy)[0] + *(u8 *)((u8 *)this + 0x6468)) >> 1;
+        *(u8 *)((u8 *)this + 0x646b) =
+            (u32)(((u8 *)&colorCopy)[3] + *(u8 *)((u8 *)this + 0x646b)) >> 1;
+    }
+}
+
 // FUNCTION: th08 0x409080
 Float3 Float3::operator+(const Float3 &other)
 {
