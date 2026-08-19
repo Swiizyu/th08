@@ -66,8 +66,8 @@ DIFFABLE_STATIC_ARRAY_ASSIGN(EffectTemplate, 66, g_EffectTemplates) = {
     {56, NULL, NULL},
     {52, &Effect::FUN_004271a0, &Effect::FUN_004270c0},
     {54, &Effect::FUN_00426c40, NULL},
-    {104, NULL, NULL},
-    {104, NULL, NULL},
+    {104, &Effect::FUN_00427250, NULL},
+    {104, &Effect::FUN_00427250, NULL},
     {35, NULL, NULL},
     {53, &Effect::FUN_004271a0, &Effect::FUN_004270c0},
     {34, &Effect::FUN_00426bb0, &Effect::FUN_00426b20},
@@ -103,8 +103,8 @@ DIFFABLE_STATIC_ARRAY_ASSIGN(EffectTemplate, 66, g_EffectTemplates) = {
     {55, NULL, NULL},
     {100, &Effect::FUN_004279d0, NULL},
     {78, &Effect::FUN_00427990, NULL},
-    {102, NULL, NULL},
-    {103, NULL, NULL},
+    {102, NULL, &Effect::FUN_00427260},
+    {103, NULL, &Effect::FUN_00427260},
     {75, NULL, NULL},
     {74, NULL, NULL},
     {77, &Effect::FUN_00427b50, NULL},
@@ -498,6 +498,19 @@ i32 Effect::FUN_004271a0()
     this->position = this->direction * factor * 128.0f + this->emitterPosition;
     this->position.z = 0.0f;
     return 1;
+}
+
+// FUNCTION: th08 0x427260
+#pragma var_order(offset)
+i32 Effect::FUN_00427260()
+{
+    Float3 offset;
+
+    offset.FromAngleMagnitude(this->custom.x, 128.0f);
+    this->position.x += offset.x;
+    this->position.y += offset.y;
+    this->vm.rotation.z = AddNormalizeAngle(this->custom.x, ZUN_PI / 2.0f);
+    return 0;
 }
 
 // FUNCTION: th08 0x426d10
@@ -1433,7 +1446,7 @@ i32 EnemyManager::DespawnAllEnemies(i32 maximumScore, i32 initialTotal)
 } /* namespace th08 */
 
 // FUNCTION: th08 0x427250
-i32 FUN_00427250(void *)
+i32 th08::Effect::FUN_00427250()
 {
     return 1;
 }
