@@ -117,6 +117,8 @@ struct Player
     void __fastcall FUN_0040bc60(D3DCOLOR color);
     void __fastcall FUN_0040be30(i32 arg0, i32 arg1, i32 arg2, i32 duration, i32 arg4);
     void FUN_0040bf00();
+    void FUN_0040c010();
+    void FUN_0040c910();
     void FUN_0040c820();
     void FUN_0040d010();
     void FUN_0040d100();
@@ -126,9 +128,13 @@ struct Player
     void FUN_00413890();
     void FUN_004142c0();
     void FUN_0040d310();
+    void FUN_0040d430();
     void FUN_0040d950();
+    void FUN_0040d970();
     void FUN_0040dee0();
+    void FUN_0040e3b0();
     void FUN_0040e610();
+    void FUN_0040e780();
     void FUN_0040f550();
     void FUN_0040fcb0();
     void FUN_00412300();

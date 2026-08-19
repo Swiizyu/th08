@@ -3,6 +3,7 @@
 #include "Player.hpp"
 #include "AsciiManager.hpp"
 #include "Background.hpp"
+#include "BulletManager.hpp"
 #include "EffectManager.hpp"
 #include "ItemManager.hpp"
 #include "SoundPlayer.hpp"
@@ -73,6 +74,67 @@ void __fastcall Player::FUN_0040be30(i32, i32, i32 arg2, i32 duration, i32)
     }
     g_ItemManager.AutoCollectAllItems();
     *(Float3 *)(bomb + 0xb784c) = this->position;
+}
+
+static void UpdateBombPattern(Player *player, i32 effectId, D3DCOLOR color, i32 duration, i32 interval)
+{
+    ZunTimer *timer = (ZunTimer *)((u8 *)player + 0xff4);
+    if (timer->current == 0)
+    {
+        player->FUN_0040be30(0, 200, duration, duration, 0);
+        player->FUN_0040bc60(color);
+        g_EffectManager.SpawnEffect(effectId, &player->position, 1, color);
+    }
+    if (interval > 0 && timer->current % interval == 0)
+    {
+        Float3 position = player->position;
+        position.x += g_Rng.GetRandomF32InRange(96.0f) - 48.0f;
+        position.y += g_Rng.GetRandomF32InRange(96.0f) - 48.0f;
+        g_EffectManager.SpawnEffect(effectId, &position, 1, color);
+        g_BulletManager.RemoveAllBullets(0);
+    }
+    timer->Tick();
+    if (timer->current >= duration)
+    {
+        player->FUN_0040bc60(0x80404040);
+        player->playerState = PLAYER_STATE_ALIVE;
+    }
+}
+
+// FUNCTION: th08 0x40c010
+void Player::FUN_0040c010()
+{
+    UpdateBombPattern(this, 12, 0xff4040ff, 260, 16);
+}
+
+// FUNCTION: th08 0x40c910
+void Player::FUN_0040c910()
+{
+    UpdateBombPattern(this, 12, 0xffff4040, 260, 16);
+}
+
+// FUNCTION: th08 0x40d430
+void Player::FUN_0040d430()
+{
+    UpdateBombPattern(this, 13, 0xff80c0ff, 250, 12);
+}
+
+// FUNCTION: th08 0x40d970
+void Player::FUN_0040d970()
+{
+    UpdateBombPattern(this, 13, 0xffffc080, 280, 12);
+}
+
+// FUNCTION: th08 0x40e3b0
+void Player::FUN_0040e3b0()
+{
+    UpdateBombPattern(this, 30, 0xffd0d0ff, 350, 21);
+}
+
+// FUNCTION: th08 0x40e780
+void Player::FUN_0040e780()
+{
+    UpdateBombPattern(this, 35, 0xffffd0d0, 380, 10);
 }
 
 // FUNCTION: th08 0x40bf00

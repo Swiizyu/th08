@@ -582,12 +582,14 @@ struct AnmManager
                        i32 fontHeight, COLORREF textColor, COLORREF outlineColor, const char *buffer,
                        float scaleFactorX, float scaleFactorY);
     void DrawTextLeft(AnmVm *vm, COLORREF textColor, COLORREF shadowColor, const char *fmt, ...);
+    void DrawTextRight(AnmVm *vm, COLORREF textColor, COLORREF shadowColor, const char *fmt, ...);
     void DrawTextCentered(AnmVm *vm, COLORREF textColor, COLORREF shadowColor, const char *fmt, ...);
     ZunResult LoadSurface(i32 surfaceIdx, const char *path);
     ZunResult PreloadSurface(i32 surfaceIdx, const char *path);
     void ReleaseSurface(i32 surfaceIdx);
     void CopySurfaceToBackbuffer(int surfaceIdx, int left, int top, int x, int y);
     void CopySurfaceToBackbuffer2(i32 surfaceIdx, i32 destX, i32 destY, i32 srcX, i32 srcY, i32 width, i32 height);
+    void FUN_00467040(i32 dstAnmIdx, i32 dstEntry, i32 srcAnmIdx, i32 srcEntry, RECT *dstRect, RECT *srcRect);
 
     void ReleaseVertexBuffer()
     {

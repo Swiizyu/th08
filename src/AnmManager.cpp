@@ -2330,6 +2330,25 @@ void AnmManager::DrawTextLeft(AnmVm *vm, COLORREF textColor, COLORREF shadowColo
     vm->visible = true;
 }
 
+// FUNCTION: th08 0x4664a0
+void AnmManager::DrawTextRight(AnmVm *vm, COLORREF textColor, COLORREF shadowColor, const char *fmt, ...)
+{
+    char buf[128];
+    i32 fontWidth = vm->fontWidth <= 0 ? 15 : vm->fontWidth;
+    va_list args;
+    va_start(args, fmt);
+    vsprintf(buf, fmt, args);
+    va_end(args);
+    i32 x = (i32)(vm->loadedSprite->startPixelInclusive.x +
+                    vm->loadedSprite->widthPx * vm->loadedSprite->scaleFactor.x -
+                    strlen(buf) * fontWidth * vm->loadedSprite->scaleFactor.x / 2.0f);
+    this->DrawTextInner(vm->loadedSprite->texture, x, vm->loadedSprite->startPixelInclusive.y,
+                        vm->loadedSprite->width, vm->loadedSprite->height, fontWidth, vm->fontHeight,
+                        textColor, shadowColor, buf, vm->loadedSprite->scaleFactor.x,
+                        vm->loadedSprite->scaleFactor.y);
+    vm->visible = true;
+}
+
 // FUNCTION: th08 0x466650
 #pragma var_order(buf, fontWidth, x)
 void AnmManager::DrawTextCentered(AnmVm *vm, COLORREF textColor, COLORREF shadowColor, const char *fmt, ...)
@@ -2626,6 +2645,27 @@ void AnmManager::CaptureToTexture(i32 captureAnmIdx, i32 srcX, i32 srcY, i32 src
     }
     textureSurface->Release();
     backbuffer->Release();
+}
+
+// FUNCTION: th08 0x467040
+void AnmManager::FUN_00467040(i32 dstAnmIdx, i32 dstEntry, i32 srcAnmIdx, i32 srcEntry,
+                              RECT *dstRect, RECT *srcRect)
+{
+    AnmEntry *dst = &this->anmFiles[dstAnmIdx].textures[dstEntry];
+    AnmEntry *src = &this->anmFiles[srcAnmIdx].textures[srcEntry];
+    if (dst->texture == NULL || src->texture == NULL) return;
+    this->FlushVertexBuffer();
+    IDirect3DSurface8 *dstSurface = NULL;
+    IDirect3DSurface8 *srcSurface = NULL;
+    if (dst->texture->GetSurfaceLevel(0, &dstSurface) != D3D_OK) return;
+    if (src->texture->GetSurfaceLevel(0, &srcSurface) != D3D_OK)
+    {
+        dstSurface->Release();
+        return;
+    }
+    D3DXLoadSurfaceFromSurface(dstSurface, NULL, dstRect, srcSurface, NULL, srcRect, D3DX_FILTER_NONE, 0);
+    dstSurface->Release();
+    srcSurface->Release();
 }
 
 #pragma var_order(srcRect, backbuffer, dstRect)
