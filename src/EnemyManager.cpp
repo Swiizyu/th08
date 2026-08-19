@@ -1213,6 +1213,88 @@ Effect *EffectManager::SpawnEffect(i32 effectId, Float3 *position, i32 count, D3
     return result;
 }
 
+// FUNCTION: th08 0x425870
+#pragma var_order(effect)
+Effect *EffectManager::SpawnSpecialEffect(i32 effectId, Float3 *position, i32 specialIndex, i32 unused,
+                                          D3DCOLOR color)
+{
+    Effect *effect;
+
+    effect = &this->effects[0x280 + specialIndex];
+    if (effect->resource != NULL)
+    {
+        g_ZunMemory.Free(effect->resource);
+    }
+    memset(effect, 0, sizeof(Effect));
+    *(i32 *)((u8 *)effect + 0x328) = specialIndex;
+    effect->active = 1;
+    effect->effectId = effectId;
+    effect->position = *position;
+    if (g_EffectTemplates[effectId].scriptIdx >= 0)
+    {
+        this->effectAnm->SetAndExecuteScriptIdx(&effect->vm, g_EffectTemplates[effectId].scriptIdx);
+    }
+    effect->vm.zWriteDisabled = true;
+    effect->vm.color1.d3dColor = color;
+    *(i32 *)((u8 *)&effect->vm + 0x288) = 0;
+    *(i32 *)((u8 *)&effect->vm + 0x28c) = 0;
+    *(i32 *)((u8 *)&effect->vm + 0x290) = 0;
+    effect->updateCallback = g_EffectTemplates[effectId].updateCallback;
+    if (g_EffectTemplates[effectId].initCallback != NULL &&
+        (effect->*g_EffectTemplates[effectId].initCallback)() != 0)
+    {
+        effect->active = 0;
+    }
+    if (g_ReplayManager != NULL)
+    {
+        g_ReplayManager->inputFlags |= 0x400;
+    }
+    return effect;
+}
+
+// FUNCTION: th08 0x4259e0
+#pragma var_order(effect)
+Effect *EffectManager::SpawnSpecialEffect2(i32 effectId, Float3 *position, Float3 *custom, i32 specialIndex,
+                                           i32 unused, D3DCOLOR color)
+{
+    Effect *effect;
+
+    effect = &this->effects[0x280 + specialIndex];
+    if (effect->resource != NULL)
+    {
+        g_ZunMemory.Free(effect->resource);
+    }
+    memset(effect, 0, sizeof(Effect));
+    *(i32 *)((u8 *)effect + 0x328) = specialIndex;
+    effect->custom = *custom;
+    effect->active = 1;
+    effect->effectId = effectId;
+    effect->position = *position;
+    if (g_EffectTemplates[effectId].scriptIdx >= 0)
+    {
+        this->effectAnm->SetAndExecuteScriptIdx(&effect->vm, g_EffectTemplates[effectId].scriptIdx);
+    }
+    effect->vm.zWriteDisabled = true;
+    effect->vm.color1.d3dColor = color;
+    *(i32 *)((u8 *)&effect->vm + 0x288) = 0;
+    *(i32 *)((u8 *)&effect->vm + 0x28c) = 0;
+    *(i32 *)((u8 *)&effect->vm + 0x290) = 0;
+    effect->updateCallback = g_EffectTemplates[effectId].updateCallback;
+    effect->timer = 0;
+    *(u8 *)((u8 *)effect + 0x352) = 0;
+    *(u8 *)((u8 *)effect + 0x353) = 0;
+    if (g_EffectTemplates[effectId].initCallback != NULL &&
+        (effect->*g_EffectTemplates[effectId].initCallback)() != 0)
+    {
+        effect->active = 0;
+    }
+    if (g_ReplayManager != NULL)
+    {
+        g_ReplayManager->inputFlags |= 0x400;
+    }
+    return effect;
+}
+
 // FUNCTION: th08 0x4286b0
 void EffectManager::CutChain()
 {

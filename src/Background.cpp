@@ -159,6 +159,22 @@ ChainCallbackResult Background::OnUpdate(Background *background)
         return CHAIN_CALLBACK_RESULT_CONTINUE;
     }
 
+    if (g_GameManager.currentStage == 7)
+    {
+        Effect *stageEffect = *(Effect **)((u8 *)background + 0xae8);
+        if (stageEffect == NULL)
+        {
+            Float3 zero = Float3(0.0f, 0.0f, 0.0f);
+            stageEffect = g_EffectManager.SpawnSpecialEffect(64, &zero, 12, 1, 0xffffffff);
+            *(Effect **)((u8 *)background + 0xae8) = stageEffect;
+            background->anm0x7f0->SetAndExecuteScriptIdx(&stageEffect->vm, 11);
+        }
+        else if (background->scriptWaitTime == 1)
+        {
+            background->anm0x7f0->SetAndExecuteScriptIdx(&stageEffect->vm, 11);
+        }
+    }
+
     if (background->scriptWaitTime != 0)
     {
         instructionIndex = 0;

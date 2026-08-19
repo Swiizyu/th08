@@ -83,6 +83,9 @@ struct EffectManager
     ZunResult FUN_00428590();
     Effect *FUN_004253e0(i32 index);
     Effect *SpawnEffect(i32 effectId, Float3 *position, i32 count, D3DCOLOR color);
+    Effect *SpawnSpecialEffect(i32 effectId, Float3 *position, i32 specialIndex, i32 unused, D3DCOLOR color);
+    Effect *SpawnSpecialEffect2(i32 effectId, Float3 *position, Float3 *custom, i32 specialIndex, i32 unused,
+                                D3DCOLOR color);
     static void CutChain();
 
     i32 unk0x0;
