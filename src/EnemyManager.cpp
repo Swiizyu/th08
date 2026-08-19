@@ -9,6 +9,7 @@
 #include "ScreenEffect.hpp"
 #include "ItemManager.hpp"
 #include "Player.hpp"
+#include "ReplayManager.hpp"
 
 u32 FUN_004338c0();
 
@@ -21,6 +22,16 @@ DIFFABLE_STATIC(EnemyManager, g_EnemyManager);
 DIFFABLE_STATIC(EclManager, g_EclManager);
 DIFFABLE_STATIC(i32, g_EnemyManagerUnknown);
 DIFFABLE_STATIC(EffectManager, g_EffectManager);
+
+struct EffectTemplate
+{
+    i32 scriptIdx;
+    EffectCallback updateCallback;
+    EffectCallback initCallback;
+};
+DIFFABLE_STATIC_ARRAY_ASSIGN(EffectTemplate, 0x7b, g_EffectTemplates) = {
+    {28, NULL, NULL}, {29, NULL, NULL}, {30, NULL, NULL},
+};
 DIFFABLE_STATIC(ChainElem, g_EffectManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_EffectManagerDrawChain);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerCalcChain);
@@ -550,6 +561,73 @@ ChainCallbackResult EffectManager::DrawUnkTypeEffects()
 void EffectManager::ResetEffects()
 {
     memset(this, 0, sizeof(EffectManager));
+}
+
+// FUNCTION: th08 0x425430
+#pragma var_order(effect, i, result)
+Effect *EffectManager::SpawnEffect(i32 effectId, Float3 *position, i32 count, D3DCOLOR color)
+{
+    Effect *effect;
+    i32 i;
+    Effect *result;
+
+    effect = &this->effects[this->unk0x0];
+    for (i = 0; i < 0x200; i++)
+    {
+        this->unk0x0++;
+        if (this->unk0x0 >= 0x200)
+        {
+            this->unk0x0 = 0;
+        }
+        if (effect->active)
+        {
+            if (this->unk0x0 == 0)
+            {
+                effect = &this->effects[0];
+            }
+            else
+            {
+                effect++;
+            }
+            continue;
+        }
+        if (effect->resource != NULL)
+        {
+            g_ZunMemory.Free(effect->resource);
+        }
+        memset(effect, 0, sizeof(Effect));
+        effect->active = 1;
+        effect->effectId = effectId;
+        effect->position = *position;
+        this->effectAnm->SetAndExecuteScriptIdx(&effect->vm, g_EffectTemplates[effectId].scriptIdx);
+        effect->vm.zWriteDisabled = true;
+        effect->vm.color1.d3dColor = color;
+        *(i32 *)((u8 *)&effect->vm + 0x288) = 0;
+        *(i32 *)((u8 *)&effect->vm + 0x28c) = 0;
+        *(i32 *)((u8 *)&effect->vm + 0x290) = 0;
+        effect->updateCallback = g_EffectTemplates[effectId].updateCallback;
+        if (g_EffectTemplates[effectId].initCallback != NULL &&
+            g_EffectTemplates[effectId].initCallback(effect) != 0)
+        {
+            effect->active = 0;
+        }
+        count--;
+        if (count == 0)
+        {
+            break;
+        }
+        if (this->unk0x0 == 0)
+        {
+            effect = &this->effects[0];
+        }
+        else
+        {
+            effect++;
+        }
+    }
+    g_ReplayManager->inputFlags |= 0x400;
+    result = i >= 0x200 ? &this->effects[0x280] : effect;
+    return result;
 }
 
 // FUNCTION: th08 0x4286b0

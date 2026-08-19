@@ -2,6 +2,7 @@
 
 #include "AsciiManager.hpp"
 #include "BulletManager.hpp"
+#include "EffectManager.hpp"
 #include "GameManager.hpp"
 #include "Gui.hpp"
 #include "ItemManager.hpp"
@@ -439,6 +440,7 @@ void ItemManager::ConvertAllPowerItemsToTimeOrbs(Item *excludedItem)
                 item->startPositionOrVelocity.y = -0.5f;
                 item->startPositionOrVelocity.z = 0.0f;
             }
+            g_EffectManager.SpawnEffect(0, &item->currentPosition, 1, 0xffffffff);
             item->itemType = ITEM_POINT_SMALL;
             g_BulletManager.bonusAnm->SetAndExecuteScriptIdx(&item->sprite, 69);
         }

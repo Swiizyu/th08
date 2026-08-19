@@ -7,6 +7,7 @@ namespace th08
 {
 
 struct Effect;
+typedef i32(__fastcall *EffectCallback)(Effect *effect);
 typedef void(__fastcall *EffectDrawCallback)(Effect *effect);
 
 struct Effect
@@ -39,9 +40,12 @@ struct Effect
     Float3 unk0x304;
     u8 unknown0x310[0x28];
     ZunTimer timer;
-    u8 unknown0x344[8];
+    u8 unknown0x344[4];
+    EffectCallback updateCallback;
     EffectDrawCallback drawCallback;
-    u8 unknown0x350[8];
+    i8 active;
+    i8 effectId;
+    u8 unknown0x352[6];
     void *resource;
     Effect *next;
 };
@@ -55,6 +59,7 @@ struct EffectManager
     ChainCallbackResult DrawUnkTypeEffects();
     ZunResult FUN_00428590();
     Effect *FUN_004253e0(i32 index);
+    Effect *SpawnEffect(i32 effectId, Float3 *position, i32 count, D3DCOLOR color);
     static void CutChain();
 
     i32 unk0x0;
@@ -70,7 +75,9 @@ struct EffectManager
     Effect specialEffect2;
     Effect specialEffect3;
     Effect specialEffect4;
-    u8 unknown0x8b03c[0x20];
+    u8 unknown0x8b03c[0x18];
+    AnmLoaded *effectAnm;
+    u8 unknown0x8b058[4];
 };
 C_ASSERT(sizeof(EffectManager) == 0x8b05c);
 
