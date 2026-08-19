@@ -94,7 +94,7 @@ DIFFABLE_STATIC_ARRAY_ASSIGN(EffectTemplate, 66, g_EffectTemplates) = {
     {85, &Effect::FUN_00413070, &Effect::FUN_004272e0},
     {86, &Effect::FUN_00427990, &Effect::FUN_004272e0},
     {80, &Effect::FUN_00427a60, &Effect::FUN_004272e0},
-    {73, NULL, NULL},
+    {73, NULL, &Effect::FUN_00426280},
     {77, &Effect::FUN_00427990, &Effect::FUN_004272e0},
     {88, &Effect::FUN_00427ae0, &Effect::FUN_004272e0},
     {88, &Effect::FUN_00427ae0, &Effect::FUN_004272e0},
@@ -483,6 +483,37 @@ i32 Effect::FUN_00426030()
         this->vm.scale.x = this->vm.scale.y;
     }
     return 1;
+}
+
+// FUNCTION: th08 0x426280
+#pragma var_order(cameraLookAtInverse)
+i32 Effect::FUN_00426280()
+{
+    Float3 cameraLookAtInverse;
+
+    cameraLookAtInverse = -g_Background.vectors0x6394.vector1;
+    this->basePosition = g_Background.vectors0x6394.vector1 + g_Background.vectors0x6394.vector0;
+    this->basePosition.x += g_Rng.GetRandomF32SignedInRange(60.0f) + cameraLookAtInverse.x / 2.0f;
+    this->basePosition.y += g_Rng.GetRandomF32SignedInRange(100.0f) - 50.0f + cameraLookAtInverse.y / 2.0f;
+    this->basePosition.z += g_Rng.GetRandomF32InRange(100.0f) - 100.0f + cameraLookAtInverse.z / 2.0f;
+    this->velocity.x = g_Rng.GetRandomF32SignedInRange(0.001f) + this->custom.x;
+    this->velocity.y = g_Rng.GetRandomF32SignedInRange(0.03f) + this->custom.y;
+    this->velocity.z = -g_Rng.GetRandomF32InRange(0.1f) - 0.3f + this->custom.z;
+    this->acceleration.x = g_Rng.GetRandomF32SignedInRange(0.0001f);
+    this->acceleration.y = g_Rng.GetRandomF32SignedInRange(0.0001f);
+    this->acceleration.z = -0.0003f;
+    this->velocity = this->velocity * g_Supervisor.framerateMultiplier;
+    this->acceleration = this->acceleration * g_Supervisor.framerateMultiplier;
+    this->drawType = 1;
+    *(f32 *)((u8 *)&this->vm + 0x288) = -9999.0f;
+    *(i32 *)((u8 *)&this->vm + 0x238) = 0;
+    *(i32 *)((u8 *)&this->vm + 0x244) = 0;
+    *(i32 *)((u8 *)&this->vm + 0x248) = 0;
+    *(i32 *)((u8 *)&this->vm + 0x24c) = 0;
+    *(i32 *)((u8 *)&this->vm + 0x250) = 0;
+    *(i32 *)((u8 *)&this->vm + 0x254) = 0;
+    *(i32 *)((u8 *)&this->vm + 0x258) = 0;
+    return 0;
 }
 
 // FUNCTION: th08 0x426b20
