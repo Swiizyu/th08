@@ -1556,9 +1556,20 @@ ZunResult AnmManager::DrawNoRotationNoRound(AnmVm *vm)
     return this->DrawInner(vm, 0);
 }
 
-// STUB: th08 0x463d60
+// FUNCTION: th08 0x463d60
 void AnmManager::TransformVerticesWorld(AnmVm *vm)
 {
+    D3DXMATRIX scale;
+    D3DXMATRIX rotation;
+    D3DXMATRIX translation;
+    D3DXMatrixScaling(&scale, vm->scale.x, vm->scale.y, 1.0f);
+    D3DXMatrixRotationYawPitchRoll(&rotation, vm->rotation.y, vm->rotation.x, vm->rotation.z);
+    Float3 position = vm->pos + vm->pos2;
+    D3DXMatrixTranslation(&translation, position.x, position.y, position.z);
+    vm->matrix2 = scale * rotation * vm->matrix1 * translation;
+    vm->matrix3 = vm->matrix2;
+    vm->updateRotation = false;
+    vm->updateScale = false;
 }
 
 // FUNCTION: th08 0x463cf0

@@ -3551,9 +3551,29 @@ ChainCallbackResult EnemyManager::OnDrawHighPrio(EnemyManager *enemyManager)
     return enemyManager->OnDrawImpl(0, 2);
 }
 
-// STUB: th08 0x42e140
+// FUNCTION: th08 0x42e140
 ChainCallbackResult EnemyManager::OnDrawImpl(i32 firstLayer, i32 lastLayer)
 {
+    Enemy **layerHeads = (Enemy **)this->unknown0x9dcedc;
+    for (i32 layer = firstLayer; layer < lastLayer; layer++)
+    {
+        for (Enemy *enemy = layerHeads[layer]; enemy != NULL; enemy = *(Enemy **)enemy)
+        {
+            if (enemy->vm.scriptIndex >= 0 && enemy->vm.IsVisible())
+            {
+                enemy->vm.pos = enemy->position0x2d88;
+                enemy->vm.pos.z = 0.4f;
+                g_AnmManager->Draw2D(&enemy->vm);
+            }
+            for (i32 i = 0; i < 2; i++)
+            {
+                if (enemy->vms[i].scriptIndex < 0 || !enemy->vms[i].IsVisible()) continue;
+                enemy->vms[i].pos = enemy->position0x2d88;
+                enemy->vms[i].pos.z = 0.3f;
+                g_AnmManager->Draw2D(&enemy->vms[i]);
+            }
+        }
+    }
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 

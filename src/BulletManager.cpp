@@ -696,9 +696,68 @@ ZunResult BulletManager::RegisterChain(char *bulletAnmFilename)
     return ZUN_SUCCESS;
 }
 
-// STUB: th08 0x431240
+// FUNCTION: th08 0x431240
 ChainCallbackResult BulletManager::OnUpdate(BulletManager *bulletManager)
 {
+    bulletManager->numActiveBullets = 0;
+    bulletManager->FUN_004321b0();
+    for (i32 i = 0; i < MAX_BULLETS; i++)
+    {
+        Bullet *bullet = &bulletManager->bullets[i];
+        if (bullet->state == 0) continue;
+        bulletManager->numActiveBullets++;
+        if (bullet->state >= 2 && bullet->state <= 4)
+        {
+            AnmVm *vm = bullet->state == 2 ? &bullet->sprites.spriteSpawnEffectFast :
+                        bullet->state == 3 ? &bullet->sprites.spriteSpawnEffectNormal :
+                                             &bullet->sprites.spriteSpawnEffectSlow;
+            if (g_AnmManager->ExecuteScript(vm)) bullet->state = 1;
+        }
+        else if (bullet->state == 5)
+        {
+            if (g_AnmManager->ExecuteScript(&bullet->sprites.spriteDespawnEffect))
+            {
+                bullet->FUN_00432170();
+                continue;
+            }
+        }
+        if (bullet->state == 1)
+        {
+            u32 flags = bullet->exFlags;
+            if (flags & 1) bullet->FUN_00432210();
+            if (flags & 0x10) bullet->FUN_004322b0();
+            if (flags & 0x20) bullet->FUN_00432390();
+            if (flags & 0x40) bullet->FUN_00432460();
+            if (flags & 0x80) bullet->FUN_004326e0();
+            if (flags & 0x100) bullet->FUN_004325a0();
+            if (flags & 0xc00) bullet->FUN_00432830();
+            if (flags & 0x400000) bullet->FUN_004329f0();
+            if (flags & 0x800000) bullet->FUN_00432aa0();
+            bullet->position += bullet->velocity * g_Supervisor.framerateMultiplier;
+            bullet->timeSinceBulletFired++;
+            bullet->timeActive++;
+            if (bullet->position.x < -192.0f || bullet->position.x > 576.0f ||
+                bullet->position.y < -192.0f || bullet->position.y > 640.0f)
+                bullet->FUN_00432170();
+        }
+    }
+    for (i32 i = 0; i < 0x100; i++)
+    {
+        Laser *laser = &bulletManager->lasers[i];
+        if (!laser->isInUse) continue;
+        laser->timer++;
+        if (laser->state == 0 && laser->timer.current >= laser->startTime)
+            laser->state = 1;
+        if (laser->state == 1 && laser->timer.current >= laser->duration)
+        {
+            laser->state = 2;
+            laser->timer = 0;
+        }
+        if (laser->state == 2 && laser->timer.current >= laser->stopTime)
+            laser->isInUse = FALSE;
+    }
+    if (bulletManager->cancelFramesRemaining > 0) bulletManager->cancelFramesRemaining--;
+    bulletManager->timer++;
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 

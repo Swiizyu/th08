@@ -2493,9 +2493,24 @@ ChainCallbackResult TitleScreen::OnUpdateSpellCardSelect()
 }
 
 /* This function checks the conditions needed to unlock certain Last Word spell cards. */
-// STUB: th08 0x46cbbb
+// FUNCTION: th08 0x46cbbb
 void TitleScreen::UnlockLastWordSpellCards()
 {
+    i32 captures = 0;
+    for (i32 i = 0; i < SPELLCARD_COUNT_SPELLCARDS; i++)
+    {
+        if (g_GameManager.catkData[i].inGameHistory.captures[SHOT_ALL] != 0 ||
+            g_GameManager.catkData[i].spellPracticeHistory.captures[SHOT_ALL] != 0)
+            captures++;
+    }
+    for (i32 i = 0; i < SPELLCARD_COUNT_LAST_WORD_SPELLCARDS; i++)
+    {
+        i32 spell = g_SpellcardNumbersPerStage[9][i];
+        Catk *catk = &g_GameManager.catkData[spell];
+        if (catk->inGameHistory.attempts[SHOT_ALL] != 0 ||
+            catk->spellPracticeHistory.attempts[SHOT_ALL] != 0 || captures >= (i + 1) * 10)
+            g_GameManager.flsp.unlockedLastWordSpellCards[i] = TRUE;
+    }
 }
 
 #pragma var_order(vm, i2, i, position)
@@ -3141,9 +3156,30 @@ i32 TitleScreen::MoveCursorHorizontal(i32 menuLength)
     return 0;
 }
 
-// STUB: th08 0x46d7f9
+// FUNCTION: th08 0x46d7f9
 void TitleScreen::FormatSpellCardInfo()
 {
+    if (this->currentNumberOfSpellCards <= 0 || this->cursor < 0 ||
+        this->cursor >= this->currentNumberOfSpellCards) return;
+    i32 spell = g_SpellcardNumbersPerStage[g_GameManager.currentStage][this->cursor];
+    if (spell < 0 || spell >= SPELLCARD_COUNT_SPELLCARDS) return;
+    Catk *catk = &g_GameManager.catkData[spell];
+    for (i32 i = 0; i < 7; i++) this->spellCardInfoVms[i].color1.a = 0xff;
+    if (!g_GameManager.HasSpellCardBeenEncountered(spell, SHOT_ALL))
+    {
+        g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[0], COLOR_TEXT_WHITE, 0, "????????????????");
+        return;
+    }
+    g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[0], COLOR_TEXT_WHITE, 0, "%s", catk->spellName);
+    g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[1], COLOR_TEXT_WHITE, 0, "%s", catk->spellOwnerName);
+    g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[2], COLOR_TEXT_WHITE, 0, "%s", catk->spellCommentLine1);
+    g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[3], COLOR_TEXT_WHITE, 0, "%s", catk->spellCommentLine2);
+    g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[4], COLOR_TEXT_WHITE, 0, "Attempts %u",
+                               catk->spellPracticeHistory.attempts[g_GameManager.character]);
+    g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[5], COLOR_TEXT_WHITE, 0, "Captures %u",
+                               catk->spellPracticeHistory.captures[g_GameManager.character]);
+    g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[6], COLOR_TEXT_WHITE, 0, "Max bonus %d",
+                               catk->spellPracticeHistory.maxBonus[g_GameManager.character]);
 }
 
 // This function is 100% matching except for stack nonsense cause by AnmLoaded::InitializeAndSetSprite.

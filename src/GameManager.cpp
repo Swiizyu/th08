@@ -8,6 +8,7 @@
 #include "EnemyManager.hpp"
 #include "Global.hpp"
 #include "Gui.hpp"
+#include "ItemManager.hpp"
 #include "Player.hpp"
 #include "ReplayManager.hpp"
 #include "ScreenEffect.hpp"
@@ -51,6 +52,25 @@ DIFFABLE_STATIC(GameManager, g_GameManager);
 DIFFABLE_STATIC(i32, g_GameManagerUnknown4e3d28);
 DIFFABLE_STATIC(ChainElem, g_GameManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_GameManagerDrawChain);
+
+// FUNCTION: th08 0x43bbe1
+int FUN_0043bbe1()
+{
+    memset(g_GameManager.catkData, 0, sizeof(g_GameManager.catkData));
+    memset(g_GameManager.catkData2, 0, sizeof(g_GameManager.catkData2));
+    for (i32 i = 0; i < SPELLCARD_COUNT_SPELLCARDS; i++)
+    {
+        Catk *catk = &g_GameManager.catkData[i];
+        catk->base.magic = CATK_MAGIC;
+        catk->base.unkLen = sizeof(Catk);
+        catk->base.th8kLen = sizeof(Catk);
+        catk->base.version = CATK_VERSION;
+        catk->spellcardNumber = (u16)i;
+        Catk *copy = &g_GameManager.catkData2[i];
+        *copy = *catk;
+    }
+    return 0;
+}
 
 struct SpellcardMusicEntry
 {
@@ -225,9 +245,24 @@ void GameManager::CollectExtend()
     }
 }
 
-// STUB: th08 0x439bc7
+// FUNCTION: th08 0x439bc7
 ChainCallbackResult GameManager::OnUpdate(GameManager *gameManager)
 {
+    if (g_Supervisor.curState != SupervisorState_GameManager) return CHAIN_CALLBACK_RESULT_BREAK;
+    if (gameManager->unk38 != 0 || gameManager->globals == NULL) return CHAIN_CALLBACK_RESULT_CONTINUE;
+    if (gameManager->globals->displayScore < gameManager->globals->score)
+    {
+        u32 difference = gameManager->globals->score - gameManager->globals->displayScore;
+        gameManager->globals->displayScore += difference < 100 ? 1 : difference / 10;
+    }
+    else if (gameManager->globals->displayScore > gameManager->globals->score)
+    {
+        gameManager->globals->displayScore = gameManager->globals->score;
+    }
+    gameManager->globals->youkaiGaugeCopy = gameManager->globals->youkaiGauge;
+    if (gameManager->flags.isDemoMode) gameManager->demoFrameCount++;
+    if (gameManager->showPauseMenu == 2) gameManager->showPauseMenu = 0;
+    if (gameManager->globals->pointItemValue > 999990) gameManager->globals->pointItemValue = 999990;
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
@@ -318,9 +353,34 @@ ZunResult GameManager::AddedCallback(GameManager *gameManager)
     return ZUN_SUCCESS;
 }
 
-// STUB: th08 0x43abd7
+// FUNCTION: th08 0x43abd7
 void GameManager::GameplaySetupThread()
 {
+    if (g_GameManager.cfg == NULL)
+    {
+        g_GameManager.cfg = new GameConfiguration;
+        *g_GameManager.cfg = g_Supervisor.cfg;
+    }
+    if (g_GameManager.globals == NULL)
+    {
+        g_GameManager.globals = new ZunGlobals;
+        memset(g_GameManager.globals, 0, sizeof(ZunGlobals));
+        g_GameManager.globals->livesRemaining = g_GameManager.cfg->lifeCount;
+        g_GameManager.globals->bombsRemaining = g_GameManager.cfg->bombCount;
+    }
+    FUN_0043bbe1();
+    g_GameManager.InitializeAntiTamper();
+    g_GameManager.InitRankParams();
+    g_GameManager.InitArcadeRegionParams();
+    ItemManager::UpdatePointItemExtendThreshold();
+    Player::RegisterChain(g_GameManager.character);
+    EffectManager::RegisterChain();
+    Background::RegisterChain(g_GameManager.currentStage);
+    BulletManager::RegisterChain("bullet.anm");
+    EnemyManager::RegisterChain();
+    Spellcard::RegisterChain();
+    Gui::RegisterChain();
+    g_GameManager.unk38 = 0;
 }
 
 #pragma var_order(sum, i)

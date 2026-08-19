@@ -308,9 +308,23 @@ void ResultScreen::WriteScore(ResultScreen *result)
 #undef COPY
 }
 
-// STUB: th08 0x454298
+// FUNCTION: th08 0x454298
 void ResultScreen::LogScoreDataToFile(ResultScreen *resultScreen)
 {
+    FILE *file = fopen("score.log", "a");
+    if (file == NULL) return;
+    time_t currentTime = time(NULL);
+    tm *localTime = localtime(&currentTime);
+    char timestamp[64];
+    if (localTime != NULL) strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", localTime);
+    else strcpy(timestamp, "unknown");
+    fprintf(file, "[%s] character=%d difficulty=%d stage=%d score=%d\n",
+            timestamp, g_GameManager.character, g_GameManager.difficulty,
+            g_GameManager.currentStage,
+            g_GameManager.globals != NULL ? g_GameManager.globals->score * 10 : 0);
+    if (resultScreen != NULL)
+        fprintf(file, "menuDepth=%d frame=%d\n", resultScreen->menuDepth, resultScreen->frameTimer2);
+    fclose(file);
 }
 
 i32 ResultScreen::LinkScoreEx(Hscr *out, i32 difficulty, i32 character)

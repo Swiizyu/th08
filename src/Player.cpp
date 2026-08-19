@@ -10,9 +10,14 @@
 #include "ScreenEffect.hpp"
 #include "Spellcard.hpp"
 
+#include <stdio.h>
+
+u32 FUN_004338b0();
 u32 FUN_004338c0();
 u32 FUN_0044e0e0();
 void FUN_0044e370(void *data);
+
+namespace th08 { i32 __fastcall FUN_00450580(void *, void *); }
 
 namespace th08
 {
@@ -2487,9 +2492,43 @@ ChainCallbackResult Player::OnDrawLowPrio(Player *player)
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
-// STUB: th08 0x44d650
+// FUNCTION: th08 0x44d650
 ZunResult Player::AddedCallback(Player *player)
 {
+    static const u8 characters[] = {0, 1, 2, 3, 0, 0, 1, 1, 2, 2, 3, 3};
+    static const char *sht1[] = {"ply00a.sht", "ply01a.sht", "ply02a.sht", "ply03a.sht",
+        "ply00a.sht", "ply00as.sht", "ply01a.sht", "ply01as.sht",
+        "ply02a.sht", "ply02as.sht", "ply03a.sht", "ply03as.sht"};
+    static const char *sht2[] = {"ply00as.sht", "ply01as.sht", "ply02as.sht", "ply03as.sht",
+        "ply00a.sht", "ply00as.sht", "ply01a.sht", "ply01as.sht",
+        "ply02a.sht", "ply02as.sht", "ply03a.sht", "ply03as.sht"};
+    i32 shot = g_GameManager.character;
+    if (shot < 0 || shot >= ARRAY_SIZE_SIGNED(characters)) shot = 0;
+    if (FUN_004338b0())
+    {
+        if (Player::LoadShtFile(&player->player1ShtFile, sht1[shot]) != ZUN_SUCCESS) return ZUN_ERROR;
+        if (Player::LoadShtFile(&player->player2ShtFile, sht2[shot]) != ZUN_SUCCESS) return ZUN_ERROR;
+        char filename[32];
+        sprintf(filename, "player%02d.anm", characters[shot]);
+        player->playerAnm = g_AnmManager->LoadAnm(5, filename);
+        if (player->playerAnm == NULL) return ZUN_ERROR;
+    }
+    else
+    {
+        player->playerAnm = g_AnmManager->GetAnm(5);
+    }
+    player->playerAnm->SetAndExecuteScriptIdx(&player->playerSprite, shot >= 4 && (shot & 1) ? 5 : 0);
+    player->position = Float3(192.0f, 384.0f, 0.49f);
+    player->velocity = Float3(0.0f, 0.0f, 0.0f);
+    player->horizontalSpeedMultiplier = 1.0f;
+    player->verticalSpeedMultiplier = 1.0f;
+    player->playerState = PLAYER_STATE_SPAWNING;
+    *(u8 *)((u8 *)player + 2) = 1;
+    player->isFocus = 2;
+    for (i32 i = 0; i < ARRAY_SIZE(player->unk0x2CC); i++) player->unk0x2CC[i] = player->position;
+    for (i32 i = 0; i < 0x180; i++) FUN_0044e370((u8 *)player + 0xb8834 + i * 0x40);
+    for (i32 i = 0; i < 0x80; i++) *(i16 *)((u8 *)player + 0xbe838 + i * 0x484 + 0x462) = 0;
+    *(i32 *)((u8 *)player + 0xe2b2c) = 40;
     return ZUN_SUCCESS;
 }
 
@@ -2527,9 +2566,49 @@ void Player::CutChain()
     g_Player.drawChainLowPrio = NULL;
 }
 
-// STUB: th08 0x44dd70
+static i32 __fastcall ShtFdd0(Player *p, u8 *d, i32 f, void *s) { return p->FUN_0044fdd0(d, f, s); }
+static i32 __fastcall ShtFe20(Player *p, u8 *d, i32 f, void *s) { return p->FUN_0044fe20(d, f, s); }
+static i32 __fastcall ShtFfa0(Player *p, u8 *d, i32 f, void *s) { return p->FUN_0044ffa0(d, f, s); }
+static i32 __fastcall Sht0080(Player *p, u8 *d, i32 f, void *s) { return p->FUN_00450080(d, f, s); }
+static i32 __fastcall Sht0110(Player *p, u8 *d, i32 f, void *s) { return p->FUN_00450110(d, f, s); }
+static i32 __fastcall Sht01b0(Player *p, u8 *d, i32 f, void *s) { return p->FUN_004501b0(d, f, s); }
+static i32 __fastcall Sht0240(Player *p, u8 *d, i32 f, void *s) { return p->FUN_00450240(d, f, s); }
+static i32 __fastcall Sht0320(Player *p, u8 *d) { return p->FUN_00450320(d); }
+static i32 __fastcall Sht0580(Player *p, u8 *d) { return FUN_00450580(p, d); }
+static i32 __fastcall Sht05d0(Player *p, u8 *d) { return p->FUN_004505d0(d); }
+static i32 __fastcall Sht0840(Player *p, u8 *d) { return p->FUN_00450840(d); }
+static i32 __fastcall Sht0ad0(Player *p, u8 *d) { return p->FUN_00450ad0(d); }
+static i32 __fastcall Sht0c50(Player *p, u8 *d, Float3 *pos) { return p->FUN_00450c50(d, pos); }
+static i32 __fastcall Sht0ee0(Player *p, Effect *e, Float3 *pos) { return p->FUN_00450ee0(e, pos); }
+
+// FUNCTION: th08 0x44dd70
 ZunResult Player::LoadShtFile(PlayerRawShtFile **header, const char *path)
 {
+    static void *callback1[] = {NULL, Sht0240, ShtFdd0, ShtFdd0, ShtFe20, ShtFfa0, Sht0080, Sht01b0, Sht0110};
+    static void *callback2[] = {NULL, Sht0320, NULL, Sht0580, Sht05d0, Sht0840};
+    static void *callback3[] = {NULL, Sht0ad0};
+    static void *callback4[] = {NULL, Sht0c50, Sht0ee0};
+    i32 fileSize = 0;
+    *header = (PlayerRawShtFile *)FileSystem::OpenFile(path, &fileSize, false);
+    if (*header == NULL) return ZUN_ERROR;
+    u8 *data = (u8 *)*header;
+    i32 count = *(u16 *)(data + 2);
+    for (i32 i = 0; i < count; i++)
+    {
+        u8 **offset = (u8 **)(data + 0x38 + i * 8);
+        *offset += (u32)data;
+        for (u8 *entry = *offset; *(i16 *)entry >= 0; entry += 0x38)
+        {
+            u32 index = *(u32 *)(entry + 0x28);
+            *(void **)(entry + 0x28) = index < ARRAY_SIZE(callback1) ? callback1[index] : NULL;
+            index = *(u32 *)(entry + 0x2c);
+            *(void **)(entry + 0x2c) = index < ARRAY_SIZE(callback2) ? callback2[index] : NULL;
+            index = *(u32 *)(entry + 0x30);
+            *(void **)(entry + 0x30) = index < ARRAY_SIZE(callback3) ? callback3[index] : NULL;
+            index = *(u32 *)(entry + 0x34);
+            *(void **)(entry + 0x34) = index < ARRAY_SIZE(callback4) ? callback4[index] : NULL;
+        }
+    }
     return ZUN_SUCCESS;
 }
 
