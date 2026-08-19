@@ -90,6 +90,7 @@ struct Enemy
     void FUN_0041f0b0(i32 value);
     void FUN_0041f0e0(i32 value);
     ZunBool FUN_0041fd20();
+    ZunBool FUN_0041fd90();
     void FUN_0042b2f0();
     void FUN_0042bc50();
     void FUN_0042bc90();

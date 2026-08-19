@@ -252,6 +252,40 @@ EnemyUnkStruct4::EnemyUnkStruct4()
     this->unk0x204 = -1;
 }
 
+// FUNCTION: th08 0x40e350
+#pragma var_order(result)
+ZunBool ZunTimer::FUN_0040e350(i32 value)
+{
+    ZunBool result;
+
+    if (this->current != this->previous && this->current == value)
+    {
+        result = true;
+    }
+    else
+    {
+        result = false;
+    }
+    return result;
+}
+
+// FUNCTION: th08 0x40ebc0
+#pragma var_order(result)
+ZunBool ZunTimer::FUN_0040ebc0(i32 value)
+{
+    ZunBool result;
+
+    if (this->current != this->previous && this->current % value == 0)
+    {
+        result = true;
+    }
+    else
+    {
+        result = false;
+    }
+    return result;
+}
+
 // FUNCTION: th08 0x40e040
 #pragma var_order(factor)
 i32 Effect::FUN_0040e040()
@@ -1637,6 +1671,23 @@ ZunBool Enemy::FUN_0041fd20()
     return *(i32 *)((u8 *)this + 0x2da4) != 0;
 }
 
+// FUNCTION: th08 0x41fd90
+#pragma var_order(result)
+ZunBool Enemy::FUN_0041fd90()
+{
+    ZunBool result;
+
+    if (((*(u32 *)this & 1) != 0) && ((*(u32 *)this >> 2) & 1) != 0)
+    {
+        result = true;
+    }
+    else
+    {
+        result = false;
+    }
+    return result;
+}
+
 // FUNCTION: th08 0x42bc50
 void Enemy::FUN_0042bc50()
 {
@@ -2059,4 +2110,3 @@ ZunBool FUN_0040d3d0(void *data)
 {
     return *((i32 *)data + 2) != *(i32 *)data;
 }
-
