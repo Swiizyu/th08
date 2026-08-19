@@ -374,6 +374,31 @@ struct PlayerCollisionObject
 };
 C_ASSERT(sizeof(PlayerCollisionObject) == 0x40);
 
+// FUNCTION: th08 0x44c5b0
+#pragma var_order(i, collision)
+void Player::FUN_0044c5b0()
+{
+    PlayerCollisionObject *collision;
+    i32 i;
+
+    collision = (PlayerCollisionObject *)((u8 *)this + 0xb8834);
+    for (i = 0; i < 0x180; i++, collision++)
+    {
+        if (*(i32 *)((u8 *)collision + 0x24) < 0)
+        {
+            continue;
+        }
+        (*(i32 *)((u8 *)collision + 0x24))--;
+        *(f32 *)((u8 *)collision + 0x8) += *(f32 *)((u8 *)collision + 0xc);
+        *(f32 *)((u8 *)collision + 0x10) += *(f32 *)((u8 *)collision + 0x18);
+        *(f32 *)((u8 *)collision + 0x14) += *(f32 *)((u8 *)collision + 0x1c);
+        if (*(i32 *)((u8 *)collision + 0x24) <= 0)
+        {
+            ((PlayerUnkStruct0x40 *)collision)->FUN_0044e350();
+        }
+    }
+}
+
 // FUNCTION: th08 0x44de60
 #pragma var_order(i, collision)
 void *Player::FUN_0044de60(Float2 *position, f32 width, f32 height, i32 arg4, i32 arg5)

@@ -134,6 +134,7 @@ struct Player
     f32 AngleToPlayer(Float3 *position);
     i32 CalcItemBoxCollision(Float3 *position, Float3 *hitbox);
     void FUN_0044cba0();
+    void FUN_0044c5b0();
     void FUN_0044d150();
     void *FUN_0044de60(Float2 *position, f32 width, f32 height, i32 arg4, i32 arg5);
     void *FUN_0044df00(Float2 *position, f32 arg2, f32 arg3, i32 arg4, i32 arg5);

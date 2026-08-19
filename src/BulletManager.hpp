@@ -90,6 +90,8 @@ struct Bullet
     void FUN_00432460();
     void FUN_004325a0();
     void FUN_004326e0();
+    void FUN_004329f0();
+    void FUN_00432aa0();
 
     BulletTypeSprites sprites;
     Float3 position;

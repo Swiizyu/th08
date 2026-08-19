@@ -369,6 +369,50 @@ void Bullet::FUN_004326e0()
     (*timer)++;
 }
 
+// FUNCTION: th08 0x4329f0
+void Bullet::FUN_004329f0()
+{
+    if (this->position.x < 0.0)
+    {
+        this->position.x += 384.0f;
+    }
+    else if (this->position.x >= 384.0)
+    {
+        this->position.x -= 384.0f;
+    }
+    ZunTimer *timer = (ZunTimer *)((u8 *)this + 0x1088);
+    if (*timer <= 0)
+    {
+        *(u32 *)((u8 *)this + 0xdac) ^= 0x400000;
+    }
+    else
+    {
+        (*timer)--;
+    }
+}
+
+// FUNCTION: th08 0x432aa0
+void Bullet::FUN_00432aa0()
+{
+    if (this->position.y < 0.0)
+    {
+        this->position.y += 448.0f;
+    }
+    else if (this->position.y >= 448.0)
+    {
+        this->position.y -= 448.0f;
+    }
+    ZunTimer *timer = (ZunTimer *)((u8 *)this + 0x1088);
+    if (*timer <= 0)
+    {
+        *(u32 *)((u8 *)this + 0xdac) ^= 0x800000;
+    }
+    else
+    {
+        (*timer)--;
+    }
+}
+
 // FUNCTION: th08 0x432170
 void Bullet::FUN_00432170()
 {
