@@ -82,6 +82,12 @@ Float3 Float3::operator-(const Float3 &other)
     return Float3(this->x - other.x, this->y - other.y, this->z - other.z);
 }
 
+// FUNCTION: th08 0x425fa0
+Float3 Float3::operator-()
+{
+    return Float3(-this->x, -this->y, -this->z);
+}
+
 // FUNCTION: th08 0x409120
 Float3 Float3::operator*(f32 scalar)
 {

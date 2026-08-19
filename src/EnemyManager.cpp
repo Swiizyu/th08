@@ -46,15 +46,15 @@ DIFFABLE_STATIC_ARRAY_ASSIGN(EffectTemplate, 66, g_EffectTemplates) = {
     {28, NULL, NULL},
     {29, NULL, NULL},
     {30, NULL, NULL},
-    {31, &Effect::FUN_00425e60, NULL},
-    {36, &Effect::FUN_00425e60, NULL},
-    {37, &Effect::FUN_00425e60, NULL},
-    {38, &Effect::FUN_00425e60, NULL},
-    {39, &Effect::FUN_00425e60, NULL},
-    {40, &Effect::FUN_00425e60, NULL},
-    {41, &Effect::FUN_00425e60, NULL},
-    {42, &Effect::FUN_00425e60, NULL},
-    {43, &Effect::FUN_00425e60, NULL},
+    {31, &Effect::FUN_00425e60, &Effect::FUN_00425ea0},
+    {36, &Effect::FUN_00425e60, &Effect::FUN_00425d70},
+    {37, &Effect::FUN_00425e60, &Effect::FUN_00425d70},
+    {38, &Effect::FUN_00425e60, &Effect::FUN_00425d70},
+    {39, &Effect::FUN_00425e60, &Effect::FUN_00425d70},
+    {40, &Effect::FUN_00425e60, &Effect::FUN_00425d70},
+    {41, &Effect::FUN_00425e60, &Effect::FUN_00425d70},
+    {42, &Effect::FUN_00425e60, &Effect::FUN_00425d70},
+    {43, &Effect::FUN_00425e60, &Effect::FUN_00425d70},
     {44, NULL, NULL},
     {45, NULL, &Effect::FUN_00425fe0},
     {45, NULL, &Effect::FUN_00425fe0},
@@ -273,12 +273,38 @@ i32 Effect::FUN_00410bb0()
     return 1;
 }
 
+// FUNCTION: th08 0x425d70
+#pragma var_order(randomY, randomX)
+i32 Effect::FUN_00425d70()
+{
+    this->velocity[0] = (g_Rng.GetRandomF32InRange(256.0f) - 128.0f) / 12.0f;
+    this->velocity[1] = (g_Rng.GetRandomF32InRange(256.0f) - 128.0f) / 12.0f;
+    this->velocity[2] = 0.0f;
+    this->acceleration = -this->velocity / 19.0f;
+    this->velocity *= g_Supervisor.framerateMultiplier;
+    this->acceleration *= g_Supervisor.framerateMultiplier;
+    return 0;
+}
+
 // FUNCTION: th08 0x425e60
 i32 Effect::FUN_00425e60()
 {
     *(Float3 *)((u8 *)this + 0x2a4) += *(Float3 *)((u8 *)this + 0x2bc);
     *(Float3 *)((u8 *)this + 0x2bc) += *(Float3 *)((u8 *)this + 0x2c8);
     return 1;
+}
+
+// FUNCTION: th08 0x425ea0
+#pragma var_order(randomY, randomX)
+i32 Effect::FUN_00425ea0()
+{
+    this->velocity[0] = (g_Rng.GetRandomF32InRange(256.0f) - 128.0f) * 4.0f / 33.0f;
+    this->velocity[1] = (g_Rng.GetRandomF32InRange(256.0f) - 128.0f) * 4.0f / 33.0f;
+    this->velocity[2] = 0.0f;
+    this->acceleration = -this->velocity / 20.0f;
+    this->velocity *= g_Supervisor.framerateMultiplier;
+    this->acceleration *= g_Supervisor.framerateMultiplier;
+    return 0;
 }
 
 // FUNCTION: th08 0x425fe0

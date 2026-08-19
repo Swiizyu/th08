@@ -428,6 +428,7 @@ struct Float3
 
     Float3 operator+(const Float3 &other);
     Float3 operator-(const Float3 &other);
+    Float3 operator-();
     Float3 operator*(f32 scalar);
     Float3 operator/(f32 scalar);
     Float3 *operator/=(f32 scalar);
