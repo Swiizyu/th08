@@ -113,6 +113,7 @@ struct Player
     ZunBool IsHuman();
     ZunBool IsYoukai();
     ZunBool FUN_00451d50();
+    i32 FUN_00449ff0(Float3 *position, Float3 *hitbox);
     void FUN_0044cba0();
     void FUN_0044d150();
     void FUN_004512f0();

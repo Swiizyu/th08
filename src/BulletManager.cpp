@@ -3,6 +3,7 @@
 #include "BulletManager.hpp"
 #include "EffectManager.hpp"
 #include "ItemManager.hpp"
+#include "Player.hpp"
 #include "ZunMath.hpp"
 
 u32 FUN_004338c0();
@@ -41,7 +42,7 @@ void BulletManager::FUN_00415c60()
 }
 
 // FUNCTION: th08 0x430830
-#pragma var_order(position, i, sine, bullet, laser, cosine, offset)
+#pragma var_order(position, collisionResult, i, sine, bullet, laser, cosine, offset)
 void BulletManager::RemoveAllBullets(i32 itemState)
 {
     f32 offset;
@@ -50,6 +51,7 @@ void BulletManager::RemoveAllBullets(i32 itemState)
     Bullet *bullet;
     f32 sine;
     i32 i;
+    i32 collisionResult;
 
     bullet = g_BulletManager.bullets;
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
@@ -58,7 +60,13 @@ void BulletManager::RemoveAllBullets(i32 itemState)
         {
             continue;
         }
-        if (itemState != 4)
+        collisionResult = g_Player.FUN_00449ff0(&bullet->position, &bullet->sprites.hitboxSize);
+        if (g_Player.FUN_00449ff0(&bullet->position, &bullet->sprites.hitboxSize) == 2)
+        {
+            g_ItemManager.SpawnItem(&bullet->position, (ItemType)*(i32 *)((u8 *)&g_Player + 0xe2a90), 1);
+            memset(bullet, 0, sizeof(Bullet));
+        }
+        else if (itemState != 4)
         {
             g_ItemManager.SpawnItem(&bullet->position, (ItemType)this->bonusItemType, itemState);
             memset(bullet, 0, sizeof(Bullet));

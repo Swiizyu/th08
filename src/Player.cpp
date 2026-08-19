@@ -161,6 +161,89 @@ ZunBool Player::IsYoukai()
 
 DIFFABLE_STATIC(Player, g_Player);
 
+struct PlayerCollisionObject
+{
+    Float3 position;
+    u8 unknown0xc[4];
+    f32 width;
+    f32 height;
+    u8 unknown0x18[8];
+    f32 rotation;
+    u8 unknown0x24[4];
+    i32 itemType;
+    u8 unknown0x2c[4];
+    i32 collisionCount;
+    u8 unknown0x34[8];
+    u8 isActive;
+    u8 padding[3];
+};
+C_ASSERT(sizeof(PlayerCollisionObject) == 0x40);
+
+// FUNCTION: th08 0x449ff0
+#pragma var_order(rectMax, collision, delta, rotated, i, deltaX, deltaY, halfWidth, halfHeight)
+i32 Player::FUN_00449ff0(Float3 *position, Float3 *hitbox)
+{
+    PlayerCollisionObject *collision;
+    i32 i;
+    f32 deltaX;
+    f32 deltaY;
+    Float3 delta;
+    Float3 rotated;
+    f32 halfWidth;
+    f32 halfHeight;
+    Float3 rectMax;
+
+    collision = (PlayerCollisionObject *)((u8 *)this + 0xbb834);
+    for (i = 0; i < 0xc0; i++, collision++)
+    {
+        if (!collision->isActive)
+        {
+            continue;
+        }
+        if (collision->position.z != 0.0)
+        {
+            deltaX = position->x - collision->position.x;
+            deltaY = position->y - collision->position.y;
+            if (deltaX * deltaX + deltaY * deltaY <= collision->position.z * collision->position.z)
+            {
+                goto collided;
+            }
+            continue;
+        }
+        if (collision->rotation != 0.0f)
+        {
+            delta.x = position->x - collision->position.x;
+            delta.y = position->y - collision->position.y;
+            Rotate(&rotated, &delta, -collision->rotation);
+            halfWidth = collision->width / 2.0f;
+            halfHeight = collision->height / 2.0f;
+            if (rotated.x >= -halfWidth && rotated.x <= halfWidth && rotated.y >= -halfHeight &&
+                rotated.y <= halfHeight)
+            {
+                goto collided;
+            }
+            continue;
+        }
+
+        halfWidth = collision->position.x - collision->width / 2.0f;
+        halfHeight = collision->position.y - collision->height / 2.0f;
+        rectMax.x = collision->position.x + collision->width / 2.0f;
+        rectMax.y = collision->position.y + collision->height / 2.0f;
+        if (position->x > halfWidth && position->x < rectMax.x && position->y > halfHeight &&
+            position->y < rectMax.y)
+        {
+            goto collided;
+        }
+        continue;
+
+    collided:
+        *(i32 *)((u8 *)this + 0xe2a90) = collision->itemType;
+        collision->collisionCount++;
+        return 2;
+    }
+    return 0;
+}
+
 // FUNCTION: th08 0x4512f0
 #pragma var_order(i, data)
 void Player::FUN_004512f0()
