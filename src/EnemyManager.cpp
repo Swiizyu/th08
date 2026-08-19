@@ -78,37 +78,37 @@ DIFFABLE_STATIC_ARRAY_ASSIGN(EffectTemplate, 66, g_EffectTemplates) = {
     {48, NULL, NULL},
     {49, NULL, NULL},
     {50, NULL, NULL},
-    {88, &Effect::FUN_00427990, NULL},
+    {88, &Effect::FUN_00427990, &Effect::FUN_004272e0},
     {88, NULL, NULL},
     {92, NULL, NULL},
     {71, NULL, NULL},
-    {76, &Effect::FUN_00427990, NULL},
-    {81, &Effect::FUN_004279d0, NULL},
-    {82, NULL, NULL},
-    {83, NULL, NULL},
-    {83, NULL, NULL},
-    {83, NULL, NULL},
-    {83, &Effect::FUN_0040e2d0, NULL},
-    {84, &Effect::FUN_00410bb0, NULL},
+    {76, &Effect::FUN_00427990, &Effect::FUN_004272e0},
+    {81, &Effect::FUN_004279d0, &Effect::FUN_004272e0},
+    {82, NULL, &Effect::FUN_004272e0},
+    {83, NULL, &Effect::FUN_004272e0},
+    {83, NULL, &Effect::FUN_004272e0},
+    {83, NULL, &Effect::FUN_004272e0},
+    {83, &Effect::FUN_0040e2d0, &Effect::FUN_004272e0},
+    {84, &Effect::FUN_00410bb0, &Effect::FUN_004272e0},
     {72, NULL, NULL},
-    {85, NULL, NULL},
-    {86, &Effect::FUN_00427990, NULL},
-    {80, &Effect::FUN_00427a60, NULL},
+    {85, NULL, &Effect::FUN_004272e0},
+    {86, &Effect::FUN_00427990, &Effect::FUN_004272e0},
+    {80, &Effect::FUN_00427a60, &Effect::FUN_004272e0},
     {73, NULL, NULL},
-    {77, &Effect::FUN_00427990, NULL},
-    {88, &Effect::FUN_00427ae0, NULL},
-    {88, &Effect::FUN_00427ae0, NULL},
-    {87, &Effect::FUN_004279d0, NULL},
-    {96, &Effect::FUN_004279d0, NULL},
+    {77, &Effect::FUN_00427990, &Effect::FUN_004272e0},
+    {88, &Effect::FUN_00427ae0, &Effect::FUN_004272e0},
+    {88, &Effect::FUN_00427ae0, &Effect::FUN_004272e0},
+    {87, &Effect::FUN_004279d0, &Effect::FUN_004272e0},
+    {96, &Effect::FUN_004279d0, &Effect::FUN_00427970},
     {55, NULL, NULL},
-    {100, &Effect::FUN_004279d0, NULL},
-    {78, &Effect::FUN_00427990, NULL},
+    {100, &Effect::FUN_004279d0, &Effect::FUN_00427970},
+    {78, &Effect::FUN_00427990, &Effect::FUN_004272e0},
     {102, NULL, &Effect::FUN_00427260},
     {103, NULL, &Effect::FUN_00427260},
     {75, NULL, NULL},
     {74, NULL, NULL},
-    {77, &Effect::FUN_00427b50, NULL},
-    {98, &Effect::FUN_004279d0, NULL},
+    {77, &Effect::FUN_00427b50, &Effect::FUN_004272e0},
+    {98, &Effect::FUN_004279d0, &Effect::FUN_00427970},
 };
 DIFFABLE_STATIC(ChainElem, g_EffectManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_EffectManagerDrawChain);
@@ -528,6 +528,38 @@ void Float3::FUN_00426d10()
             *(Float3 *)((u8 *)effect + 0x2d4) += *this;
         }
     }
+}
+
+// FUNCTION: th08 0x4272e0
+i32 Effect::FUN_004272e0()
+{
+    this->resource = g_ZunMemory.Alloc(0x1c38, "effect");
+    if (this->resource == NULL)
+    {
+        return -1;
+    }
+    *(i32 *)((u8 *)this + 0x324) = 3;
+    this->emitterPosition = this->position;
+    this->direction = Float3(0.0f, 0.0f, 1.0f);
+    this->unk0x2f8 = Float3(0.0f, -1.0f, 0.0f);
+    *(i32 *)((u8 *)this + 0x318) = *(i32 *)((u8 *)this + 0x2b0);
+    *(i32 *)((u8 *)this + 0x314) = *(i32 *)((u8 *)this + 0x2b4);
+    *(i32 *)((u8 *)this + 0x320) = *(i32 *)((u8 *)this + 0x2b8);
+    *(u8 *)((u8 *)this + 0x356) = 1;
+    this->drawCallback = NULL;
+    *(i32 *)((u8 *)this + 0x32c) = 0;
+    *(i32 *)((u8 *)this + 0x330) = 0;
+    *(i32 *)((u8 *)this + 0x334) = 0;
+    *(i32 *)((u8 *)this + 0x324) = 24;
+    return 0;
+}
+
+// FUNCTION: th08 0x427970
+i32 Effect::FUN_00427970()
+{
+    this->FUN_004272e0();
+    *(u8 *)((u8 *)this + 0x355) = 1;
+    return 0;
 }
 
 // FUNCTION: th08 0x427990
