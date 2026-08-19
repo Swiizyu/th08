@@ -4,6 +4,7 @@
 #include "EffectManager.hpp"
 #include "ItemManager.hpp"
 #include "Player.hpp"
+#include "SoundPlayer.hpp"
 #include "ZunMath.hpp"
 
 u32 FUN_004338b0();
@@ -271,6 +272,100 @@ void Bullet::FUN_00432390()
             ->FromAngleMagnitude(*(f32 *)((u8 *)this + 0xd74),
                                  *(f32 *)((u8 *)this + 0xd68) * *(f32 *)((u8 *)&g_Supervisor + 0x188));
     }
+    (*timer)++;
+}
+
+// FUNCTION: th08 0x432460
+#pragma var_order(speed)
+void Bullet::FUN_00432460()
+{
+    f32 speed;
+    ZunTimer *timer = (ZunTimer *)((u8 *)this + 0x1004);
+    i32 interval = *(i32 *)((u8 *)this + 0x1024);
+    if (*timer > interval)
+    {
+        if (*(i32 *)((u8 *)this + 0xdc8) >= 0)
+        {
+            g_SoundPlayer.PlaySoundByIdx((SoundIdx)*(i32 *)((u8 *)this + 0xdc8), 0);
+        }
+        (*(i32 *)((u8 *)this + 0x102c))++;
+        if (*(i32 *)((u8 *)this + 0x102c) >= *(i32 *)((u8 *)this + 0x1028))
+        {
+            *(u32 *)((u8 *)this + 0xdac) &= ~0x40;
+        }
+        *(f32 *)((u8 *)this + 0xd74) += *(f32 *)((u8 *)this + 0x1014);
+        *(f32 *)((u8 *)this + 0xd68) = *(f32 *)((u8 *)this + 0x1010);
+        speed = *(f32 *)((u8 *)this + 0xd68);
+        timer->SetCurrent(0);
+    }
+    else
+    {
+        speed = *(f32 *)((u8 *)this + 0xd68) -
+                (f32)*timer * *(f32 *)((u8 *)this + 0xd68) / interval;
+    }
+    this->velocity.FromAngleMagnitude(this->angle, speed * *(f32 *)((u8 *)&g_Supervisor + 0x188));
+    (*timer)++;
+}
+
+// FUNCTION: th08 0x4325a0
+#pragma var_order(speed)
+void Bullet::FUN_004325a0()
+{
+    f32 speed;
+    ZunTimer *timer = (ZunTimer *)((u8 *)this + 0x1004);
+    i32 interval = *(i32 *)((u8 *)this + 0x1024);
+    if (*timer > interval)
+    {
+        if (*(i32 *)((u8 *)this + 0xdc8) >= 0)
+        {
+            g_SoundPlayer.PlaySoundByIdx((SoundIdx)*(i32 *)((u8 *)this + 0xdc8), 0);
+        }
+        (*(i32 *)((u8 *)this + 0x102c))++;
+        if (*(i32 *)((u8 *)this + 0x102c) >= *(i32 *)((u8 *)this + 0x1028))
+        {
+            *(u32 *)((u8 *)this + 0xdac) &= ~0x100;
+        }
+        this->angle = *(f32 *)((u8 *)this + 0x1014);
+        this->speed = *(f32 *)((u8 *)this + 0x1010);
+        speed = this->speed;
+        timer->SetCurrent(0);
+    }
+    else
+    {
+        speed = this->speed - (f32)*timer * this->speed / interval;
+    }
+    this->velocity.FromAngleMagnitude(this->angle, speed * *(f32 *)((u8 *)&g_Supervisor + 0x188));
+    (*timer)++;
+}
+
+// FUNCTION: th08 0x4326e0
+#pragma var_order(speed)
+void Bullet::FUN_004326e0()
+{
+    f32 speed;
+    ZunTimer *timer = (ZunTimer *)((u8 *)this + 0x1004);
+    i32 interval = *(i32 *)((u8 *)this + 0x1024);
+    if (*timer > interval)
+    {
+        if (*(i32 *)((u8 *)this + 0xdc8) >= 0)
+        {
+            g_SoundPlayer.PlaySoundByIdx((SoundIdx)*(i32 *)((u8 *)this + 0xdc8), 0);
+        }
+        (*(i32 *)((u8 *)this + 0x102c))++;
+        if (*(i32 *)((u8 *)this + 0x102c) >= *(i32 *)((u8 *)this + 0x1028))
+        {
+            *(u32 *)((u8 *)this + 0xdac) &= ~0x80;
+        }
+        this->angle = AddNormalizeAngle(g_Player.AngleToPlayer(&this->position), *(f32 *)((u8 *)this + 0x1014));
+        this->speed = *(f32 *)((u8 *)this + 0x1010);
+        speed = this->speed;
+        timer->SetCurrent(0);
+    }
+    else
+    {
+        speed = this->speed - (f32)*timer * this->speed / interval;
+    }
+    this->velocity.FromAngleMagnitude(this->angle, speed * *(f32 *)((u8 *)&g_Supervisor + 0x188));
     (*timer)++;
 }
 
