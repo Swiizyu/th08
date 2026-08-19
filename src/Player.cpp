@@ -127,6 +127,58 @@ void Player::FUN_0040c820()
     }
 }
 
+// FUNCTION: th08 0x40d010
+#pragma var_order(vm, i, entry)
+void Player::FUN_0040d010()
+{
+    u8 *entry;
+    i32 i;
+    AnmVm *vm;
+
+    this->FUN_0040bc60(0x802020d0);
+    entry = (u8 *)this + 0x1028;
+    for (i = 0; i < 128; i++, entry += 0x16f0)
+    {
+        if (*(i32 *)entry == 0)
+        {
+            continue;
+        }
+        vm = (AnmVm *)(entry + 0x1b8);
+        vm->pos = *(Float3 *)(entry + 0x14) + vm->pos2;
+        vm->pos.x += g_GameManager.arcadeRegionTopLeftPos.x;
+        vm->pos.y += g_GameManager.arcadeRegionTopLeftPos.y;
+        vm->pos.z = 0.0f;
+        g_AnmManager->DrawNoRotation(vm);
+    }
+}
+
+// FUNCTION: th08 0x40e610
+#pragma var_order(angle, i, vm)
+void Player::FUN_0040e610()
+{
+    f32 angleStep = 0.20943952f;
+    AnmVm *vm = (AnmVm *)((u8 *)this + 0x11e0);
+
+    this->FUN_0040bc60(0x80404040);
+    for (i32 i = 0; i < 5; i++, vm++)
+    {
+        f32 angle = i * angleStep - ZUN_PI / 2.0f - angleStep * 2.0f;
+        if (angle < -ZUN_PI)
+        {
+            angle += ZUN_2PI;
+        }
+        vm->pos = this->position;
+        f32 radius = vm->loadedSprite->widthPx * vm->scale.y / 2.0f;
+        vm->pos.x += cosf(angle) * radius;
+        vm->pos.y += sinf(angle) * radius;
+        vm->SetZRotation(angle);
+        vm->pos.x += g_GameManager.arcadeRegionTopLeftPos.x;
+        vm->pos.y += g_GameManager.arcadeRegionTopLeftPos.y;
+        vm->pos.z = 0.0f;
+        g_AnmManager->Draw2D(vm);
+    }
+}
+
 // FUNCTION: th08 0x410300
 #pragma var_order(i, entry)
 void Player::FUN_00410300()
@@ -169,6 +221,71 @@ void Player::FUN_00410ac0()
         }
         AnmVm *vm = (AnmVm *)(entry + 0x1b8);
         vm->SetZRotation(*(f32 *)(entry + 0x10));
+        vm->pos = *(Float3 *)(entry + 0x14);
+        vm->pos.x += g_GameManager.arcadeRegionTopLeftPos.x;
+        vm->pos.y += g_GameManager.arcadeRegionTopLeftPos.y;
+        vm->pos.z = 0.0f;
+        g_AnmManager->Draw2D(vm);
+    }
+}
+
+// FUNCTION: th08 0x4113a0
+#pragma var_order(vm, entry)
+void Player::FUN_004113a0()
+{
+    u8 *entry = (u8 *)this + 0x1028;
+    AnmVm *vm = (AnmVm *)(entry + 0x1b8);
+
+    this->FUN_0040bc60(0x802020d0);
+    vm->pos = *(Float3 *)(entry + 0x14) + vm->pos2;
+    vm->pos.x += g_GameManager.arcadeRegionTopLeftPos.x;
+    vm->pos.y += g_GameManager.arcadeRegionTopLeftPos.y;
+    vm->pos.z = 0.01f;
+    g_AnmManager->Draw2D(vm);
+    vm++;
+    vm->pos = *(Float3 *)(entry + 0x14) + vm->pos2;
+    vm->pos.x += g_GameManager.arcadeRegionTopLeftPos.x;
+    vm->pos.y += g_GameManager.arcadeRegionTopLeftPos.y;
+    vm->pos.z = 0.0f;
+    g_AnmManager->Draw2D(vm);
+}
+
+// FUNCTION: th08 0x413890
+#pragma var_order(i, entry)
+void Player::FUN_00413890()
+{
+    u8 *entry = (u8 *)this + 0x1028;
+    this->FUN_0040bc60(0x80404040);
+    for (i32 i = 0; i < 96; i++, entry += 0x16f0)
+    {
+        if (*(i32 *)entry == 0)
+        {
+            continue;
+        }
+        AnmVm *vm = (AnmVm *)(entry + 0x1b8);
+        vm->SetZRotation(atan2f(*(f32 *)(entry + 0x30), *(f32 *)(entry + 0x2c)));
+        vm->pos = *(Float3 *)(entry + 0x14);
+        vm->pos.x += g_GameManager.arcadeRegionTopLeftPos.x;
+        vm->pos.y += g_GameManager.arcadeRegionTopLeftPos.y;
+        vm->pos.z = 0.0f;
+        g_AnmManager->Draw2D(vm);
+    }
+}
+
+// FUNCTION: th08 0x4142c0
+#pragma var_order(i, entry)
+void Player::FUN_004142c0()
+{
+    u8 *entry = (u8 *)this + 0x1028;
+    this->FUN_0040bc60(0x80802020);
+    for (i32 i = 0; i < 128; i++, entry += 0x16f0)
+    {
+        if (*(i32 *)entry == 0)
+        {
+            continue;
+        }
+        AnmVm *vm = (AnmVm *)(entry + 0x1b8);
+        vm->SetZRotation(atan2f(*(f32 *)(entry + 0x30), *(f32 *)(entry + 0x2c)));
         vm->pos = *(Float3 *)(entry + 0x14);
         vm->pos.x += g_GameManager.arcadeRegionTopLeftPos.x;
         vm->pos.y += g_GameManager.arcadeRegionTopLeftPos.y;
@@ -1043,6 +1160,62 @@ i32 __fastcall Player::FUN_0044ea40(PlayerUnkStruct0x2ec *data)
     return 0;
 }
 
+// FUNCTION: th08 0x44f930
+#pragma var_order(state, targetPosition)
+i32 __fastcall Player::FUN_0044f930(u8 *data)
+{
+    Float3 targetPosition = this->position;
+    i32 state = *(i32 *)(data + 0x2c8);
+
+    if (state == 1)
+    {
+        this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)data, 21);
+        *(i32 *)(data + 0x2c8) = 2;
+        *(Float3 *)(data + 0x2b0) = targetPosition;
+        *(f32 *)(data + 0x2d8) = *(i32 *)(data + 0x2d0) == 0 ? 0.0f : -2.3561945f;
+        state = 2;
+    }
+    if (state == 2)
+    {
+        if (*(i32 *)(data + 0x2d0) == 0)
+        {
+            targetPosition.x -= 32.0f;
+            *(f32 *)(data + 0x2d8) = AddNormalizeAngle(*(f32 *)(data + 0x2d8), 0.05235988f);
+        }
+        else
+        {
+            targetPosition.x += 32.0f;
+            *(f32 *)(data + 0x2d8) = AddNormalizeAngle(*(f32 *)(data + 0x2d8), -0.05235988f);
+        }
+        ((Float3 *)(data + 0x2a4))->FromAngleMagnitude(*(f32 *)(data + 0x2d8), 6.0f);
+        Float3 delta = targetPosition - *(Float3 *)(data + 0x2b0);
+        f32 length = delta.FUN_0040b4c0();
+        if (length != 0.0f)
+        {
+            delta *= 0.09f / length;
+        }
+        *(Float3 *)(data + 0x2b0) += delta;
+        *(Float3 *)(data + 0x2a4) += *(Float3 *)(data + 0x2b0);
+        *(f32 *)(data + 0x2ac) = 0.0f;
+        g_EffectManager.SpawnEffect(47, (Float3 *)(data + 0x2a4), 1, 0x80602050);
+    }
+    else if (state == 3)
+    {
+        ZunTimer *timer = (ZunTimer *)(data + 0x2e0);
+        if (timer->AsFrames() == 0)
+        {
+            ((AnmVm *)data)->SetInterrupt(5);
+        }
+        if (timer->AsFrames() > 16)
+        {
+            *(i32 *)(data + 0x2c8) = 0;
+            *(i32 *)(data + 0x2ec) = 0;
+            *(i32 *)(data + 0x2f0) = 0;
+        }
+    }
+    return 0;
+}
+
 struct PlayerShotData
 {
     i16 interval;
@@ -1467,6 +1640,96 @@ i32 __fastcall Player::FUN_00450ee0(Effect *effect, Float3 *position)
         g_EffectManager.SpawnEffect(5, &spawnPosition, 1, -1);
     }
     return 0;
+}
+
+// FUNCTION: th08 0x450f60
+#pragma var_order(result, i, data, shot)
+void __fastcall Player::FUN_00450f60(i32 frame)
+{
+    u8 *group;
+    u8 *shot;
+    u8 *data;
+    i32 i;
+    i32 result;
+
+    group = *(u8 **)((u8 *)this + (this->isFocus ? 0xe2a78 : 0xe2a74)) + 0x38;
+    while (g_GameManager.GetPower() >= *(i32 *)(group + 4))
+    {
+        group += 8;
+    }
+    shot = *(u8 **)group;
+    data = (u8 *)this + 0xbe838;
+    for (i = 0; i < 128; i++, data += 0x484)
+    {
+        if (*(i16 *)(data + 0x462) != 0)
+        {
+            continue;
+        }
+        while (*(i16 *)shot >= 0)
+        {
+            if (*(void **)(shot + 0x28) != NULL)
+            {
+                result = ((i32(__fastcall *)(Player *, u8 *, i32, void *))*(void **)(shot + 0x28))(
+                    this, data, frame, shot);
+            }
+            else
+            {
+                result = this->FUN_0044fd80(data, frame, shot);
+            }
+            if (result == 1)
+            {
+                *(u32 *)(data + 0x1f8) |= 0x2000;
+                *(i16 *)(data + 0x462) = 1;
+                *(void **)(data + 0x480) = shot;
+                *(void **)(data + 0x474) = *(void **)(shot + 0x2c);
+                *(void **)(data + 0x478) = *(void **)(shot + 0x30);
+                *(void **)(data + 0x47c) = *(void **)(shot + 0x34);
+                shot += 0x38;
+                break;
+            }
+            shot += 0x38;
+        }
+        if (*(i16 *)shot < 0)
+        {
+            break;
+        }
+    }
+}
+
+// FUNCTION: th08 0x451150
+#pragma var_order(i, data)
+void Player::FUN_00451150()
+{
+    u8 *data = (u8 *)this + 0xbe838;
+    for (i32 i = 0; i < 128; i++, data += 0x484)
+    {
+        if (*(i16 *)(data + 0x462) == 0)
+        {
+            continue;
+        }
+        if (*(void **)(data + 0x474) != NULL &&
+            ((i32(__fastcall *)(Player *, u8 *))*(void **)(data + 0x474))(this, data) != 0)
+        {
+            *(i16 *)(data + 0x462) = 0;
+            continue;
+        }
+        *(f32 *)(data + 0x2a4) += g_Supervisor.framerateMultiplier * *(f32 *)(data + 0x43c);
+        *(f32 *)(data + 0x2a8) += g_Supervisor.framerateMultiplier * *(f32 *)(data + 0x440);
+        if (*(i16 *)(data + 0x464) != 4 && *(i16 *)(data + 0x464) != 5)
+        {
+            AnmLoadedSprite *sprite = ((AnmVm *)data)->loadedSprite;
+            if (!g_GameManager.IsWithinPlayfield(*(f32 *)(data + 0x2a4), *(f32 *)(data + 0x2a8),
+                                                  sprite->widthPx, sprite->heightPx))
+            {
+                *(i16 *)(data + 0x462) = 0;
+            }
+        }
+        if (g_AnmManager->ExecuteScript((AnmVm *)data))
+        {
+            *(i16 *)(data + 0x462) = 0;
+        }
+        ((ZunTimer *)(data + 0x454))->Tick();
+    }
 }
 
 // FUNCTION: th08 0x451ce0

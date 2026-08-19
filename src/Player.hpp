@@ -118,10 +118,15 @@ struct Player
     void __fastcall FUN_0040be30(i32 arg0, i32 arg1, i32 arg2, i32 duration, i32 arg4);
     void FUN_0040bf00();
     void FUN_0040c820();
+    void FUN_0040d010();
     void FUN_00410300();
     void FUN_00410ac0();
+    void FUN_004113a0();
+    void FUN_00413890();
+    void FUN_004142c0();
     void FUN_0040d310();
     void FUN_0040d950();
+    void FUN_0040e610();
     void FUN_0040f550();
     void FUN_0040fcb0();
     void FUN_00412300();
@@ -149,6 +154,7 @@ struct Player
     void __fastcall FUN_0044e770(Effect *effect);
     void __fastcall FUN_0044e8d0(Effect *effect);
     i32 __fastcall FUN_0044ea40(PlayerUnkStruct0x2ec *data);
+    i32 __fastcall FUN_0044f930(u8 *data);
     void __fastcall FUN_0044fb70(u8 *data, void *shotData);
     i32 __fastcall FUN_0044fd80(u8 *data, i32 frame, void *shotData);
     i32 __fastcall FUN_0044fdd0(u8 *data, i32 frame, void *shotData);
@@ -163,6 +169,8 @@ struct Player
     i32 __fastcall FUN_00450ad0(u8 *data);
     i32 __fastcall FUN_00450c50(u8 *data, Float3 *position);
     i32 __fastcall FUN_00450ee0(Effect *effect, Float3 *position);
+    void __fastcall FUN_00450f60(i32 frame);
+    void FUN_00451150();
     void FUN_004512f0();
     void FUN_00451400();
     i32 FUN_00451500();
