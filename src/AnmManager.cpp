@@ -1486,6 +1486,7 @@ void AnmManager::TransformVerticesWorld(AnmVm *vm)
 {
 }
 
+// FUNCTION: th08 0x463cf0
 ZunResult AnmManager::DrawWorld(AnmVm *vm)
 {
     if (!vm->IsVisible())

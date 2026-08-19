@@ -45,7 +45,9 @@ struct Effect
     EffectDrawCallback drawCallback;
     i8 active;
     i8 effectId;
-    u8 unknown0x352[6];
+    u8 unknown0x352[2];
+    i8 drawType;
+    u8 unknown0x355[3];
     void *resource;
     Effect *next;
 };
@@ -57,6 +59,7 @@ struct EffectManager
 
     void ResetEffects();
     ChainCallbackResult DrawUnkTypeEffects();
+    ChainCallbackResult FUN_004281e0();
     ZunResult FUN_00428590();
     Effect *FUN_004253e0(i32 index);
     Effect *SpawnEffect(i32 effectId, Float3 *position, i32 count, D3DCOLOR color);

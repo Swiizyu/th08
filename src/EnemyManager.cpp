@@ -531,6 +531,51 @@ ZunResult EffectManager::FUN_00428590()
     return ZUN_SUCCESS;
 }
 
+// FUNCTION: th08 0x4281e0
+#pragma var_order(effectCounter, effect)
+ChainCallbackResult EffectManager::FUN_004281e0()
+{
+    Effect *effect;
+    i32 effectCounter;
+
+    effect = this->specialEffect1.next;
+    effectCounter = 0;
+    if (g_Supervisor.cfg.effectQuality == 0)
+    {
+        return CHAIN_CALLBACK_RESULT_CONTINUE;
+    }
+    while (effect != NULL)
+    {
+        effectCounter++;
+        if (g_Supervisor.cfg.effectQuality == 1 && (effectCounter & 1))
+        {
+            return CHAIN_CALLBACK_RESULT_CONTINUE;
+        }
+        effect->vm.pos = effect->position;
+        if (effect->drawType == 4)
+        {
+            g_AnmManager->Draw2D(&effect->vm);
+        }
+        else if (effect->drawType == 1)
+        {
+            if (effect->effectId == 51 || effect->effectId == 63)
+            {
+                g_AnmManager->DrawWorld(&effect->vm);
+            }
+            else
+            {
+                g_AnmManager->DrawWorld(&effect->vm);
+            }
+        }
+        else
+        {
+            g_AnmManager->FUN_00464070(&effect->vm);
+        }
+        effect = effect->next;
+    }
+    return CHAIN_CALLBACK_RESULT_CONTINUE;
+}
+
 // FUNCTION: th08 0x428100
 ChainCallbackResult EffectManager::DrawUnkTypeEffects()
 {
