@@ -89,13 +89,8 @@ struct Background
     void background_fun_00415ce0();
     void FUN_00409160(u32 color);
 
-    void SetCamera1()
-    {
-    }
-
-    void SetCamera2()
-    {
-    }
+    void SetCamera1();
+    void SetCamera2();
 
     AnmVm *quadVms;
     AnmVm vm0x4;

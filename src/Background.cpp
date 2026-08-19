@@ -3,6 +3,7 @@
 #include "Background.hpp"
 #include "GameManager.hpp"
 #include "Player.hpp"
+#include "ZunMath.hpp"
 
 namespace th08
 {
@@ -409,6 +410,49 @@ u32 Background::FUN_00409f40()
         }
     }
     return 0;
+}
+
+// FUNCTION: th08 0x40b5a0
+#pragma var_order(eyeZ, centerY, centerX, aspectRatio, fov)
+void Background::SetCamera1()
+{
+    f32 fov;
+    f32 aspectRatio;
+    f32 centerX;
+    f32 centerY;
+    f32 eyeZ;
+
+    centerX = (f32)g_Supervisor.viewport.Width / 2.0f;
+    centerY = (f32)g_Supervisor.viewport.Height / 2.0f;
+    aspectRatio = (f32)g_Supervisor.viewport.Width / (f32)g_Supervisor.viewport.Height;
+    fov = ZUN_PI / 10.0f;
+    eyeZ = centerY / tan(fov / 2.0f);
+    D3DXMatrixLookAtLH(&g_Supervisor.viewMatrix, (D3DXVECTOR3 *)&Float3(centerX, centerY, eyeZ),
+                       (D3DXVECTOR3 *)&Float3(centerX, centerY, 0.0f),
+                       (D3DXVECTOR3 *)&Float3(0.0f, -1.0f, 0.0f));
+    D3DXMatrixPerspectiveFovLH(&g_Supervisor.projectionMatrix, fov, aspectRatio, 1.0f, 10000.0f);
+    g_Supervisor.d3dDevice->SetTransform(D3DTS_VIEW, &g_Supervisor.viewMatrix);
+    g_Supervisor.d3dDevice->SetTransform(D3DTS_PROJECTION, &g_Supervisor.projectionMatrix);
+}
+
+// FUNCTION: th08 0x40b6d0
+#pragma var_order(eye, at)
+void Background::SetCamera2()
+{
+    Float3 at = this->vectors0x6394.vector1 + this->vectors0x6394.vector0;
+    Float3 eye = this->vectors0x6394.vector5 + this->vectors0x6394.vector0;
+
+    D3DXMatrixLookAtLH(&g_Supervisor.viewMatrix, (D3DXVECTOR3 *)&eye, (D3DXVECTOR3 *)&at,
+                       (D3DXVECTOR3 *)&this->vectors0x6394.vector2);
+    D3DXMatrixPerspectiveFovLH(&g_Supervisor.projectionMatrix, this->vectors0x6394.angle,
+                               (f32)g_Supervisor.viewport.Width / (f32)g_Supervisor.viewport.Height, 30.0f,
+                               1800.0f);
+    g_Supervisor.d3dDevice->SetTransform(D3DTS_VIEW, &g_Supervisor.viewMatrix);
+    g_Supervisor.d3dDevice->SetTransform(D3DTS_PROJECTION, &g_Supervisor.projectionMatrix);
+    D3DXVec3Cross((D3DXVECTOR3 *)&this->vectors0x6394.vector4, (D3DXVECTOR3 *)&this->vectors0x6394.vector1,
+                  (D3DXVECTOR3 *)&this->vectors0x6394.vector2);
+    D3DXVec3Normalize((D3DXVECTOR3 *)&this->vectors0x6394.vector4,
+                      (D3DXVECTOR3 *)&this->vectors0x6394.vector4);
 }
 
 }; // Namespace th08
