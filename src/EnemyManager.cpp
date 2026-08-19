@@ -56,9 +56,9 @@ DIFFABLE_STATIC_ARRAY_ASSIGN(EffectTemplate, 66, g_EffectTemplates) = {
     {42, &Effect::FUN_00425e60, &Effect::FUN_00425d70},
     {43, &Effect::FUN_00425e60, &Effect::FUN_00425d70},
     {44, NULL, NULL},
-    {45, NULL, &Effect::FUN_00425fe0},
-    {45, NULL, &Effect::FUN_00425fe0},
-    {45, NULL, &Effect::FUN_00425fe0},
+    {45, &Effect::FUN_00426030, &Effect::FUN_00425fe0},
+    {45, &Effect::FUN_00426030, &Effect::FUN_00425fe0},
+    {45, &Effect::FUN_00426030, &Effect::FUN_00425fe0},
     {0, NULL, NULL},
     {32, &Effect::FUN_00426bb0, &Effect::FUN_00426b20},
     {33, &Effect::FUN_00426c90, &Effect::FUN_00426b20},
@@ -316,6 +316,57 @@ i32 Effect::FUN_00425fe0()
     *(i32 *)((u8 *)this + 0x2f4) = 0;
     *(i32 *)((u8 *)this + 0x314) = 0;
     return 0;
+}
+
+// FUNCTION: th08 0x426030
+#pragma var_order(fadeRatio, localVector, sine, matrix, cosine, normalized)
+i32 Effect::FUN_00426030()
+{
+    Float3 normalized;
+    f32 cosine;
+    D3DXMATRIX matrix;
+    f32 sine;
+    Float3 localVector;
+    f32 fadeRatio;
+
+    D3DXVec3Normalize((D3DXVECTOR3 *)&normalized, (D3DXVECTOR3 *)&this->direction);
+    sine = sinf(*(f32 *)((u8 *)this + 0x318));
+    cosine = cosf(*(f32 *)((u8 *)this + 0x318));
+    *(f32 *)((u8 *)this + 0x304) = normalized.x * sine;
+    *(f32 *)((u8 *)this + 0x308) = normalized.y * sine;
+    *(f32 *)((u8 *)this + 0x30c) = normalized.z * sine;
+    *(f32 *)((u8 *)this + 0x310) = cosine;
+    D3DXMatrixRotationQuaternion(&matrix, (D3DXQUATERNION *)((u8 *)this + 0x304));
+    localVector.x = normalized.y;
+    localVector.y = -normalized.x;
+    localVector.z = 0.0f;
+    if (localVector.FUN_0040b500() < 0.00001f)
+    {
+        normalized = Float3(1.0f, 0.0f, 0.0f);
+    }
+    else
+    {
+        D3DXVec3Normalize((D3DXVECTOR3 *)&localVector, (D3DXVECTOR3 *)&localVector);
+    }
+    localVector *= *(f32 *)((u8 *)this + 0x314);
+    D3DXVec3TransformCoord((D3DXVECTOR3 *)&localVector, (D3DXVECTOR3 *)&localVector, &matrix);
+    localVector.z *= 6.0f;
+    this->position = localVector + this->emitterPosition;
+    this->position.z = 0.0f;
+    if (*(i8 *)((u8 *)this + 0x352))
+    {
+        (*(i8 *)((u8 *)this + 0x353))++;
+        if (*(i8 *)((u8 *)this + 0x353) >= 16)
+        {
+            return 0;
+        }
+        fadeRatio = 1.0f - (f32)*(i8 *)((u8 *)this + 0x353) / 16.0f;
+        this->vm.color1.d3dColor =
+            (this->vm.color1.d3dColor & 0xffffff) | (u32)(fadeRatio * 255.0f) << 24;
+        this->vm.scale.y = 2.0f - fadeRatio;
+        this->vm.scale.x = this->vm.scale.y;
+    }
+    return 1;
 }
 
 // FUNCTION: th08 0x426b20
