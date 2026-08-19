@@ -188,6 +188,7 @@ ChainCallbackResult Gui::OnDraw(Gui *gui)
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
+// FUNCTION: th08 0x43396d
 void GuiImpl::MsgRead(i32 msgIdx)
 {
     // \n\r?
@@ -882,6 +883,7 @@ i32 Gui::IsDialoguePresent()
     return this->impl->msg.currentMsgIdx >= 0 || this->impl->msg.currentMsgIdx == -2;
 }
 
+// FUNCTION: th08 0x435900
 void Gui::UpdateStageElements()
 {
     if (this->impl->msg.currentMsgIdx < 0)
@@ -1386,6 +1388,7 @@ void Gui::DrawGameScene()
 }
 
 #pragma var_order(i, color2, color1, healthBarRect, tmp, j, segmentEndHealth, timeColor, markerGap)
+// FUNCTION: th08 0x43741d
 void Gui::DrawStageElements()
 {
     u32 i;
@@ -1629,6 +1632,7 @@ void Gui::FUN_00438046()
     // Not actually sure this is Gui related, but it's located nearby other Gui functions
 }
 
+// FUNCTION: th08 0x43826b
 void Gui::DrawStageClearScreen()
 {
     Float3 pos(120.0f, 96.0f, 0.0f);
@@ -1765,6 +1769,7 @@ void Gui::DrawStageClearScreen()
     }
 }
 
+// FUNCTION: th08 0x438a89
 void Gui::DrawAsciiText()
 {
     char fmtArg[32];
@@ -2051,6 +2056,7 @@ void Gui::FreeMsgFile(void)
     }
 }
 
+// FUNCTION: th08 0x439810
 void Gui::MsgRead(i32 msgIdx)
 {
     this->impl->MsgRead(msgIdx);

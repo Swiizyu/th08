@@ -1379,6 +1379,7 @@ ZunResult AnmManager::Draw2D(AnmVm *vm)
 // Has the effect of Draw2D, but does not round vertex positions if
 // the rotation is 0 (DrawNoRotation rounds the vertex positions)
 #pragma var_order(sine, rotation, cosine, x, y, yOffset, xOffset, spriteHalfWidth, spriteHalfHeight)
+// FUNCTION: th08 0x463470
 ZunResult AnmManager::Draw2DNoRound(AnmVm *vm)
 {
     float sine, cosine, rotation, xOffset, yOffset, x, y, spriteHalfWidth, spriteHalfHeight;

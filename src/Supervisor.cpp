@@ -30,6 +30,12 @@ DIFFABLE_STATIC(ScreenEffect *, g_SupervisorScreenEffect);
 DIFFABLE_STATIC(Supervisor, g_Supervisor);
 DIFFABLE_STATIC_ARRAY(AnmVm, 3, g_SupervisorLoadingVms);
 
+// FUNCTION: th08 0x40b900
+ZunBool KeepStageResources()
+{
+    return g_Supervisor.keepStageResources;
+}
+
 // FUNCTION: th08 0x448972
 void Supervisor::FUN_00448972()
 {

@@ -450,9 +450,6 @@ inline ZunBool ReleaseResourcesOnRestart()
     return g_Supervisor.releaseResourcesOnRestart;
 }
 
-inline ZunBool KeepStageResources()
-{
-    return g_Supervisor.keepStageResources;
-}
+ZunBool KeepStageResources();
 
 }; // namespace th08
