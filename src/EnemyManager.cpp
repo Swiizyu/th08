@@ -35,6 +35,10 @@ DIFFABLE_STATIC_ARRAY_ASSIGN(const char *, 9, g_StageSpellEclFiles) = {
     "ecldata1sp.ecl", "ecldata2sp.ecl", "ecldata3sp.ecl", "ecldata4asp.ecl", "ecldata4bsp.ecl",
     "ecldata5sp.ecl", "ecldata6sp.ecl", "ecldata7sp.ecl", "ecldata8sp.ecl",
 };
+DIFFABLE_STATIC_ARRAY_ASSIGN(const char *, 9, g_EffectAnms) = {
+    "eff01.anm", "eff02.anm", "eff03.anm", "eff04a.anm", "eff04b.anm",
+    "eff05.anm", "eff06.anm", "eff07.anm", "eff08.anm",
+};
 
 struct EffectTemplate
 {
@@ -1046,14 +1050,65 @@ EffectManager::EffectManager()
     this->colorMultiplierA = 1.0f;
 }
 
+// FUNCTION: th08 0x4284b0
+ZunResult EffectManager::AddedCallback(EffectManager *effectManager)
+{
+    effectManager->ResetEffects();
+    effectManager->effectAnm = g_AnmManager->GetAnm(6);
+    if (!IsDisableResourceReload())
+    {
+        effectManager->effectAnm2 = g_AnmManager->PreloadAnm(9, g_EffectAnms[g_GameManager.currentStage]);
+        if (effectManager->effectAnm2 == NULL)
+        {
+            return ZUN_ERROR;
+        }
+    }
+    else
+    {
+        effectManager->effectAnm2 = g_AnmManager->GetAnm(9);
+    }
+    return ZUN_SUCCESS;
+}
+
+static ChainCallbackResult __fastcall EffectManagerUpdateCallback(EffectManager *effectManager)
+{
+    return effectManager->UpdateEffects();
+}
+
+static ChainCallbackResult __fastcall EffectManagerDrawCallback(EffectManager *effectManager)
+{
+    return effectManager->DrawEffects();
+}
+
+// FUNCTION: th08 0x428620
+ZunResult EffectManager::RegisterChain()
+{
+    EffectManager *effectManager;
+
+    effectManager = &g_EffectManager;
+    effectManager->ResetEffects();
+    g_EffectManagerCalcChain.SetCallback((ChainCallback)EffectManagerUpdateCallback);
+    g_EffectManagerCalcChain.addedCallback = (ChainLifetimeCallback)EffectManager::AddedCallback;
+    g_EffectManagerCalcChain.deletedCallback = (ChainLifetimeCallback)EffectManager::DeletedCallback;
+    g_EffectManagerCalcChain.arg = effectManager;
+    if (g_Chain.AddToCalcChain(&g_EffectManagerCalcChain, 13) != ZUN_SUCCESS)
+    {
+        return ZUN_ERROR;
+    }
+    g_EffectManagerDrawChain.SetCallback((ChainCallback)EffectManagerDrawCallback);
+    g_EffectManagerDrawChain.arg = effectManager;
+    g_Chain.AddToDrawChain(&g_EffectManagerDrawChain, 12);
+    return ZUN_SUCCESS;
+}
+
 // FUNCTION: th08 0x428590
 #pragma var_order(effect, i)
-ZunResult EffectManager::FUN_00428590()
+ZunResult EffectManager::DeletedCallback(EffectManager *effectManager)
 {
     Effect *effect;
     i32 i;
 
-    effect = (Effect *)((u8 *)this + 0x1c);
+    effect = (Effect *)((u8 *)effectManager + 0x1c);
     for (i = 0; i < 0x28d; i++, effect = (Effect *)((u8 *)effect + 0x360))
     {
         if (effect->resource != NULL)
@@ -1067,6 +1122,88 @@ ZunResult EffectManager::FUN_00428590()
         g_AnmManager->ReleaseAnm(9);
     }
     return ZUN_SUCCESS;
+}
+
+// FUNCTION: th08 0x427bf0
+#pragma var_order(i, effect)
+ChainCallbackResult EffectManager::UpdateEffects()
+{
+    Effect *effect;
+    i32 i;
+
+    effect = &this->effects[0];
+    this->unk0x8 = 0;
+    this->listTails[0] = &this->specialEffect0;
+    this->listTails[1] = &this->specialEffect1;
+    this->listTails[2] = &this->specialEffect2;
+    this->listTails[3] = &this->specialEffect3;
+    this->listTails[4] = &this->specialEffect4;
+    this->specialEffect0.next = NULL;
+    this->specialEffect1.next = NULL;
+    this->specialEffect2.next = NULL;
+    this->specialEffect3.next = NULL;
+    this->specialEffect4.next = NULL;
+
+    for (i = 0; i < 0x28d; i++, effect++)
+    {
+        if (!effect->active)
+        {
+            if (effect->resource != NULL)
+            {
+                g_ZunMemory.Free(effect->resource);
+                effect->resource = NULL;
+            }
+            continue;
+        }
+        this->unk0x8++;
+        if ((*(u32 *)((u8 *)&g_GameManager + 0x3dbac) & 0x400) == 0 || *(u8 *)((u8 *)effect + 0x357))
+        {
+            if (effect->updateCallback != NULL && (effect->*effect->updateCallback)() != 1)
+            {
+                effect->active = 0;
+                continue;
+            }
+            if (g_AnmManager->ExecuteScript(&effect->vm) != 0)
+            {
+                effect->active = 0;
+                continue;
+            }
+            effect->timer++;
+        }
+        effect->next = NULL;
+        if (effect->effectId == 64)
+        {
+            continue;
+        }
+        i32 listIndex;
+        if (effect->drawType == 1 || effect->drawType >= 3)
+        {
+            listIndex = 1;
+        }
+        else if (effect->drawType == 0)
+        {
+            if (*(u8 *)((u8 *)effect + 0x355))
+            {
+                listIndex = 3;
+            }
+            else if (effect->vm.blendMode == 1)
+            {
+                listIndex = 4;
+            }
+            else
+            {
+                listIndex = 0;
+            }
+        }
+        else
+        {
+            listIndex = 2;
+        }
+        this->listTails[listIndex]->next = effect;
+        this->listTails[listIndex] = effect;
+    }
+    this->frameCounter++;
+    return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
 // FUNCTION: th08 0x4281e0
@@ -1108,6 +1245,60 @@ ChainCallbackResult EffectManager::FUN_004281e0()
         else
         {
             g_AnmManager->FUN_00464070(&effect->vm);
+        }
+        effect = effect->next;
+    }
+    return CHAIN_CALLBACK_RESULT_CONTINUE;
+}
+
+// FUNCTION: th08 0x427f00
+#pragma var_order(effect)
+ChainCallbackResult EffectManager::DrawEffects()
+{
+    Effect *effect;
+
+    effect = this->specialEffect0.next;
+    while (effect != NULL)
+    {
+        if (effect->drawCallback != NULL)
+        {
+            effect->drawCallback(effect);
+        }
+        else
+        {
+            effect->vm.pos = effect->position;
+            effect->vm.pos.x += g_GameManager.arcadeRegionTopLeftPos.x;
+            effect->vm.pos.y += g_GameManager.arcadeRegionTopLeftPos.y;
+            effect->vm.pos.z = 0.07f;
+            effect->vm.pos += effect->vm.pos2;
+            g_AnmManager->Draw2D(&effect->vm);
+        }
+        effect = effect->next;
+    }
+
+    effect = this->specialEffect2.next;
+    while (effect != NULL)
+    {
+        effect->vm.pos = effect->position;
+        g_AnmManager->DrawWorld(&effect->vm);
+        effect = effect->next;
+    }
+
+    effect = this->specialEffect4.next;
+    while (effect != NULL)
+    {
+        if (effect->drawCallback != NULL)
+        {
+            effect->drawCallback(effect);
+        }
+        else
+        {
+            effect->vm.pos = effect->position;
+            effect->vm.pos.x += g_GameManager.arcadeRegionTopLeftPos.x;
+            effect->vm.pos.y += g_GameManager.arcadeRegionTopLeftPos.y;
+            effect->vm.pos.z = 0.07f;
+            effect->vm.pos += effect->vm.pos2;
+            g_AnmManager->Draw2D(&effect->vm);
         }
         effect = effect->next;
     }

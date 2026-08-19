@@ -78,9 +78,13 @@ struct EffectManager
     EffectManager();
 
     void ResetEffects();
+    ChainCallbackResult UpdateEffects();
+    ChainCallbackResult DrawEffects();
     ChainCallbackResult DrawUnkTypeEffects();
     ChainCallbackResult FUN_004281e0();
-    ZunResult FUN_00428590();
+    static ZunResult AddedCallback(EffectManager *effectManager);
+    static ZunResult DeletedCallback(EffectManager *effectManager);
+    static ZunResult RegisterChain();
     Effect *FUN_004253e0(i32 index);
     Effect *SpawnEffect(i32 effectId, Float3 *position, i32 count, D3DCOLOR color);
     Effect *SpawnSpecialEffect(i32 effectId, Float3 *position, i32 specialIndex, i32 unused, D3DCOLOR color);
@@ -101,9 +105,10 @@ struct EffectManager
     Effect specialEffect2;
     Effect specialEffect3;
     Effect specialEffect4;
-    u8 unknown0x8b03c[0x18];
+    Effect *listTails[5];
+    i32 frameCounter;
     AnmLoaded *effectAnm;
-    u8 unknown0x8b058[4];
+    AnmLoaded *effectAnm2;
 };
 C_ASSERT(sizeof(EffectManager) == 0x8b05c);
 
