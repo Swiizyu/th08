@@ -121,6 +121,7 @@ struct Player
     i32 CalcLaserHitbox(Float3 *center, Float3 *size, Float3 *origin, f32 rotation, i32 canGraze);
     void ScoreGraze(Float3 *position, i32 suppressTimeOrbEffects);
     void Die();
+    f32 AngleToPlayer(Float3 *position);
     i32 CalcItemBoxCollision(Float3 *position, Float3 *hitbox);
     void FUN_0044cba0();
     void FUN_0044d150();

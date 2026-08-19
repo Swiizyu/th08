@@ -424,6 +424,31 @@ void Player::Die()
     g_SoundPlayer.PlaySoundPositionedByIdx(SOUND_PICHUN, this->position.x);
 }
 
+// FUNCTION: th08 0x44c1b0
+#pragma var_order(deltaY, deltaX)
+f32 Player::AngleToPlayer(Float3 *position)
+{
+    f32 deltaX;
+    f32 deltaY;
+
+    deltaX = this->position.x - position->x;
+    deltaY = this->position.y - position->y;
+    if (deltaY == 0.0f && deltaX == 0.0f)
+    {
+        return 1.5707964f;
+    }
+    return atan2f(deltaY, deltaX);
+}
+
+// FUNCTION: th08 0x451ce0
+void __fastcall FUN_00451ce0(Float3 *minimum, Float3 *maximum, Float3 *center, Float3 *size)
+{
+    minimum->x = center->x - size->x * 0.5f;
+    minimum->y = center->y - size->y * 0.5f;
+    maximum->x = center->x + size->x * 0.5f;
+    maximum->y = center->y + size->y * 0.5f;
+}
+
 // FUNCTION: th08 0x4512f0
 #pragma var_order(i, data)
 void Player::FUN_004512f0()
