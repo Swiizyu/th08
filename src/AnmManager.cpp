@@ -13,6 +13,11 @@ namespace th08
 DIFFABLE_STATIC(AnmManager *, g_AnmManager);
 DIFFABLE_STATIC_ARRAY(VertexTex1DiffuseXyzrhw, 4, g_QuadVertices);
 
+// FUNCTION: th08 0x4067c0
+AnmVmBase::AnmVmBase()
+{
+}
+
 // FUNCTION: th08 0x464070
 ZunResult AnmManager::FUN_00464070(AnmVm *vm)
 {

@@ -7,6 +7,31 @@
 namespace th08
 {
 
+struct EnemyFlags
+{
+    u32 flag0 : 1;
+    u32 flag1 : 1;
+    u32 flag2 : 1;
+    u32 flag3 : 1;
+    u32 flag4 : 1;
+    u32 flag5 : 1;
+    u32 flag6 : 1;
+    u32 flag7 : 1;
+    u32 flag8 : 1;
+    u32 flag9 : 1;
+    u32 flag10 : 1;
+    u32 flag11 : 1;
+};
+
+struct EnemyFloat3Holder
+{
+    EnemyFloat3Holder();
+
+    u32 unknown;
+    Float3 position;
+};
+C_ASSERT(sizeof(EnemyFloat3Holder) == 0x10);
+
 struct EnemyUnkStruct0x1c
 {
     EnemyUnkStruct0x1c();
@@ -54,6 +79,11 @@ C_ASSERT(sizeof(EnemyUnkStruct4) == 0x210);
 struct Enemy
 {
     i32 GetFamiliarCount();
+    Enemy *FUN_0041efc0();
+    ZunBool FUN_0041f000();
+    void FUN_0041f040(i32 x, i32 y, i32 z);
+    void FUN_0041f0b0(i32 value);
+    void FUN_0041f0e0(i32 value);
     ZunBool FUN_0041fd20();
     void FUN_0042bc50();
     void FUN_0042bc90();

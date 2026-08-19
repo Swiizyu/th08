@@ -22,6 +22,20 @@ DIFFABLE_STATIC(ChainElem, g_EnemyManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerDrawChainHighPrio);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerDrawChainLowPrio);
 
+// FUNCTION: th08 0x41f400
+EnemyFloat3Holder::EnemyFloat3Holder()
+{
+}
+
+// FUNCTION: th08 0x423d70
+Float3 *Float3::operator*=(f32 scalar)
+{
+    this->x *= scalar;
+    this->y *= scalar;
+    this->z *= scalar;
+    return this;
+}
+
 // FUNCTION: th08 0x42eb10
 f32 FUN_0042eb10(f32 start, f32 end, f32 factor)
 {
@@ -384,6 +398,21 @@ EclTimeline *EclManager::GetTimeline(i32 timelineIdx)
     return this->timelineFile->timelines[timelineIdx];
 }
 
+// FUNCTION: th08 0x4287e0
+Effect::Effect()
+{
+}
+
+// FUNCTION: th08 0x428740
+EffectManager::EffectManager()
+{
+    this->ResetEffects();
+    this->colorMultiplierR = 1.0f;
+    this->colorMultiplierG = 1.0f;
+    this->colorMultiplierB = 1.0f;
+    this->colorMultiplierA = 1.0f;
+}
+
 // FUNCTION: th08 0x428590
 #pragma var_order(effect, i)
 ZunResult EffectManager::FUN_00428590()
@@ -394,10 +423,10 @@ ZunResult EffectManager::FUN_00428590()
     effect = (Effect *)((u8 *)this + 0x1c);
     for (i = 0; i < 0x28d; i++, effect = (Effect *)((u8 *)effect + 0x360))
     {
-        if (*(void **)((u8 *)effect + 0x358) != NULL)
+        if (effect->resource != NULL)
         {
-            g_ZunMemory.Free(*(void **)((u8 *)effect + 0x358));
-            *(void **)((u8 *)effect + 0x358) = NULL;
+            g_ZunMemory.Free(effect->resource);
+            effect->resource = NULL;
         }
     }
     if (!IsDisableResourceReload())
@@ -412,7 +441,7 @@ ChainCallbackResult EffectManager::DrawUnkTypeEffects()
 {
     Effect *effect;
 
-    effect = this->drawListHead;
+    effect = this->specialEffect3.next;
     while (effect != NULL)
     {
         if (effect->drawCallback != NULL)
@@ -444,6 +473,58 @@ void EffectManager::CutChain()
 {
     g_Chain.Cut(&g_EffectManagerCalcChain);
     g_Chain.Cut(&g_EffectManagerDrawChain);
+}
+
+// FUNCTION: th08 0x41efc0
+Enemy *Enemy::FUN_0041efc0()
+{
+    Enemy *current;
+
+    current = this;
+    if (this->FUN_0041f000())
+    {
+        while (*(Enemy **)((u8 *)current + 8) != NULL)
+        {
+            current = *(Enemy **)((u8 *)current + 8);
+        }
+    }
+    return current;
+}
+
+// FUNCTION: th08 0x41f000
+ZunBool Enemy::FUN_0041f000()
+{
+    ZunBool result;
+
+    if (*(i32 *)((u8 *)this + 0x2da4) == 0 && *(Enemy **)((u8 *)this + 8) != NULL)
+    {
+        result = TRUE;
+    }
+    else
+    {
+        result = FALSE;
+    }
+    return result;
+}
+
+// FUNCTION: th08 0x41f040
+void Enemy::FUN_0041f040(i32 x, i32 y, i32 z)
+{
+    *(i32 *)((u8 *)*(void **)((u8 *)this + 0xf4) + 0x2a4) = x;
+    *(i32 *)((u8 *)*(void **)((u8 *)this + 0xf4) + 0x2a8) = y;
+    *(i32 *)((u8 *)*(void **)((u8 *)this + 0xf4) + 0x2ac) = z;
+}
+
+// FUNCTION: th08 0x41f0b0
+void Enemy::FUN_0041f0b0(i32 value)
+{
+    ((EnemyFlags *)this)->flag6 = value;
+}
+
+// FUNCTION: th08 0x41f0e0
+void Enemy::FUN_0041f0e0(i32 value)
+{
+    ((EnemyFlags *)this)->flag11 = value;
 }
 
 // FUNCTION: th08 0x41fd20

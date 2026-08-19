@@ -279,6 +279,8 @@ struct AnmRawInstr
 
 struct AnmVmBase
 {
+    AnmVmBase();
+
     void Initialize()
     {
         memset(this, 0, sizeof(AnmVmBase));
