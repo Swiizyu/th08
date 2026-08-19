@@ -1360,6 +1360,42 @@ ChainCallbackResult EffectManager::FUN_004281e0()
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
+// FUNCTION: th08 0x428310
+#pragma var_order(delta, transformed)
+void __fastcall FUN_00428310(Effect *effect, Float3 *position)
+{
+    Float3 transformed;
+    Float3 delta;
+
+    if (*(u8 *)((u8 *)&g_GameManager + 0x12) == 0 && *(u8 *)((u8 *)&g_GameManager + 0x13) == 0)
+    {
+        transformed = *position + effect->vm.posFinal;
+        delta = effect->vm.pos2 - transformed;
+        if (effect->vm.pos2.x >= -9999.0f)
+        {
+            delta.x += 32.0f;
+            delta.y += 16.0f;
+            delta.z = 0.0f;
+            if (delta.FUN_0040b500() >= 25600.0f)
+            {
+                effect->vm.posInitial.x += 0.0005f;
+                effect->vm.posFinal += delta * effect->vm.posInitial.x;
+            }
+        }
+
+        delta = transformed - g_Player.position;
+        delta.x -= 32.0f;
+        delta.y -= 16.0f;
+        delta.z = 0.0f;
+        if (delta.FUN_0040b500() >= 7744.0f)
+        {
+            effect->vm.posFinal += delta * 0.02f;
+        }
+    }
+
+    *position += effect->vm.posFinal;
+}
+
 // FUNCTION: th08 0x427f00
 #pragma var_order(effect)
 ChainCallbackResult EffectManager::DrawEffects()
