@@ -763,10 +763,58 @@ err:
     g_Supervisor.flags.receivedCloseMsg = true;
 }
 
-// STUB: th08 0x446a37
+// FUNCTION: th08 0x446a37
 ZunResult Supervisor::SetupDInput()
 {
-    return ZUN_ERROR;
+    HINSTANCE hInstance;
+
+    hInstance = (HINSTANCE)GetWindowLongA(this->hwndGameWindow, GWL_HINSTANCE);
+    if (this->cfg.opts.dontUseDirectInput)
+    {
+        return ZUN_ERROR;
+    }
+    if (FAILED(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8A,
+                                  (LPVOID *)&this->dInputIface, NULL)))
+    {
+        this->dInputIface = NULL;
+        g_GameErrorContext.Log("DirectInput \x82\xAA\x8E\x67\x97\x70\x82\xC5\x82\xAB\x82\xDC\x82\xB9\x82\xF1\r\n");
+        return ZUN_ERROR;
+    }
+    if (FAILED(this->dInputIface->CreateDevice(GUID_SysKeyboard, &this->keyboard, NULL)))
+    {
+        SAFE_RELEASE(this->dInputIface);
+        g_GameErrorContext.Log("DirectInput \x82\xAA\x8E\x67\x97\x70\x82\xC5\x82\xAB\x82\xDC\x82\xB9\x82\xF1\r\n");
+        return ZUN_ERROR;
+    }
+    if (FAILED(this->keyboard->SetDataFormat(&c_dfDIKeyboard)))
+    {
+        SAFE_RELEASE(this->keyboard);
+        SAFE_RELEASE(this->dInputIface);
+        g_GameErrorContext.Log("DirectInput SetDataFormat \x82\xAA\x8E\x67\x97\x70\x82\xC5\x82\xAB\x82\xDC\x82\xB9\x82\xF1\r\n");
+        return ZUN_ERROR;
+    }
+    if (FAILED(this->keyboard->SetCooperativeLevel(this->hwndGameWindow,
+                                                   DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY)))
+    {
+        SAFE_RELEASE(this->keyboard);
+        SAFE_RELEASE(this->dInputIface);
+        g_GameErrorContext.Log(
+            "DirectInput SetCooperativeLevel \x82\xAA\x8E\x67\x97\x70\x82\xC5\x82\xAB\x82\xDC\x82\xB9\x82\xF1\r\n");
+        return ZUN_ERROR;
+    }
+    this->keyboard->Acquire();
+    g_GameErrorContext.Log("DirectInput \x82\xCD\x90\xB3\x8F\xED\x82\xC9\x8F\x89\x8A\xFA\x89\xBB\x82\xB3\x82\xEA\x82\xDC\x82\xB5\x82\xBD\r\n");
+    this->dInputIface->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumGameControllersCb, NULL, DIEDFL_ATTACHEDONLY);
+    if (this->controller != NULL)
+    {
+        this->controller->SetDataFormat(&c_dfDIJoystick2);
+        this->controller->SetCooperativeLevel(this->hwndGameWindow, DISCL_BACKGROUND | DISCL_NONEXCLUSIVE);
+        this->controllerCaps.dwSize = sizeof(DIDEVCAPS);
+        this->controller->GetCapabilities(&this->controllerCaps);
+        this->controller->EnumObjects(ControllerCallback, NULL, 0);
+        g_GameErrorContext.Log("\x97\x4C\x8C\xF8\x82\xC8\x83\x70\x83\x62\x83\x68\x82\xF0\x94\xAD\x8C\xA9\x82\xB5\x82\xDC\x82\xB5\x82\xBD\r\n");
+    }
+    return ZUN_SUCCESS;
 }
 
 // FUNCTION: th08 0x446cc7

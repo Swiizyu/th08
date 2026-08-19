@@ -130,10 +130,8 @@ struct BulletManager
     void Initialize();
     void FUN_004321b0();
 
-    // STUB: th08 0x415c60
-    void FUN_00415c60()
-    {
-    }
+    void FUN_00415c60();
+    void RemoveAllBullets(i32 itemState);
 
     static ZunResult RegisterChain(char *bulletAnmFilename);
     static ChainCallbackResult OnUpdate(BulletManager *bulletManager);

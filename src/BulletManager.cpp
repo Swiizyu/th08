@@ -34,6 +34,77 @@ Bullet::Bullet()
 {
 }
 
+// FUNCTION: th08 0x415c60
+void BulletManager::FUN_00415c60()
+{
+    this->RemoveAllBullets(1);
+}
+
+// FUNCTION: th08 0x430830
+#pragma var_order(position, i, sine, bullet, laser, cosine, offset)
+void BulletManager::RemoveAllBullets(i32 itemState)
+{
+    f32 offset;
+    f32 cosine;
+    Laser *laser;
+    Bullet *bullet;
+    f32 sine;
+    i32 i;
+
+    bullet = g_BulletManager.bullets;
+    for (i = 0; i < MAX_BULLETS; i++, bullet++)
+    {
+        if (bullet->state == 0 || bullet->state == 5)
+        {
+            continue;
+        }
+        if (itemState != 4)
+        {
+            g_ItemManager.SpawnItem(&bullet->position, (ItemType)this->bonusItemType, itemState);
+            memset(bullet, 0, sizeof(Bullet));
+        }
+        else
+        {
+            bullet->state = 5;
+        }
+    }
+
+    laser = this->lasers;
+    Float3 position;
+    for (i = 0; i < ARRAY_SIZE_SIGNED(this->lasers); i++, laser++)
+    {
+        if (!laser->isInUse)
+        {
+            continue;
+        }
+        if ((laser->flags & 4) && itemState != 4)
+        {
+            continue;
+        }
+        if (laser->state < 2)
+        {
+            laser->state = 2;
+            laser->timer = 0;
+            laser->width = laser->width2;
+            if (itemState != 4)
+            {
+                offset = laser->startOffset;
+                fsincos(&sine, &cosine, laser->angle);
+                while (laser->endOffset > offset)
+                {
+                    position.x = cosine * offset + laser->position.x;
+                    position.y = sine * offset + laser->position.y;
+                    position.z = 0.0f;
+                    g_ItemManager.SpawnItem(&position, (ItemType)this->bonusItemType, itemState);
+                    offset += 32.0f;
+                }
+            }
+        }
+        laser->stopHitboxTime = 0;
+    }
+    this->cancelFramesRemaining = 10;
+}
+
 // FUNCTION: th08 0x42f4a0
 BulletTypeSprites::BulletTypeSprites()
 {

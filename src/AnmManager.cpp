@@ -12,6 +12,7 @@ namespace th08
 {
 DIFFABLE_STATIC(AnmManager *, g_AnmManager);
 DIFFABLE_STATIC_ARRAY(VertexTex1DiffuseXyzrhw, 4, g_QuadVertices);
+DIFFABLE_STATIC_ARRAY(VertexTex1Xyzrhw, 4, g_UnknownQuadVertices);
 DIFFABLE_STATIC_ARRAY(VertexTex1Xyzrhw, 4, g_BackgroundQuadVertices);
 
 // FUNCTION: th08 0x4067c0
@@ -1556,16 +1557,16 @@ AnmManager::AnmManager()
 {
     memset((void *)this, 0, sizeof(AnmManager));
 
-    g_BackgroundQuadVertices[0].w = g_BackgroundQuadVertices[1].w = g_BackgroundQuadVertices[2].w =
-        g_BackgroundQuadVertices[3].w = 1.0f;
-    g_BackgroundQuadVertices[0].textureUV.x = 0.0f;
-    g_BackgroundQuadVertices[0].textureUV.y = 0.0f;
-    g_BackgroundQuadVertices[1].textureUV.x = 1.0f;
-    g_BackgroundQuadVertices[1].textureUV.y = 0.0f;
-    g_BackgroundQuadVertices[2].textureUV.x = 0.0f;
-    g_BackgroundQuadVertices[2].textureUV.y = 1.0f;
-    g_BackgroundQuadVertices[3].textureUV.x = 1.0f;
-    g_BackgroundQuadVertices[3].textureUV.y = 1.0f;
+    g_UnknownQuadVertices[0].w = g_UnknownQuadVertices[1].w = g_UnknownQuadVertices[2].w =
+        g_UnknownQuadVertices[3].w = 1.0f;
+    g_UnknownQuadVertices[0].textureUV.x = 0.0f;
+    g_UnknownQuadVertices[0].textureUV.y = 0.0f;
+    g_UnknownQuadVertices[1].textureUV.x = 1.0f;
+    g_UnknownQuadVertices[1].textureUV.y = 0.0f;
+    g_UnknownQuadVertices[2].textureUV.x = 0.0f;
+    g_UnknownQuadVertices[2].textureUV.y = 1.0f;
+    g_UnknownQuadVertices[3].textureUV.x = 1.0f;
+    g_UnknownQuadVertices[3].textureUV.y = 1.0f;
 
     g_QuadVertices[0].w = g_QuadVertices[1].w = g_QuadVertices[2].w = g_QuadVertices[3].w = 1.0f;
     g_QuadVertices[0].textureUV.x = 0.0f;
@@ -1589,9 +1590,45 @@ AnmManager::AnmManager()
     this->captureSurfaceIdx = -1;
 }
 
-// STUB: th08 0x465250
+// FUNCTION: th08 0x465250
 void AnmManager::SetupVertexBuffer()
 {
+    void *vertexData;
+
+    this->untexturedVector[2].pos.x = this->untexturedVector[0].pos.x = -128.0f;
+    this->untexturedVector[3].pos.x = this->untexturedVector[1].pos.x = 128.0f;
+    this->untexturedVector[1].pos.y = this->untexturedVector[0].pos.y = -128.0f;
+    this->untexturedVector[3].pos.y = this->untexturedVector[2].pos.y = 128.0f;
+    this->untexturedVector[3].pos.z = this->untexturedVector[2].pos.z =
+        this->untexturedVector[1].pos.z = this->untexturedVector[0].pos.z = 0.0f;
+    this->untexturedVector[2].w = this->untexturedVector[0].w = 0.0f;
+    this->untexturedVector[3].w = this->untexturedVector[1].w = 1.0f;
+    *(f32 *)&this->untexturedVector[0].diffuse = 0.0f;
+    *(f32 *)&this->untexturedVector[1].diffuse = 0.0f;
+    *(f32 *)&this->untexturedVector[2].diffuse = 1.0f;
+    *(f32 *)&this->untexturedVector[3].diffuse = 1.0f;
+
+    g_BackgroundQuadVertices[0].pos = this->untexturedVector[0].pos;
+    g_BackgroundQuadVertices[1].pos = this->untexturedVector[1].pos;
+    g_BackgroundQuadVertices[2].pos = this->untexturedVector[2].pos;
+    g_BackgroundQuadVertices[3].pos = this->untexturedVector[3].pos;
+    g_BackgroundQuadVertices[0].textureUV.x = this->untexturedVector[0].w;
+    g_BackgroundQuadVertices[0].textureUV.y = *(f32 *)&this->untexturedVector[0].diffuse;
+    g_BackgroundQuadVertices[1].textureUV.x = this->untexturedVector[1].w;
+    g_BackgroundQuadVertices[1].textureUV.y = *(f32 *)&this->untexturedVector[1].diffuse;
+    g_BackgroundQuadVertices[2].textureUV.x = this->untexturedVector[2].w;
+    g_BackgroundQuadVertices[2].textureUV.y = *(f32 *)&this->untexturedVector[2].diffuse;
+    g_BackgroundQuadVertices[3].textureUV.x = this->untexturedVector[3].w;
+    g_BackgroundQuadVertices[3].textureUV.y = *(f32 *)&this->untexturedVector[3].diffuse;
+
+    if (!g_Supervisor.IsVertexBufferDisabled())
+    {
+        g_Supervisor.d3dDevice->CreateVertexBuffer(0x50, 0, 0x102, D3DPOOL_MANAGED, &this->quadVertexBuffer);
+        this->quadVertexBuffer->Lock(0, 0, (BYTE **)&vertexData, 0);
+        memcpy(vertexData, this->untexturedVector, 0x50);
+        this->quadVertexBuffer->Unlock();
+        g_Supervisor.d3dDevice->SetStreamSource(0, this->quadVertexBuffer, 0x14);
+    }
 }
 
 static i32 GetAnmFormat(i32 format)
@@ -2129,9 +2166,28 @@ void AnmManager::DrawTextLeft(AnmVm *vm, COLORREF textColor, COLORREF shadowColo
     vm->visible = true;
 }
 
-// STUB: th08 0x466650
+// FUNCTION: th08 0x466650
+#pragma var_order(buf, fontWidth, x)
 void AnmManager::DrawTextCentered(AnmVm *vm, COLORREF textColor, COLORREF shadowColor, const char *fmt, ...)
 {
+    char buf[64];
+    i32 fontWidth;
+    i32 x;
+    va_list args;
+
+    fontWidth = vm->fontWidth <= 0 ? 15 : vm->fontWidth;
+    va_start(args, fmt);
+    vsprintf(buf, fmt, args);
+    va_end(args);
+
+    x = (i32)(vm->loadedSprite->startPixelInclusive.x +
+              vm->loadedSprite->widthPx * vm->loadedSprite->scaleFactor.x / 2.0f -
+              (f32)strlen(buf) * fontWidth * vm->loadedSprite->scaleFactor.x / 4.0f);
+    this->DrawTextInner(vm->loadedSprite->texture, x, vm->loadedSprite->startPixelInclusive.y,
+                        vm->loadedSprite->width, vm->loadedSprite->height, fontWidth, vm->fontHeight,
+                        textColor, shadowColor, buf, vm->loadedSprite->scaleFactor.x,
+                        vm->loadedSprite->scaleFactor.y);
+    vm->visible = true;
 }
 
 #pragma var_order(surface, fileSize, fileData)
@@ -2365,10 +2421,47 @@ void AnmManager::CopySurfaceToBackbuffer2(i32 surfaceIdx, i32 rectX, i32 rectY, 
     backbuffer->Release();
 }
 
-// STUB: th08 0x466f20
+// FUNCTION: th08 0x466f20
+#pragma var_order(srcRect, textureSurface, backbuffer, dstRect)
 void AnmManager::CaptureToTexture(i32 captureAnmIdx, i32 srcX, i32 srcY, i32 srcW, i32 srcH, i32 dstX, i32 dstY,
                                   i32 dstW, i32 dstH)
 {
+    IDirect3DSurface8 *backbuffer;
+    IDirect3DSurface8 *textureSurface;
+    RECT srcRect;
+    RECT dstRect;
+
+    if (this->anmFiles[captureAnmIdx].textures[0].texture == NULL)
+    {
+        return;
+    }
+    this->FlushVertexBuffer();
+    if (g_Supervisor.d3dDevice->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &backbuffer) != D3D_OK)
+    {
+        return;
+    }
+    if (this->anmFiles[captureAnmIdx].textures[0].texture->GetSurfaceLevel(0, &textureSurface) != D3D_OK)
+    {
+        backbuffer->Release();
+        return;
+    }
+
+    srcRect.left = srcX;
+    srcRect.top = srcY;
+    srcRect.right = srcX + srcW;
+    srcRect.bottom = srcY + srcH;
+    dstRect.left = dstX;
+    dstRect.top = dstY;
+    dstRect.right = dstX + dstW;
+    dstRect.bottom = dstY + dstH;
+    if (D3DXLoadSurfaceFromSurface(textureSurface, NULL, &dstRect, backbuffer, NULL, &srcRect, -1, 0) != D3D_OK)
+    {
+        textureSurface->Release();
+        backbuffer->Release();
+        return;
+    }
+    textureSurface->Release();
+    backbuffer->Release();
 }
 
 #pragma var_order(srcRect, backbuffer, dstRect)

@@ -255,9 +255,42 @@ ZunResult GameManager::RegisterChain()
     return ZUN_SUCCESS;
 }
 
-// STUB: th08 0x43aaf4
+// FUNCTION: th08 0x43aaf4
 ZunResult GameManager::AddedCallback(GameManager *gameManager)
 {
+    if (g_Supervisor.curState != SupervisorState_GameManagerReInit &&
+        g_Supervisor.curState != SupervisorState_SpellcardPracticeRestart &&
+        g_Supervisor.curState != SupervisorState_GameManagerNextStageWeird)
+    {
+        g_Supervisor.isInitialStageLoad = TRUE;
+    }
+    else
+    {
+        g_Supervisor.isInitialStageLoad = FALSE;
+    }
+    g_GameManager.unk38 = 1;
+    if (g_Supervisor.wantedState2 == 1)
+    {
+        Float3 position;
+        position.x = 500.0f;
+        position.y = 440.0f;
+        position.z = 0.0f;
+        g_Supervisor.SetupLoadingVmsAndInitCapture(&position);
+        g_Supervisor.StartEffect(0);
+    }
+    else
+    {
+        Float3 position;
+        position.x = 280.0f;
+        position.y = 430.0f;
+        position.z = 0.0f;
+        g_Supervisor.SetupLoadingVmsAndInitCapture(&position);
+    }
+    if (gameManager->flags.unk5 >= 2)
+    {
+        gameManager->flags.unk5 = 1;
+    }
+    g_Supervisor.ThreadStart((LPTHREAD_START_ROUTINE)GameManager::GameplaySetupThread, NULL);
     return ZUN_SUCCESS;
 }
 

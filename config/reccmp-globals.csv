@@ -146,7 +146,8 @@ th08::g_ScreenEffect,0x18b8a30,global
 th08::g_SoundPlayer,0x18b8a68,global
 th08::g_AnmManager,0x18bdc90,global
 th08::g_QuadVertices,0x18bdc98,global
-th08::g_BackgroundQuadVertices,0x18bdd08,global
+th08::g_UnknownQuadVertices,0x18bdd08,global
+th08::g_BackgroundQuadVertices,0x18bdd68,global
 th08::g_FullWidthNumberBuffer,0x18bddc8,global
 th08::g_TitleScreen,0x18bde08,global
 th08::Lzss::m_Tree,0x18bdf58,global
