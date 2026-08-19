@@ -208,6 +208,72 @@ void Bullet::Draw()
     g_AnmManager->Draw2D(vmToDraw);
 }
 
+// FUNCTION: th08 0x432210
+#pragma var_order(factor)
+void Bullet::FUN_00432210()
+{
+    f32 factor;
+    ZunTimer *timer = (ZunTimer *)((u8 *)this + 0xf80);
+
+    if (*timer <= 16)
+    {
+        factor = 5.0f - (f32)*timer * 5.0f / 16.0f;
+        ((Float3 *)((u8 *)this + 0xd50))
+            ->FromAngleMagnitude(*(f32 *)((u8 *)this + 0xd74),
+                                 (factor + *(f32 *)((u8 *)this + 0xd68)) *
+                                     *(f32 *)((u8 *)&g_Supervisor + 0x188));
+    }
+    else
+    {
+        *(i32 *)((u8 *)this + 0xdac) ^= 1;
+    }
+    (*timer)++;
+}
+
+// FUNCTION: th08 0x4322b0
+void Bullet::FUN_004322b0()
+{
+    ZunTimer *timer = (ZunTimer *)((u8 *)this + 0xfac);
+    if (*timer > *(i32 *)((u8 *)this + 0xfcc))
+    {
+        *(u32 *)((u8 *)this + 0xdac) &= ~0x10;
+    }
+    else
+    {
+        *(Float3 *)((u8 *)this + 0xd50) +=
+            *(Float3 *)((u8 *)this + 0xfc0) * *(f32 *)((u8 *)&g_Supervisor + 0x188);
+        f32 x = *(f32 *)((u8 *)this + 0xd50);
+        f32 y = *(f32 *)((u8 *)this + 0xd54);
+        if (fabsf(x) > 0.0001f || fabsf(y) > 0.0001f)
+        {
+            *(f32 *)((u8 *)this + 0xd74) = atan2f(y, x);
+        }
+    }
+    (*timer)++;
+}
+
+// FUNCTION: th08 0x432390
+void Bullet::FUN_00432390()
+{
+    ZunTimer *timer = (ZunTimer *)((u8 *)this + 0xfd8);
+    if (*timer > *(i32 *)((u8 *)this + 0xff8))
+    {
+        *(u32 *)((u8 *)this + 0xdac) &= ~0x20;
+    }
+    else
+    {
+        *(f32 *)((u8 *)this + 0xd74) =
+            AddNormalizeAngle(*(f32 *)((u8 *)this + 0xd74),
+                              *(f32 *)((u8 *)&g_Supervisor + 0x188) * *(f32 *)((u8 *)this + 0xfe8));
+        *(f32 *)((u8 *)this + 0xd68) +=
+            *(f32 *)((u8 *)&g_Supervisor + 0x188) * *(f32 *)((u8 *)this + 0xfe4);
+        ((Float3 *)((u8 *)this + 0xd50))
+            ->FromAngleMagnitude(*(f32 *)((u8 *)this + 0xd74),
+                                 *(f32 *)((u8 *)this + 0xd68) * *(f32 *)((u8 *)&g_Supervisor + 0x188));
+    }
+    (*timer)++;
+}
+
 // FUNCTION: th08 0x432170
 void Bullet::FUN_00432170()
 {
