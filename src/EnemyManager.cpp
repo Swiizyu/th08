@@ -85,9 +85,9 @@ DIFFABLE_STATIC_ARRAY_ASSIGN(EffectTemplate, 66, g_EffectTemplates) = {
     {76, &Effect::FUN_00427990, &Effect::FUN_004272e0},
     {81, &Effect::FUN_004279d0, &Effect::FUN_004272e0},
     {82, NULL, &Effect::FUN_004272e0},
-    {83, NULL, &Effect::FUN_004272e0},
-    {83, NULL, &Effect::FUN_004272e0},
-    {83, NULL, &Effect::FUN_004272e0},
+    {83, &Effect::FUN_0040e040, &Effect::FUN_004272e0},
+    {83, &Effect::FUN_0040e120, &Effect::FUN_004272e0},
+    {83, &Effect::FUN_0040e200, &Effect::FUN_004272e0},
     {83, &Effect::FUN_0040e2d0, &Effect::FUN_004272e0},
     {84, &Effect::FUN_00410bb0, &Effect::FUN_004272e0},
     {72, NULL, NULL},
@@ -246,6 +246,83 @@ EnemyUnkStruct4::EnemyUnkStruct4()
 {
     memset(this, 0, sizeof(EnemyUnkStruct4));
     this->unk0x204 = -1;
+}
+
+// FUNCTION: th08 0x40e040
+#pragma var_order(factor)
+i32 Effect::FUN_0040e040()
+{
+    f32 factor;
+
+    factor = 1.0f - (f32)this->timer / 40.0f;
+    factor *= factor;
+    factor = 1.0f - factor;
+    *(f32 *)((u8 *)this + 0x314) = 256.0f * factor;
+    *(i32 *)((u8 *)this + 0x324) = 64;
+    *(u8 *)((u8 *)this + 0x356) = 1;
+    *(f32 *)((u8 *)this + 0x334) = 5.0f;
+    *(i32 *)((u8 *)this + 0x330) = 0;
+    if (this->timer == 40)
+    {
+        *(f32 *)((u8 *)this + 0x320) = 8.0f;
+    }
+    else
+    {
+        *(f32 *)((u8 *)this + 0x32c) = 64.0f * factor;
+        *(f32 *)((u8 *)this + 0x320) += 2.0f;
+    }
+    return 1;
+}
+
+// FUNCTION: th08 0x40e120
+#pragma var_order(factor)
+i32 Effect::FUN_0040e120()
+{
+    f32 factor;
+
+    factor = 1.0f - (f32)this->timer / 40.0f;
+    factor *= factor;
+    factor = 1.0f - factor;
+    *(f32 *)((u8 *)this + 0x314) = 256.0f * factor;
+    *(i32 *)((u8 *)this + 0x324) = 48;
+    *(u8 *)((u8 *)this + 0x356) = 1;
+    *(i32 *)((u8 *)this + 0x334) = 0;
+    *(f32 *)((u8 *)this + 0x32c) = 128.0f * factor;
+    *(f32 *)((u8 *)this + 0x330) = ZUN_PI / 4.0f;
+    if (this->timer == 40)
+    {
+        *(f32 *)((u8 *)this + 0x320) = 8.0f;
+    }
+    else
+    {
+        *(f32 *)((u8 *)this + 0x320) += 1.5f;
+    }
+    return 1;
+}
+
+// FUNCTION: th08 0x40e200
+#pragma var_order(factor)
+i32 Effect::FUN_0040e200()
+{
+    f32 factor;
+
+    factor = 1.0f - (f32)this->timer / 40.0f;
+    factor *= factor;
+    factor = 1.0f - factor;
+    *(f32 *)((u8 *)this + 0x314) = 256.0f * factor;
+    *(i32 *)((u8 *)this + 0x324) = 48;
+    *(u8 *)((u8 *)this + 0x356) = 1;
+    *(f32 *)((u8 *)this + 0x32c) = 128.0f * factor;
+    *(f32 *)((u8 *)this + 0x330) = -ZUN_PI / 4.0f;
+    if (this->timer == 40)
+    {
+        *(f32 *)((u8 *)this + 0x320) = 8.0f;
+    }
+    else
+    {
+        *(f32 *)((u8 *)this + 0x320) += 1.5f;
+    }
+    return 1;
 }
 
 // FUNCTION: th08 0x40e2d0
