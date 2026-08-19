@@ -86,6 +86,32 @@ EclTimeline *EclManager::GetTimeline(i32 timelineIdx)
     return this->timelineFile->timelines[timelineIdx];
 }
 
+// FUNCTION: th08 0x428100
+ChainCallbackResult EffectManager::DrawUnkTypeEffects()
+{
+    Effect *effect;
+
+    effect = this->drawListHead;
+    while (effect != NULL)
+    {
+        if (effect->drawCallback != NULL)
+        {
+            effect->drawCallback(effect);
+        }
+        else
+        {
+            effect->vm.pos = effect->position;
+            effect->vm.pos.x += g_GameManager.arcadeRegionTopLeftPos.x;
+            effect->vm.pos.y += g_GameManager.arcadeRegionTopLeftPos.y;
+            effect->vm.pos += effect->vm.pos2;
+            effect->vm.pos.z = 0.04f;
+            g_AnmManager->Draw2D(&effect->vm);
+        }
+        effect = effect->next;
+    }
+    return CHAIN_CALLBACK_RESULT_CONTINUE;
+}
+
 // FUNCTION: th08 0x425410
 void EffectManager::ResetEffects()
 {

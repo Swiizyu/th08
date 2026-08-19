@@ -19,6 +19,18 @@
         __asm fstp out_sine }                                            \
     }
 
+inline void fsincos(f32 *outSine, f32 *outCosine, f32 angle)
+{
+    __asm {
+        fld [angle]
+        fsincos
+        mov eax, [outCosine]
+        fstp [eax]
+        mov eax, [outSine]
+        fstp [eax]
+    }
+}
+
 namespace th08
 {
 

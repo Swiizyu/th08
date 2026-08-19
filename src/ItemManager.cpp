@@ -10,6 +10,13 @@ namespace th08
 
 DIFFABLE_STATIC(ItemManager, g_ItemManager);
 
+// FUNCTION: th08 0x4337f0
+void ItemManager::FUN_004337f0()
+{
+    memset(this, 0, sizeof(ItemManager));
+    this->itemListTail = &this->itemListHead;
+}
+
 #pragma var_order(i, item)
 Item *ItemManager::SpawnItem(Float3 *position, ItemType itemType, i32 state)
 {

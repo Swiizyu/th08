@@ -64,6 +64,8 @@ C_ASSERT(sizeof(Item) == 0x2e4);
 
 struct ItemManager
 {
+    void FUN_004337f0();
+
     Item items[MAX_ITEMS + 1];
 
     i32 nextIndex;

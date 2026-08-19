@@ -445,6 +445,8 @@ struct Float3
         return this;
     }
 
+    Float3 *FUN_0042ff70(const Float3 &other);
+
     float x, y, z;
 };
 
