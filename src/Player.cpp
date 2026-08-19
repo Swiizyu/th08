@@ -4,6 +4,7 @@
 #include "AsciiManager.hpp"
 #include "Background.hpp"
 #include "EffectManager.hpp"
+#include "ItemManager.hpp"
 #include "SoundPlayer.hpp"
 #include "ScreenEffect.hpp"
 
@@ -49,6 +50,55 @@ void __fastcall Player::FUN_0040bc60(D3DCOLOR color)
     result = 0x80000000 | (red << 16) | (green << 8) | blue;
     g_Background.FUN_00409160(result);
     g_BackgroundTintActive = 1;
+}
+
+// FUNCTION: th08 0x40be30
+#pragma var_order(i, entry, bomb)
+void __fastcall Player::FUN_0040be30(i32, i32, i32 arg2, i32 duration, i32)
+{
+    u8 *bomb;
+    u8 *entry;
+    i32 i;
+
+    bomb = (u8 *)this + 0xfdc;
+    *(i32 *)(bomb + 8) = arg2;
+    ((ZunTimer *)((u8 *)this + 0xe2af4))->SetCurrent(duration);
+    this->playerState = 3;
+    this->FUN_0040bf00();
+    entry = bomb + 0x4c;
+    for (i = 0; i < 0x80; i++, entry += 0x16f0)
+    {
+        *(i32 *)entry = 0;
+    }
+    g_ItemManager.AutoCollectAllItems();
+    *(Float3 *)(bomb + 0xb784c) = this->position;
+}
+
+// FUNCTION: th08 0x40bf00
+#pragma var_order(effect)
+void Player::FUN_0040bf00()
+{
+    Effect *effect;
+
+    effect = *(Effect **)((u8 *)this + 0xe2b1c);
+    if (effect != NULL)
+    {
+        effect->active = 0;
+    }
+    effect = g_EffectManager.SpawnSpecialEffect(23, &this->position, 0, 1, -1);
+    ((ZunTimer *)((u8 *)&effect->vm + 0x80))->SetCurrent(0);
+    *(ZunTimer *)((u8 *)&effect->vm + 0xd4) = *(ZunTimer *)((u8 *)this + 0xe2af4);
+    *(u8 *)((u8 *)&effect->vm + 0xfc) = 0;
+    *(f32 *)((u8 *)&effect->vm + 0x268) = effect->vm.scale.x;
+    *(f32 *)((u8 *)&effect->vm + 0x26c) = effect->vm.scale.y;
+    *(f32 *)((u8 *)&effect->vm + 0x270) = 0.0625f;
+    *(f32 *)((u8 *)&effect->vm + 0x274) = 0.0625f;
+    *(i32 *)((u8 *)&effect->vm + 0x100) = ((ZunTimer *)((u8 *)this + 0xe2af4))->AsFrames();
+    *(f32 *)((u8 *)&effect->vm + 0x14) = -*(f32 *)((u8 *)&effect->vm + 0x14);
+    *(u8 *)((u8 *)&effect->vm + 0x1f2) = 0xff;
+    *(u8 *)((u8 *)&effect->vm + 0x1f1) = 0x40;
+    *(u8 *)((u8 *)&effect->vm + 0x1f0) = 0x40;
+    *(Effect **)((u8 *)this + 0xe2b1c) = effect;
 }
 
 // FUNCTION: th08 0x40d310
