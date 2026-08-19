@@ -3,6 +3,7 @@
 #include "EnemyManager.hpp"
 #include "AsciiManager.hpp"
 #include "Background.hpp"
+#include "BulletManager.hpp"
 #include "EffectManager.hpp"
 #include "EclManager.hpp"
 #include "Spellcard.hpp"
@@ -1256,6 +1257,67 @@ void __fastcall EclExIns::FUN_00425070(void *instruction)
         g_EclEffectVm0.SetInterrupt(1);
         g_EclEffectVm1.SetInterrupt(1);
     }
+}
+
+// FUNCTION: th08 0x4251b0
+#pragma var_order(i, bullet)
+void __fastcall EclExIns::FUN_004251b0(void *instruction)
+{
+    Bullet *bullet;
+    i32 i;
+
+    *(f32 *)((u8 *)&g_Supervisor + 0x188) = 1.0f / *(i32 *)((u8 *)instruction + 0x10);
+    g_EclEffectVm0.SetInterrupt(2);
+    g_EclEffectVm1.SetInterrupt(2);
+    bullet = &g_BulletManager.bullets[0];
+    for (i = 0; i < MAX_BULLETS; i++, bullet++)
+    {
+        if (bullet->state == 0)
+        {
+            continue;
+        }
+        bullet->velocity *= *(f32 *)((u8 *)&g_Supervisor + 0x188);
+        bullet->sprites.spriteBullet.baseSpriteIndex = bullet->sprites.spriteBullet.activeSpriteIndex;
+        if (bullet->sprites.spriteBullet.activeSpriteIndex >= 96 &&
+            bullet->sprites.spriteBullet.activeSpriteIndex <= 111)
+        {
+            bullet->sprites.spriteBullet.anmFile->SetSprite(&bullet->sprites.spriteBullet, 111);
+        }
+    }
+}
+
+// FUNCTION: th08 0x425290
+#pragma var_order(i, factor, bullet)
+void __fastcall EclExIns::FUN_00425290(void *instruction)
+{
+    Bullet *bullet;
+    f32 factor;
+    i32 i;
+
+    bullet = &g_BulletManager.bullets[0];
+    factor = 1.0f / *(f32 *)((u8 *)&g_Supervisor + 0x188);
+    for (i = 0; i < MAX_BULLETS; i++, bullet++)
+    {
+        if (bullet->state == 0)
+        {
+            continue;
+        }
+        bullet->velocity *= factor;
+        if (bullet->sprites.spriteBullet.activeSpriteIndex >= 96 &&
+            bullet->sprites.spriteBullet.activeSpriteIndex <= 111)
+        {
+            bullet->sprites.spriteBullet.anmFile->SetSprite(&bullet->sprites.spriteBullet,
+                                                            bullet->sprites.spriteBullet.baseSpriteIndex);
+        }
+    }
+    *(f32 *)((u8 *)&g_Supervisor + 0x188) = 1.0f / *(i32 *)((u8 *)instruction + 0x10);
+    if (*(f32 *)((u8 *)&g_Supervisor + 0x188) >= 1.0f)
+    {
+        *(u32 *)((u8 *)&g_Supervisor + 0x1a4) |= 0x20;
+    }
+    *(f32 *)((u8 *)&g_Supervisor + 0x188) = 1.0f;
+    g_EclEffectVm0.SetInterrupt(1);
+    g_EclEffectVm1.SetInterrupt(1);
 }
 
 // FUNCTION: th08 0x425390
