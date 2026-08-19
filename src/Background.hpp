@@ -88,6 +88,8 @@ struct Background
     void background_fun_00416ad0();
     void background_fun_00415ce0();
     void FUN_00409160(u32 color);
+    void __fastcall FUN_00408d60(i32 index, Float3 *out, Float3 *initial, Float3 *final,
+                                 Float3 *control1, Float3 *control2);
 
     void SetCamera1();
     void SetCamera2();

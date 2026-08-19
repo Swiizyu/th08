@@ -1204,6 +1204,90 @@ void __fastcall EclExIns::FUN_004233d0(void *)
     ScreenEffect::RegisterChain(SCREEN_EFFECT_FULL_FADE_OUT, 60, 1, -1, 0, 21);
 }
 
+// FUNCTION: th08 0x424a20
+void __fastcall Enemy::FUN_00424a20(void *)
+{
+    u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
+    u32 mask = *(u32 *)(context + 0x18);
+    for (i32 i = 0; i < MAX_BULLETS; i++)
+    {
+        Bullet *bullet = &g_BulletManager.bullets[i];
+        if (bullet->state == 0 || (bullet->flags & mask) == 0)
+        {
+            continue;
+        }
+        AnmVm *vm = &bullet->sprites.spriteBullet;
+        if (vm->type == 1)
+        {
+            vm->type = 0;
+            vm->blendMode = 1;
+            if (vm->anmFile != NULL) vm->anmFile->SetSprite(vm, vm->activeSpriteIndex + 16);
+            *(u8 *)((u8 *)bullet + 0x10b4) = 1;
+            bullet->velocity.FromAngleMagnitude(*(f32 *)(context + 0x38),
+                                                *(f32 *)(context + 0x3c) * g_Supervisor.framerateMultiplier);
+        }
+        else
+        {
+            vm->type = 1;
+            vm->blendMode = 0;
+            if (vm->anmFile != NULL) vm->anmFile->SetSprite(vm, vm->activeSpriteIndex - 16);
+            *(u8 *)((u8 *)bullet + 0x10b4) = 0;
+            bullet->velocity.FromAngleMagnitude(bullet->angle,
+                                                bullet->speed * g_Supervisor.framerateMultiplier);
+        }
+    }
+    Enemy *enemy = this;
+    i32 enabled = *(i32 *)(context + 0x1c) == 0;
+    while (*(Enemy **)((u8 *)enemy + 8) != NULL)
+    {
+        enemy = *(Enemy **)((u8 *)enemy + 8);
+        if (enabled) *(u32 *)((u8 *)enemy + 0x3328) |= 0x80;
+        else *(u32 *)((u8 *)enemy + 0x3328) &= ~0x80;
+    }
+    g_EclEffectVm0.SetInterrupt(enabled ? 2 : 1);
+    g_EclEffectVm1.SetInterrupt(enabled ? 2 : 1);
+}
+
+// FUNCTION: th08 0x424c40
+void __fastcall Enemy::FUN_00424c40(void *)
+{
+    u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
+    u32 mask = *(u32 *)(context + 0x18);
+    for (i32 i = 0; i < MAX_BULLETS; i++)
+    {
+        Bullet *bullet = &g_BulletManager.bullets[i];
+        if (bullet->state == 0 || (bullet->flags & mask) == 0)
+        {
+            continue;
+        }
+        AnmVm *vm = &bullet->sprites.spriteBullet;
+        if (vm->type == 1)
+        {
+            vm->type = 0;
+            vm->blendMode = 1;
+            vm->color1.a = 0;
+            if (vm->anmFile != NULL) vm->anmFile->SetSprite(vm, vm->activeSpriteIndex + 16);
+            *(u8 *)((u8 *)bullet + 0x10b4) = 1;
+            bullet->velocity.FromAngleMagnitude(bullet->angle,
+                                                *(f32 *)(context + 0x3c) * g_Supervisor.framerateMultiplier);
+        }
+        else if (vm->type == 0)
+        {
+            vm->type = 2;
+            vm->FUN_0040ed50(15, 0, 0, 255);
+        }
+        else
+        {
+            vm->type = 1;
+            vm->blendMode = 0;
+            if (vm->anmFile != NULL) vm->anmFile->SetSprite(vm, vm->activeSpriteIndex - 16);
+            *(u8 *)((u8 *)bullet + 0x10b4) = 0;
+            bullet->velocity.FromAngleMagnitude(bullet->angle,
+                                                bullet->speed * g_Supervisor.framerateMultiplier);
+        }
+    }
+}
+
 // FUNCTION: th08 0x424e00
 void __fastcall EclExIns::FUN_00424e00(void *)
 {
@@ -2020,6 +2104,38 @@ void Enemy::FUN_0041f0e0(i32 value)
     ((EnemyFlags *)this)->flag11 = value;
 }
 
+// FUNCTION: th08 0x41fe10
+i32 *__fastcall Enemy::FUN_0041fe10(void *operand, i32 flags, i32 operandIndex)
+{
+    if (operandIndex >= 0 && ((flags >> operandIndex) & 1) == 0)
+    {
+        return (i32 *)operand;
+    }
+    i32 id = *(i32 *)operand;
+    u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
+    if (id >= 10000 && id < 10008)
+    {
+        return (i32 *)(context + 0x18 + (id - 10000) * 4);
+    }
+    if (id >= 10008 && id < 10016)
+    {
+        return (i32 *)((u8 *)this + 0x2ca8 + (id - 10008) * 4);
+    }
+    if (id >= 10016 && id < 10020)
+    {
+        return (i32 *)(context + 0x70 + (id - 10016) * 4);
+    }
+    if (id >= 10020 && id < 10024)
+    {
+        return (i32 *)(context + 0x58 + (id - 10020) * 4);
+    }
+    if (id == 10026) return (i32 *)((u8 *)this + 0x2e1c);
+    if (id == 10027) return (i32 *)((u8 *)this + 0x2dfc);
+    if (id == 10028) return (i32 *)((u8 *)this + 0x3304);
+    if (id == 10029) return (i32 *)((u8 *)this + 0x2e08);
+    return (i32 *)operand;
+}
+
 // FUNCTION: th08 0x420120
 f32 Enemy::FUN_00420120(f32 value)
 {
@@ -2062,6 +2178,51 @@ f32 *__fastcall Enemy::FUN_00420950(void *operand, i32 flags, i32 operandIndex)
         return (f32 *)((u8 *)this + 0x2cc8 + (id - 10024) * 4);
     }
     return (f32 *)operand;
+}
+
+// FUNCTION: th08 0x420d10
+void __fastcall Enemy::FUN_00420d10(void *instruction)
+{
+    u16 flags = *(u16 *)((u8 *)instruction + 0xa);
+    i32 duration = *this->FUN_0041fe10((u8 *)instruction + 0xc, flags, 0);
+    i32 mode = *this->FUN_0041fe10((u8 *)instruction + 0x10, flags, 1);
+    f32 angle = AddNormalizeAngle(this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x14)), 0.0f);
+    f32 magnitude = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x18));
+    *(f32 *)((u8 *)this + 0x2dc4) = cosf(angle) * magnitude * duration;
+    *(f32 *)((u8 *)this + 0x2dc8) = sinf(angle) * magnitude * duration;
+    *(f32 *)((u8 *)this + 0x2dcc) = 0.0f;
+    this->position0x2dd0 = this->position0x2d88;
+    *(i32 *)((u8 *)this + 0x2de8) = duration;
+    this->timer0x2ddc.SetCurrent(duration);
+    u32 *enemyFlags = (u32 *)((u8 *)this + 0x3324);
+    *enemyFlags = (*enemyFlags & 0xfffe3fff) | ((mode & 7) << 14);
+    *enemyFlags = (*enemyFlags & 0xffffcfff) | 0x2000;
+    if ((*enemyFlags & 0x40000) != 0)
+    {
+        *(f32 *)((u8 *)this + 0x2dc4) = -*(f32 *)((u8 *)this + 0x2dc4);
+    }
+}
+
+// FUNCTION: th08 0x420f40
+void __fastcall Enemy::FUN_00420f40(void *instruction)
+{
+    u16 flags = *(u16 *)((u8 *)instruction + 0xa);
+    i32 duration = *this->FUN_0041fe10((u8 *)instruction + 0xc, flags, 0);
+    i32 mode = *this->FUN_0041fe10((u8 *)instruction + 0x10, flags, 1);
+    Float3 target(this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x14)),
+                  this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x18)), 0.0f);
+    *(Float3 *)((u8 *)this + 0x2dc4) = target - this->position0x2d88;
+    this->position0x2dd0 = this->position0x2d34;
+    *(i32 *)((u8 *)this + 0x2de8) = duration;
+    this->timer0x2ddc.SetCurrent(duration);
+    u32 *enemyFlags = (u32 *)((u8 *)this + 0x3324);
+    *enemyFlags = (*enemyFlags & 0xfffe3fff) | ((mode & 7) << 14);
+    *enemyFlags = (*enemyFlags & 0xffffcfff) | 0x2000;
+    this->position0x2d4c = Float3(0.0f, 0.0f, 0.0f);
+    if ((*enemyFlags & 0x40000) != 0)
+    {
+        *(f32 *)((u8 *)this + 0x2dc4) = -*(f32 *)((u8 *)this + 0x2dc4);
+    }
 }
 
 // FUNCTION: th08 0x421120
@@ -2131,6 +2292,31 @@ void __fastcall Enemy::FUN_004213f0(void *instruction)
         *(i32 *)entry = 1;
         break;
     }
+}
+
+// FUNCTION: th08 0x422020
+void __fastcall Enemy::FUN_00422020(void *instruction)
+{
+    f32 angle = AddNormalizeAngle(g_Rng.GetRandomF32InRange(ZUN_PI / 2.0f), -ZUN_PI / 4.0f);
+    this->FUN_004222b0(instruction, angle);
+}
+
+// FUNCTION: th08 0x4222b0
+void __fastcall Enemy::FUN_004222b0(void *instruction, f32 angle)
+{
+    u16 flags = *(u16 *)((u8 *)instruction + 0xa);
+    i32 duration = *this->FUN_0041fe10((u8 *)instruction + 0xc, flags, 0);
+    i32 mode = *this->FUN_0041fe10((u8 *)instruction + 0x10, flags, 1);
+    f32 magnitude = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x14));
+    *(f32 *)((u8 *)this + 0x2dc4) = cosf(angle) * magnitude * duration;
+    *(f32 *)((u8 *)this + 0x2dc8) = sinf(angle) * magnitude * duration;
+    *(f32 *)((u8 *)this + 0x2dcc) = 0.0f;
+    this->position0x2dd0 = this->position0x2d88;
+    *(i32 *)((u8 *)this + 0x2de8) = duration;
+    this->timer0x2ddc.SetCurrent(duration);
+    u32 *enemyFlags = (u32 *)((u8 *)this + 0x3324);
+    *enemyFlags = (*enemyFlags & 0xfffe3fff) | ((mode & 7) << 14);
+    *enemyFlags = (*enemyFlags & 0xffffcfff) | 0x2000;
 }
 
 // FUNCTION: th08 0x421e50

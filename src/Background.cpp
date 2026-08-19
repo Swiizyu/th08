@@ -70,6 +70,47 @@ void Background::FUN_00409160(u32 color)
     }
 }
 
+// FUNCTION: th08 0x408d60
+void __fastcall Background::FUN_00408d60(i32 index, Float3 *out, Float3 *initial, Float3 *final,
+                                          Float3 *control1, Float3 *control2)
+{
+    i32 *duration = (i32 *)((u8 *)this + 0x63e0 + index * 4);
+    ZunTimer *timer = (ZunTimer *)((u8 *)this + 0x63f4 + index * sizeof(ZunTimer));
+    f32 t;
+    if (timer->AsFrames() < *duration)
+    {
+        timer->Tick();
+        t = (f32)timer->AsFrames() / *duration;
+    }
+    else
+    {
+        timer->SetCurrent(*duration);
+        t = 1.0f;
+        *duration = 0;
+    }
+    switch (*(i32 *)((u8 *)this + 0x6430 + index * 4))
+    {
+    case 1: t = 1.0f - (1.0f - t) * (1.0f - t); break;
+    case 2: t = 1.0f - (1.0f - t) * (1.0f - t) * (1.0f - t); break;
+    case 3: t = 1.0f - (1.0f - t) * (1.0f - t) * (1.0f - t) * (1.0f - t); break;
+    case 4: t *= t; break;
+    case 5: t = t * t * t; break;
+    case 6: t = t * t * t * t; break;
+    case 7:
+    {
+        f32 u = 1.0f - t;
+        out->x = u * u * u * initial->x + 3.0f * u * u * t * control1->x +
+                 3.0f * u * t * t * control2->x + t * t * t * final->x;
+        out->y = u * u * u * initial->y + 3.0f * u * u * t * control1->y +
+                 3.0f * u * t * t * control2->y + t * t * t * final->y;
+        out->z = u * u * u * initial->z + 3.0f * u * u * t * control1->z +
+                 3.0f * u * t * t * control2->z + t * t * t * final->z;
+        return;
+    }
+    }
+    *out = *initial + (*final - *initial) * t;
+}
+
 // FUNCTION: th08 0x409080
 Float3 Float3::operator+(const Float3 &other)
 {
