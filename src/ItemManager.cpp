@@ -194,9 +194,19 @@ void Item::CollectTimeOrb()
 {
 }
 
-// STUB: th08 0x4413e0
+// FUNCTION: th08 0x4413e0
+#pragma var_order(item)
 void ItemManager::AutoCollectAllItems()
 {
+    Item *item;
+
+    item = this->itemListHead.next;
+    while (item != NULL)
+    {
+        item->state = ITEM_STATE_AUTOCOLLECT;
+        item->startPositionOrVelocity = Float3(0.0f, -0.5f, 0.0f);
+        item = item->next;
+    }
 }
 
 // STUB: th08 0x441450
@@ -221,9 +231,45 @@ void ItemManager::CancelAutoCollect()
     }
 }
 
-// STUB: th08 0x4415a0
+// FUNCTION: th08 0x4415a0
+#pragma var_order(alpha, item)
 void ItemManager::OnDraw()
 {
+    Item *item;
+    i32 alpha;
+
+    item = this->itemListHead.next;
+    while (item != NULL)
+    {
+        item->sprite.pos.x = g_GameManager.arcadeRegionTopLeftPos.x + item->currentPosition.x;
+        item->sprite.pos.y = g_GameManager.arcadeRegionTopLeftPos.y + item->currentPosition.y;
+        item->sprite.pos.z = 0.15f;
+        if (item->currentPosition[1] < -8.0f)
+        {
+            item->sprite.pos.y = 8.0f + g_GameManager.arcadeRegionTopLeftPos.y;
+            if (item->isOnscreen)
+            {
+                g_BulletManager.bonusAnm->SetSprite(&item->sprite, item->itemType + 0xb6);
+                item->isOnscreen = false;
+                item->sprite.zWriteDisabled = true;
+            }
+            alpha = 255 - (i32)((8.0f - item->currentPosition[1]) * 255.0f / 128.0f);
+            if (alpha < 64)
+            {
+                alpha = 64;
+            }
+            item->sprite.color1.d3dColor = (item->sprite.color1.d3dColor & 0xffffff) | alpha << 24;
+        }
+        else if (!item->isOnscreen)
+        {
+            g_BulletManager.bonusAnm->SetSprite(&item->sprite, item->itemType + 0xac);
+            item->isOnscreen = true;
+            item->sprite.color1.d3dColor = 0xffffffff;
+            item->sprite.zWriteDisabled = true;
+        }
+        g_AnmManager->Draw2D(&item->sprite);
+        item = item->next;
+    }
 }
 
 void Item::Delete()

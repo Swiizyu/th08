@@ -3,6 +3,8 @@
 #include "GameManager.hpp"
 #include "Global.hpp"
 #include "Gui.hpp"
+#include "Player.hpp"
+#include "ReplayManager.hpp"
 #include "SoundPlayer.hpp"
 #include "SpellCard.hpp"
 
@@ -104,10 +106,26 @@ i32 GameManager::GetSongNameSpriteIdx(i32 spellcardNumber)
     return FALSE;
 }
 
-// STUB: th08 0x4399ac
-ZunBool GameManager::IsWithinPlayfield()
+// FUNCTION: th08 0x4399ac
+ZunBool GameManager::IsWithinPlayfield(f32 x, f32 y, f32 width, f32 height)
 {
-    return FALSE;
+    if (x + width / 2.0f < 0.0f)
+    {
+        return FALSE;
+    }
+    if (x - width / 2.0f > 384.0f)
+    {
+        return FALSE;
+    }
+    if (y + height / 2.0f < 0.0f)
+    {
+        return FALSE;
+    }
+    if (y - height / 2.0f > 448.0f)
+    {
+        return FALSE;
+    }
+    return TRUE;
 }
 
 i32 GameManager::CalcAntiTamperChecksum()
@@ -164,15 +182,51 @@ ChainCallbackResult GameManager::OnUpdate(GameManager *gameManager)
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
-// STUB: th08 0x43aa03
+// FUNCTION: th08 0x43aa03
 ChainCallbackResult GameManager::OnDraw(GameManager *gameManager)
 {
+    if (gameManager->showPauseMenu)
+    {
+        gameManager->showPauseMenu = 2;
+    }
+    if (g_Supervisor.curState != SupervisorState_GameManager)
+    {
+        return CHAIN_CALLBACK_RESULT_BREAK;
+    }
+    if (gameManager->flags.unk5 == 1)
+    {
+        return CHAIN_CALLBACK_RESULT_BREAK;
+    }
+    if (gameManager->unk38 != 0)
+    {
+        return CHAIN_CALLBACK_RESULT_BREAK;
+    }
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
-// STUB: th08 0x43aa5c
+// FUNCTION: th08 0x43aa5c
 ZunResult GameManager::RegisterChain()
 {
+    GameManager *gameManager;
+
+    gameManager = &g_GameManager;
+    g_GameManagerCalcChain.callback = (ChainCallback)GameManager::OnUpdate;
+    g_GameManagerCalcChain.addedCallback = NULL;
+    g_GameManagerCalcChain.deletedCallback = NULL;
+    g_GameManagerCalcChain.addedCallback = (ChainLifetimeCallback)GameManager::AddedCallback;
+    g_GameManagerCalcChain.deletedCallback = (ChainLifetimeCallback)GameManager::DeletedCallback;
+    g_GameManagerCalcChain.arg = gameManager;
+    gameManager->unk3ddc0 = 0;
+    if (g_Chain.AddToCalcChain(&g_GameManagerCalcChain, 2) != ZUN_SUCCESS)
+    {
+        return ZUN_ERROR;
+    }
+
+    g_GameManagerDrawChain.callback = (ChainCallback)GameManager::OnDraw;
+    g_GameManagerDrawChain.addedCallback = NULL;
+    g_GameManagerDrawChain.deletedCallback = NULL;
+    g_GameManagerDrawChain.arg = gameManager;
+    g_Chain.AddToDrawChain(&g_GameManagerDrawChain, 5);
     return ZUN_SUCCESS;
 }
 
@@ -262,9 +316,24 @@ void GameManager::DecreaseSubrank(int amount)
     }
 }
 
-// STUB: th08 0x43c0bb
-void GameManager::AddToYoukaiGauge(u16 param_1, i32 param_2)
+// FUNCTION: th08 0x43c0bb
+void GameManager::AddToYoukaiGauge(i32 amount, i32 force)
 {
+    if (*(i32 *)((u8 *)&g_Player + 0xfdc) != 0 && force == 0)
+    {
+        return;
+    }
+
+    this->globals->youkaiGauge += amount;
+    if (this->globals->youkaiGauge < this->youkaiGaugeHumanLimit)
+    {
+        this->globals->youkaiGauge = this->youkaiGaugeHumanLimit;
+    }
+    else if (this->globals->youkaiGauge > this->youkaiGaugeYoukaiLimit)
+    {
+        this->globals->youkaiGauge = this->youkaiGaugeYoukaiLimit;
+    }
+    this->globals->youkaiGaugeCopy = this->globals->youkaiGauge;
 }
 
 ZunBool GameManager::IsExtraUnlockedForCharacter(i32 character)
@@ -307,10 +376,20 @@ ZunBool GameManager::IsPhantasmUnlocked()
     return FALSE;
 }
 
-// STUB: th08 0x43c322
+// FUNCTION: th08 0x43c322
 ZunBool GameManager::IsReplayPractice()
 {
-    return FALSE;
+    ZunBool result;
+
+    if (this->flags.isReplay && g_ReplayManager->replayData->isPractice)
+    {
+        result = TRUE;
+    }
+    else
+    {
+        result = FALSE;
+    }
+    return result;
 }
 
 void GameManager::CutChain()

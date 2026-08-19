@@ -90,6 +90,7 @@ struct Enemy
     void FUN_0041f0b0(i32 value);
     void FUN_0041f0e0(i32 value);
     ZunBool FUN_0041fd20();
+    void FUN_0042b2f0();
     void FUN_0042bc50();
     void FUN_0042bc90();
     void FUN_0042a820();
@@ -141,7 +142,7 @@ struct EnemyManager
     static ZunResult RegisterChain();
     static ChainCallbackResult OnUpdate();
     static ChainCallbackResult OnDrawHighPrio(EnemyManager *enemyManager);
-    ChainCallbackResult OnDrawImpl();
+    ChainCallbackResult __fastcall OnDrawImpl(i32 firstLayer, i32 lastLayer);
     static ChainCallbackResult OnDrawLowPrio(EnemyManager *enemyManager);
     static ZunResult AddedCallback(EnemyManager *enemyManager);
     static ZunResult DeletedCallback(EnemyManager *enemyManager);

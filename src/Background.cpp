@@ -4,7 +4,12 @@
 
 namespace th08
 {
+u32 IsDisableResourceReload();
+
 DIFFABLE_STATIC(Background, g_Background);
+DIFFABLE_STATIC(ChainElem, g_BackgroundCalcChain);
+DIFFABLE_STATIC(ChainElem, g_BackgroundDrawChainHighPrio);
+DIFFABLE_STATIC(ChainElem, g_BackgroundDrawChainLowPrio);
 
 // FUNCTION: th08 0x4031e0
 f32 FUN_004031e0(f32 value)
@@ -94,9 +99,16 @@ void Background::background_fun_00416ad0()
     *(i32 *)((u8 *)this + 0xb24) = 0;
 }
 
-// STUB: th08 0x4071a0
+// FUNCTION: th08 0x4071a0
 Background::Background()
 {
+    memset(this, 0, sizeof(Background));
+    this->vectors0x6394.vector0 = Float3(0.0f, 0.0f, 1000.0f);
+    this->vectors0x6394.vector1 = Float3(0.0f, 0.0f, 0.0f);
+    this->vectors0x6394.vector2 = Float3(0.0f, 1.0f, 0.0f);
+    this->vectors0x6394.angle = 0.5235988f;
+    this->vectors0x6264 = this->vectors0x6394;
+    this->vectors0x62b0 = this->vectors0x6394;
 }
 
 // STUB: th08 0x407400
@@ -123,21 +135,71 @@ ZunResult Background::AddedCallback(Background *background)
     return ZUN_ERROR;
 }
 
-// STUB: th08 0x409b20
-ZunResult Background::RegisterChain()
+// FUNCTION: th08 0x409b20
+#pragma var_order(savedStdData, background)
+ZunResult Background::RegisterChain(i32 stage)
 {
-    return ZUN_ERROR;
+    Background *background;
+    StdRawHeader *savedStdData;
+
+    background = &g_Background;
+    if (IsDisableResourceReload())
+    {
+        savedStdData = background->stdData;
+    }
+    memset(background, 0, sizeof(Background));
+    if (IsDisableResourceReload())
+    {
+        background->stdData = savedStdData;
+    }
+    *(i32 *)((u8 *)background + 0x81c) = 0;
+    *(i32 *)((u8 *)background + 0x820) = stage;
+
+    g_BackgroundCalcChain.SetCallback((ChainCallback)Background::OnUpdate);
+    g_BackgroundCalcChain.addedCallback = (ChainLifetimeCallback)Background::AddedCallback;
+    g_BackgroundCalcChain.deletedCallback = (ChainLifetimeCallback)Background::DeletedCallback;
+    g_BackgroundCalcChain.arg = background;
+    if (g_Chain.AddToCalcChain(&g_BackgroundCalcChain, 8) != ZUN_SUCCESS)
+    {
+        return ZUN_ERROR;
+    }
+
+    g_BackgroundDrawChainHighPrio.SetCallback((ChainCallback)Background::OnDrawHighPrio);
+    g_BackgroundDrawChainHighPrio.arg = background;
+    g_Chain.AddToDrawChain(&g_BackgroundDrawChainHighPrio, 6);
+
+    g_BackgroundDrawChainLowPrio.SetCallback((ChainCallback)Background::OnDrawLowPrio);
+    g_BackgroundDrawChainLowPrio.arg = background;
+    g_Chain.AddToDrawChain(&g_BackgroundDrawChainLowPrio, 7);
+    return ZUN_SUCCESS;
 }
 
-// STUB: th08 0x409c20
-ZunResult Background::DeletedCallback()
+// FUNCTION: th08 0x409c20
+ZunResult Background::DeletedCallback(Background *background)
 {
-    return ZUN_ERROR;
+    if (!IsDisableResourceReload())
+    {
+        g_AnmManager->ReleaseAnm(4);
+    }
+    if (*(void **)background != NULL)
+    {
+        g_ZunMemory.Free(*(void **)background);
+        *(void **)background = NULL;
+    }
+    if (!IsDisableResourceReload() && background->stdData != NULL)
+    {
+        g_ZunMemory.Free(background->stdData);
+        background->stdData = NULL;
+    }
+    return ZUN_SUCCESS;
 }
 
-// STUB: th08 0x409ca0
+// FUNCTION: th08 0x409ca0
 void Background::CutChain()
 {
+    g_Chain.Cut(&g_BackgroundCalcChain);
+    g_Chain.Cut(&g_BackgroundDrawChainHighPrio);
+    g_Chain.Cut(&g_BackgroundDrawChainLowPrio);
 }
 
 // STUB: th08 0x409ce0

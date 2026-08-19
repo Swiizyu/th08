@@ -1,7 +1,11 @@
 #include "th_pch.h"
 
 #include "Player.hpp"
+#include "AsciiManager.hpp"
 #include "EffectManager.hpp"
+
+u32 FUN_004338c0();
+u32 FUN_0044e0e0();
 
 namespace th08
 {
@@ -156,13 +160,111 @@ ZunBool Player::IsYoukai()
 }
 
 DIFFABLE_STATIC(Player, g_Player);
-DIFFABLE_STATIC(ChainElem *, g_PlayerCalcChain);
-DIFFABLE_STATIC(ChainElem *, g_PlayerDrawChainHighPrio);
-DIFFABLE_STATIC(ChainElem *, g_PlayerDrawChainLowPrio);
 
-// STUB: th08 0x44c230
+// FUNCTION: th08 0x4512f0
+#pragma var_order(i, data)
+void Player::FUN_004512f0()
+{
+    u8 *data;
+    i32 i;
+
+    data = (u8 *)this + 0xbe838;
+    for (i = 0; i < 0x80; i++, data += 0x484)
+    {
+        if (*(i16 *)(data + 0x462) != 1)
+        {
+            continue;
+        }
+        if (*(i16 *)(data + 0x1fc) != 0)
+        {
+            ((AnmVm *)data)->SetZRotation(*(f32 *)(data + 0x450));
+        }
+        ((AnmVm *)data)->pos.x = g_GameManager.arcadeRegionTopLeftPos.x + *(f32 *)(data + 0x2a4);
+        ((AnmVm *)data)->pos.y = g_GameManager.arcadeRegionTopLeftPos.y + *(f32 *)(data + 0x2a8);
+        ((AnmVm *)data)->pos.z = 0.4f;
+        if (*(i8 *)(data + 0x470) != 0)
+        {
+            *(u8 *)(data + 0x1f2) = 0xff;
+            *(u8 *)(data + 0x1f1) = 0x40;
+            *(u8 *)(data + 0x1f0) = 0x40;
+        }
+        g_AnmManager->Draw2D((AnmVm *)data);
+        if (*(void **)(data + 0x478) != NULL)
+        {
+            ((void(__fastcall *)(Player *, void *))*(void **)(data + 0x478))(this, data);
+        }
+    }
+}
+
+// FUNCTION: th08 0x451400
+#pragma var_order(i, data)
+void Player::FUN_00451400()
+{
+    u8 *data;
+    i32 i;
+
+    data = (u8 *)this + 0xbe838;
+    for (i = 0; i < 0x80; i++, data += 0x484)
+    {
+        if (*(i16 *)(data + 0x462) != 2)
+        {
+            continue;
+        }
+        if (*(i16 *)(data + 0x1fc) != 0)
+        {
+            ((AnmVm *)data)->SetZRotation(*(f32 *)(data + 0x450));
+        }
+        ((AnmVm *)data)->pos.x = g_GameManager.arcadeRegionTopLeftPos.x + *(f32 *)(data + 0x2a4);
+        ((AnmVm *)data)->pos.y = g_GameManager.arcadeRegionTopLeftPos.y + *(f32 *)(data + 0x2a8);
+        ((AnmVm *)data)->pos.z = 0.2f;
+        if (*(i8 *)(data + 0x470) != 0)
+        {
+            *(u8 *)(data + 0x1f2) = 0xff;
+            *(u8 *)(data + 0x1f1) = 0x40;
+            *(u8 *)(data + 0x1f0) = 0x40;
+        }
+        g_AnmManager->DrawPlayerBullet((AnmVm *)data);
+    }
+}
+
+// FUNCTION: th08 0x44c230
+#pragma var_order(player1ShtFile, player, player2ShtFile)
 ZunResult Player::RegisterChain(u32 param)
 {
+    Player *player;
+    PlayerRawShtFile *player1ShtFile;
+    PlayerRawShtFile *player2ShtFile;
+
+    player = &g_Player;
+    if (FUN_0044e0e0())
+    {
+        player1ShtFile = player->player1ShtFile;
+        player2ShtFile = player->player2ShtFile;
+    }
+    memset(player, 0, 0xe2b30);
+    if (FUN_0044e0e0())
+    {
+        player->player1ShtFile = player1ShtFile;
+        player->player2ShtFile = player2ShtFile;
+    }
+    *(ZunTimer *)((u8 *)player + 0xe2af4) = 0;
+    *(u8 *)((u8 *)player + 1) = param;
+
+    player->calcChain = g_Chain.CreateElem((ChainCallback)Player::OnUpdate);
+    player->calcChain->arg = player;
+    player->calcChain->addedCallback = (ChainLifetimeCallback)Player::AddedCallback;
+    player->calcChain->deletedCallback = (ChainLifetimeCallback)Player::DeletedCallback;
+    if (g_Chain.AddToCalcChain(player->calcChain, 9) != ZUN_SUCCESS)
+    {
+        return ZUN_ERROR;
+    }
+
+    player->drawChainHighPrio = g_Chain.CreateElem((ChainCallback)Player::OnDrawHighPrio);
+    player->drawChainLowPrio = g_Chain.CreateElem((ChainCallback)Player::OnDrawLowPrio);
+    player->drawChainHighPrio->arg = player;
+    player->drawChainLowPrio->arg = player;
+    g_Chain.AddToDrawChain(player->drawChainHighPrio, 9);
+    g_Chain.AddToDrawChain(player->drawChainLowPrio, 10);
     return ZUN_SUCCESS;
 }
 
@@ -172,15 +274,40 @@ ChainCallbackResult Player::OnUpdate(Player *player)
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
-// STUB: th08 0x44d530
+// FUNCTION: th08 0x44d530
+#pragma var_order(i)
 ChainCallbackResult Player::OnDrawHighPrio(Player *player)
 {
+    i32 i;
+
+    player->FUN_004512f0();
+    if (*(i32 *)((u8 *)player + 0xfdc) != 0)
+    {
+        ((void(__fastcall *)(Player *))*(void **)((u8 *)player + 0x1014 +
+                                                  *(i32 *)((u8 *)player + 0xfe0) * 4))(player);
+    }
+    if (!g_GameManager.showRetryMenu)
+    {
+        player->playerSprite.pos.x = g_GameManager.arcadeRegionTopLeftPos.x + player->position.x;
+        player->playerSprite.pos.y = g_GameManager.arcadeRegionTopLeftPos.y + player->position.y;
+        player->playerSprite.pos.z = 0.1f;
+        g_AnmManager->DrawNoRotation(&player->playerSprite);
+    }
+    for (i = 0; (u32)i < 4; i++)
+    {
+        if (*(void **)((u8 *)player + 0x6fc + i * 0x2f4) != NULL)
+        {
+            ((void(__fastcall *)(Player *, void *))*(void **)((u8 *)player + 0x6fc + i * 0x2f4))(
+                player, (u8 *)player + 0x40c + i * 0x2f4);
+        }
+    }
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
-// STUB: th08 0x44d630
+// FUNCTION: th08 0x44d630
 ChainCallbackResult Player::OnDrawLowPrio(Player *player)
 {
+    player->FUN_00451400();
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
@@ -190,20 +317,38 @@ ZunResult Player::AddedCallback(Player *player)
     return ZUN_SUCCESS;
 }
 
-// STUB: th08 0x44dc60
+// FUNCTION: th08 0x44dc60
 ZunResult Player::DeletedCallback(Player *player)
 {
+    if (::FUN_004338c0())
+    {
+        g_AnmManager->ReleaseAnm(5);
+        g_AsciiManager.SetGaugeInterrupt(99);
+        g_AsciiManager.FUN_00422bb0(0, 99);
+        g_AsciiManager.FUN_00422bb0(1, 99);
+        g_AsciiManager.FUN_00422bb0(2, 99);
+        if (g_Player.player1ShtFile != NULL)
+        {
+            g_ZunMemory.Free(g_Player.player1ShtFile);
+            g_Player.player1ShtFile = NULL;
+        }
+        if (g_Player.player2ShtFile != NULL)
+        {
+            g_ZunMemory.Free(g_Player.player2ShtFile);
+            g_Player.player2ShtFile = NULL;
+        }
+    }
     return ZUN_SUCCESS;
 }
 
 void Player::CutChain()
 {
-    g_Chain.Cut(g_PlayerCalcChain);
-    g_PlayerCalcChain = NULL;
-    g_Chain.Cut(g_PlayerDrawChainHighPrio);
-    g_PlayerDrawChainHighPrio = NULL;
-    g_Chain.Cut(g_PlayerDrawChainLowPrio);
-    g_PlayerDrawChainLowPrio = NULL;
+    g_Chain.Cut(g_Player.calcChain);
+    g_Player.calcChain = NULL;
+    g_Chain.Cut(g_Player.drawChainHighPrio);
+    g_Player.drawChainHighPrio = NULL;
+    g_Chain.Cut(g_Player.drawChainLowPrio);
+    g_Player.drawChainLowPrio = NULL;
 }
 
 // STUB: th08 0x44dd70

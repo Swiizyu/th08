@@ -429,9 +429,26 @@ ChainCallbackResult Supervisor::DrawLoadingVms(Supervisor *s)
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
-// STUB: th08 0x445e3d
+// FUNCTION: th08 0x445e3d
 BOOL CALLBACK Supervisor::ControllerCallback(LPCDIDEVICEOBJECTINSTANCEA lpddoi, LPVOID pvRef)
 {
+    LPDIRECTINPUTDEVICE8A controller;
+    DIPROPRANGE range;
+
+    controller = (LPDIRECTINPUTDEVICE8A)pvRef;
+    if (lpddoi->dwType & 3)
+    {
+        range.diph.dwSize = sizeof(DIPROPRANGE);
+        range.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+        range.diph.dwHow = DIPH_BYID;
+        range.diph.dwObj = lpddoi->dwType;
+        range.lMin = -1000;
+        range.lMax = 1000;
+        if (FAILED(g_Supervisor.controller->SetProperty(DIPROP_RANGE, &range.diph)))
+        {
+            return FALSE;
+        }
+    }
     return TRUE;
 }
 
@@ -752,10 +769,20 @@ ZunResult Supervisor::SetupDInput()
     return ZUN_ERROR;
 }
 
-// STUB: th08 0x446cc7
+// FUNCTION: th08 0x446cc7
 BOOL CALLBACK Supervisor::EnumGameControllersCb(LPCDIDEVICEINSTANCE pdidInstance, LPVOID pContext)
 {
-    return FALSE;
+    HRESULT result;
+
+    if (g_Supervisor.controller == NULL)
+    {
+        result = g_Supervisor.dInputIface->CreateDevice(pdidInstance->guidInstance, &g_Supervisor.controller, NULL);
+        if (FAILED(result))
+        {
+            return DIENUM_CONTINUE;
+        }
+    }
+    return DIENUM_STOP;
 }
 
 ZunResult Supervisor::DeletedCallback(Supervisor *s)
@@ -1162,9 +1189,38 @@ ZunResult Supervisor::StopAudio()
     return ZUN_SUCCESS;
 }
 
-// STUB: th08 0x4480f8
-ZunResult Supervisor::FadeOutMusic(float param_1)
+// FUNCTION: th08 0x4480f8
+ZunResult Supervisor::FadeOutMusic(float seconds)
 {
+    f32 fadeOutTime;
+
+    if (g_Supervisor.cfg.musicMode == 2)
+    {
+        if (g_Supervisor.midiOutput != NULL)
+        {
+            g_Supervisor.midiOutput->SetFadeOut((i32)(1000.0f * seconds));
+        }
+    }
+    else if (g_Supervisor.cfg.musicMode == 1)
+    {
+        if (this->framerateMultiplier == 0.0f)
+        {
+            fadeOutTime = seconds;
+        }
+        else if (this->framerateMultiplier > 1.0f)
+        {
+            fadeOutTime = seconds;
+        }
+        else
+        {
+            fadeOutTime = seconds / this->framerateMultiplier;
+        }
+        g_SoundPlayer.QueueCommand(5, (i32)fadeOutTime, "");
+    }
+    else
+    {
+        return ZUN_ERROR;
+    }
     return ZUN_SUCCESS;
 }
 

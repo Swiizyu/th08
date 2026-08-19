@@ -54,7 +54,7 @@ struct GameManager
 
     static ZunBool ShouldPauseMusicInSpellPractice(i32 spellcardNumber);
     static i32 GetSongNameSpriteIdx(i32 spellcardNumber);
-    ZunBool IsWithinPlayfield();
+    ZunBool IsWithinPlayfield(f32 x, f32 y, f32 width, f32 height);
     i32 CalcAntiTamperChecksum();
     static i32 CalcChecksum(u8 *address, i32 size);
     void CollectExtend();
@@ -138,7 +138,7 @@ struct GameManager
 
     void IncreaseSubrank(int amount);
     void DecreaseSubrank(int amount);
-    void AddToYoukaiGauge(u16 param_1, i32 param_2);
+    void AddToYoukaiGauge(i32 amount, i32 force);
 
     ZunBool IsPhantasmUnlocked();
     ZunBool IsReplayPractice();

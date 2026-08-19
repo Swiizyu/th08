@@ -20,6 +20,14 @@ struct VertexDiffuseXyzrhw
     D3DCOLOR diffuse;
 };
 
+struct VertexTex1Xyzrhw
+{
+    Float3 pos;
+    f32 w;
+    Float2 textureUV;
+};
+C_ASSERT(sizeof(VertexTex1Xyzrhw) == 0x18);
+
 struct VertexTex1DiffuseXyzrhw
 {
     Float3 pos;
@@ -539,6 +547,7 @@ struct AnmManager
     ZunResult DrawNoRotationNoRound(AnmVm *vm);
     void TransformVerticesWorld(AnmVm *vm);
     ZunResult DrawWorld(AnmVm *vm);
+    void DrawPlayerBullet(AnmVm *vm);
     ZunResult DrawTriangleFan(AnmVm *vm, VertexDiffuseXyzrhw *vertices, i32 vertexCount);
     ZunResult CreateTextureFromFile(IDirect3DTexture8 **outTexture, i32 format, i32 colorKey);
     ZunResult CreateTextureFromAnm(IDirect3DTexture8 **outTexture, AnmTextureHeader *textureData, i32 format);

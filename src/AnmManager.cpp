@@ -12,6 +12,7 @@ namespace th08
 {
 DIFFABLE_STATIC(AnmManager *, g_AnmManager);
 DIFFABLE_STATIC_ARRAY(VertexTex1DiffuseXyzrhw, 4, g_QuadVertices);
+DIFFABLE_STATIC_ARRAY(VertexTex1Xyzrhw, 4, g_BackgroundQuadVertices);
 
 // FUNCTION: th08 0x4067c0
 AnmVmBase::AnmVmBase()
@@ -36,6 +37,32 @@ ZunResult AnmManager::FUN_00464070(AnmVm *vm)
 
     this->TransformVerticesWorld(vm);
     return this->DrawInner(vm, 0);
+}
+
+// FUNCTION: th08 0x45e960
+void AnmManager::DrawPlayerBullet(AnmVm *vm)
+{
+    switch (*(i32 *)((u8 *)vm + 0x200))
+    {
+    case 0:
+        this->DrawNoRotation(vm);
+        break;
+    case 1:
+        this->DrawNoRotationNoRound(vm);
+        break;
+    case 2:
+        this->Draw2D(vm);
+        break;
+    case 3:
+        this->Draw2DNoRound(vm);
+        break;
+    case 4:
+        this->DrawWorld(vm);
+        break;
+    case 5:
+        this->FUN_00464070(vm);
+        break;
+    }
 }
 
 // FUNCTION: th08 0x40baf0
@@ -1524,12 +1551,42 @@ ZunResult AnmManager::DrawTriangleFan(AnmVm *vm, VertexDiffuseXyzrhw *vertices, 
     return ZUN_SUCCESS;
 }
 
-// STUB: th08 0x465070
+// FUNCTION: th08 0x465070
 AnmManager::AnmManager()
 {
     memset((void *)this, 0, sizeof(AnmManager));
 
+    g_BackgroundQuadVertices[0].w = g_BackgroundQuadVertices[1].w = g_BackgroundQuadVertices[2].w =
+        g_BackgroundQuadVertices[3].w = 1.0f;
+    g_BackgroundQuadVertices[0].textureUV.x = 0.0f;
+    g_BackgroundQuadVertices[0].textureUV.y = 0.0f;
+    g_BackgroundQuadVertices[1].textureUV.x = 1.0f;
+    g_BackgroundQuadVertices[1].textureUV.y = 0.0f;
+    g_BackgroundQuadVertices[2].textureUV.x = 0.0f;
+    g_BackgroundQuadVertices[2].textureUV.y = 1.0f;
+    g_BackgroundQuadVertices[3].textureUV.x = 1.0f;
+    g_BackgroundQuadVertices[3].textureUV.y = 1.0f;
+
     g_QuadVertices[0].w = g_QuadVertices[1].w = g_QuadVertices[2].w = g_QuadVertices[3].w = 1.0f;
+    g_QuadVertices[0].textureUV.x = 0.0f;
+    g_QuadVertices[0].textureUV.y = 0.0f;
+    g_QuadVertices[1].textureUV.x = 1.0f;
+    g_QuadVertices[1].textureUV.y = 0.0f;
+    g_QuadVertices[2].textureUV.x = 0.0f;
+    g_QuadVertices[2].textureUV.y = 1.0f;
+    g_QuadVertices[3].textureUV.x = 1.0f;
+    g_QuadVertices[3].textureUV.y = 1.0f;
+
+    this->quadVertexBuffer = NULL;
+    this->currentTexture = NULL;
+    this->currentBlendMode = 0;
+    this->currentColorOp = 0;
+    *(i32 *)this->unk0x24b8 = 1;
+    this->currentVertexShader = 0;
+    this->cameraMode = 0xff;
+    this->disableZWrite = 0;
+    this->captureAnmIdx = -1;
+    this->captureSurfaceIdx = -1;
 }
 
 // STUB: th08 0x465250
@@ -1555,10 +1612,18 @@ static i32 GetAnmFormat(i32 format)
     return format;
 }
 
-// STUB: th08 0x465570
+// FUNCTION: th08 0x465570
 ZunResult AnmManager::CreateTextureFromFile(IDirect3DTexture8 **outTexture, i32 format, i32 colorKey)
 {
-    return ZUN_ERROR;
+    format = GetAnmFormat(format);
+    if (D3DXCreateTextureFromFileInMemoryEx(g_Supervisor.d3dDevice, ((AnmEntry *)outTexture)->rawData,
+                                            ((AnmEntry *)outTexture)->size, 0, 0, 0, 0,
+                                            g_TextureFormatD3D8Mapping[format], D3DPOOL_MANAGED, 3, -1, colorKey,
+                                            NULL, NULL, outTexture) != D3D_OK)
+    {
+        return ZUN_ERROR;
+    }
+    return ZUN_SUCCESS;
 }
 
 #pragma var_order(surface, textureSurfaceLevel, header, lockedRect, currentY, textureSrc, textureDest)
@@ -1763,11 +1828,46 @@ AnmLoaded *AnmManager::PreloadAnm(i32 anmIdx, const char *filename)
     return g_Supervisor.subthreadCloseRequestActive ? NULL : anmLoaded;
 }
 
-// STUB: th08 0x465ac0
+// FUNCTION: th08 0x465ac0
+#pragma var_order(result, startOfEntry, path, fileSize, data)
 i32 AnmManager::LoadExternalTextureData(AnmLoaded *anmLoaded, i32 entryNumber, i32 *sprites, i32 *scripts,
                                         AnmRawEntry *rawEntry)
 {
-    return 0;
+    i32 result;
+    AnmRawEntry *startOfEntry;
+    char *path;
+    i32 fileSize;
+    u8 *data;
+
+    result = 0;
+    if (rawEntry == NULL)
+    {
+        g_GameErrorContext.Fatal(TH_ERR_ANMMANAGER_ANIMATION_CORRUPTED);
+        return ZUN_ERROR;
+    }
+
+    startOfEntry = rawEntry;
+    if (startOfEntry->version != 3)
+    {
+        g_GameErrorContext.Fatal(TH_ERR_ANMMANAGER_ANIMATION_WRONG_VERSION);
+        return ZUN_ERROR;
+    }
+    if (!startOfEntry->hasData)
+    {
+        path = (char *)startOfEntry + startOfEntry->nameOffset;
+        if (path[0] != '@')
+        {
+            data = FileSystem::OpenFile(path, &fileSize, TRUE);
+            if (data == NULL)
+            {
+                g_GameErrorContext.Fatal(TH_ERR_ANMMANAGER_EXTERN_TEXTURE_CORRUPTED, path);
+                return ZUN_ERROR;
+            }
+            anmLoaded->textures[entryNumber].size = fileSize;
+            anmLoaded->textures[entryNumber].rawData = data;
+        }
+    }
+    return result + 1;
 }
 
 #pragma var_order(currentEntryNumber, currentNumSprites, entryLoadNumber, data, result, currentNumScripts, rawEntry)

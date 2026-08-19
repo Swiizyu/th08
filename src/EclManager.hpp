@@ -74,6 +74,10 @@ struct EclManager
     EclTimelineHeader *timelineFile;
     void *unknown;
     EclManagerSub sub;
+    u8 unknown0x168[0x20];
 };
+C_ASSERT(sizeof(EclManager) == 0x188);
+
+DIFFABLE_EXTERN(EclManager, g_EclManager);
 
 } /* namespace th08 */

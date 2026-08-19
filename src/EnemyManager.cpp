@@ -7,7 +7,10 @@
 #include "EclManager.hpp"
 #include "Spellcard.hpp"
 #include "ScreenEffect.hpp"
+#include "ItemManager.hpp"
 #include "Player.hpp"
+
+u32 FUN_004338c0();
 
 namespace th08
 {
@@ -15,6 +18,8 @@ namespace th08
 u32 IsDisableResourceReload();
 
 DIFFABLE_STATIC(EnemyManager, g_EnemyManager);
+DIFFABLE_STATIC(EclManager, g_EclManager);
+DIFFABLE_STATIC(i32, g_EnemyManagerUnknown);
 DIFFABLE_STATIC(EffectManager, g_EffectManager);
 DIFFABLE_STATIC(ChainElem, g_EffectManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_EffectManagerDrawChain);
@@ -631,6 +636,27 @@ void Enemy::FUN_0042bc50()
     *(i32 *)((u8 *)this + 0xfc) = 0;
 }
 
+// FUNCTION: th08 0x42b2f0
+void Enemy::FUN_0042b2f0()
+{
+    if (this->FUN_0041fd20())
+    {
+        *(Enemy **)(*(u8 **)((u8 *)this + 4) + 8) = *(Enemy **)((u8 *)this + 8);
+        if (*(Enemy **)((u8 *)this + 8) != NULL)
+        {
+            *(Enemy **)(*(u8 **)((u8 *)this + 8) + 4) = *(Enemy **)((u8 *)this + 4);
+        }
+        *(i32 *)((u8 *)this + 0x2da4) = 0;
+        *(Enemy **)((u8 *)this + 8) = NULL;
+        *(Enemy **)((u8 *)this + 4) = NULL;
+    }
+    else
+    {
+        *(Enemy **)((u8 *)this + 4) = NULL;
+        *(Enemy **)((u8 *)this + 8) = NULL;
+    }
+}
+
 // FUNCTION: th08 0x42bc90
 void Enemy::FUN_0042bc90()
 {
@@ -663,21 +689,135 @@ void Enemy::FUN_0042a820()
     *(i32 *)((u8 *)this + 0x53c0) = 0;
 }
 
-// STUB: th08 0x41fd40
+// FUNCTION: th08 0x41fd40
 i32 Enemy::GetFamiliarCount()
 {
-    return 0;
+    Enemy *enemy;
+    i32 count;
+
+    enemy = this;
+    count = 0;
+    if (this->FUN_0041f000())
+    {
+        while (*(Enemy **)((u8 *)enemy + 8) != NULL)
+        {
+            enemy = *(Enemy **)((u8 *)enemy + 8);
+            count++;
+        }
+    }
+    return count;
 }
 
-// STUB: th08 0x429e00
+// FUNCTION: th08 0x429e00
+#pragma var_order(i, enemy)
 void EnemyManager::Initialize()
 {
+    Enemy *enemy;
+    i32 i;
+
+    enemy = &this->enemies[0];
+    memset(this, 0, sizeof(EnemyManager));
+    for (i = 0; (u32)i < 4; i++)
+    {
+        *(i32 *)((u8 *)this + 0x9dcefc + i * 4) = -1;
+    }
+
+    enemy = &this->enemyTemplate;
+    memset(enemy, 0, sizeof(Enemy));
+    for (i = 0; i < 2; i++)
+    {
+        *(i16 *)((u8 *)enemy + 0x4ca + i * sizeof(AnmVm)) = -1;
+    }
+    for (i = 0; i < 0x60; i++)
+    {
+        *(f32 *)((u8 *)enemy + 0x3394 + i * sizeof(EnemyUnkStruct0x1c)) = -999.0f;
+    }
+
+    *(u32 *)((u8 *)enemy + 0x3324) |= 1;
+    enemy->timer0x2e14 = 0;
+    *(u32 *)((u8 *)enemy + 0x3324) &= 0xfeffffff;
+    enemy->position0x2d70 = Float3(24.0f, 24.0f, 24.0f);
+    enemy->position0x2d4c = Float3(0.0f, 0.0f, 0.0f);
+    *(i32 *)((u8 *)enemy + 0x2d98) = 0;
+    *(i32 *)((u8 *)enemy + 0x2d94) = 0;
+    *(i32 *)((u8 *)enemy + 0x2dac) = 0;
+    *(i32 *)((u8 *)enemy + 0x2da8) = 0;
+    *(u32 *)((u8 *)enemy + 0x3324) &= 0xffffcfff;
+    *(u32 *)((u8 *)enemy + 0x3324) &= 0xfffdffff;
+    *(u32 *)((u8 *)enemy + 0x3324) &= 0xfffbffff;
+    *(u32 *)((u8 *)enemy + 0x3324) &= 0xfffffffd;
+    *(i16 *)((u8 *)enemy + 0x2cea) = 0;
+    *(i32 *)((u8 *)enemy + 0x2dfc) = 1;
+    *(i32 *)((u8 *)enemy + 0x2e08) = 100;
+    *(u8 *)((u8 *)enemy + 0x3310) = 0;
+    *(u8 *)((u8 *)enemy + 0x3311) = 0;
+    *(u8 *)((u8 *)enemy + 0x3312) = 0;
+    *(i32 *)((u8 *)enemy + 0x3060) = 0;
+    enemy->timer0x3064 = 0;
+    enemy->position0x2db8 = Float3(0.0f, 0.0f, 0.0f);
+    *(i16 *)((u8 *)enemy + 0x3338) = -1;
+    *(i16 *)((u8 *)enemy + 0x333a) = -1;
+    *(i16 *)((u8 *)enemy + 0x3332) = -1;
+    *(u32 *)((u8 *)enemy + 0x3324) |= 4;
+    *(u32 *)((u8 *)enemy + 0x3324) |= 8;
+    *(u32 *)((u8 *)enemy + 0x3324) &= 0xffffffef;
+    *(u32 *)((u8 *)enemy + 0x3324) |= 0x40;
+    *(u32 *)((u8 *)enemy + 0x3324) &= 0xffffff7f;
+    *(u32 *)((u8 *)enemy + 0x3324) &= 0xff8fffff;
+    *(i16 *)((u8 *)enemy + 0x2cee) = -1;
+    *(u32 *)((u8 *)enemy + 0x3324) &= 0xfff7ffff;
+    *(i32 *)((u8 *)enemy + 0x53c0) = 0;
+    *(i16 *)((u8 *)enemy + 0x2d30) = -1;
+    for (i = 0; i < 4; i++)
+    {
+        *(i32 *)((u8 *)enemy + 0x3358 + i * 4) = -1;
+    }
+    *(i32 *)((u8 *)enemy + 0x3378) = -1;
+    *(i32 *)((u8 *)enemy + 0x3300) = 0;
+    *(u8 *)((u8 *)enemy + 0x3314) = 0;
+    *(u32 *)((u8 *)enemy + 0x3324) &= 0xfdffffff;
+    *(f32 *)((u8 *)enemy + 0x2dec) = -0.15f;
+    *(f32 *)((u8 *)enemy + 0x2df0) = 0.15f;
+    *(i32 *)((u8 *)enemy + 0x3024) = 7;
+    *(i32 *)((u8 *)enemy + 0x3028) = 25;
+    *(f32 *)((u8 *)enemy + 0x3350) = 1024.0f;
+    *(i32 *)((u8 *)enemy + 0x2e10) = g_EnemyManagerUnknown;
 }
 
-// STUB: th08 0x42c590
+// FUNCTION: th08 0x42c590
+#pragma var_order(result, enemyManager)
 ZunResult EnemyManager::RegisterChain()
 {
-    return ZUN_ERROR;
+    EnemyManager *enemyManager;
+    ZunResult result;
+
+    enemyManager = &g_EnemyManager;
+    result = ZUN_SUCCESS;
+    enemyManager->Initialize();
+
+    g_EnemyManagerCalcChain.SetCallback((ChainCallback)EnemyManager::OnUpdate);
+    g_EnemyManagerCalcChain.addedCallback = (ChainLifetimeCallback)EnemyManager::AddedCallback;
+    g_EnemyManagerCalcChain.deletedCallback = (ChainLifetimeCallback)EnemyManager::DeletedCallback;
+    g_EnemyManagerCalcChain.arg = enemyManager;
+    if (g_Chain.AddToCalcChain(&g_EnemyManagerCalcChain, 11) != ZUN_SUCCESS)
+    {
+        return ZUN_ERROR;
+    }
+
+    g_EnemyManagerDrawChainHighPrio.SetCallback((ChainCallback)EnemyManager::OnDrawHighPrio);
+    g_EnemyManagerDrawChainHighPrio.arg = enemyManager;
+    if (g_Chain.AddToDrawChain(&g_EnemyManagerDrawChainHighPrio, 8) != ZUN_SUCCESS)
+    {
+        return ZUN_ERROR;
+    }
+
+    g_EnemyManagerDrawChainLowPrio.SetCallback((ChainCallback)EnemyManager::OnDrawLowPrio);
+    g_EnemyManagerDrawChainLowPrio.arg = enemyManager;
+    if (g_Chain.AddToDrawChain(&g_EnemyManagerDrawChainLowPrio, 11) != ZUN_SUCCESS)
+    {
+        return ZUN_ERROR;
+    }
+    return ZUN_SUCCESS;
 }
 
 // STUB: th08 0x42c660
@@ -686,22 +826,33 @@ ChainCallbackResult EnemyManager::OnUpdate()
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
-// STUB: th08 0x42e120
+// FUNCTION: th08 0x42e120
 ChainCallbackResult EnemyManager::OnDrawHighPrio(EnemyManager *enemyManager)
 {
-    return CHAIN_CALLBACK_RESULT_CONTINUE;
+    return enemyManager->OnDrawImpl(0, 2);
 }
 
 // STUB: th08 0x42e140
-ChainCallbackResult EnemyManager::OnDrawImpl()
+ChainCallbackResult EnemyManager::OnDrawImpl(i32 firstLayer, i32 lastLayer)
 {
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
-// STUB: th08 0x42eb90
+// FUNCTION: th08 0x42eb90
 ChainCallbackResult EnemyManager::OnDrawLowPrio(EnemyManager *enemyManager)
 {
-    return CHAIN_CALLBACK_RESULT_CONTINUE;
+    ChainCallbackResult result;
+
+    if (g_GameManager.flags.unk10)
+    {
+        g_AnmManager->SetMixColor(0xfff01010);
+    }
+    result = enemyManager->OnDrawImpl(2, 4);
+    if (g_GameManager.flags.unk10)
+    {
+        g_AnmManager->SetMixColorDefault();
+    }
+    return result;
 }
 
 // STUB: th08 0x42ebf0
@@ -710,21 +861,115 @@ ZunResult EnemyManager::AddedCallback(EnemyManager *enemyManager)
     return ZUN_ERROR;
 }
 
-// STUB: th08 0x42ee80
+// FUNCTION: th08 0x42ee80
+#pragma var_order(i, enemy, position)
 ZunResult EnemyManager::DeletedCallback(EnemyManager *enemyManager)
 {
-    return ZUN_ERROR;
+    Enemy *enemy;
+    i32 i;
+
+    enemy = &enemyManager->enemies[0];
+    for (i = 0; i < 0x1e0; i++, enemy++)
+    {
+        enemy->FUN_0042bc90();
+    }
+    if (!IsDisableResourceReload())
+    {
+        g_AnmManager->ReleaseAnm(8);
+    }
+    if (::FUN_004338c0())
+    {
+        g_AnmManager->ReleaseAnm(7);
+    }
+    if (!IsDisableResourceReload())
+    {
+        g_EclManager.FUN_00418420();
+    }
+
+    Float3 position = Float3(-999.0f, -999.0f, -999.0f);
+    g_AsciiManager.SetBossMarkerPosition(0, &position);
+    g_AsciiManager.SetBossMarkerPosition(1, &position);
+    g_AsciiManager.SetBossMarkerPosition(2, &position);
+    g_AsciiManager.SetBossMarkerPosition(3, &position);
+    return ZUN_SUCCESS;
 }
 
-// STUB: th08 0x42ef70
+// FUNCTION: th08 0x42ef70
 void EnemyManager::CutChain()
 {
+    g_Chain.Cut(&g_EnemyManagerCalcChain);
+    g_Chain.Cut(&g_EnemyManagerDrawChainHighPrio);
+    g_Chain.Cut(&g_EnemyManagerDrawChainLowPrio);
 }
 
-// STUB: th08 0x42efb0
-i32 EnemyManager::DespawnAllEnemies(i32 param_1, i32 param_2)
+// FUNCTION: th08 0x42efb0
+#pragma var_order(score, total, enemy, i, j)
+i32 EnemyManager::DespawnAllEnemies(i32 maximumScore, i32 initialTotal)
 {
-    return 0;
+    Enemy *enemy;
+    i32 total;
+    i32 score;
+    i32 i;
+    i32 j;
+
+    enemy = &this->enemies[0];
+    total = initialTotal;
+    score = 2000;
+    for (i = 0; i < 0x1e0; i++, enemy++)
+    {
+        if ((*(u32 *)((u8 *)enemy + 0x3324) & 1) == 0)
+        {
+            continue;
+        }
+        if ((*(u32 *)((u8 *)enemy + 0x3324) >> 1 & 1) != 0)
+        {
+            continue;
+        }
+        if ((*(u32 *)((u8 *)enemy + 0x3328) >> 6 & 1) != 0)
+        {
+            continue;
+        }
+
+        *(i32 *)((u8 *)enemy + 0x2dfc) = 0;
+        if ((*(u32 *)((u8 *)enemy + 0x3324) >> 7 & 1) != 0)
+        {
+            enemy->position0x2d88 = enemy->position0x2d34 + enemy->position0x2d40;
+            g_ItemManager.SpawnItem(&enemy->position0x2d88, ITEM_POINT_STAR, 1);
+            g_AsciiManager.CreateScorePopup(&enemy->position0x2d88, score,
+                                            score >= maximumScore ? 0xffffff00 : 0xffffffff);
+            total += score;
+            score += 30;
+            if (score > maximumScore)
+            {
+                score = maximumScore;
+            }
+
+            if (*(u8 *)((u8 *)enemy + 0x534c) != 0)
+            {
+                for (j = 0; j < *(i16 *)((u8 *)enemy + 0x534e); j += 6)
+                {
+                    g_ItemManager.SpawnItem(&enemy->unk0x3394[j].first, ITEM_POINT_STAR, 1);
+                    g_AsciiManager.CreateScorePopup(&enemy->unk0x3394[j].first, score,
+                                                    score >= maximumScore ? 0xffffff00 : 0xffffffff);
+                    total += score;
+                    score += 30;
+                    if (score > maximumScore)
+                    {
+                        score = maximumScore;
+                    }
+                }
+            }
+        }
+
+        enemy->FUN_0042b2f0();
+        if (*(i16 *)((u8 *)enemy + 0x2cee) >= 0)
+        {
+            g_EclManager.FUN_00418450((EclTimelineContext *)((u8 *)enemy + 0x7f8),
+                                      *(i16 *)((u8 *)enemy + 0x2cee));
+            *(i16 *)((u8 *)enemy + 0x2cee) = -1;
+        }
+    }
+    return total;
 }
 
 } /* namespace th08 */

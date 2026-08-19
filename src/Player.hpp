@@ -115,6 +115,8 @@ struct Player
     ZunBool FUN_00451d50();
     void FUN_0044cba0();
     void FUN_0044d150();
+    void FUN_004512f0();
+    void FUN_00451400();
     void FUN_00451640();
 
     i8 playerState;           // 0x0
@@ -148,7 +150,15 @@ struct Player
 
     PlayerRawShtFile *player1ShtFile; // 0xE2A74
     PlayerRawShtFile *player2ShtFile; // 0xE2A78
+    u8 unknown0xe2a7c[0x78];
+    ZunTimer timer0xe2af4;
+    u8 unknown0xe2b00[0x10];
+    ChainElem *calcChain;
+    ChainElem *drawChainHighPrio;
+    ChainElem *drawChainLowPrio;
+    u8 unknown0xe2b1c[0x14];
 };
+C_ASSERT(sizeof(Player) == 0xe2b30);
 
 DIFFABLE_EXTERN(Player, g_Player);
 
