@@ -84,14 +84,14 @@ DIFFABLE_STATIC_ARRAY_ASSIGN(EffectTemplate, 66, g_EffectTemplates) = {
     {71, NULL, NULL},
     {76, &Effect::FUN_00427990, &Effect::FUN_004272e0},
     {81, &Effect::FUN_004279d0, &Effect::FUN_004272e0},
-    {82, NULL, &Effect::FUN_004272e0},
+    {82, &Effect::FUN_0040eb50, &Effect::FUN_004272e0},
     {83, &Effect::FUN_0040e040, &Effect::FUN_004272e0},
     {83, &Effect::FUN_0040e120, &Effect::FUN_004272e0},
     {83, &Effect::FUN_0040e200, &Effect::FUN_004272e0},
     {83, &Effect::FUN_0040e2d0, &Effect::FUN_004272e0},
     {84, &Effect::FUN_00410bb0, &Effect::FUN_004272e0},
     {72, NULL, NULL},
-    {85, NULL, &Effect::FUN_004272e0},
+    {85, &Effect::FUN_00413070, &Effect::FUN_004272e0},
     {86, &Effect::FUN_00427990, &Effect::FUN_004272e0},
     {80, &Effect::FUN_00427a60, &Effect::FUN_004272e0},
     {73, NULL, NULL},
@@ -340,6 +340,20 @@ i32 Effect::FUN_0040e2d0()
     return 1;
 }
 
+// FUNCTION: th08 0x40eb50
+i32 Effect::FUN_0040eb50()
+{
+    i32 offset;
+
+    *(u8 *)((u8 *)this + 0x356) = 1;
+    *(i32 *)((u8 *)this + 0x324) = 48;
+    *(f32 *)((u8 *)this + 0x320) = 32.0f;
+    offset = -((this->timer.AsFrames() & 1) != 0) & 8;
+    *(f32 *)((u8 *)this + 0x314) = 64.0f + (f32)offset;
+    *(i32 *)((u8 *)this + 0x318) = 0;
+    return 1;
+}
+
 // FUNCTION: th08 0x410bb0
 i32 Effect::FUN_00410bb0()
 {
@@ -347,6 +361,31 @@ i32 Effect::FUN_00410bb0()
     *(u8 *)((u8 *)this + 0x356) = 1;
     *(i32 *)((u8 *)this + 0x324) = 12;
     *(f32 *)((u8 *)this + 0x320) = 32.0f;
+    return 1;
+}
+
+// FUNCTION: th08 0x413070
+#pragma var_order(factor)
+i32 Effect::FUN_00413070()
+{
+    f32 factor;
+
+    if (this->timer == 30)
+    {
+        *(f32 *)((u8 *)this + 0x314) = 192.0f;
+        *(i32 *)((u8 *)this + 0x324) = 48;
+        *(f32 *)((u8 *)this + 0x320) = 3.0f;
+        *(f32 *)((u8 *)this + 0x32c) = 0.0001f;
+        *(f32 *)((u8 *)this + 0x330) = ZUN_PI / 2.0f;
+    }
+    else
+    {
+        factor = ((f32)this->timer - 30.0f) / 30.0f;
+        factor = factor * factor * factor;
+        *(f32 *)((u8 *)this + 0x32c) = 192.0f * factor + 0.0001f;
+        *(f32 *)((u8 *)this + 0x320) = 80.0f * factor + 3.0f;
+    }
+    *(u8 *)((u8 *)this + 0x356) = 1;
     return 1;
 }
 

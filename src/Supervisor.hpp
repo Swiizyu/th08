@@ -423,6 +423,7 @@ struct ZunTimer
         return this->current == value;
     }
 
+    i32 AsFrames();
     i32 operator%(i32 value);
     ZunBool operator!=(i32 value);
 

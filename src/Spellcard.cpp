@@ -70,6 +70,12 @@ ZunBool Spellcard::IsLastSpell(i32 spellcardNumber)
     return FALSE;
 }
 
+// FUNCTION: th08 0x40d3b0
+i32 ZunTimer::AsFrames()
+{
+    return this->current;
+}
+
 // FUNCTION: th08 0x40d410
 i32 ZunTimer::operator%(i32 value)
 {
