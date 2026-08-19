@@ -7,6 +7,7 @@
 #include "ItemManager.hpp"
 #include "SoundPlayer.hpp"
 #include "ScreenEffect.hpp"
+#include "Spellcard.hpp"
 
 u32 FUN_004338c0();
 u32 FUN_0044e0e0();
@@ -479,6 +480,51 @@ void Player::FUN_0044d180()
     }
 }
 
+// FUNCTION: th08 0x44d2c0
+void Player::FUN_0044d2c0()
+{
+    ZunTimer *timer = (ZunTimer *)((u8 *)this + 0xe2af4);
+
+    if (*(i32 *)((u8 *)this + 0xe2a70) != 0)
+    {
+        (*(i32 *)((u8 *)this + 0xe2a70))--;
+        this->FUN_0044de60((Float2 *)&this->position, 768.0f, 896.0f, -1, 0);
+    }
+    if (this->playerState == 3)
+    {
+        *(u8 *)((u8 *)this + 4) = 0;
+        Effect *effect = *(Effect **)((u8 *)this + 0xe2b1c);
+        if (effect != NULL)
+        {
+            effect->position = this->position;
+        }
+        (*timer)--;
+        if (timer->AsFrames() <= 0)
+        {
+            if (effect != NULL)
+            {
+                effect->active = 0;
+                *(Effect **)((u8 *)this + 0xe2b1c) = NULL;
+            }
+            this->playerState = PLAYER_STATE_ALIVE;
+            timer->SetCurrent(0);
+            *(i32 *)((u8 *)this + 0x200) = -1;
+        }
+        else if (timer->AsFrames() % 8 < 2)
+        {
+            *(D3DCOLOR *)((u8 *)this + 0x200) = 0xfff02020;
+        }
+        else
+        {
+            *(D3DCOLOR *)((u8 *)this + 0x200) = 0xffffffff;
+        }
+    }
+    else
+    {
+        timer->Tick();
+    }
+}
+
 // FUNCTION: th08 0x44d420
 void Player::FUN_0044d420()
 {
@@ -896,6 +942,44 @@ f32 Player::AngleToPlayer(Float3 *position)
     return atan2f(deltaY, deltaX);
 }
 
+// FUNCTION: th08 0x44e770
+#pragma var_order(delta, targetPosition)
+void __fastcall Player::FUN_0044e770(Effect *effect)
+{
+    Float3 targetPosition;
+    Float3 delta;
+
+    targetPosition = this->position;
+    targetPosition.y -= 96.0f;
+    if (targetPosition.y < 32.0f)
+    {
+        targetPosition.y = 32.0f;
+    }
+    delta = targetPosition - effect->position;
+    f32 length = delta.FUN_0040b4c0();
+    if (length != 0.0f)
+    {
+        delta *= 16.0f / length;
+    }
+    effect->velocity += (delta - effect->velocity) * 0.2f;
+    effect->position += effect->velocity;
+    if (fabsf(effect->velocity.x) <= 0.05f)
+    {
+        effect->velocity.x = 0.0f;
+    }
+    if (((ZunTimer *)((u8 *)this + 0xe2ac4))->AsFrames() >= 0 &&
+        *(void **)((u8 *)this + 0xe2abc) != NULL &&
+        ((ZunTimer *)((u8 *)effect + 0x2e0))->AsFrames() >= 10)
+    {
+        effect->vm.SetInterrupt(3);
+        *(i32 *)((u8 *)effect + 0x2cc) = 3;
+    }
+    else
+    {
+        *(void **)((u8 *)this + 0xe2abc) = NULL;
+    }
+}
+
 // FUNCTION: th08 0x44e8d0
 #pragma var_order(delta, targetPosition)
 void __fastcall Player::FUN_0044e8d0(Effect *effect)
@@ -1148,6 +1232,227 @@ i32 __fastcall Player::FUN_00450240(u8 *data, i32 frame, void *shotData)
     return 1;
 }
 
+// FUNCTION: th08 0x450320
+#pragma var_order(speed, deltaY, deltaX)
+i32 __fastcall Player::FUN_00450320(u8 *data)
+{
+    f32 deltaX;
+    f32 deltaY;
+    f32 speed;
+
+    if (*(i16 *)(data + 0x462) == 1)
+    {
+        if (*(f32 *)((u8 *)this + 0xe2aa4) >= -100.0f && ((ZunTimer *)(data + 0x454))->AsFrames() < 40)
+        {
+            deltaX = *(f32 *)((u8 *)this + 0xe2aa4) - *(f32 *)(data + 0x2a4);
+            deltaY = *(f32 *)((u8 *)this + 0xe2aa8) - *(f32 *)(data + 0x2a8);
+            speed = sqrtf(deltaX * deltaX + deltaY * deltaY) / (*(f32 *)(data + 0x44c) / 4.0f);
+            if (speed < 1.0f)
+            {
+                speed = 1.0f;
+            }
+            deltaX = deltaX / speed + *(f32 *)(data + 0x43c);
+            deltaY = deltaY / speed + *(f32 *)(data + 0x440);
+            speed = sqrtf(deltaX * deltaX + deltaY * deltaY);
+            *(f32 *)(data + 0x44c) = speed > 10.0f ? 10.0f : speed;
+            if (*(f32 *)(data + 0x44c) < 1.0f)
+            {
+                *(f32 *)(data + 0x44c) = 1.0f;
+            }
+            *(f32 *)(data + 0x43c) = deltaX * *(f32 *)(data + 0x44c) / speed;
+            *(f32 *)(data + 0x440) = deltaY * *(f32 *)(data + 0x44c) / speed;
+        }
+        else if (*(f32 *)(data + 0x44c) < 10.0f)
+        {
+            *(f32 *)(data + 0x44c) += 1.0f / 3.0f;
+            deltaX = *(f32 *)(data + 0x43c);
+            deltaY = *(f32 *)(data + 0x440);
+            speed = sqrtf(deltaX * deltaX + deltaY * deltaY);
+            *(f32 *)(data + 0x43c) = deltaX * *(f32 *)(data + 0x44c) / speed;
+            *(f32 *)(data + 0x440) = deltaY * *(f32 *)(data + 0x44c) / speed;
+        }
+    }
+    *(f32 *)(data + 0x450) = atan2f(*(f32 *)(data + 0x440), *(f32 *)(data + 0x43c));
+    return 0;
+}
+
+// FUNCTION: th08 0x4505d0
+i32 __fastcall Player::FUN_004505d0(u8 *data)
+{
+    i32 index = *(i16 *)(data + 0x466);
+    ZunTimer *slotTimer = (ZunTimer *)((u8 *)this + 0xe2a38 + index * 16);
+    void **owner = (void **)((u8 *)this + 0xe2a44 + index * 16);
+
+    if (*owner != data)
+    {
+        *(i16 *)(data + 0x1fe) = 1;
+    }
+    if (this->playerState == PLAYER_STATE_DEAD || *(i32 *)((u8 *)this + 0xfdc) != 0)
+    {
+        if (slotTimer->AsFrames() > 20)
+        {
+            slotTimer->SetCurrent(20);
+        }
+    }
+    if (slotTimer->AsFrames() <= 0)
+    {
+        slotTimer->SetCurrent(0);
+        *owner = NULL;
+        *(i16 *)(data + 0x462) = 0;
+        return 1;
+    }
+    *(f32 *)(data + 0x2a4) += *(f32 *)(data + 0x444);
+    *(f32 *)(data + 0x2ac) = 0.44f;
+    if (this->playerState == PLAYER_STATE_DEAD)
+    {
+        return 1;
+    }
+    *(f32 *)(data + 0x1c) = *(f32 *)(data + 0x2a8) / 14.0f;
+    *(f32 *)(data + 0x434) = *(f32 *)(data + 0x2a8);
+    *(f32 *)(data + 0x2a8) /= 2.0f;
+    if (g_GameManager.GaugeIsExtremelyYoukai())
+    {
+        *(u8 *)(data + 0x1f2) = 0xff;
+        *(u8 *)(data + 0x1f1) = 0xd0;
+        *(u8 *)(data + 0x1f0) = 0xb0;
+    }
+    else
+    {
+        *(D3DCOLOR *)(data + 0x1f0) = 0xffffffff;
+    }
+    return 0;
+}
+
+// FUNCTION: th08 0x450840
+#pragma var_order(i)
+i32 __fastcall Player::FUN_00450840(u8 *data)
+{
+    i32 i;
+    i32 index = *(i16 *)(data + 0x466);
+    void **owner = (void **)((u8 *)this + 0xe2a44 + index * 16);
+
+    if (*owner != data || ((ZunTimer *)((u8 *)this + 0xe2ac4))->AsFrames() < 0 ||
+        this->playerState == PLAYER_STATE_DEAD || *(i32 *)((u8 *)this + 0xfdc) != 0)
+    {
+        *(i16 *)(data + 0x1fe) = 1;
+        *owner = NULL;
+        *(void **)(data + 0x474) = NULL;
+    }
+    if (*(i32 *)((u8 *)this + 0x6d4) == 0)
+    {
+        *owner = NULL;
+        return 1;
+    }
+    for (i = 0; i < *(i16 *)(data + 0x46a); i++)
+    {
+        Float3 *trailPosition = (Float3 *)(data + 0x2b0 + i * 24);
+        if (trailPosition->x >= -900.0f)
+        {
+            u8 *hitbox = (u8 *)this->FUN_0044dfa0((Float2 *)trailPosition, 16.0f, 448.0f, 1, 0);
+            *(u8 *)(hitbox + 0x3d) = 1;
+        }
+    }
+    for (i = 31; i > 0; i--)
+    {
+        *(Float3 *)(data + 0x2b0 + i * 12) = *(Float3 *)(data + 0x2b0 + (i - 1) * 12);
+        *(f32 *)(data + 0x2b4 + i * 12) -= 1.0f;
+    }
+    *(Float3 *)(data + 0x2b0) = *(Float3 *)(data + 0x2a4);
+    *(Float3 *)(data + 0x2a4) = *(Float3 *)((u8 *)this + 0x6b0);
+    *(f32 *)(data + 0x2ac) = 0.44f;
+    *(f32 *)(data + 0x434) = 448.0f;
+    *(f32 *)(data + 0x2a8) -= 208.0f;
+    if (g_GameManager.GaugeIsExtremelyYoukai())
+    {
+        *(u8 *)(data + 0x1f2) = 0xff;
+        *(u8 *)(data + 0x1f1) = 0xd0;
+        *(u8 *)(data + 0x1f0) = 0xb0;
+    }
+    else
+    {
+        *(D3DCOLOR *)(data + 0x1f0) = 0xffffffff;
+    }
+    return 0;
+}
+
+// FUNCTION: th08 0x450ad0
+#pragma var_order(i, alpha, originalAlpha)
+i32 __fastcall Player::FUN_00450ad0(u8 *data)
+{
+    i32 originalAlpha = *(u8 *)(data + 0x1f3);
+    i32 alpha = originalAlpha * 3 / 4;
+
+    for (i32 i = 0; i < *(i16 *)(data + 0x46a) * 2; i += 2)
+    {
+        Float3 *position = (Float3 *)(data + 0x2b0 + i * 12);
+        if (position->x == -999.0f)
+        {
+            break;
+        }
+        ((AnmVm *)data)->pos = *position;
+        if (i != 0)
+        {
+            *(u8 *)(data + 0x1f3) = (u8)(alpha - (alpha / 2) * i / *(i16 *)(data + 0x46a));
+        }
+        ((AnmVm *)data)->pos.x += g_GameManager.arcadeRegionTopLeftPos.x;
+        ((AnmVm *)data)->pos.y += g_GameManager.arcadeRegionTopLeftPos.y;
+        if (g_GameManager.GaugeIsExtremelyYoukai())
+        {
+            *(u8 *)(data + 0x1f2) = 0xff;
+            *(u8 *)(data + 0x1f1) = 0x40;
+            *(u8 *)(data + 0x1f0) = 0x40;
+        }
+        g_AnmManager->Draw2D((AnmVm *)data);
+    }
+    *(u8 *)(data + 0x1f3) = (u8)originalAlpha;
+    return 0;
+}
+
+// FUNCTION: th08 0x450c50
+i32 __fastcall Player::FUN_00450c50(u8 *data, Float3 *position)
+{
+    if (*(i16 *)(data + 0x462) == 2)
+    {
+        if (((ZunTimer *)(data + 0x454))->AsFrames() % 2 != 0)
+        {
+            return 1;
+        }
+        if (g_Spellcard.IsActive() && ((ZunTimer *)(data + 0x454))->AsFrames() % 4 != 0)
+        {
+            return 1;
+        }
+        *(i16 *)(data + 0x460) /= 3;
+        if (*(i16 *)(data + 0x460) == 0)
+        {
+            *(i16 *)(data + 0x460) = 1;
+        }
+        *(f32 *)(data + 0x43c) *= 0.88f;
+        *(f32 *)(data + 0x440) *= 0.88f;
+    }
+    else
+    {
+        f32 angle = g_Rng.GetRandomF32InRange(3.1415927f / 2.0f) - 2.3561945f;
+        i32 script = *(i16 *)(data + 0x21a);
+        f32 size = 0.0f;
+        if (script == 12) size = 48.0f;
+        if (script == 14) size = 64.0f;
+        if (script == 16) size = 80.0f;
+        if (script == 18) size = 96.0f;
+        if (script == 20) size = 128.0f;
+        if (size != 0.0f)
+        {
+            *(f32 *)(data + 0x430) = size;
+            *(f32 *)(data + 0x434) = size;
+            ((Float3 *)(data + 0x43c))->FromAngleMagnitude(angle, 6.0f);
+        }
+    }
+    if (((ZunTimer *)(data + 0x454))->AsFrames() % 6 == 0)
+    {
+        g_EffectManager.SpawnEffect(5, position, 1, -1);
+    }
+    return 0;
+}
+
 // FUNCTION: th08 0x450ee0
 #pragma var_order(spawnPosition)
 i32 __fastcall Player::FUN_00450ee0(Effect *effect, Float3 *position)
@@ -1237,6 +1542,31 @@ void Player::FUN_00451400()
         }
         g_AnmManager->DrawPlayerBullet((AnmVm *)data);
     }
+}
+
+// FUNCTION: th08 0x451500
+i32 Player::FUN_00451500()
+{
+    ZunTimer *timer = (ZunTimer *)((u8 *)this + 0xe2ac4);
+
+    if (*(i32 *)((u8 *)&g_GameManager + 0x3ddc0) < 20 || timer->AsFrames() < 0 || this->FUN_00451d50())
+    {
+        return 0;
+    }
+    timer->Tick();
+    if (timer->AsFrames() >= 20)
+    {
+        timer->SetCurrent(-1);
+    }
+    if ((g_CurFrameInput & 1) != 0 && timer->AsFrames() < 0)
+    {
+        timer->SetCurrent(0);
+    }
+    if (this->playerState == PLAYER_STATE_DEAD || this->playerState == PLAYER_STATE_SPAWNING)
+    {
+        timer->SetCurrent(-1);
+    }
+    return 0;
 }
 
 // FUNCTION: th08 0x44c230
