@@ -89,6 +89,7 @@ struct Enemy
     void FUN_0041f040(i32 x, i32 y, i32 z);
     void FUN_0041f0b0(i32 value);
     void FUN_0041f0e0(i32 value);
+    void FUN_00421de0(i16 a, i16 b, i16 c, i16 d, i16 e, i16 f);
     ZunBool FUN_0041fd20();
     ZunBool FUN_0041fd90();
     void FUN_0042b2f0();

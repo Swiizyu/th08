@@ -117,6 +117,9 @@ struct Player
     void __fastcall FUN_0040bc60(D3DCOLOR color);
     void __fastcall FUN_0040be30(i32 arg0, i32 arg1, i32 arg2, i32 duration, i32 arg4);
     void FUN_0040bf00();
+    void FUN_0040c820();
+    void FUN_00410300();
+    void FUN_00410ac0();
     void FUN_0040d310();
     void FUN_0040d950();
     void FUN_0040f550();
@@ -136,10 +139,14 @@ struct Player
     void FUN_0044cba0();
     void FUN_0044c5b0();
     void FUN_0044d150();
+    void FUN_0044d180();
+    void FUN_0044d420();
     void *FUN_0044de60(Float2 *position, f32 width, f32 height, i32 arg4, i32 arg5);
     void *FUN_0044df00(Float2 *position, f32 arg2, f32 arg3, i32 arg4, i32 arg5);
     void *FUN_0044dfa0(Float2 *position, f32 width, f32 height, i32 arg4, i32 arg5);
     void *FUN_0044e040(Float2 *position, f32 arg2, f32 arg3, i32 arg4, i32 arg5);
+    void __fastcall FUN_0044e8d0(Effect *effect);
+    i32 __fastcall FUN_0044ea40(PlayerUnkStruct0x2ec *data);
     i32 __fastcall FUN_00450ee0(Effect *effect, Float3 *position);
     void FUN_004512f0();
     void FUN_00451400();

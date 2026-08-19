@@ -2006,6 +2006,18 @@ void Enemy::FUN_0041f0e0(i32 value)
     ((EnemyFlags *)this)->flag11 = value;
 }
 
+// FUNCTION: th08 0x421de0
+void Enemy::FUN_00421de0(i16 a, i16 b, i16 c, i16 d, i16 e, i16 f)
+{
+    *(i16 *)((u8 *)this + 0x3332) = a;
+    *(i16 *)((u8 *)this + 0x3338) = b;
+    *(i16 *)((u8 *)this + 0x333a) = c;
+    *(i16 *)((u8 *)this + 0x3334) = d;
+    *(i16 *)((u8 *)this + 0x3336) = e;
+    *(i16 *)((u8 *)this + 0x333c) = f;
+    *(u8 *)((u8 *)this + 0x332e) = 0xff;
+}
+
 // FUNCTION: th08 0x41fd20
 ZunBool Enemy::FUN_0041fd20()
 {
