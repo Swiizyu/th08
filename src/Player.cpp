@@ -179,6 +179,38 @@ struct PlayerCollisionObject
 };
 C_ASSERT(sizeof(PlayerCollisionObject) == 0x40);
 
+// FUNCTION: th08 0x44a5a0
+#pragma var_order(maxPosition, minPosition)
+i32 Player::CalcItemBoxCollision(Float3 *position, Float3 *hitbox)
+{
+    Float3 minPosition;
+    Float3 maxPosition;
+
+    if (this->playerState != 0 && this->playerState != 3 && this->playerState != 4)
+    {
+        return 0;
+    }
+    minPosition = *position - *hitbox / 2.0f;
+    maxPosition = *position + *hitbox / 2.0f;
+    if (*(f32 *)((u8 *)this + 0x3bc) >= maxPosition.x)
+    {
+        return 0;
+    }
+    if (*(f32 *)((u8 *)this + 0x3c8) <= minPosition.x)
+    {
+        return 0;
+    }
+    if (*(f32 *)((u8 *)this + 0x3c0) >= maxPosition.y)
+    {
+        return 0;
+    }
+    if (*(f32 *)((u8 *)this + 0x3cc) <= minPosition.y)
+    {
+        return 0;
+    }
+    return 1;
+}
+
 // FUNCTION: th08 0x449ff0
 #pragma var_order(halfSize, deltaY, deltaX, i, rotated, delta, collision, rectMax)
 i32 Player::FUN_00449ff0(Float3 *position, Float3 *hitbox)

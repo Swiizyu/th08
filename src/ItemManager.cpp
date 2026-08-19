@@ -7,6 +7,7 @@
 #include "Gui.hpp"
 #include "ItemManager.hpp"
 #include "Player.hpp"
+#include "ReplayManager.hpp"
 #include "SoundPlayer.hpp"
 #include "Spellcard.hpp"
 
@@ -169,10 +170,166 @@ void ItemManager::UpdatePointItemExtendThreshold()
     }
 }
 
-// STUB: th08 0x440500
+// FUNCTION: th08 0x440500
+#pragma var_order(itemType, next, angle, itemTimer, collectSpeed, item, hitbox, soundIdx)
 void ItemManager::OnUpdate()
 {
-    // TODO: NEEDS WORK ON Gui
+    i32 soundIdx;
+    Float3 hitbox;
+    Item *item;
+    f32 collectSpeed;
+    f32 itemTimer;
+    f32 angle;
+    Item *next;
+    i32 itemType;
+
+    soundIdx = 0;
+    item = this->itemListHead.next;
+    hitbox = Float3(16.0f, 16.0f, 16.0f);
+    this->itemCount = 0;
+    collectSpeed = 8.0f * g_Supervisor.framerateMultiplier;
+    while (item != NULL)
+    {
+        this->itemCount++;
+        next = item->next;
+        if (item->state == ITEM_STATE_UNK2)
+        {
+            if (item->timer < 60)
+            {
+                itemTimer = (f32)item->timer / 60.0f;
+                item->currentPosition = item->targetPosition * itemTimer +
+                                        item->startPositionOrVelocity * (1.0f - itemTimer);
+                goto check_collision;
+            }
+            if (item->timer >= 60)
+            {
+                item->startPositionOrVelocity = Float3(0.0f, 0.0f, 0.0f);
+                item->state = ITEM_STATE_DEFAULT;
+            }
+        }
+        else if (item->state == ITEM_STATE_UNK3 || item->state == ITEM_STATE_UNK5)
+        {
+            item->startPositionOrVelocity.y += 0.03f * g_Supervisor.framerateMultiplier;
+            if (item->startPositionOrVelocity.y >= 3.0f || item->timer == 0)
+            {
+                item->state = ITEM_STATE_AUTOCOLLECT;
+            }
+            if (g_Player.playerState == PLAYER_STATE_DEAD)
+            {
+                item->state = ITEM_STATE_DEFAULT;
+                item->startPositionOrVelocity = Float3(0.0f, -0.7f, 0.0f);
+            }
+        }
+        else if (item->state == ITEM_STATE_AUTOCOLLECT)
+        {
+            if (g_Player.playerState != PLAYER_STATE_DEAD)
+            {
+                angle = atan2f(g_Player.position.y - item->currentPosition.y,
+                               g_Player.position.x - item->currentPosition.x);
+                item->startPositionOrVelocity.FromAngleMagnitude(angle, collectSpeed);
+            }
+            else
+            {
+                item->startPositionOrVelocity = Float3(0.0f, -0.7f, 0.0f);
+                item->state = ITEM_STATE_DEFAULT;
+            }
+        }
+        else
+        {
+            item->startPositionOrVelocity.x = 0.0f;
+            item->startPositionOrVelocity.z = 0.0f;
+            if (item->startPositionOrVelocity.y < -2.2f)
+            {
+                item->startPositionOrVelocity.y = -2.2f;
+            }
+        }
+
+        item->currentPosition += item->startPositionOrVelocity * g_Supervisor.framerateMultiplier;
+        if (item->state == ITEM_STATE_DEFAULT &&
+            item->currentPosition.y >= g_GameManager.arcadeRegionSize.y + 16.0f)
+        {
+            g_GameManager.DecreaseSubrank(3);
+            item->Delete();
+            item = next;
+            continue;
+        }
+        if (item->startPositionOrVelocity.y < 3.0f)
+        {
+            item->startPositionOrVelocity.y += 0.03f * g_Supervisor.framerateMultiplier;
+        }
+        else
+        {
+            item->startPositionOrVelocity.y = 3.0f;
+        }
+
+check_collision:
+        if (item->state != ITEM_STATE_UNK3 && g_Player.CalcItemBoxCollision(&item->currentPosition, &hitbox))
+        {
+            if (g_ReplayManager != NULL)
+            {
+                g_ReplayManager->inputFlags |= 0x40;
+            }
+            itemType = item->itemType;
+            switch (itemType)
+            {
+            case ITEM_POWER_SMALL:
+                item->CollectPowerSmall();
+                break;
+            case ITEM_POINT:
+                item->CollectPoint();
+                break;
+            case ITEM_POWER_BIG:
+                item->CollectPowerBig();
+                break;
+            case ITEM_BOMB:
+                if (g_GameManager.GetBombsRemaining() < 8)
+                {
+                    g_GameManager.AddToBombCount(1);
+                }
+                g_GameManager.IncreaseSubrank(5);
+                break;
+            case ITEM_POWER_FULL:
+                if (g_GameManager.GetPower() < 128)
+                {
+                    g_BulletManager.FUN_00415c60();
+                    g_Gui.ShowPopupText(0, 1);
+                    g_ItemManager.ConvertAllPowerItemsToTimeOrbs(item);
+                }
+                g_GameManager.SetPower(128);
+                g_GameManager.AddScore(1000);
+                break;
+            case ITEM_EXTEND:
+                g_GameManager.CollectExtend();
+                break;
+            case ITEM_POINT_STAR:
+                g_GameManager.AddScore(100);
+                break;
+            case ITEM_TIME:
+                item->CollectTimeOrb();
+                break;
+            case ITEM_POINT_SMALL:
+                item->CollectPointSmall();
+                break;
+            }
+            if (soundIdx <= 0x15)
+            {
+                soundIdx = item->isMaxValue ? 0x2c : 0x15;
+            }
+            item->Delete();
+            item = next;
+            continue;
+        }
+        item->timer++;
+        if (item->sprite.currentInstruction != NULL)
+        {
+            g_AnmManager->ExecuteScript(&item->sprite);
+        }
+        item = next;
+    }
+    if (soundIdx != 0)
+    {
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)soundIdx, 0);
+    }
 }
 
 // FUNCTION: th08 0x440cf0
