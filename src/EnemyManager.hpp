@@ -85,6 +85,9 @@ struct Enemy
     i32 GetFamiliarCount();
     void FUN_00415c80();
     Enemy *FUN_0041efc0();
+    Enemy *__fastcall FUN_0041f110(void *instruction);
+    Enemy *__fastcall FUN_0041f280(void *instruction);
+    i32 __fastcall FUN_0041f420(i32 value);
     i32 *__fastcall FUN_0041fe10(void *operand, i32 flags, i32 operandIndex);
     f32 FUN_00420120(f32 value);
     f32 *__fastcall FUN_00420950(void *operand, i32 flags, i32 operandIndex);
@@ -97,6 +100,11 @@ struct Enemy
     void __fastcall FUN_004213f0(void *instruction);
     void __fastcall FUN_00422020(void *instruction);
     void __fastcall FUN_004222b0(void *instruction, f32 angle);
+    void __fastcall FUN_004224a0(void *instruction);
+    void FUN_00423150();
+    void __fastcall FUN_00423a60(void *instruction);
+    void __fastcall FUN_00423e20(void *instruction);
+    void __fastcall FUN_004241e0(void *instruction);
     void __fastcall FUN_00421e50(void *instruction);
     void __fastcall FUN_00424a20(void *instruction);
     void __fastcall FUN_00424c40(void *instruction);

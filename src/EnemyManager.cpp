@@ -1205,6 +1205,114 @@ void __fastcall EclExIns::FUN_004233d0(void *)
     ScreenEffect::RegisterChain(SCREEN_EFFECT_FULL_FADE_OUT, 60, 1, -1, 0, 21);
 }
 
+// FUNCTION: th08 0x423150
+void Enemy::FUN_00423150()
+{
+    if (*(i32 *)((u8 *)this + 0x2dfc) <= 0 || *(i16 *)((u8 *)this + 0x3338) < 0)
+        return;
+    f32 horizontalVelocity = this->position0x2d4c.x;
+    i32 state = 0;
+    bool reverse = (*(u32 *)((u8 *)this + 0x3324) & 0x40000) != 0;
+    if (horizontalVelocity <= -0.01f) state = reverse ? 2 : 1;
+    else if (horizontalVelocity >= 0.01f) state = reverse ? 1 : 2;
+    u8 previousState = *(u8 *)((u8 *)this + 0x332e);
+    if (previousState == state) return;
+    i32 script;
+    if (state == 0)
+    {
+        if (previousState == 0xff) script = *(i16 *)((u8 *)this + 0x3332);
+        else if (previousState == 1) script = *(i16 *)((u8 *)this + 0x3334);
+        else script = *(i16 *)((u8 *)this + 0x3336);
+    }
+    else if (state == 1) script = *(i16 *)((u8 *)this + 0x3338);
+    else script = *(i16 *)((u8 *)this + 0x333a);
+    if (script >= 0 && this->vm.anmFile != NULL)
+        this->vm.anmFile->SetAndExecuteScriptIdx(&this->vm, script);
+    *(u8 *)((u8 *)this + 0x332e) = (u8)state;
+}
+
+// FUNCTION: th08 0x423a60
+void __fastcall Enemy::FUN_00423a60(void *)
+{
+    for (i32 i = 0; i < MAX_BULLETS; i++)
+    {
+        Bullet *bullet = &g_BulletManager.bullets[i];
+        if (bullet->state == 0) continue;
+        if (bullet->reimuBarrierCooldownFrames > 0)
+        {
+            bullet->reimuBarrierCooldownFrames--;
+            continue;
+        }
+        Float3 next = bullet->position + bullet->velocity;
+        i32 oldRegion = bullet->position.x < 0.0f ? 0 : (bullet->position.x > 384.0f ? 1 : 2);
+        i32 newRegion = next.x < 0.0f ? 0 : (next.x > 384.0f ? 1 : 2);
+        if (oldRegion == newRegion) continue;
+        bullet->reimuBarrierCooldownFrames = 2;
+        if (newRegion == 0) bullet->position.x += 384.0f;
+        else if (newRegion == 1) bullet->position.x -= 384.0f;
+        bullet->angle = AddNormalizeAngle(ZUN_PI - bullet->angle, 0.0f);
+        f32 sine, cosine;
+        fsincos(&sine, &cosine, bullet->angle);
+        bullet->velocity.x = cosine * bullet->speed;
+        bullet->velocity.y = sine * bullet->speed;
+    }
+}
+
+// FUNCTION: th08 0x423e20
+void __fastcall Enemy::FUN_00423e20(void *)
+{
+    for (i32 i = 0; i < MAX_BULLETS; i++)
+    {
+        Bullet *bullet = &g_BulletManager.bullets[i];
+        if (bullet->state == 0) continue;
+        if (bullet->reimuBarrierCooldownFrames > 0)
+        {
+            bullet->reimuBarrierCooldownFrames--;
+            continue;
+        }
+        Float3 next = bullet->position + bullet->velocity;
+        i32 oldRegion = bullet->position.y < 0.0f ? 0 : (bullet->position.y > 448.0f ? 1 : 2);
+        i32 newRegion = next.y < 0.0f ? 0 : (next.y > 448.0f ? 1 : 2);
+        if (oldRegion == newRegion) continue;
+        bullet->reimuBarrierCooldownFrames = 2;
+        if (newRegion == 0) bullet->position.y += 448.0f;
+        else if (newRegion == 1) bullet->position.y -= 448.0f;
+        bullet->angle = AddNormalizeAngle(-bullet->angle, 0.0f);
+        f32 sine, cosine;
+        fsincos(&sine, &cosine, bullet->angle);
+        bullet->velocity.x = cosine * bullet->speed;
+        bullet->velocity.y = sine * bullet->speed;
+    }
+}
+
+// FUNCTION: th08 0x4241e0
+void __fastcall Enemy::FUN_004241e0(void *)
+{
+    for (i32 i = 0; i < MAX_BULLETS; i++)
+    {
+        Bullet *bullet = &g_BulletManager.bullets[i];
+        if (bullet->state == 0) continue;
+        if (bullet->reimuBarrierCooldownFrames > 0)
+        {
+            bullet->reimuBarrierCooldownFrames--;
+            continue;
+        }
+        Float3 next = bullet->position + bullet->velocity;
+        bool outside = next.x < 0.0f || next.x > 384.0f || next.y < 0.0f || next.y > 448.0f;
+        if (!outside) continue;
+        bullet->reimuBarrierCooldownFrames = 2;
+        f32 x = bullet->position.x - 192.0f;
+        f32 y = bullet->position.y - 224.0f;
+        bullet->position.x = 192.0f - y;
+        bullet->position.y = 224.0f + x;
+        bullet->angle = AddNormalizeAngle(bullet->angle + ZUN_PI / 2.0f, 0.0f);
+        f32 sine, cosine;
+        fsincos(&sine, &cosine, bullet->angle);
+        bullet->velocity.x = cosine * bullet->speed;
+        bullet->velocity.y = sine * bullet->speed;
+    }
+}
+
 // FUNCTION: th08 0x4244f0
 void Enemy::FUN_004244f0(void *)
 {
@@ -2258,6 +2366,50 @@ void Enemy::FUN_0041f0e0(i32 value)
     ((EnemyFlags *)this)->flag11 = value;
 }
 
+// FUNCTION: th08 0x41f110
+Enemy *__fastcall Enemy::FUN_0041f110(void *instruction)
+{
+    u8 *ins = (u8 *)instruction;
+    if (*(i32 *)((u8 *)this + 0x2dfc) <= 0 || (*(u32 *)((u8 *)this + 0x3324) & 0x400) != 0)
+        return &g_EnemyManager.enemies[480];
+    u16 mask = *(u16 *)(ins + 0xa);
+    Float3 position;
+    position.x = (mask & 2) ? this->FUN_00420120(*(f32 *)(ins + 0x10)) : *(f32 *)(ins + 0x10);
+    position.y = (mask & 4) ? this->FUN_00420120(*(f32 *)(ins + 0x14)) : *(f32 *)(ins + 0x14);
+    position.z = 0.0f;
+    i32 health = (mask & 8) ? this->FUN_0041f420(*(i32 *)(ins + 0x18)) : *(i32 *)(ins + 0x18);
+    i32 arg4 = (mask & 0x10) ? this->FUN_0041f420(*(i32 *)(ins + 0x1c)) : *(i32 *)(ins + 0x1c);
+    i32 field = (mask & 0x20) ? this->FUN_0041f420(*(i32 *)(ins + 0x20)) : *(i32 *)(ins + 0x20);
+    u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
+    return g_EnemyManager.FUN_0042a680(*(i16 *)(ins + 0xc), &position, health, (i8)arg4, field, context + 0x18);
+}
+
+// FUNCTION: th08 0x41f280
+Enemy *__fastcall Enemy::FUN_0041f280(void *instruction)
+{
+    u8 *ins = (u8 *)instruction;
+    if (*(i32 *)((u8 *)this + 0x2dfc) <= 0 || (*(u32 *)((u8 *)this + 0x3324) & 0x400) != 0)
+        return &g_EnemyManager.enemies[480];
+    u16 mask = *(u16 *)(ins + 0xa);
+    Float3 position;
+    position.x = (mask & 2) ? this->FUN_00420120(*(f32 *)(ins + 0x10)) : *(f32 *)(ins + 0x10);
+    position.y = (mask & 4) ? this->FUN_00420120(*(f32 *)(ins + 0x14)) : *(f32 *)(ins + 0x14);
+    position.z = 0.0f;
+    position += this->position0x2d88;
+    i32 health = (mask & 8) ? this->FUN_0041f420(*(i32 *)(ins + 0x18)) : *(i32 *)(ins + 0x18);
+    i32 arg4 = (mask & 0x10) ? this->FUN_0041f420(*(i32 *)(ins + 0x1c)) : *(i32 *)(ins + 0x1c);
+    i32 field = (mask & 0x20) ? this->FUN_0041f420(*(i32 *)(ins + 0x20)) : *(i32 *)(ins + 0x20);
+    u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
+    return g_EnemyManager.FUN_0042a680(*(i16 *)(ins + 0xc), &position, health, (i8)arg4, field, context + 0x18);
+}
+
+// FUNCTION: th08 0x41f420
+int __fastcall Enemy::FUN_0041f420(i32 value)
+{
+    i32 *resolved = this->FUN_0041fe10(&value, 1, 0);
+    return resolved != NULL ? *resolved : value;
+}
+
 // FUNCTION: th08 0x41fe10
 i32 *__fastcall Enemy::FUN_0041fe10(void *operand, i32 flags, i32 operandIndex)
 {
@@ -2471,6 +2623,29 @@ void __fastcall Enemy::FUN_004222b0(void *instruction, f32 angle)
     u32 *enemyFlags = (u32 *)((u8 *)this + 0x3324);
     *enemyFlags = (*enemyFlags & 0xfffe3fff) | ((mode & 7) << 14);
     *enemyFlags = (*enemyFlags & 0xffffcfff) | 0x2000;
+}
+
+// FUNCTION: th08 0x4224a0
+void __fastcall Enemy::FUN_004224a0(void *instruction)
+{
+    u8 *ins = (u8 *)instruction;
+    u16 flags = *(u16 *)(ins + 0xa);
+    f32 angle = g_Player.AngleToPlayer(&this->position0x2d34);
+    angle += g_Rng.GetRandomF32InRange(ZUN_PI / 2.0f) - ZUN_PI / 4.0f;
+    i32 duration = *this->FUN_0041fe10(ins + 0xc, flags, 0);
+    if (duration <= 0)
+    {
+        *(f32 *)((u8 *)this + 0x2d94) = angle;
+        *(f32 *)((u8 *)this + 0x2da8) = this->FUN_00420120(*(f32 *)(ins + 0x14));
+        u32 *enemyFlags = (u32 *)((u8 *)this + 0x3324);
+        *enemyFlags = (*enemyFlags & 0xffffcfff) | 0x1000;
+        *(i32 *)((u8 *)this + 0x2de8) = 0;
+        this->timer0x2ddc = 0;
+    }
+    else
+    {
+        this->FUN_004222b0(instruction, angle);
+    }
 }
 
 // FUNCTION: th08 0x421e50
