@@ -62,7 +62,7 @@ DIFFABLE_STATIC_ARRAY_ASSIGN(EffectTemplate, 66, g_EffectTemplates) = {
     {0, NULL, NULL},
     {32, &Effect::FUN_00426bb0, &Effect::FUN_00426b20},
     {33, &Effect::FUN_00426c90, &Effect::FUN_00426b20},
-    {51, &Effect::FUN_00426d70, NULL},
+    {51, &Effect::FUN_00426d70, &Effect::FUN_00426e70},
     {56, NULL, NULL},
     {52, NULL, NULL},
     {54, &Effect::FUN_00426c40, NULL},
@@ -438,6 +438,30 @@ i32 Effect::FUN_00426d70()
         return 0;
     }
     return 1;
+}
+
+// FUNCTION: th08 0x426e70
+#pragma var_order(cameraLookAtInverse)
+i32 Effect::FUN_00426e70()
+{
+    Float3 cameraLookAtInverse;
+
+    cameraLookAtInverse = -g_Background.vectors0x6394.vector1;
+    this->basePosition = g_Background.vectors0x6394.vector1 + g_Background.vectors0x6394.vector0;
+    this->basePosition.x += g_Rng.GetRandomF32InRange(120.0f) - 60.0f + cameraLookAtInverse.x / 2.0f;
+    this->basePosition.y += g_Rng.GetRandomF32InRange(200.0f) - 100.0f + cameraLookAtInverse.y / 2.0f;
+    this->basePosition.z += g_Rng.GetRandomF32InRange(100.0f) - 100.0f + cameraLookAtInverse.z / 2.0f;
+    this->velocity.x = g_Rng.GetRandomF32InRange(0.06f) - 0.03f + this->custom.x;
+    this->velocity.y = g_Rng.GetRandomF32InRange(0.06f) - 0.03f + this->custom.y;
+    this->velocity.z = g_Rng.GetRandomF32InRange(0.1f) + 0.03f + this->custom.z;
+    this->acceleration.x = g_Rng.GetRandomF32InRange(0.0002f) - 0.0001f;
+    this->acceleration.y = g_Rng.GetRandomF32InRange(0.0002f) - 0.0001f;
+    this->velocity = this->velocity * g_Supervisor.framerateMultiplier;
+    this->acceleration = this->acceleration * g_Supervisor.framerateMultiplier;
+    this->drawType = 1;
+    this->vm.rotation.z = g_Rng.GetRandomF32InRange(ZUN_2PI) - ZUN_PI;
+    this->vm.rotation.x = g_Rng.GetRandomF32InRange(ZUN_PI / 100.0f) - ZUN_PI / 200.0f;
+    return 0;
 }
 
 // FUNCTION: th08 0x426d10
