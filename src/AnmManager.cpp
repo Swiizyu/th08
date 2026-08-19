@@ -1593,6 +1593,15 @@ ZunResult AnmManager::FUN_00464400(AnmVm *vm, i32 flags)
     return this->DrawInner(vm, flags);
 }
 
+// FUNCTION: th08 0x464470
+ZunResult AnmManager::FUN_00464470(AnmVm *vm)
+{
+    if (vm == NULL || !vm->FUN_00428720() || !vm->flag1 || vm->color1.a == 0)
+        return ZUN_ERROR;
+    this->SetRenderStateForVm(vm);
+    return this->DrawInner(vm, 0);
+}
+
 // FUNCTION: th08 0x4649a0
 ZunResult AnmManager::FUN_004649a0(AnmVm *vm, VertexTex1DiffuseXyzrhw *vertices, i32 vertexCount)
 {

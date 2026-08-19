@@ -1117,11 +1117,11 @@ th08::PbgArchive::SeekPastInt,0x475200,function
 th08::PbgArchive::SeekPastString,0x475220,function
 th08::PbgArchiveEntry::~PbgArchiveEntry,0x475270,function
 WithinEpsilon,0x476cf2,library
-D3DXVec2Hermite,0x476d1f,library
-D3DXVec2CatmullRom,0x476dad,library
-D3DXVec2BaryCentric,0x476e5c,library
-D3DXVec3Hermite,0x476ea5,library
-D3DXVec3CatmullRom,0x476f53,library
+th08::D3DXVec2Hermite,0x476d1f,library
+th08::D3DXVec2CatmullRom,0x476dad,library
+th08::D3DXVec2BaryCentric,0x476e5c,library
+th08::D3DXVec3Hermite,0x476ea5,library
+th08::D3DXVec3CatmullRom,0x476f53,library
 FUN_00477024,0x477024,library
 FUN_00477081,0x477081,library
 FUN_0047717e,0x47717e,library
