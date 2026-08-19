@@ -46,7 +46,7 @@ struct Background
     static ZunResult RegisterChain(i32 stage);
     static ZunResult DeletedCallback(Background *background);
     static void CutChain();
-    ZunResult LoadStageData();
+    ZunResult LoadStageData(const char *path);
     void background_fun_00416ad0();
     void background_fun_00415ce0();
     void FUN_00409160(u32 color);

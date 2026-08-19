@@ -1,6 +1,7 @@
 #include "th_pch.h"
 
 #include "Background.hpp"
+#include "GameManager.hpp"
 
 namespace th08
 {
@@ -10,6 +11,18 @@ DIFFABLE_STATIC(Background, g_Background);
 DIFFABLE_STATIC(ChainElem, g_BackgroundCalcChain);
 DIFFABLE_STATIC(ChainElem, g_BackgroundDrawChainHighPrio);
 DIFFABLE_STATIC(ChainElem, g_BackgroundDrawChainLowPrio);
+DIFFABLE_STATIC_ARRAY_ASSIGN(const char *, 9, g_StageAnmFiles) = {
+    "stg1bg.anm", "stg2bg.anm", "stg3bg.anm", "stg4abg.anm", "stg4abg.anm",
+    "stg5bg.anm", "stg6bg.anm", "stg7bg.anm", "stg8bg.anm",
+};
+DIFFABLE_STATIC_ARRAY_ASSIGN(const char *, 9, g_StageStdFiles) = {
+    "stage1.std", "stage2.std", "stage3.std", "stage4a.std", "stage4b.std",
+    "stage5.std", "stage6.std", "stage7.std", "stage8.std",
+};
+DIFFABLE_STATIC_ARRAY_ASSIGN(const char *, 9, g_StageSpellStdFiles) = {
+    "stage1_s.std", "stage2_s.std", "stage3_s.std", "stage4a_s.std", "stage4b_s.std",
+    "stage5_s.std", "stage6_s.std", "stage7_s.std", "stage8_s.std",
+};
 
 // FUNCTION: th08 0x4031e0
 f32 FUN_004031e0(f32 value)
@@ -129,10 +142,72 @@ ChainCallbackResult Background::OnDrawLowPrio(Background *background)
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
-// STUB: th08 0x409850
+// FUNCTION: th08 0x409850
+#pragma var_order(i)
 ZunResult Background::AddedCallback(Background *background)
 {
-    return ZUN_ERROR;
+    i32 i;
+
+    background->timer0x80c = 0;
+    *(i32 *)((u8 *)background + 0x818) = 0;
+    background->position0x824.x = 0.0f;
+    background->position0x824.y = 0.0f;
+    background->position0x824.z = 0.0f;
+    *(i32 *)((u8 *)background + 0xb24) = 0;
+    *(i32 *)((u8 *)background + 0xb10) = 0;
+
+    if (!IsDisableResourceReload())
+    {
+        background->anm0x7f0 = g_AnmManager->PreloadAnm(4, g_StageAnmFiles[g_GameManager.currentStage]);
+        if (background->anm0x7f0 == NULL)
+        {
+            return ZUN_ERROR;
+        }
+    }
+    else
+    {
+        background->anm0x7f0 = g_AnmManager->GetAnm(4);
+    }
+
+    if (!g_GameManager.IsSpellPractice())
+    {
+        if (background->LoadStageData(g_StageStdFiles[g_GameManager.currentStage]) != ZUN_SUCCESS)
+        {
+            return ZUN_ERROR;
+        }
+    }
+    else if (background->LoadStageData(g_StageSpellStdFiles[g_GameManager.currentStage]) != ZUN_SUCCESS)
+    {
+        return ZUN_ERROR;
+    }
+
+    *(u32 *)((u8 *)background + 0xaf4) = 0xff000000;
+    *(f32 *)((u8 *)background + 0xaec) = 200.0f;
+    *(f32 *)((u8 *)background + 0xaf0) = 500.0f;
+    background->vectors0x6394.vector0 = Float3(0.0f, 0.0f, 1000.0f);
+    background->vectors0x6394.vector1 = Float3(0.0f, 0.0f, 0.0f);
+    background->vectors0x6394.vector5 = Float3(0.0f, 0.0f, 0.0f);
+    background->vectors0x6394.vector2 = Float3(0.0f, 1.0f, 0.0f);
+    background->vectors0x6394.angle = 0.5235988f;
+    background->vectors0x6264 = background->vectors0x6394;
+    background->vectors0x62b0 = background->vectors0x6394;
+    *(u8 *)((u8 *)background + 0x6474) = 0;
+    for (i = 0; i < 4; i++)
+    {
+        *(i32 *)((u8 *)background + 0x63e0 + i * 4) = 0;
+        background->timers0x63f4[i] = 0;
+    }
+    background->unknown0x6260 = 0;
+    *(f32 *)((u8 *)background + 0x6470) = 1322500.0f;
+    if (g_GameManager.currentStage == 5)
+    {
+        *(f32 *)((u8 *)background + 0x6470) = 1822500.0f;
+    }
+    else if (g_GameManager.currentStage == 6 || g_GameManager.currentStage == 7)
+    {
+        *(f32 *)((u8 *)background + 0x6470) = 3240000.0f;
+    }
+    return ZUN_SUCCESS;
 }
 
 // FUNCTION: th08 0x409b20
@@ -203,7 +278,7 @@ void Background::CutChain()
 }
 
 // STUB: th08 0x409ce0
-ZunResult Background::LoadStageData()
+ZunResult Background::LoadStageData(const char *path)
 {
     return ZUN_ERROR;
 }
