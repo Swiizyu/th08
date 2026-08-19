@@ -94,7 +94,7 @@ DIFFABLE_STATIC_ARRAY_ASSIGN(EffectTemplate, 66, g_EffectTemplates) = {
     {85, &Effect::FUN_00413070, &Effect::FUN_004272e0},
     {86, &Effect::FUN_00427990, &Effect::FUN_004272e0},
     {80, &Effect::FUN_00427a60, &Effect::FUN_004272e0},
-    {73, NULL, &Effect::FUN_00426280},
+    {73, &Effect::FUN_004264f0, &Effect::FUN_00426280},
     {77, &Effect::FUN_00427990, &Effect::FUN_004272e0},
     {88, &Effect::FUN_00427ae0, &Effect::FUN_004272e0},
     {88, &Effect::FUN_00427ae0, &Effect::FUN_004272e0},
@@ -514,6 +514,31 @@ i32 Effect::FUN_00426280()
     *(i32 *)((u8 *)&this->vm + 0x254) = 0;
     *(i32 *)((u8 *)&this->vm + 0x258) = 0;
     return 0;
+}
+
+// FUNCTION: th08 0x4264f0
+#pragma var_order(localPosition, dot)
+i32 Effect::FUN_004264f0()
+{
+    Float3 localPosition;
+    f32 dot;
+
+    this->velocity += this->acceleration;
+    this->basePosition += this->velocity;
+    this->position = this->basePosition;
+    localPosition = this->position - g_Background.vectors0x6394.vector0;
+    D3DXVec3Normalize((D3DXVECTOR3 *)&localPosition, (D3DXVECTOR3 *)&localPosition);
+    dot = g_Background.vectors0x6394.vector3.FUN_0040b540(&localPosition);
+    if (dot < 0.94f)
+    {
+        return 0;
+    }
+    *(u32 *)((u8 *)&this->vm + 0x1f8) |= 0x20000;
+    this->vm.color2.r = (u32)(this->vm.color1.r * g_Background.vm0x844.color1.r) >> 8;
+    this->vm.color2.g = (u32)(this->vm.color1.g * g_Background.vm0x844.color1.g) >> 8;
+    this->vm.color2.b = (u32)(this->vm.color1.b * g_Background.vm0x844.color1.b) >> 8;
+    this->vm.color2.a = (u32)(this->vm.color1.a * g_Background.vm0x844.color1.a) >> 8;
+    return 1;
 }
 
 // FUNCTION: th08 0x426b20
