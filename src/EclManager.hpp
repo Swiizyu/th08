@@ -43,6 +43,18 @@ struct EclTimelineHeader
     EclTimeline *timelines[1];
 };
 
+struct EclTimelineContext
+{
+    void *timeline;
+    ZunTimer timer1;
+    u8 unknown0x10[0x80];
+    ZunTimer timer2;
+    u8 unknown0x9c[0x188];
+    i16 timelineIndex;
+    u8 padding[2];
+};
+C_ASSERT(sizeof(EclTimelineContext) == 0x228);
+
 struct EclManagerSub
 {
     EclManagerSub();
@@ -54,6 +66,8 @@ struct EclManagerSub
 struct EclManager
 {
     EclManager();
+    void FUN_00418420();
+    i32 FUN_00418450(EclTimelineContext *context, i16 timelineIndex);
     i32 GetTimelineCount();
     EclTimeline *GetTimeline(i32 timelineIdx);
 

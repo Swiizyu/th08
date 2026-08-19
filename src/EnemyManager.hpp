@@ -79,6 +79,7 @@ C_ASSERT(sizeof(EnemyUnkStruct4) == 0x210);
 struct Enemy
 {
     i32 GetFamiliarCount();
+    void FUN_00415c80();
     Enemy *FUN_0041efc0();
     ZunBool FUN_0041f000();
     void FUN_0041f040(i32 x, i32 y, i32 z);

@@ -399,6 +399,9 @@ struct Float3
 
     Float3(float x, float y, float z);
 
+    f32 FUN_0040b4c0();
+    f32 FUN_0040b500();
+    f32 __fastcall FUN_0040b540(Float3 *other);
     void FromAngleMagnitude(float angle, float magnitude);
     void FUN_00428700(float angle, float magnitudeX, float magnitudeY);
     void FUN_00426d10();

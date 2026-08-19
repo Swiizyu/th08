@@ -13,6 +13,8 @@ struct Effect
 {
     Effect();
 
+    i32 FUN_0040e2d0();
+    i32 FUN_00410bb0();
     i32 FUN_00425e60();
     i32 FUN_00425fe0();
     i32 FUN_00426b20();

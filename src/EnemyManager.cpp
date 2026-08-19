@@ -22,6 +22,24 @@ DIFFABLE_STATIC(ChainElem, g_EnemyManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerDrawChainHighPrio);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerDrawChainLowPrio);
 
+// FUNCTION: th08 0x40b4c0
+f32 Float3::FUN_0040b4c0()
+{
+    return sqrtf(this->x * this->x + this->y * this->y + this->z * this->z);
+}
+
+// FUNCTION: th08 0x40b500
+f32 Float3::FUN_0040b500()
+{
+    return this->x * this->x + this->y * this->y + this->z * this->z;
+}
+
+// FUNCTION: th08 0x40b540
+f32 __fastcall Float3::FUN_0040b540(Float3 *other)
+{
+    return this->x * other->x + this->y * other->y + this->z * other->z;
+}
+
 // FUNCTION: th08 0x41f400
 EnemyFloat3Holder::EnemyFloat3Holder()
 {
@@ -123,6 +141,31 @@ EnemyUnkStruct4::EnemyUnkStruct4()
 {
     memset(this, 0, sizeof(EnemyUnkStruct4));
     this->unk0x204 = -1;
+}
+
+// FUNCTION: th08 0x40e2d0
+i32 Effect::FUN_0040e2d0()
+{
+    f32 factor;
+
+    factor = 1.0f - (f32)this->timer / 40.0f;
+    factor *= factor;
+    factor = 1.0f - factor;
+    *(f32 *)((u8 *)this + 0x314) = 192.0f * factor;
+    *(i32 *)((u8 *)this + 0x324) = 8;
+    *(u8 *)((u8 *)this + 0x356) = 1;
+    *(f32 *)((u8 *)this + 0x320) = 8.0f;
+    return 1;
+}
+
+// FUNCTION: th08 0x410bb0
+i32 Effect::FUN_00410bb0()
+{
+    *(f32 *)((u8 *)this + 0x314) += 8.0f;
+    *(u8 *)((u8 *)this + 0x356) = 1;
+    *(i32 *)((u8 *)this + 0x324) = 12;
+    *(f32 *)((u8 *)this + 0x320) = 32.0f;
+    return 1;
 }
 
 // FUNCTION: th08 0x425e60
@@ -381,6 +424,31 @@ EclManagerSub::EclManagerSub()
 {
 }
 
+// FUNCTION: th08 0x418420
+void EclManager::FUN_00418420()
+{
+    if (this->timelineFile != NULL)
+    {
+        g_ZunMemory.Free(this->timelineFile);
+    }
+    this->timelineFile = NULL;
+}
+
+// FUNCTION: th08 0x418450
+i32 EclManager::FUN_00418450(EclTimelineContext *context, i16 timelineIndex)
+{
+    if (timelineIndex < 0)
+    {
+        return 0;
+    }
+
+    context->timeline = ((void **)this->unknown)[timelineIndex];
+    context->timer1 = 0;
+    context->timer2 = 0;
+    context->timelineIndex = timelineIndex;
+    return 0;
+}
+
 // FUNCTION: th08 0x449f50
 EclTimeline::EclTimeline()
 {
@@ -473,6 +541,17 @@ void EffectManager::CutChain()
 {
     g_Chain.Cut(&g_EffectManagerCalcChain);
     g_Chain.Cut(&g_EffectManagerDrawChain);
+}
+
+// FUNCTION: th08 0x415c80
+void Enemy::FUN_00415c80()
+{
+    *(f32 *)((u8 *)this + 0x2dec) = -0.5f;
+    *(f32 *)((u8 *)this + 0x2df0) = 0.5f;
+    *(i16 *)((u8 *)this + 0x2df4) = 0;
+    *(i16 *)((u8 *)this + 0x2df6) = 0;
+    *(i16 *)((u8 *)this + 0x2df8) = 0;
+    *(i16 *)((u8 *)this + 0x2dfa) = 0;
 }
 
 // FUNCTION: th08 0x41efc0
