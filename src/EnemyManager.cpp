@@ -24,6 +24,8 @@ DIFFABLE_STATIC(EclManager, g_EclManager);
 DIFFABLE_STATIC(i32, g_EnemyManagerUnknown);
 DIFFABLE_STATIC(EffectManager, g_EffectManager);
 DIFFABLE_STATIC(i32, g_EffectManagerState);
+DIFFABLE_STATIC(AnmVm, g_EclEffectVm0);
+DIFFABLE_STATIC(AnmVm, g_EclEffectVm1);
 DIFFABLE_STATIC_ARRAY_ASSIGN(const char *, 9, g_StageEnemyAnms) = {
     "stg1enm.anm", "stg2enm.anm", "stg3enm.anm", "stg4aenm.anm", "stg4benm.anm",
     "stg5enm.anm", "stg6enm.anm", "stg7enm.anm", "stg8enm.anm",
@@ -1176,6 +1178,35 @@ void __fastcall EclExIns::FUN_00425040(void *)
     *(i32 *)((u8 *)this->enemyData + 0x18) = g_GameManager.globals->spellcardsCaptured;
 }
 
+// FUNCTION: th08 0x425070
+void __fastcall EclExIns::FUN_00425070(void *instruction)
+{
+    *(i8 *)((u8 *)&g_GameManager + 0x2c) = *(i8 *)((u8 *)instruction + 0x10);
+    if (*(i8 *)((u8 *)&g_GameManager + 0x2c) != 0)
+    {
+        g_EclEffectVm0.SetInterrupt(2);
+        g_EclEffectVm1.SetInterrupt(2);
+    }
+    else
+    {
+        g_EclEffectVm0.SetInterrupt(1);
+        g_EclEffectVm1.SetInterrupt(1);
+    }
+}
+
+// FUNCTION: th08 0x425390
+void __fastcall EclExIns::FUN_00425390(void *)
+{
+    if (*(i32 *)((u8 *)&g_Player + 0xfdc) != 0)
+    {
+        g_ItemManager.SpawnItem((Float3 *)((u8 *)this + 0x2d34), ITEM_BOMB, 0);
+    }
+    else
+    {
+        g_ItemManager.SpawnItem((Float3 *)((u8 *)this + 0x2d34), ITEM_EXTEND, 0);
+    }
+}
+
 // FUNCTION: th08 0x423390
 void __fastcall EclExIns::MystiaNightBlindness(void *)
 {
@@ -1433,6 +1464,10 @@ ChainCallbackResult EffectManager::UpdateEffects()
         this->listTails[listIndex] = effect;
     }
     this->frameCounter++;
+    if (this->frameCounter % 300 == 100 && g_GameManager.IsTampered())
+    {
+        return CHAIN_CALLBACK_RESULT_EXIT_GAME_SUCCESS;
+    }
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 

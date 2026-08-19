@@ -38,6 +38,8 @@ struct EclExIns
     void __fastcall FUN_00424fc0(void *instruction);
     void __fastcall FUN_00425020(void *instruction);
     void __fastcall FUN_00425040(void *instruction);
+    void __fastcall FUN_00425070(void *instruction);
+    void __fastcall FUN_00425390(void *instruction);
     void __fastcall MystiaNightBlindness(void *unused);
 
     u8 data[0x2ca0];

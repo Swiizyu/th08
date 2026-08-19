@@ -10,6 +10,8 @@ _g_SFXList,                 0x004c81b0
 _g_Stage,                   0x004e4030
 _g_Spellcard,               0x004ea670
 _g_EffectManagerState,      0x004e4b60
+_g_EclEffectVm0,            0x004e4b68
+_g_EclEffectVm1,            0x004e4e0c
 _g_EffectManager,           0x004ece60
 _g_EnemyManager,            0x00577f20
 _g_BulletManager,           0x00f54e90
