@@ -9,6 +9,16 @@ DIFFABLE_STATIC(BulletManager, g_BulletManager);
 DIFFABLE_STATIC(ChainElem, g_BulletManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_BulletManagerDrawChain);
 
+// FUNCTION: th08 0x42f4a0
+BulletTypeSprites::BulletTypeSprites()
+{
+}
+
+// FUNCTION: th08 0x42f580
+Laser::Laser()
+{
+}
+
 // FUNCTION: th08 0x42f5c0
 BulletExState::BulletExState()
 {

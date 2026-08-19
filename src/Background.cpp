@@ -6,6 +6,41 @@ namespace th08
 {
 DIFFABLE_STATIC(Background, g_Background);
 
+// FUNCTION: th08 0x409080
+Float3 Float3::operator+(const Float3 &other)
+{
+    return Float3(this->x + other.x, this->y + other.y, this->z + other.z);
+}
+
+// FUNCTION: th08 0x4090d0
+Float3 Float3::operator-(const Float3 &other)
+{
+    return Float3(this->x - other.x, this->y - other.y, this->z - other.z);
+}
+
+// FUNCTION: th08 0x409120
+Float3 Float3::operator*(f32 scalar)
+{
+    return Float3(this->x * scalar, this->y * scalar, this->z * scalar);
+}
+
+// FUNCTION: th08 0x40b470
+Float3 *Float3::operator/=(f32 scalar)
+{
+    f32 inverse = 1.0f / scalar;
+    this->x *= inverse;
+    this->y *= inverse;
+    this->z *= inverse;
+    return this;
+}
+
+// FUNCTION: th08 0x40c7d0
+Float3 Float3::operator/(f32 scalar)
+{
+    f32 inverse = 1.0f / scalar;
+    return Float3(this->x * inverse, this->y * inverse, this->z * inverse);
+}
+
 // FUNCTION: th08 0x415ce0
 void Background::background_fun_00415ce0()
 {

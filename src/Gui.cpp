@@ -18,6 +18,12 @@
 namespace th08
 {
 
+// FUNCTION: th08 0x439856
+u32 GameManager::FUN_00439856(i32 bit, i32 entryIdx, i32 valueIdx)
+{
+    return *(u16 *)((u8 *)this + 0x3c490 + entryIdx * 0x24 + 0x16 + valueIdx * 2) & (1 << bit);
+}
+
 // FUNCTION: th08 0x45a4a0
 ZunBool Catk::WasAttemptedWithShot(i32 shotType)
 {

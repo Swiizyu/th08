@@ -15,6 +15,11 @@ DIFFABLE_STATIC(ChainElem, g_EnemyManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerDrawChainHighPrio);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerDrawChainLowPrio);
 
+// FUNCTION: th08 0x42a450
+EnemyUnkStruct2::EnemyUnkStruct2()
+{
+}
+
 // FUNCTION: th08 0x42a490
 EnemyUnkStruct0x1c::EnemyUnkStruct0x1c()
 {

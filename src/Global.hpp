@@ -421,6 +421,12 @@ struct Float3
         return (float *)this;
     }
 
+    Float3 operator+(const Float3 &other);
+    Float3 operator-(const Float3 &other);
+    Float3 operator*(f32 scalar);
+    Float3 operator/(f32 scalar);
+    Float3 *operator/=(f32 scalar);
+
     Float3 *operator+=(const Float3 &other)
     {
         this->x += other.x;

@@ -23,8 +23,21 @@ struct EnemyUnkStruct3
 
     u32 unknown;
     ZunTimer timer;
+    u8 padding[0x20];
 };
-C_ASSERT(sizeof(EnemyUnkStruct3) == 0x10);
+C_ASSERT(sizeof(EnemyUnkStruct3) == 0x30);
+
+struct EnemyUnkStruct2
+{
+    EnemyUnkStruct2();
+
+    u32 unknown;
+    ZunTimer firstTimer;
+    u8 padding[0x80];
+    ZunTimer secondTimer;
+    EnemyUnkStruct3 entries[8];
+};
+C_ASSERT(sizeof(EnemyUnkStruct2) == 0x21c);
 
 struct Enemy
 {

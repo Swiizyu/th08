@@ -209,6 +209,7 @@ struct GameManager
     ZunBool IsSoloYoukai();
     ZunBool IsSpellNumberEqualTo(i32 spellNumber);
     ZunBool IsSpellNumberInRange(i32 firstSpellNumber, i32 lastSpellNumber);
+    u32 FUN_00439856(i32 bit, i32 entryIdx, i32 valueIdx);
 
     i8 GetClockTime()
     {

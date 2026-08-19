@@ -18,11 +18,28 @@ C_ASSERT(sizeof(BulletExState) == 0x20);
 
 struct BulletTypeSprites
 {
+    BulletTypeSprites();
+
+    AnmVm sprite0;
+    AnmVm sprite1;
+    AnmVm sprite2;
+    AnmVm sprite3;
+    AnmVm sprite4;
+    Float3 position;
 };
+C_ASSERT(sizeof(BulletTypeSprites) == 0xd40);
 
 struct Laser
 {
+    Laser();
+
+    AnmVm sprite0;
+    AnmVm sprite1;
+    Float3 position;
+    u8 unknown[0x34];
+    ZunTimer timer;
 };
+C_ASSERT(sizeof(Laser) == 0x594);
 
 struct Bullet
 {
