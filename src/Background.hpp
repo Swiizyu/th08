@@ -84,7 +84,7 @@ struct Background
     static void CutChain();
     ZunResult LoadStageData(const char *path);
     u32 FUN_00409f40();
-    u8 FUN_0040a1b0(u32 zLevel);
+    u8 RenderObjects(u32 zLevel);
     void background_fun_00416ad0();
     void background_fun_00415ce0();
     void FUN_00409160(u32 color);

@@ -1,8 +1,11 @@
 #include "th_pch.h"
 
 #include "Background.hpp"
+#include "EffectManager.hpp"
 #include "GameManager.hpp"
+#include "Gui.hpp"
 #include "Player.hpp"
+#include "ScreenEffect.hpp"
 #include "ZunMath.hpp"
 
 namespace th08
@@ -138,9 +141,71 @@ ChainCallbackResult Background::OnDrawHighPrio(Background *background)
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
-// STUB: th08 0x409640
+// FUNCTION: th08 0x409640
+#pragma var_order(fogDistance, alpha, rect, i)
 ChainCallbackResult Background::OnDrawLowPrio(Background *background)
 {
+    ZunRect rect;
+    i32 alpha;
+    i32 i;
+    f32 fogDistance;
+
+    if (*(i32 *)((u8 *)background + 0xb24) <= 1 && !g_Gui.FUN_00437d87())
+    {
+        background->RenderObjects(2);
+        background->RenderObjects(3);
+        if (!g_Supervisor.IsFogDisabled())
+        {
+            g_Supervisor.DisableFog();
+        }
+        g_EffectManager.FUN_004281e0();
+        if (*(i32 *)((u8 *)background + 0xb24) == 1)
+        {
+            rect.left = 32.0f;
+            rect.top = 16.0f;
+            rect.right = 416.0f;
+            rect.bottom = 464.0f;
+            alpha = *(i32 *)((u8 *)background + 0xb28) * 255 / 60;
+            g_AnmManager->FlushVertexBuffer();
+            g_Supervisor.SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+            if (!g_Supervisor.IsFogDisabled())
+            {
+                g_Supervisor.SetRenderState(D3DRS_FOGENABLE, FALSE);
+            }
+            ScreenEffect::DrawSquare(&rect, alpha << 24);
+        }
+    }
+
+    g_AnmManager->FlushVertexBuffer();
+    g_Supervisor.SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+    if (!g_Supervisor.IsFogDisabled())
+    {
+        g_Supervisor.DisableFog();
+    }
+    if (*(i32 *)((u8 *)background + 0xb24) >= 1)
+    {
+        for (i = 0; i < *(i32 *)((u8 *)background + 0xb30); i++)
+        {
+            g_AnmManager->Draw2DAndFlush(&background->vms0xb38[i]);
+        }
+        if (background->callback0x625c != NULL)
+        {
+            background->callback0x625c();
+        }
+    }
+    g_AnmManager->SetCameraMode(0);
+    background->SetCamera1();
+    g_Supervisor.d3dDevice->SetViewport(&g_Supervisor.viewport);
+    fogDistance = 1000.0f;
+    g_Supervisor.SetRenderState(D3DRS_FOGSTART, *(u32 *)&fogDistance);
+    fogDistance = 2000.0f;
+    g_Supervisor.SetRenderState(D3DRS_FOGEND, *(u32 *)&fogDistance);
+    if (*(i32 *)((u8 *)background + 0x646c) == 0)
+    {
+        g_AnmManager->SetMixColorDefault();
+    }
+    *(i32 *)((u8 *)background + 0x646c) = 0;
+    *(i32 *)((u8 *)background + 0x647c) = 0;
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
@@ -408,6 +473,71 @@ u32 Background::FUN_00409f40()
                 object->flags &= ~1;
             }
         }
+    }
+    return 0;
+}
+
+// FUNCTION: th08 0x40a1b0
+u8 Background::RenderObjects(u32 zLevel)
+{
+    StdRawInstance *instance;
+    StdRawObject *object;
+    StdRawQuadBasic *quad;
+    AnmVm *vm;
+    Float3 center;
+    Float3 cameraPosition;
+    f32 distance;
+    f32 radius;
+
+    instance = this->objectInstances;
+    this->SetCamera2();
+    g_AnmManager->SetCameraMode(1);
+    while (instance->id >= 0)
+    {
+        object = this->objects[instance->id];
+        if (object->zLevel == zLevel)
+        {
+            center.x = object->position.x + instance->position.x - this->position0x824.x + object->size.x / 2.0f;
+            center.y = object->position.y + instance->position.y - this->position0x824.y + object->size.y / 2.0f;
+            center.z = object->position.z + instance->position.z - this->position0x824.z + object->size.z / 2.0f;
+            cameraPosition = this->vectors0x6394.vector0 + this->vectors0x6394.vector5;
+            center -= cameraPosition;
+            if (center.FUN_0040b500() <= *(f32 *)((u8 *)this + 0x6470))
+            {
+                distance = center.FUN_0040b540(&this->vectors0x6394.vector3);
+                radius = object->size.FUN_0040b4c0() / 2.0f + 960.0f;
+                if (distance <= radius && distance >= 80.0f)
+                {
+                    object->flags |= 2;
+                    quad = &object->firstQuad;
+                    while (quad->type >= 0)
+                    {
+                        vm = &this->quadVms[quad->vmIndex];
+                        vm->pos.x = vm->pos2.x + quad->position.x + instance->position.x - this->position0x824.x;
+                        vm->pos.y = vm->pos2.y + quad->position.y + instance->position.y - this->position0x824.y;
+                        vm->pos.z = vm->pos2.z + quad->position.z + instance->position.z - this->position0x824.z;
+                        if (quad->size.x != 0.0f && vm->loadedSprite != NULL)
+                        {
+                            vm->scale.x = quad->size.x / vm->loadedSprite->widthPx;
+                        }
+                        if (quad->size.y != 0.0f && vm->loadedSprite != NULL)
+                        {
+                            vm->scale.y = quad->size.y / vm->loadedSprite->heightPx;
+                        }
+                        if (quad->type == 0)
+                        {
+                            g_AnmManager->DrawWorld(vm);
+                        }
+                        else if (quad->type == 1)
+                        {
+                            g_AnmManager->FUN_00464070(vm);
+                        }
+                        quad = (StdRawQuadBasic *)((u8 *)quad + quad->byteSize);
+                    }
+                }
+            }
+        }
+        instance++;
     }
     return 0;
 }

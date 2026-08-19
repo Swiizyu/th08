@@ -101,7 +101,7 @@ th08::Background::DeletedCallback,0x409c20,0x7a,__fastcall,,u32,Background*
 th08::Background::CutChain,0x409ca0,0x32,__stdcall,,void
 th08::Background::LoadStageData,0x409ce0,0x256,__thiscall,,u32,Background*,char*
 th08::Background::FUN_00409f40,0x409f40,0x262,__thiscall,,u32,Background*
-th08::Background::FUN_0040a1b0,0x40a1b0,0x128a,__thiscall,,u8,Background*,u32
+th08::Background::RenderObjects,0x40a1b0,0x128a,__thiscall,,u8,Background*,u32
 _sqrtf,0x40b440,0x15,__fastcall,,f32,f32
 D3DXVECTOR3::D3DXVECTOR3,0x40b460,0xe,__thiscall,,_D3DVECTOR*,_D3DVECTOR*
 FUN_0040b470,0x40b470,0x49,unknown,,u8,u8
