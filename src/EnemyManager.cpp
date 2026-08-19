@@ -278,6 +278,20 @@ void __fastcall AnmVm::FUN_0042fe70(AnmVm *other)
     }
 }
 
+// FUNCTION: th08 0x42fea0
+void __fastcall AnmVm::FUN_0042fea0(AnmVm *other, AnmVm *reference, i32 spriteOffset)
+{
+    i32 sprite = other->activeSpriteIndex + spriteOffset;
+    if (this->activeSpriteIndex == sprite || reference == NULL || reference->loadedSprite == NULL)
+    {
+        return;
+    }
+    if (this->anmFile != NULL)
+    {
+        this->anmFile->SetSprite(this, sprite);
+    }
+}
+
 // FUNCTION: th08 0x42a410
 EnemyUnkStruct4::EnemyUnkStruct4()
 {
@@ -2220,6 +2234,39 @@ void Enemy::FUN_0042c290(Float3 *position, Float3 *hitbox)
     if (g_Player.FUN_0044a360(position, &size) == 1 && (flags & 2) == 0 && (flags & 0x80) == 0)
     {
         *(i32 *)((u8 *)this + 0x2dfc) -= 10;
+    }
+}
+
+// FUNCTION: th08 0x42e010
+#pragma var_order(i, effect)
+void Enemy::FUN_0042e010()
+{
+    for (i32 i = 0; i < *(i32 *)((u8 *)this + 0x53c0); i++)
+    {
+        u8 *effect = *(u8 **)((u8 *)this + 0x5360 + i * 4);
+        if (effect == NULL)
+        {
+            continue;
+        }
+        if ((*(u32 *)((u8 *)this + 0x3324) & 0x10) == 0)
+        {
+            *(u32 *)(effect + 0x1f8) |= 2;
+        }
+        else
+        {
+            *(u32 *)(effect + 0x1f8) &= ~2;
+        }
+        *(Float3 *)(effect + 0x2e0) = this->position0x2d34;
+        f32 targetScale = *(f32 *)((u8 *)this + 0x53c4);
+        if (*(f32 *)(effect + 0x314) >= targetScale)
+        {
+            *(f32 *)(effect + 0x314) = targetScale;
+        }
+        else
+        {
+            *(f32 *)(effect + 0x314) += 0.3f;
+        }
+        *(f32 *)(effect + 0x318) = AddNormalizeAngle(*(f32 *)(effect + 0x318), 0.03141593f);
     }
 }
 

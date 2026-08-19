@@ -1553,6 +1553,85 @@ ZunResult AnmManager::DrawWorld(AnmVm *vm)
     return DrawInner(vm, 0);
 }
 
+// FUNCTION: th08 0x464400
+ZunResult AnmManager::FUN_00464400(AnmVm *vm, i32 flags)
+{
+    if (!vm->FUN_00428720() || !vm->flag1 || vm->color1.a == 0)
+    {
+        return ZUN_ERROR;
+    }
+    return this->DrawInner(vm, flags);
+}
+
+// FUNCTION: th08 0x4649a0
+ZunResult AnmManager::FUN_004649a0(AnmVm *vm, VertexTex1DiffuseXyzrhw *vertices, i32 vertexCount)
+{
+    if (vertexCount < 3 || vm->loadedSprite == NULL)
+    {
+        return ZUN_ERROR;
+    }
+    i32 pairs = (vertexCount + 1) / 2 - 1;
+    f32 step = pairs > 0 ? (vm->loadedSprite->uvEnd.x - vm->loadedSprite->uvStart.x) / pairs : 0.0f;
+    f32 u = vm->loadedSprite->uvEnd.x + vm->spriteSize.y;
+    for (i32 i = 0; i < vertexCount; i++)
+    {
+        vertices[i].textureUV.x = u;
+        vertices[i].textureUV.y = (i & 1) ? vm->loadedSprite->uvStart.y : vm->loadedSprite->uvEnd.y;
+        vertices[i].diffuse = vm->color1.d3dColor;
+        vertices[i].w = 1.0f;
+        if (i & 1)
+        {
+            u -= step;
+        }
+    }
+    return ZUN_SUCCESS;
+}
+
+// FUNCTION: th08 0x464b00
+ZunResult AnmManager::FUN_00464b00(AnmVm *vm, VertexTex1DiffuseXyzrhw *vertices, i32 vertexCount)
+{
+    if (vertexCount < 3 || vm->loadedSprite == NULL)
+    {
+        return ZUN_ERROR;
+    }
+    i32 pairs = (vertexCount + 1) / 2 - 1;
+    f32 step = pairs > 0 ? (vm->loadedSprite->uvEnd.y - vm->loadedSprite->uvStart.y) / pairs : 0.0f;
+    f32 v = vm->loadedSprite->uvEnd.y + vm->spriteSize.y;
+    for (i32 i = 0; i < vertexCount; i++)
+    {
+        vertices[i].textureUV.x = (i & 1) ? vm->loadedSprite->uvStart.x : vm->loadedSprite->uvEnd.x;
+        vertices[i].textureUV.y = v;
+        vertices[i].diffuse = vm->color1.d3dColor;
+        vertices[i].w = 1.0f;
+        if (i & 1)
+        {
+            v -= step;
+        }
+    }
+    return ZUN_SUCCESS;
+}
+
+// FUNCTION: th08 0x464c60
+ZunResult AnmManager::FUN_00464c60(AnmVm *vm, VertexDiffuseXyzrhw *vertices, i32 vertexCount)
+{
+    if (!vm->FUN_00428720() || !vm->flag1 || vm->color1.a == 0)
+    {
+        return ZUN_ERROR;
+    }
+    return this->DrawTriangleFan(vm, vertices, vertexCount);
+}
+
+// FUNCTION: th08 0x464dd0
+ZunResult AnmManager::FUN_00464dd0(AnmVm *vm, i32 flags)
+{
+    if (!vm->FUN_00428720() || !vm->flag1 || vm->color1.a == 0)
+    {
+        return ZUN_ERROR;
+    }
+    this->SetRenderStateForVm(vm);
+    return this->DrawInner(vm, flags);
+}
+
 ZunResult AnmManager::DrawTriangleFan(AnmVm *vm, VertexDiffuseXyzrhw *vertices, i32 vertexCount)
 {
     if (this->spritesToDraw != 0)

@@ -100,6 +100,7 @@ struct Enemy
     void FUN_0042bc90();
     void FUN_0042c180();
     void FUN_0042c290(Float3 *position, Float3 *hitbox);
+    void FUN_0042e010();
     void FUN_0042a820();
 
     u8 unknown0x0[0xc];

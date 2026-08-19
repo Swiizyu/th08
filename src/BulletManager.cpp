@@ -369,6 +369,39 @@ void Bullet::FUN_004326e0()
     (*timer)++;
 }
 
+// FUNCTION: th08 0x432830
+void Bullet::FUN_00432830()
+{
+    AnmLoadedSprite *sprite = this->sprites.spriteBullet.loadedSprite;
+    if (sprite != NULL &&
+        g_GameManager.IsWithinPlayfield(this->position.x, this->position.y, sprite->widthPx, sprite->heightPx))
+    {
+        return;
+    }
+    i32 sound = *(i32 *)((u8 *)this + 0xdc8);
+    if (sound >= 0)
+    {
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)sound, 0);
+    }
+    if (this->position.x <= 0.0f || this->position.x >= 384.0f)
+    {
+        this->angle = AddNormalizeAngle(-this->angle - ZUN_PI, 0.0f);
+    }
+    if ((this->position.y <= 0.0f || this->position.y >= 448.0f) &&
+        (*(u32 *)((u8 *)this + 0xdac) & 0x400) == 0)
+    {
+        this->angle = -this->angle;
+    }
+    *(f32 *)((u8 *)this + 0xd68) = *(f32 *)((u8 *)this + 0x103c);
+    this->velocity.FromAngleMagnitude(this->angle,
+        *(f32 *)((u8 *)this + 0xd68) * g_Supervisor.framerateMultiplier);
+    (*(i32 *)((u8 *)this + 0x1050))++;
+    if (*(i32 *)((u8 *)this + 0x1050) >= *(i32 *)((u8 *)this + 0x1054))
+    {
+        *(u32 *)((u8 *)this + 0xdac) &= ~0xc00;
+    }
+}
+
 // FUNCTION: th08 0x4329f0
 void Bullet::FUN_004329f0()
 {

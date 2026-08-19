@@ -421,6 +421,7 @@ struct AnmVm : AnmVmBase
     void FUN_0044e120();
     ZunBool FUN_00428720();
     void __fastcall FUN_0042fe70(AnmVm *other);
+    void __fastcall FUN_0042fea0(AnmVm *other, AnmVm *reference, i32 spriteOffset);
 
     Float3 pos;
     i16 activeSpriteIndex;
@@ -552,6 +553,11 @@ struct AnmManager
     ZunResult DrawNoRotationNoRound(AnmVm *vm);
     void TransformVerticesWorld(AnmVm *vm);
     ZunResult DrawWorld(AnmVm *vm);
+    ZunResult FUN_00464400(AnmVm *vm, i32 flags);
+    ZunResult FUN_004649a0(AnmVm *vm, VertexTex1DiffuseXyzrhw *vertices, i32 vertexCount);
+    ZunResult FUN_00464b00(AnmVm *vm, VertexTex1DiffuseXyzrhw *vertices, i32 vertexCount);
+    ZunResult FUN_00464c60(AnmVm *vm, VertexDiffuseXyzrhw *vertices, i32 vertexCount);
+    ZunResult FUN_00464dd0(AnmVm *vm, i32 flags);
     void DrawPlayerBullet(AnmVm *vm);
     ZunResult DrawTriangleFan(AnmVm *vm, VertexDiffuseXyzrhw *vertices, i32 vertexCount);
     ZunResult CreateTextureFromFile(IDirect3DTexture8 **outTexture, i32 format, i32 colorKey);
