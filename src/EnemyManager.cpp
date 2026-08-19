@@ -1967,6 +1967,51 @@ ZunBool Enemy::FUN_0041fd90()
     return result;
 }
 
+// FUNCTION: th08 0x42b370
+#pragma var_order(maxHealth, i, damageAmount)
+void Enemy::FUN_0042b370(i32 damage)
+{
+    i32 damageAmount;
+    i32 i;
+    i32 maxHealth;
+    u8 *data;
+
+    if (!this->FUN_0041fd20() || *(i32 *)((u8 *)&g_Player + 0xfdc) != 0)
+    {
+        return;
+    }
+    data = *(u8 **)((u8 *)this + 0x2da4);
+    maxHealth = 0;
+    for (i = 0; i < 4; i++)
+    {
+        if (maxHealth < *(i32 *)(data + 0x3358 + i * 4))
+        {
+            maxHealth = *(i32 *)(data + 0x3358 + i * 4);
+        }
+    }
+    damageAmount = damage / 2;
+    if (*(ZunTimer *)(data + 0x5354) > 0)
+    {
+        if ((*(u32 *)(data + 0x3324) & 2) != 0)
+        {
+            damageAmount /= 9;
+        }
+        else
+        {
+            damageAmount = 0;
+        }
+    }
+    if (damageAmount == 0)
+    {
+        return;
+    }
+    *(i32 *)(data + 0x2dfc) -= damageAmount;
+    if (*(i32 *)(data + 0x2dfc) <= maxHealth)
+    {
+        *(i32 *)(data + 0x2dfc) = maxHealth;
+    }
+}
+
 // FUNCTION: th08 0x42bc50
 void Enemy::FUN_0042bc50()
 {
@@ -2008,6 +2053,55 @@ void Enemy::FUN_0042bc90()
             g_ZunMemory.Free(*(void **)((u8 *)this + i * 4 + 0x3384));
             *(void **)((u8 *)this + i * 4 + 0x3384) = NULL;
         }
+    }
+}
+
+// FUNCTION: th08 0x42c180
+void Enemy::FUN_0042c180()
+{
+    if ((*(u32 *)((u8 *)this + 0x3324) & 0x80000) != 0)
+    {
+        if (this->position0x2d34.x <= *(f32 *)((u8 *)this + 0x3340))
+        {
+            this->position0x2d34.x = *(f32 *)((u8 *)this + 0x3340);
+        }
+        else if (this->position0x2d34.x >= *(f32 *)((u8 *)this + 0x3348))
+        {
+            this->position0x2d34.x = *(f32 *)((u8 *)this + 0x3348);
+        }
+        if (this->position0x2d34.y <= *(f32 *)((u8 *)this + 0x3344))
+        {
+            this->position0x2d34.y = *(f32 *)((u8 *)this + 0x3344);
+        }
+        else if (this->position0x2d34.y >= *(f32 *)((u8 *)this + 0x334c))
+        {
+            this->position0x2d34.y = *(f32 *)((u8 *)this + 0x334c);
+        }
+    }
+}
+
+// FUNCTION: th08 0x42c290
+#pragma var_order(size)
+void Enemy::FUN_0042c290(Float3 *position, Float3 *hitbox)
+{
+    Float3 size;
+    u32 flags = *(u32 *)((u8 *)this + 0x3324);
+
+    size = *hitbox / 0.7f;
+    if ((flags & 0x80) != 0 && this->timer0x2e14.current != this->timer0x2e14.previous &&
+        this->timer0x2e14.current % 6 == 0)
+    {
+        g_Player.FUN_0044a470(position, &size);
+    }
+    u8 gameMode = *(u8 *)((u8 *)&g_GameManager + 0x3dba9);
+    if ((gameMode == 0 || gameMode == 4) && this->FUN_0041fd20())
+    {
+        return;
+    }
+    size = *hitbox / 1.5f;
+    if (g_Player.FUN_0044a360(position, &size) == 1 && (flags & 2) == 0 && (flags & 0x80) == 0)
+    {
+        *(i32 *)((u8 *)this + 0x2dfc) -= 10;
     }
 }
 

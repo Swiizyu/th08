@@ -92,8 +92,11 @@ struct Enemy
     ZunBool FUN_0041fd20();
     ZunBool FUN_0041fd90();
     void FUN_0042b2f0();
+    void FUN_0042b370(i32 damage);
     void FUN_0042bc50();
     void FUN_0042bc90();
+    void FUN_0042c180();
+    void FUN_0042c290(Float3 *position, Float3 *hitbox);
     void FUN_0042a820();
 
     u8 unknown0x0[0xc];
