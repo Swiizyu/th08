@@ -120,8 +120,10 @@ struct Enemy
     i32 __fastcall FUN_00421cb0(void *instruction);
     ZunBool FUN_0041fd20();
     ZunBool FUN_0041fd90();
+    void FUN_0042adb0(i32 spawnDrops);
     void FUN_0042b2f0();
     void FUN_0042b370(i32 damage);
+    i32 FUN_0042b490();
     i32 FUN_0042b930();
     void FUN_0042bc50();
     void FUN_0042bc90();

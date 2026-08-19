@@ -1231,6 +1231,34 @@ void Enemy::FUN_00423150()
     *(u8 *)((u8 *)this + 0x332e) = (u8)state;
 }
 
+// FUNCTION: th08 0x427450
+int Effect::FUN_00427450()
+{
+    if (*(u8 *)((u8 *)this + 0x356) != 0)
+    {
+        *(u8 *)((u8 *)this + 0x356) = 0;
+        this->timer = 0;
+    }
+    if (this->resource == NULL)
+    {
+        this->vm.pos = this->position;
+        this->vm.rotation.z = AddNormalizeAngle(this->vm.rotation.z,
+                                                g_Supervisor.framerateMultiplier * this->velocity.z);
+        g_AnmManager->Draw2D(&this->vm);
+        return 1;
+    }
+    i32 count = *(i32 *)((u8 *)this + 0x324);
+    if (count < 0) count = 0;
+    Float3 *points = (Float3 *)this->resource;
+    for (i32 i = 0; i < count; i++)
+    {
+        this->vm.pos = points[i * 2] + this->position;
+        this->vm.rotation.z = *(f32 *)((u8 *)this + 0x318) + i * *(f32 *)((u8 *)this + 0x314);
+        g_AnmManager->Draw2D(&this->vm);
+    }
+    return 1;
+}
+
 // FUNCTION: th08 0x4235a0
 void FUN_004235a0()
 {
@@ -2955,6 +2983,94 @@ void Enemy::FUN_0042bc90()
     }
 }
 
+// FUNCTION: th08 0x42adb0
+void Enemy::FUN_0042adb0(i32 spawnDrops)
+{
+    i32 familiarCount = this->GetFamiliarCount();
+    Enemy *familiar = *(Enemy **)((u8 *)this + 8);
+    for (i32 i = 0; familiar != NULL && i < familiarCount; i++)
+    {
+        Enemy *next = *(Enemy **)((u8 *)familiar + 8);
+        *(u32 *)((u8 *)familiar + 0x3324) |= 0x400;
+        *(Enemy **)((u8 *)familiar + 4) = NULL;
+        *(Enemy **)((u8 *)familiar + 8) = NULL;
+        familiar->position0x2d88 = familiar->position0x2d34 - familiar->position0x2d40;
+        if (spawnDrops)
+        {
+            i32 count = familiarCount < 10 ? familiarCount * 2 + 6 : 26;
+            g_EffectManager.SpawnEffect(7, &familiar->position0x2d88, count, -1);
+            for (i32 j = 0; j < count; j++)
+            {
+                Float3 position = familiar->position0x2d88;
+                position.x += g_Rng.GetRandomF32InRange(64.0f) - 32.0f;
+                position.y += g_Rng.GetRandomF32InRange(64.0f) - 32.0f;
+                g_ItemManager.SpawnItem(&position, ITEM_POINT_STAR, ITEM_STATE_AUTOCOLLECT);
+            }
+        }
+        *(i32 *)((u8 *)familiar + 0x330c) = 0;
+        *(i32 *)((u8 *)familiar + 0x3308) = 0;
+        *(i32 *)((u8 *)familiar + 0x3304) = -2;
+        familiar = next;
+    }
+    *(Enemy **)((u8 *)this + 8) = NULL;
+    if (spawnDrops && familiarCount == 0)
+    {
+        g_EffectManager.SpawnEffect(7, &this->position0x2d88,
+                                    *(i32 *)((u8 *)this + 0x3380) * 2, 0xfff0f00f);
+    }
+    this->FUN_0042b2f0();
+}
+
+// FUNCTION: th08 0x42b490
+int Enemy::FUN_0042b490()
+{
+    *(u32 *)((u8 *)this + 0x3328) &= ~0x30;
+    i32 activePhases = 0;
+    for (i32 i = 0; i < 4; i++)
+    {
+        i32 threshold = *(i32 *)((u8 *)this + 0x3358 + i * 4);
+        if (threshold < 0) continue;
+        activePhases++;
+        if (*(i32 *)((u8 *)this + 0x2dfc) < threshold)
+        {
+            *(i32 *)((u8 *)this + 0x2dfc) = threshold;
+            *(i32 *)((u8 *)this + 0x2e04) = threshold;
+            i16 timeline = *(i16 *)((u8 *)this + 0x3368 + i * 4);
+            g_EclManager.FUN_00418450((EclTimelineContext *)((u8 *)this + 0x7f8), timeline);
+            *(i32 *)((u8 *)this + 0x3358 + i * 4) = -1;
+            *(i32 *)((u8 *)this + 0x53cc) = (*(i32 *)((u8 *)this + 0x3378) - this->timer0x2e14.current) / 60;
+            *(i32 *)((u8 *)this + 0x3378) = -1;
+            this->FUN_00415c80();
+            *(i16 *)((u8 *)this + 0x2cea) = 0;
+            memset((u8 *)this + 0x2e24, 0, 0x210);
+            *(i32 *)((u8 *)this + 0x3060) = 0;
+            this->FUN_0042adb0(1);
+            for (i32 j = 0; j < 480; j++)
+            {
+                Enemy *enemy = &g_EnemyManager.enemies[j];
+                if ((*(u32 *)((u8 *)enemy + 0x3324) & 1) != 0 &&
+                    (*(u32 *)((u8 *)enemy + 0x3324) & 2) == 0)
+                    *(i32 *)((u8 *)enemy + 0x2dfc) = 0;
+            }
+            return 1;
+        }
+        i32 difference = *(i32 *)((u8 *)this + 0x2dfc) - threshold;
+        i32 level = difference < 120 ? 3 : difference < 300 ? 2 : difference < 600 ? 1 : 0;
+        u32 *flags = (u32 *)((u8 *)this + 0x3328);
+        if (((*flags >> 4) & 3) < (u32)level)
+            *flags = (*flags & ~0x30) | (level << 4);
+    }
+    if (activePhases == 0)
+    {
+        i32 health = *(i32 *)((u8 *)this + 0x2dfc);
+        i32 level = health < 50 ? 3 : health < 400 ? 2 : health < 1200 ? 1 : 0;
+        u32 *flags = (u32 *)((u8 *)this + 0x3328);
+        if (((*flags >> 4) & 3) < (u32)level)
+            *flags = (*flags & ~0x30) | (level << 4);
+    }
+    return 0;
+}
+
 // FUNCTION: th08 0x42b930
 int Enemy::FUN_0042b930()
 {
@@ -3228,6 +3344,42 @@ i32 Enemy::GetFamiliarCount()
         }
     }
     return count;
+}
+
+// FUNCTION: th08 0x42a8a0
+void EclTimeline::FUN_0042a8a0()
+{
+    u8 *instruction = (u8 *)this->unknown;
+    for (i32 guard = 0; instruction != NULL && guard < 256; guard++)
+    {
+        i32 time = *(i32 *)instruction;
+        if (time < 0 || this->timer.current < time) break;
+        i16 opcode = *(i16 *)(instruction + 4);
+        u8 size = *(u8 *)(instruction + 6);
+        if (size < 8) break;
+        if ((*(u8 *)(instruction + 7) & g_GameManager.difficultyMask) != 0)
+        {
+            u8 *args = instruction + 8;
+            if (opcode >= 1 && opcode <= 5)
+            {
+                Float3 position(*(f32 *)(args + 4), *(f32 *)(args + 8), 0.0f);
+                Enemy *enemy = g_EnemyManager.FUN_0042a4e0(*(i16 *)args, &position,
+                    *(i32 *)(args + 0xc), (i8)*(i32 *)(args + 0x10), *(i32 *)(args + 0x14), opcode == 1);
+                if (enemy != NULL && opcode == 3)
+                {
+                    *(i32 *)((u8 *)enemy + 0x3308) = *(i32 *)(args + 0x10);
+                    *(i32 *)((u8 *)enemy + 0x330c) = *(i32 *)(args + 0x14);
+                }
+            }
+            else if (opcode == 7)
+            {
+                g_BulletManager.RemoveAllBullets(*(i32 *)args);
+            }
+        }
+        instruction += size;
+        this->unknown = (u32)instruction;
+    }
+    this->timer.Tick();
 }
 
 // FUNCTION: th08 0x42a4e0

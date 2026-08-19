@@ -9,6 +9,7 @@ namespace th08
 struct EclTimeline
 {
     EclTimeline();
+    void FUN_0042a8a0();
 
     ZunTimer timer;
     u32 unknown;

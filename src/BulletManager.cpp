@@ -197,6 +197,12 @@ int BulletManager::FUN_00430aa0(i32 itemType, i32 itemState)
     return score;
 }
 
+// FUNCTION: th08 0x430ab0
+int BulletManager::FUN_00430ab0(i32 itemType, i32 itemState)
+{
+    return this->FUN_00430aa0(itemType, itemState);
+}
+
 // FUNCTION: th08 0x430d30
 #pragma var_order(i, bullet, delta)
 void BulletManager::FUN_00430d30(Float3 *position, f32 radius)

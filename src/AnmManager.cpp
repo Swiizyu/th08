@@ -20,6 +20,36 @@ AnmVmBase::AnmVmBase()
 {
 }
 
+// FUNCTION: th08 0x4623c0
+void AnmManager::FUN_004623c0(AnmVm *vm)
+{
+    this->SetRenderStateForVm(vm);
+    if (vm->loadedSprite != NULL && vm->anmFile != NULL)
+    {
+        this->currentTexture = vm->loadedSprite->texture;
+    }
+    this->renderStateChangesThisFrame++;
+}
+
+// FUNCTION: th08 0x4639e0
+ZunResult AnmManager::FUN_004639e0(AnmVm *vm)
+{
+    if (vm == NULL || !vm->IsVisible() || !vm->flag1 || vm->color1.a == 0)
+        return ZUN_ERROR;
+    this->TransformVerticesWorld(vm);
+    return this->DrawInner(vm, 0);
+}
+
+// FUNCTION: th08 0x4640e0
+ZunResult AnmManager::FUN_004640e0(AnmVm *vm)
+{
+    if (vm == NULL || !vm->IsVisible() || !vm->flag1 || vm->color1.a == 0)
+        return ZUN_ERROR;
+    this->TransformVerticesWorld(vm);
+    i32 flags = (vm->anchor & 3) != 0 ? 1 : 0;
+    return this->DrawInner(vm, flags);
+}
+
 // FUNCTION: th08 0x464070
 ZunResult AnmManager::FUN_00464070(AnmVm *vm)
 {

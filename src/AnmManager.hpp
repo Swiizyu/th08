@@ -537,11 +537,14 @@ struct AnmManager
     AnmLoaded *GetAnm(i32 anmIdx);
     void SetCameraMode(u8 cameraMode);
     void SetupVertexBuffer();
+    void FUN_004623c0(AnmVm *vm);
 
     ZunBool ExecuteScript(AnmVm *vm);
     void ExecuteScriptArray(AnmVm *sprites, int count);
     void SetRenderStateForVm(AnmVm *vm);
     ZunResult DrawInner(AnmVm *vm, i32 flags);
+    ZunResult FUN_004639e0(AnmVm *vm);
+    ZunResult FUN_004640e0(AnmVm *vm);
     ZunResult FUN_00464070(AnmVm *vm);
     ZunResult AddSpriteToDrawBuffer(VertexTex1DiffuseXyzrhw *vertices);
     ZunResult DrawNoRotation(AnmVm *vm);
