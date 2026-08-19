@@ -1060,6 +1060,63 @@ void __fastcall EclExIns::FUN_004246e0(void *)
     ScreenEffect::RegisterChain(SCREEN_EFFECT_UNK7, 4, 120, 190, 60, 21);
 }
 
+// FUNCTION: th08 0x424730
+#pragma var_order(origin, collisionSize, grazeSize, center)
+void __fastcall EclExIns::FUN_00424730(void *)
+{
+    u8 *enemy = *(u8 **)((u8 *)this + 0x2ca0);
+    Float3 origin(*(f32 *)((u8 *)this + 0x2d88) - *(f32 *)(enemy + 0x38),
+                  *(f32 *)((u8 *)this + 0x2d8c) - *(f32 *)(enemy + 0x3c), 0.0f);
+    Float3 collisionSize(590.0f, 160.0f, 0.0f);
+    Float3 grazeSize(590.0f, 128.0f, 0.0f);
+    Float3 center(origin.x + collisionSize.x / 2.0f, origin.y, 0.0f);
+    f32 angle = *(f32 *)((u8 *)this + 0x14);
+
+    if (((ZunTimer *)((u8 *)this + 0x2e14))->FUN_0040ebc0(12))
+    {
+        g_Player.CalcLaserHitbox(&center, &grazeSize, &origin, angle, 1);
+    }
+    g_Player.CalcLaserHitbox(&center, &collisionSize, &origin, angle, 0);
+}
+
+// FUNCTION: th08 0x424820
+#pragma var_order(origin, collisionSize, grazeSize, center)
+void __fastcall EclExIns::FUN_00424820(void *)
+{
+    u8 *enemy = *(u8 **)((u8 *)this + 0x2ca0);
+    Float3 origin(*(f32 *)((u8 *)this + 0x2d34) - *(f32 *)(enemy + 0x38),
+                  *(f32 *)((u8 *)this + 0x2d38) - *(f32 *)(enemy + 0x3c), 0.0f);
+    Float3 collisionSize(590.0f, 240.0f, 0.0f);
+    Float3 grazeSize(590.0f, 192.0f, 0.0f);
+    Float3 center(origin.x + collisionSize.x / 2.0f, origin.y, 0.0f);
+    f32 angle = *(f32 *)((u8 *)this + 0x14);
+
+    if (((ZunTimer *)((u8 *)this + 0x2e14))->FUN_0040ebc0(12))
+    {
+        g_Player.CalcLaserHitbox(&center, &grazeSize, &origin, angle, 1);
+    }
+    g_Player.CalcLaserHitbox(&center, &collisionSize, &origin, angle, 0);
+}
+
+// FUNCTION: th08 0x424910
+#pragma var_order(origin, collisionSize, grazeSize, center)
+void __fastcall EclExIns::FUN_00424910(void *)
+{
+    u8 *enemy = *(u8 **)((u8 *)this + 0x2ca0);
+    Float3 origin(*(f32 *)((u8 *)this + 0x2d88) - *(f32 *)(enemy + 0x38),
+                  *(f32 *)((u8 *)this + 0x2d8c) - *(f32 *)(enemy + 0x3c), 0.0f);
+    Float3 collisionSize(590.0f, 288.0f, 0.0f);
+    Float3 grazeSize(590.0f, 224.0f, 0.0f);
+    Float3 center(origin.x + collisionSize.x / 2.0f, origin.y, 0.0f);
+    f32 angle = *(f32 *)((u8 *)this + 0x14);
+
+    if (((ZunTimer *)((u8 *)this + 0x2e14))->FUN_0040ebc0(12))
+    {
+        g_Player.CalcLaserHitbox(&center, &grazeSize, &origin, angle, 1);
+    }
+    g_Player.CalcLaserHitbox(&center, &collisionSize, &origin, angle, 0);
+}
+
 // FUNCTION: th08 0x424a00
 void __fastcall EclExIns::FUN_00424a00(void *instruction)
 {

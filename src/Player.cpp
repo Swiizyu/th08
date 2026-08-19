@@ -275,6 +275,58 @@ collided:
     return 2;
 }
 
+// FUNCTION: th08 0x44a6a0
+#pragma var_order(playerRelativeTopLeft, laserBottomRight, laserTopLeft, playerRelativeBottomRight)
+i32 Player::CalcLaserHitbox(Float3 *center, Float3 *size, Float3 *origin, f32 rotation, i32 canGraze)
+{
+    Float3 playerRelativeTopLeft;
+    Float3 playerRelativeBottomRight;
+    Float3 laserTopLeft;
+    Float3 laserBottomRight;
+
+    laserTopLeft = this->position - *origin;
+    Rotate(&laserBottomRight, &laserTopLeft, -rotation);
+    laserBottomRight.z = 0.0f;
+    laserTopLeft = laserBottomRight + *origin;
+    playerRelativeTopLeft = laserTopLeft - this->unk0x3D4;
+    playerRelativeBottomRight = laserTopLeft + this->unk0x3D4;
+
+    laserTopLeft = *center - *size / 2.0f;
+    laserBottomRight = *center + *size / 2.0f;
+    if (!(playerRelativeTopLeft.x > laserBottomRight.x || playerRelativeBottomRight.x < laserTopLeft.x ||
+          playerRelativeTopLeft.y > laserBottomRight.y || playerRelativeBottomRight.y < laserTopLeft.y))
+    {
+        goto laser_collision;
+    }
+
+    if (!canGraze)
+    {
+        return 0;
+    }
+
+    laserTopLeft.x -= 48.0f;
+    laserTopLeft.y -= 48.0f;
+    laserBottomRight.x += 48.0f;
+    laserBottomRight.y += 48.0f;
+    if (playerRelativeTopLeft.x > laserBottomRight.x || playerRelativeBottomRight.x < laserTopLeft.x ||
+        playerRelativeTopLeft.y > laserBottomRight.y || playerRelativeBottomRight.y < laserTopLeft.y)
+    {
+        return 0;
+    }
+    if (this->playerState == PLAYER_STATE_DEAD || this->playerState == PLAYER_STATE_SPAWNING)
+    {
+        return 0;
+    }
+    return 2;
+
+laser_collision:
+    if (this->playerState != PLAYER_STATE_ALIVE)
+    {
+        return 0;
+    }
+    return 1;
+}
+
 // FUNCTION: th08 0x4512f0
 #pragma var_order(i, data)
 void Player::FUN_004512f0()

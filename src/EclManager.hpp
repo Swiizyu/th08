@@ -27,6 +27,9 @@ struct EclExIns
     void __fastcall FUN_00424130(void *instruction);
     void __fastcall FUN_00424170(void *instruction);
     void __fastcall FUN_004246e0(void *instruction);
+    void __fastcall FUN_00424730(void *instruction);
+    void __fastcall FUN_00424820(void *instruction);
+    void __fastcall FUN_00424910(void *instruction);
     void __fastcall FUN_00424a00(void *instruction);
     void __fastcall FUN_00424e00(void *instruction);
     void __fastcall FUN_00424e20(void *instruction);
