@@ -112,6 +112,10 @@ struct Player
 
     ZunBool IsHuman();
     ZunBool IsYoukai();
+    void __fastcall FUN_0040bc60(D3DCOLOR color);
+    void FUN_0040d950();
+    void FUN_0040f550();
+    void FUN_0040fcb0();
     ZunBool FUN_00451d50();
     i32 FUN_00449ff0(Float3 *position, Float3 *hitbox);
     i32 CalcLaserHitbox(Float3 *center, Float3 *size, Float3 *origin, f32 rotation, i32 canGraze);

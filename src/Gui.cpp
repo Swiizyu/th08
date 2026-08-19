@@ -40,18 +40,7 @@ struct GuiImpl
 {
     void MsgRead(i32 msgIdx);
     ZunResult RunMsg();
-    static void DecryptDialogue(char *dst, char *src)
-    {
-        i32 i = 0;
-        char c;
-        do
-        {
-            c = *src ^ 0x77;
-            dst[i] = c;
-            i++;
-            src++;
-        } while (c != 0);
-    }
+    static void __fastcall DecryptDialogue(char *dst, char *src);
     ZunResult DrawDialogue();
 
     AnmVm frontSprites[16];
@@ -87,6 +76,21 @@ struct GuiImpl
     AnmVm difficultySprite;
 };
 C_ASSERT(sizeof(GuiImpl) == 0x230b8);
+
+// FUNCTION: th08 0x4353ec
+#pragma var_order(c, i)
+void __fastcall GuiImpl::DecryptDialogue(char *dst, char *src)
+{
+    i32 i = 0;
+    char c;
+    do
+    {
+        c = *src ^ 0x77;
+        dst[i] = c;
+        i++;
+        src++;
+    } while (c != 0);
+}
 
 DIFFABLE_STATIC(Gui, g_Gui);
 DIFFABLE_STATIC(ChainElem, g_GuiCalcChain);

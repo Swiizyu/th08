@@ -1011,6 +1011,41 @@ void EclExIns::FUN_00423130(i32 value)
     *(i32 *)((u8 *)this + 0x20) = value;
 }
 
+// FUNCTION: th08 0x423400
+#pragma var_order(changed)
+void __fastcall EclExIns::FUN_00423400(void *)
+{
+    i32 changed;
+    u8 *enemy;
+
+    changed = 0;
+    if (*(f32 *)((u8 *)this + 0x2d34) <= 0.0f || *(f32 *)((u8 *)this + 0x2d34) >= 384.0f)
+    {
+        *(f32 *)((u8 *)this + 0x2d4c) = -*(f32 *)((u8 *)this + 0x2d4c);
+        changed = 1;
+    }
+    enemy = *(u8 **)((u8 *)this + 0x2ca0);
+    if (*(f32 *)((u8 *)this + 0x2d50) >= *(f32 *)(enemy + 0x54))
+    {
+        *(f32 *)((u8 *)this + 0x2d50) += *(f32 *)(enemy + 0x50);
+        changed = 1;
+    }
+    if (*(f32 *)((u8 *)this + 0x2d38) >= -64.0f)
+    {
+        *(f32 *)((u8 *)this + 0x2d50) = -*(f32 *)((u8 *)this + 0x2d50);
+        changed = 1;
+    }
+    else if (*(f32 *)((u8 *)this + 0x2d38) >= 480.0f)
+    {
+        *(u32 *)((u8 *)this + 0x3324) &= ~0x10000000;
+    }
+    if (changed)
+    {
+        *(f32 *)((u8 *)this + 0x2d94) =
+            atan2f(*(f32 *)((u8 *)this + 0x2d50), *(f32 *)((u8 *)this + 0x2d4c));
+    }
+}
+
 // FUNCTION: th08 0x423530
 #pragma var_order(effect)
 void __fastcall EclExIns::FUN_00423530(void *)

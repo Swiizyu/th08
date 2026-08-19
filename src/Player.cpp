@@ -2,6 +2,7 @@
 
 #include "Player.hpp"
 #include "AsciiManager.hpp"
+#include "Background.hpp"
 #include "EffectManager.hpp"
 #include "SoundPlayer.hpp"
 
@@ -10,6 +11,61 @@ u32 FUN_0044e0e0();
 
 namespace th08
 {
+
+DIFFABLE_STATIC(i32, g_BackgroundTintActive);
+
+// FUNCTION: th08 0x40bc60
+#pragma var_order(result, blue, green, red, factor)
+void __fastcall Player::FUN_0040bc60(D3DCOLOR color)
+{
+    i32 factor;
+    i32 red;
+    i32 green;
+    i32 blue;
+    D3DCOLOR result;
+    i32 timer = ((ZunTimer *)((u8 *)this + 0xe2af4))->AsFrames();
+    i32 duration = *(i32 *)((u8 *)this + 0xe2ae4);
+
+    red = (color >> 16) & 0xff;
+    green = (color >> 8) & 0xff;
+    blue = color & 0xff;
+    if (timer < 60)
+    {
+        factor = timer;
+    }
+    else if (timer > duration - 60)
+    {
+        factor = duration - timer;
+    }
+    else
+    {
+        factor = 60;
+    }
+    red = 128 - (128 - red) * factor / 60;
+    green = 128 - (128 - green) * factor / 60;
+    blue = 128 - (128 - blue) * factor / 60;
+    result = 0x80000000 | (red << 16) | (green << 8) | blue;
+    g_Background.FUN_00409160(result);
+    g_BackgroundTintActive = 1;
+}
+
+// FUNCTION: th08 0x40d950
+void Player::FUN_0040d950()
+{
+    this->FUN_0040bc60(0x80404040);
+}
+
+// FUNCTION: th08 0x40f550
+void Player::FUN_0040f550()
+{
+    this->FUN_0040bc60(0x80d02020);
+}
+
+// FUNCTION: th08 0x40fcb0
+void Player::FUN_0040fcb0()
+{
+    this->FUN_0040bc60(0x80f00000);
+}
 
 // FUNCTION: th08 0x449e50
 PlayerUnkStruct0x2ec::PlayerUnkStruct0x2ec()
