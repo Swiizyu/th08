@@ -130,9 +130,341 @@ Background::Background()
     this->vectors0x62b0 = this->vectors0x6394;
 }
 
-// STUB: th08 0x407400
+// FUNCTION: th08 0x407400
 ChainCallbackResult Background::OnUpdate(Background *background)
 {
+    Float3 position;
+    StdRawInstr *instruction;
+    Float3 *vectorArg;
+    i32 instructionIndex;
+    i32 cameraIndex;
+    f32 t;
+    Float3 *current;
+    Float3 *start;
+    Float3 *end;
+    u8 stageScratch[0x83c];
+
+    if (background->stdData == NULL)
+    {
+        return CHAIN_CALLBACK_RESULT_CONTINUE;
+    }
+    if ((*(u32 *)((u8 *)&g_GameManager + 0x3dbac) & 0x400) != 0)
+    {
+        return CHAIN_CALLBACK_RESULT_CONTINUE;
+    }
+
+    if (background->scriptWaitTime != 0)
+    {
+        instructionIndex = 0;
+        instruction = background->beginningOfScript;
+        background->instructionIndex = 0;
+        while ((instruction->opcode != 31 || background->scriptWaitTime != instruction->args[0]) &&
+               instruction->frame != -1)
+        {
+            instruction++;
+            instructionIndex++;
+        }
+        if (instruction->frame != -1)
+        {
+            background->instructionIndex = instructionIndex + 1;
+            background->timer0x80c = instruction->frame;
+            background->scriptWaitTime = 0;
+        }
+    }
+
+script_loop:
+    instruction = background->beginningOfScript + background->instructionIndex;
+    if (background->timer0x80c >= instruction->frame && instruction->frame != -1)
+    {
+        vectorArg = (Float3 *)instruction->args;
+        switch (instruction->opcode)
+        {
+        case 0:
+            position = *vectorArg;
+            background->position0x824 = position;
+            background->position0x6454 = position;
+            background->positionInterpStartTime = instruction->frame;
+            instruction++;
+            while (instruction->opcode != 0 && instruction->frame != -1)
+            {
+                instruction++;
+            }
+            if (instruction->frame != -1)
+            {
+                background->positionInterpEndTime = instruction->frame;
+                background->position0x6444 = *(Float3 *)instruction->args;
+            }
+            break;
+        case 1:
+            *(u32 *)((u8 *)background + 0xaf4) = instruction->args[0];
+            *(f32 *)((u8 *)background + 0xaec) = *(f32 *)&instruction->args[1];
+            *(f32 *)((u8 *)background + 0xaf0) = *(f32 *)&instruction->args[2];
+            memcpy((u8 *)background + 0xb04, (u8 *)background + 0xaec, 12);
+            break;
+        case 2:
+            memcpy((u8 *)background + 0xaf8, (u8 *)background + 0xaec, 12);
+            *(i32 *)((u8 *)background + 0xb10) = instruction->args[0];
+            background->timer0xb14 = 0;
+            break;
+        case 3:
+            if (background->scriptWaitTime != 0)
+            {
+                background->scriptWaitTime = 0;
+                break;
+            }
+            goto script_done;
+        case 4:
+            background->instructionIndex = instruction->args[0];
+            background->timer0x80c = instruction->args[1];
+            background->timersMax[0] = 0;
+            background->cameraTeleported = 1;
+            goto script_loop;
+        case 5:
+            background->vectors0x62b0.vector0 = background->vectors0x6264.vector0;
+            background->vectors0x6264.vector0 = *vectorArg;
+            if (background->timersMax[0] == 0)
+            {
+                background->vectors0x6394.vector0 = *vectorArg;
+            }
+            break;
+        case 6:
+            background->timersMax[0] = instruction->args[0];
+            background->timers0x63f4[0] = 0;
+            background->easeModes[0] = instruction->args[1];
+            break;
+        case 7:
+            background->vectors0x62b0.vector1 = background->vectors0x6264.vector1;
+            background->vectors0x6264.vector1 = *vectorArg;
+            if (background->timersMax[1] == 0)
+            {
+                background->vectors0x6394.vector1 = *vectorArg;
+            }
+            break;
+        case 8:
+            background->timersMax[1] = instruction->args[0];
+            background->timers0x63f4[1] = 0;
+            background->easeModes[1] = instruction->args[1];
+            break;
+        case 9:
+            background->vectors0x62b0.vector2 = background->vectors0x6264.vector2;
+            background->vectors0x6264.vector2 = *vectorArg;
+            if (background->timersMax[2] == 0)
+            {
+                background->vectors0x6394.vector2 = *vectorArg;
+            }
+            break;
+        case 10:
+            background->timersMax[2] = instruction->args[0];
+            background->timers0x63f4[2] = 0;
+            background->easeModes[2] = instruction->args[1];
+            break;
+        case 11:
+            background->vectors0x62b0.angle = background->vectors0x6264.angle;
+            background->vectors0x6264.angle = *(f32 *)&instruction->args[0];
+            if (background->timersMax[3] == 0)
+            {
+                background->vectors0x6394.angle = *(f32 *)&instruction->args[0];
+            }
+            break;
+        case 12:
+            background->timersMax[3] = instruction->args[0];
+            background->timers0x63f4[3] = 0;
+            background->easeModes[3] = instruction->args[1];
+            break;
+        case 13:
+            *(u32 *)((u8 *)background + 0x830) = instruction->args[0];
+            break;
+        case 14:
+            background->vectors0x62b0.vector0 = *vectorArg;
+            break;
+        case 15:
+            background->vectors0x6264.vector0 = *vectorArg;
+            break;
+        case 16:
+            background->vectors0x6348.vector0 = *vectorArg;
+            break;
+        case 17:
+            background->vectors0x62fc.vector0 = *vectorArg;
+            break;
+        case 18:
+            background->timersMax[0] = instruction->args[0];
+            background->timers0x63f4[0] = 0;
+            background->easeModes[0] = 7;
+            break;
+        case 19:
+            background->vectors0x62b0.vector1 = *vectorArg;
+            break;
+        case 20:
+            background->vectors0x6264.vector1 = *vectorArg;
+            break;
+        case 21:
+            background->vectors0x6348.vector1 = *vectorArg;
+            break;
+        case 22:
+            background->vectors0x62fc.vector1 = *vectorArg;
+            break;
+        case 23:
+            background->timersMax[1] = instruction->args[0];
+            background->timers0x63f4[1] = 0;
+            background->easeModes[1] = 7;
+            break;
+        case 24:
+            background->vectors0x62b0.vector2 = *vectorArg;
+            break;
+        case 25:
+            background->vectors0x6264.vector2 = *vectorArg;
+            break;
+        case 26:
+            background->vectors0x6348.vector2 = *vectorArg;
+            break;
+        case 27:
+            background->vectors0x62fc.vector2 = *vectorArg;
+            break;
+        case 28:
+            background->timersMax[2] = instruction->args[0];
+            background->timers0x63f4[2] = 0;
+            background->easeModes[2] = 7;
+            break;
+        case 29:
+            if (instruction->args[0] >= 0)
+            {
+                background->anm0x7f0->ExecuteAnmIdx(&background->vm0x4, instruction->args[0]);
+            }
+            else
+            {
+                background->vm0x4.activeSpriteIndex = -1;
+            }
+            break;
+        case 30:
+            if (instruction->args[0] >= 0)
+            {
+                background->anm0x7f0->ExecuteAnmIdx(&background->vm0x2a8, instruction->args[0]);
+            }
+            else
+            {
+                background->vm0x2a8.activeSpriteIndex = -1;
+            }
+            break;
+        }
+        background->instructionIndex++;
+        goto script_loop;
+    }
+
+script_done:
+    for (cameraIndex = 0; cameraIndex < 3; cameraIndex++)
+    {
+        if (background->timersMax[cameraIndex] != 0)
+        {
+            if (background->timers0x63f4[cameraIndex] < background->timersMax[cameraIndex])
+            {
+                background->timers0x63f4[cameraIndex]++;
+                t = (f32)background->timers0x63f4[cameraIndex] / (f32)background->timersMax[cameraIndex];
+            }
+            else
+            {
+                background->timers0x63f4[cameraIndex] = background->timersMax[cameraIndex];
+                t = 1.0f;
+                background->timersMax[cameraIndex] = 0;
+            }
+            switch (background->easeModes[cameraIndex])
+            {
+            case 1:
+                t = 1.0f - t;
+                t = 1.0f - t * t;
+                break;
+            case 2:
+                t = 1.0f - t;
+                t = 1.0f - t * t * t;
+                break;
+            case 3:
+                t = 1.0f - t;
+                t = 1.0f - t * t * t * t;
+                break;
+            case 4:
+                t *= t;
+                break;
+            case 5:
+                t = t * t * t;
+                break;
+            case 6:
+                t = t * t * t * t;
+                break;
+            }
+            current = &background->vectors0x6394.vector0 + cameraIndex;
+            start = &background->vectors0x62b0.vector0 + cameraIndex;
+            end = &background->vectors0x6264.vector0 + cameraIndex;
+            current->x = (end->x - start->x) * t + start->x;
+            current->y = (end->y - start->y) * t + start->y;
+            current->z = (end->z - start->z) * t + start->z;
+        }
+    }
+    if (background->timersMax[3] != 0)
+    {
+        background->timers0x63f4[3]++;
+        t = (f32)background->timers0x63f4[3] / (f32)background->timersMax[3];
+        if (t >= 1.0f)
+        {
+            t = 1.0f;
+            background->timersMax[3] = 0;
+        }
+        background->vectors0x6394.angle =
+            (background->vectors0x6264.angle - background->vectors0x62b0.angle) * t +
+            background->vectors0x62b0.angle;
+    }
+    D3DXVec3Normalize((D3DXVECTOR3 *)&background->vectors0x6394.vector3,
+                      (D3DXVECTOR3 *)&background->vectors0x6394.vector1);
+
+    if (*(i32 *)((u8 *)background + 0xb10) != 0)
+    {
+        background->timer0xb14++;
+        t = (f32)background->timer0xb14 / (f32)*(i32 *)((u8 *)background + 0xb10);
+        if (t > 1.0f)
+        {
+            t = 1.0f;
+        }
+        for (i32 colorIndex = 0; colorIndex < 4; colorIndex++)
+        {
+            ((u8 *)background)[0xaf4 + colorIndex] =
+                (u8)((((u8 *)background)[0xb08 + colorIndex] - ((u8 *)background)[0xafc + colorIndex]) * t +
+                     ((u8 *)background)[0xafc + colorIndex]);
+        }
+        *(f32 *)((u8 *)background + 0xaec) =
+            (*(f32 *)((u8 *)background + 0xb04) - *(f32 *)((u8 *)background + 0xaf8)) * t +
+            *(f32 *)((u8 *)background + 0xaf8);
+        *(f32 *)((u8 *)background + 0xaf0) =
+            (*(f32 *)((u8 *)background + 0xb00) - *(f32 *)((u8 *)background + 0xafc)) * t +
+            *(f32 *)((u8 *)background + 0xafc);
+        if (background->timer0xb14 >= *(i32 *)((u8 *)background + 0xb10))
+        {
+            *(i32 *)((u8 *)background + 0xb10) = 0;
+        }
+    }
+    if (instruction->opcode != 3)
+    {
+        background->timer0x80c++;
+    }
+    background->FUN_00409f40();
+    if (*(i32 *)((u8 *)background + 0xb24) >= 1)
+    {
+        if (*(i32 *)((u8 *)background + 0xb28) == 60)
+        {
+            (*(i32 *)((u8 *)background + 0xb24))++;
+        }
+        (*(i32 *)((u8 *)background + 0xb28))++;
+        for (instructionIndex = 0; instructionIndex < *(i32 *)((u8 *)background + 0xb30); instructionIndex++)
+        {
+            g_AnmManager->ExecuteScript(&background->vms0xb38[instructionIndex]);
+        }
+    }
+    if (background->vm0x4.activeSpriteIndex > 0)
+    {
+        g_AnmManager->ExecuteScript(&background->vm0x4);
+    }
+    if (background->vm0x2a8.activeSpriteIndex > 0)
+    {
+        g_AnmManager->ExecuteScript(&background->vm0x2a8);
+    }
+    background->stageFrameCounter++;
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
@@ -376,7 +708,7 @@ ZunResult Background::AddedCallback(Background *background)
         *(i32 *)((u8 *)background + 0x63e0 + i * 4) = 0;
         background->timers0x63f4[i] = 0;
     }
-    background->unknown0x6260 = 0;
+    background->scriptWaitTime = 0;
     *(f32 *)((u8 *)background + 0x6470) = 1322500.0f;
     if (g_GameManager.currentStage == 5)
     {
