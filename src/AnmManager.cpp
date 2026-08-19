@@ -80,6 +80,50 @@ void AnmVm::SetZRotation(f32 rotation)
     *(u32 *)((u8 *)this + 0x1f8) |= 4;
 }
 
+// FUNCTION: th08 0x40ec30
+void AnmVm::FUN_0040ec30(i32 duration, u8 mode, Float3 *initial, Float3 *final)
+{
+    ((ZunTimer *)((u8 *)this + 0x50))->SetCurrent(0);
+    ((ZunTimer *)((u8 *)this + 0xa4))->SetCurrent(duration);
+    *(u8 *)((u8 *)this + 0xf8) = mode;
+    *(Float3 *)((u8 *)this + 0x238) = *initial;
+    *(Float3 *)((u8 *)this + 0x244) = *final;
+}
+
+// FUNCTION: th08 0x40eca0
+void AnmVm::FUN_0040eca0(i32 duration, u8 mode, D3DCOLOR initial, D3DCOLOR final)
+{
+    ((ZunTimer *)((u8 *)this + 0x5c))->SetCurrent(0);
+    ((ZunTimer *)((u8 *)this + 0xb0))->SetCurrent(duration);
+    *(u8 *)((u8 *)this + 0xf9) = mode;
+    *(u8 *)((u8 *)this + 0x27a) = (initial >> 16) & 0xff;
+    *(u8 *)((u8 *)this + 0x279) = (initial >> 8) & 0xff;
+    *(u8 *)((u8 *)this + 0x278) = initial & 0xff;
+    *(u8 *)((u8 *)this + 0x27e) = (final >> 16) & 0xff;
+    *(u8 *)((u8 *)this + 0x27d) = (final >> 8) & 0xff;
+    *(u8 *)((u8 *)this + 0x27c) = final & 0xff;
+}
+
+// FUNCTION: th08 0x40ed50
+void AnmVm::FUN_0040ed50(i32 duration, u8 mode, u8 initial, u8 final)
+{
+    ((ZunTimer *)((u8 *)this + 0x68))->SetCurrent(0);
+    ((ZunTimer *)((u8 *)this + 0xbc))->SetCurrent(duration);
+    *(u8 *)((u8 *)this + 0xfa) = mode;
+    *(u8 *)((u8 *)this + 0x27b) = initial;
+    *(u8 *)((u8 *)this + 0x27f) = final;
+}
+
+// FUNCTION: th08 0x40eda0
+void AnmVm::FUN_0040eda0(i32 duration, u8 mode, Float2 *initial, Float2 *final)
+{
+    ((ZunTimer *)((u8 *)this + 0x80))->SetCurrent(0);
+    ((ZunTimer *)((u8 *)this + 0xd4))->SetCurrent(duration);
+    *(u8 *)((u8 *)this + 0xfc) = mode;
+    *(Float2 *)((u8 *)this + 0x268) = *initial;
+    *(Float2 *)((u8 *)this + 0x270) = *final;
+}
+
 // FUNCTION: th08 0x40bb60
 AnmLoaded *AnmManager::GetAnm(i32 anmIdx)
 {

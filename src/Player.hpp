@@ -113,6 +113,7 @@ struct Player
     ZunBool IsHuman();
     ZunBool IsYoukai();
     void __fastcall FUN_0040bc60(D3DCOLOR color);
+    void FUN_0040d310();
     void FUN_0040d950();
     void FUN_0040f550();
     void FUN_0040fcb0();

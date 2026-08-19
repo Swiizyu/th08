@@ -8,6 +8,22 @@
 #include <limits.h>
 #include <stdio.h>
 
+// FUNCTION: th08 0x408fc0
+#pragma var_order(factor3, factor2, factor1, factor0)
+f32 __stdcall FUN_00408fc0(f32 value0, f32 value1, f32 tangent0, f32 tangent1, f32 time)
+{
+    f32 factor0;
+    f32 factor1;
+    f32 factor2;
+    f32 factor3;
+
+    factor0 = (time - 1.0f) * (time - 1.0f) * (2.0f * time + 1.0f);
+    factor1 = time * time * (3.0f - 2.0f * time);
+    factor2 = (1.0f - time) * (1.0f - time) * time;
+    factor3 = (time - 1.0f) * time * time;
+    return factor0 * value0 + factor1 * value1 + factor2 * tangent0 + factor3 * tangent1;
+}
+
 namespace th08
 {
 DIFFABLE_STATIC(Rng, g_Rng)

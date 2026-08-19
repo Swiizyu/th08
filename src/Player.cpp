@@ -49,6 +49,24 @@ void __fastcall Player::FUN_0040bc60(D3DCOLOR color)
     g_BackgroundTintActive = 1;
 }
 
+// FUNCTION: th08 0x40d310
+#pragma var_order(color)
+void Player::FUN_0040d310()
+{
+    i32 color;
+    ZunTimer *timer = (ZunTimer *)((u8 *)this + 0xff4);
+
+    if (*timer < 60)
+    {
+        this->FUN_0040bc60(0x80404040);
+    }
+    else
+    {
+        color = (timer->AsFrames() - 60) * 176 / 60 + 64;
+        this->FUN_0040bc60(0x80000000 | color << 16 | color << 8 | color);
+    }
+}
+
 // FUNCTION: th08 0x40d950
 void Player::FUN_0040d950()
 {

@@ -413,6 +413,10 @@ struct AnmVm : AnmVmBase
     }
 
     void SetZRotation(f32 rotation);
+    void FUN_0040ec30(i32 duration, u8 mode, Float3 *initial, Float3 *final);
+    void FUN_0040eca0(i32 duration, u8 mode, D3DCOLOR initial, D3DCOLOR final);
+    void FUN_0040ed50(i32 duration, u8 mode, u8 initial, u8 final);
+    void FUN_0040eda0(i32 duration, u8 mode, Float2 *initial, Float2 *final);
     void FUN_0044e0f0();
     void FUN_0044e120();
     ZunBool FUN_00428720();
