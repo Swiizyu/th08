@@ -64,12 +64,12 @@ DIFFABLE_STATIC_ARRAY_ASSIGN(EffectTemplate, 66, g_EffectTemplates) = {
     {33, &Effect::FUN_00426c90, &Effect::FUN_00426b20},
     {51, &Effect::FUN_00426d70, &Effect::FUN_00426e70},
     {56, NULL, NULL},
-    {52, NULL, NULL},
+    {52, &Effect::FUN_004271a0, &Effect::FUN_004270c0},
     {54, &Effect::FUN_00426c40, NULL},
     {104, NULL, NULL},
     {104, NULL, NULL},
     {35, NULL, NULL},
-    {53, NULL, NULL},
+    {53, &Effect::FUN_004271a0, &Effect::FUN_004270c0},
     {34, &Effect::FUN_00426bb0, &Effect::FUN_00426b20},
     {57, NULL, NULL},
     {58, NULL, NULL},
@@ -462,6 +462,42 @@ i32 Effect::FUN_00426e70()
     this->vm.rotation.z = g_Rng.GetRandomF32InRange(ZUN_2PI) - ZUN_PI;
     this->vm.rotation.x = g_Rng.GetRandomF32InRange(ZUN_PI / 100.0f) - ZUN_PI / 200.0f;
     return 0;
+}
+
+// FUNCTION: th08 0x4270c0
+#pragma var_order(angle)
+i32 Effect::FUN_004270c0()
+{
+    f32 angle;
+
+    if ((f64)this->custom.x >= -990.0)
+    {
+        angle = AddNormalizeAngle(this->custom.x, 0.0f);
+    }
+    else
+    {
+        angle = g_Rng.GetRandomF32InRange(ZUN_2PI) - ZUN_PI;
+    }
+    this->emitterPosition = this->position;
+    this->emitterPosition.z = 0.0f;
+    this->direction.x = cosf(angle);
+    this->direction.y = sinf(angle);
+    this->direction.z = 0.0f;
+    this->direction *= g_Rng.GetRandomF32InRange(1.5f) + 1.0f;
+    return 0;
+}
+
+// FUNCTION: th08 0x4271a0
+#pragma var_order(factor)
+i32 Effect::FUN_004271a0()
+{
+    f32 factor;
+
+    factor = (f32)this->timer / 90.0f;
+    factor = 1.0f - (1.0f - factor) * (1.0f - factor);
+    this->position = this->direction * factor * 128.0f + this->emitterPosition;
+    this->position.z = 0.0f;
+    return 1;
 }
 
 // FUNCTION: th08 0x426d10
