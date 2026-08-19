@@ -9,6 +9,7 @@
 
 u32 FUN_004338c0();
 u32 FUN_0044e0e0();
+void FUN_0044e370(void *data);
 
 namespace th08
 {
@@ -323,6 +324,102 @@ struct PlayerCollisionObject
 };
 C_ASSERT(sizeof(PlayerCollisionObject) == 0x40);
 
+// FUNCTION: th08 0x44de60
+#pragma var_order(i, collision)
+void *Player::FUN_0044de60(Float2 *position, f32 width, f32 height, i32 arg4, i32 arg5)
+{
+    PlayerCollisionObject *collision = (PlayerCollisionObject *)((u8 *)this + 0xbb834);
+    i32 i;
+    for (i = 0; i < 0xbf; i++, collision++)
+    {
+        if (!collision->isActive)
+        {
+            break;
+        }
+    }
+    ::FUN_0044e370(collision);
+    collision->isActive = 1;
+    collision->position.x = position->x;
+    collision->position.y = position->y;
+    collision->width = width;
+    collision->height = height;
+    *(i32 *)((u8 *)collision + 0x24) = arg5;
+    *(i32 *)((u8 *)collision + 0x28) = arg4;
+    return collision;
+}
+
+// FUNCTION: th08 0x44df00
+#pragma var_order(i, collision)
+void *Player::FUN_0044df00(Float2 *position, f32 arg2, f32 arg3, i32 arg4, i32 arg5)
+{
+    PlayerCollisionObject *collision = (PlayerCollisionObject *)((u8 *)this + 0xbb834);
+    i32 i;
+    for (i = 0; i < 0xbf; i++, collision++)
+    {
+        if (!collision->isActive)
+        {
+            break;
+        }
+    }
+    ::FUN_0044e370(collision);
+    collision->isActive = 1;
+    collision->position.x = position->x;
+    collision->position.y = position->y;
+    *(f32 *)((u8 *)collision + 0x8) = arg2;
+    *(f32 *)((u8 *)collision + 0xc) = arg3;
+    *(i32 *)((u8 *)collision + 0x24) = arg4;
+    *(i32 *)((u8 *)collision + 0x28) = arg5;
+    return collision;
+}
+
+// FUNCTION: th08 0x44dfa0
+#pragma var_order(i, collision)
+void *Player::FUN_0044dfa0(Float2 *position, f32 width, f32 height, i32 arg4, i32 arg5)
+{
+    PlayerCollisionObject *collision = (PlayerCollisionObject *)((u8 *)this + 0xb8834);
+    i32 i;
+    for (i = 0; i < 0xbf; i++, collision++)
+    {
+        if (!collision->isActive)
+        {
+            break;
+        }
+    }
+    ::FUN_0044e370(collision);
+    collision->isActive = 1;
+    collision->position.x = position->x;
+    collision->position.y = position->y;
+    collision->width = width;
+    collision->height = height;
+    *(i32 *)((u8 *)collision + 0x24) = arg5;
+    *(i32 *)((u8 *)collision + 0x2c) = arg4;
+    return collision;
+}
+
+// FUNCTION: th08 0x44e040
+#pragma var_order(i, collision)
+void *Player::FUN_0044e040(Float2 *position, f32 arg2, f32 arg3, i32 arg4, i32 arg5)
+{
+    PlayerCollisionObject *collision = (PlayerCollisionObject *)((u8 *)this + 0xb8834);
+    i32 i;
+    for (i = 0; i < 0xbf; i++, collision++)
+    {
+        if (!collision->isActive)
+        {
+            break;
+        }
+    }
+    ::FUN_0044e370(collision);
+    collision->isActive = 1;
+    collision->position.x = position->x;
+    collision->position.y = position->y;
+    *(f32 *)((u8 *)collision + 0x8) = arg2;
+    *(f32 *)((u8 *)collision + 0xc) = arg3;
+    *(i32 *)((u8 *)collision + 0x24) = arg5;
+    *(i32 *)((u8 *)collision + 0x2c) = arg4;
+    return collision;
+}
+
 // FUNCTION: th08 0x44a5a0
 #pragma var_order(maxPosition, minPosition)
 i32 Player::CalcItemBoxCollision(Float3 *position, Float3 *hitbox)
@@ -417,6 +514,89 @@ collided:
     *(i32 *)((u8 *)this + 0xe2a90) = collision->itemType;
     collision->collisionCount++;
     return 2;
+}
+
+// FUNCTION: th08 0x44a230
+#pragma var_order(maxPosition, minPosition)
+i32 Player::FUN_0044a230(Float3 *position, Float3 *hitbox)
+{
+    Float3 minPosition;
+    Float3 maxPosition;
+
+    *(i32 *)((u8 *)this + 0xe2a90) = 6;
+    if (this->FUN_00449ff0(position, hitbox))
+    {
+        return 2;
+    }
+    minPosition = *position - *hitbox / 2.0f;
+    maxPosition = *position + *hitbox / 2.0f;
+    if (this->unk0x38C.x >= maxPosition.x || this->unk0x38C.y >= maxPosition.y ||
+        this->unk0x398.x <= minPosition.x || this->unk0x398.y <= minPosition.y)
+    {
+        return 0;
+    }
+    if (this->playerState != PLAYER_STATE_ALIVE)
+    {
+        return 1;
+    }
+    g_GameManager.RandomizeAntiTamper();
+    this->Die();
+    return 1;
+}
+
+// FUNCTION: th08 0x44a360
+#pragma var_order(maxPosition, minPosition)
+i32 Player::FUN_0044a360(Float3 *position, Float3 *hitbox)
+{
+    Float3 minPosition;
+    Float3 maxPosition;
+
+    *(i32 *)((u8 *)this + 0xe2a90) = 6;
+    minPosition = *position - *hitbox / 2.0f;
+    maxPosition = *position + *hitbox / 2.0f;
+    if (this->unk0x38C.x >= maxPosition.x || this->unk0x38C.y >= maxPosition.y ||
+        this->unk0x398.x <= minPosition.x || this->unk0x398.y <= minPosition.y)
+    {
+        return 0;
+    }
+    if (this->playerState != PLAYER_STATE_ALIVE)
+    {
+        return 1;
+    }
+    g_GameManager.RandomizeAntiTamper();
+    this->Die();
+    return 1;
+}
+
+// FUNCTION: th08 0x44a470
+#pragma var_order(maxPosition, minPosition)
+i32 Player::FUN_0044a470(Float3 *position, Float3 *hitbox)
+{
+    Float3 minPosition;
+    Float3 maxPosition;
+
+    *(i32 *)((u8 *)this + 0xe2a90) = 6;
+    if (this->FUN_00449ff0(position, hitbox))
+    {
+        return 2;
+    }
+    minPosition = *position - *hitbox / 2.0f;
+    maxPosition = *position + *hitbox / 2.0f;
+    minPosition.x -= 20.0f;
+    minPosition.y -= 20.0f;
+    maxPosition.x += 20.0f;
+    maxPosition.y += 20.0f;
+    if (this->playerState == PLAYER_STATE_DEAD || this->playerState == PLAYER_STATE_SPAWNING)
+    {
+        return 0;
+    }
+    if (this->unk0x3A4.x >= maxPosition.x || this->unk0x3A4.y >= maxPosition.y ||
+        this->unk0x3B0.x <= minPosition.x || this->unk0x3B0.y <= minPosition.y)
+    {
+        return 0;
+    }
+    this->ScoreGraze(position, 0);
+    return 1;
 }
 
 // FUNCTION: th08 0x44a6a0
