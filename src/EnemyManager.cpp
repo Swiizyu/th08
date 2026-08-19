@@ -1009,6 +1009,42 @@ void EclExIns::FUN_00423130(i32 value)
     *(i32 *)((u8 *)this + 0x20) = value;
 }
 
+// FUNCTION: th08 0x423530
+#pragma var_order(effect)
+void __fastcall EclExIns::FUN_00423530(void *)
+{
+    Effect *effect;
+    Float3 *position = (Float3 *)((u8 *)this + 0x2d34);
+
+    effect = g_EffectManager.SpawnSpecialEffect(56, position, 9, 1, -1);
+    effect = g_EffectManager.SpawnSpecialEffect(56, position, 10, 1, -1);
+    g_EffectManager.effectAnm->SetAndExecuteScriptIdx(&effect->vm, 97);
+}
+
+// FUNCTION: th08 0x423db0
+#pragma var_order(effect)
+void __fastcall EclExIns::FUN_00423db0(void *)
+{
+    Effect *effect;
+    Float3 *position = (Float3 *)((u8 *)this + 0x2d34);
+
+    effect = g_EffectManager.SpawnSpecialEffect(65, position, 9, 1, -1);
+    effect = g_EffectManager.SpawnSpecialEffect(65, position, 10, 1, -1);
+    g_EffectManager.effectAnm->SetAndExecuteScriptIdx(&effect->vm, 99);
+}
+
+// FUNCTION: th08 0x424170
+#pragma var_order(effect)
+void __fastcall EclExIns::FUN_00424170(void *)
+{
+    Effect *effect;
+    Float3 *position = (Float3 *)((u8 *)this + 0x2d34);
+
+    effect = g_EffectManager.SpawnSpecialEffect(58, position, 9, 1, -1);
+    effect = g_EffectManager.SpawnSpecialEffect(58, position, 10, 1, -1);
+    g_EffectManager.effectAnm->SetAndExecuteScriptIdx(&effect->vm, 101);
+}
+
 // FUNCTION: th08 0x424130
 void __fastcall EclExIns::FUN_00424130(void *)
 {
