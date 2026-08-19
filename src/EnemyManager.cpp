@@ -1003,6 +1003,12 @@ Effect *EffectManager::FUN_004253e0(i32 index)
     return (Effect *)((u8 *)this + (index + 0x280) * 0x360 + 0x1c);
 }
 
+// FUNCTION: th08 0x4212e0
+void __fastcall EndEnemySpell(void *, void *)
+{
+    g_Spellcard.EndSpell();
+}
+
 // FUNCTION: th08 0x4230c0
 void EclExIns::FUN_004230c0(i32 value)
 {

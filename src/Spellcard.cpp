@@ -90,6 +90,22 @@ void Spellcard::FUN_00415d10(const char *, void *)
     *(u32 *)this &= ~0x10;
 }
 
+// FUNCTION: th08 0x4161b0
+void Spellcard::EndSpell()
+{
+    if ((*(u32 *)this & 1) != 0)
+    {
+        *(u32 *)this &= ~1;
+        this->spellcard_fun_00416160();
+    }
+    if (*(void **)((u8 *)this + 4) != NULL)
+    {
+        *(u32 *)((u8 *)*(void **)((u8 *)this + 4) + 0x3324) &= ~0x08000000;
+    }
+    *(void **)((u8 *)this + 4) = NULL;
+    *(u32 *)this &= ~0x800;
+}
+
 // FUNCTION: th08 0x405260
 ZunBool Spellcard::FUN_00405260()
 {
