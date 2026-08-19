@@ -42,8 +42,73 @@ struct EffectTemplate
     EffectCallback updateCallback;
     EffectCallback initCallback;
 };
-DIFFABLE_STATIC_ARRAY_ASSIGN(EffectTemplate, 0x7b, g_EffectTemplates) = {
-    {28, NULL, NULL}, {29, NULL, NULL}, {30, NULL, NULL},
+DIFFABLE_STATIC_ARRAY_ASSIGN(EffectTemplate, 66, g_EffectTemplates) = {
+    {28, NULL, NULL},
+    {29, NULL, NULL},
+    {30, NULL, NULL},
+    {31, &Effect::FUN_00425e60, NULL},
+    {36, &Effect::FUN_00425e60, NULL},
+    {37, &Effect::FUN_00425e60, NULL},
+    {38, &Effect::FUN_00425e60, NULL},
+    {39, &Effect::FUN_00425e60, NULL},
+    {40, &Effect::FUN_00425e60, NULL},
+    {41, &Effect::FUN_00425e60, NULL},
+    {42, &Effect::FUN_00425e60, NULL},
+    {43, &Effect::FUN_00425e60, NULL},
+    {44, NULL, NULL},
+    {45, NULL, &Effect::FUN_00425fe0},
+    {45, NULL, &Effect::FUN_00425fe0},
+    {45, NULL, &Effect::FUN_00425fe0},
+    {0, NULL, NULL},
+    {32, &Effect::FUN_00426bb0, &Effect::FUN_00426b20},
+    {33, &Effect::FUN_00426c90, &Effect::FUN_00426b20},
+    {51, NULL, NULL},
+    {56, NULL, NULL},
+    {52, NULL, NULL},
+    {54, &Effect::FUN_00426c40, NULL},
+    {104, NULL, NULL},
+    {104, NULL, NULL},
+    {35, NULL, NULL},
+    {53, NULL, NULL},
+    {34, &Effect::FUN_00426bb0, &Effect::FUN_00426b20},
+    {57, NULL, NULL},
+    {58, NULL, NULL},
+    {59, NULL, NULL},
+    {60, NULL, NULL},
+    {48, NULL, NULL},
+    {49, NULL, NULL},
+    {50, NULL, NULL},
+    {88, &Effect::FUN_00427990, NULL},
+    {88, NULL, NULL},
+    {92, NULL, NULL},
+    {71, NULL, NULL},
+    {76, &Effect::FUN_00427990, NULL},
+    {81, &Effect::FUN_004279d0, NULL},
+    {82, NULL, NULL},
+    {83, NULL, NULL},
+    {83, NULL, NULL},
+    {83, NULL, NULL},
+    {83, &Effect::FUN_0040e2d0, NULL},
+    {84, &Effect::FUN_00410bb0, NULL},
+    {72, NULL, NULL},
+    {85, NULL, NULL},
+    {86, &Effect::FUN_00427990, NULL},
+    {80, &Effect::FUN_00427a60, NULL},
+    {73, NULL, NULL},
+    {77, &Effect::FUN_00427990, NULL},
+    {88, &Effect::FUN_00427ae0, NULL},
+    {88, &Effect::FUN_00427ae0, NULL},
+    {87, &Effect::FUN_004279d0, NULL},
+    {96, &Effect::FUN_004279d0, NULL},
+    {55, NULL, NULL},
+    {100, &Effect::FUN_004279d0, NULL},
+    {78, &Effect::FUN_00427990, NULL},
+    {102, NULL, NULL},
+    {103, NULL, NULL},
+    {75, NULL, NULL},
+    {74, NULL, NULL},
+    {77, &Effect::FUN_00427b50, NULL},
+    {98, &Effect::FUN_004279d0, NULL},
 };
 DIFFABLE_STATIC(ChainElem, g_EffectManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_EffectManagerDrawChain);
@@ -695,7 +760,7 @@ Effect *EffectManager::SpawnEffect(i32 effectId, Float3 *position, i32 count, D3
         *(i32 *)((u8 *)&effect->vm + 0x290) = 0;
         effect->updateCallback = g_EffectTemplates[effectId].updateCallback;
         if (g_EffectTemplates[effectId].initCallback != NULL &&
-            g_EffectTemplates[effectId].initCallback(effect) != 0)
+            (effect->*g_EffectTemplates[effectId].initCallback)() != 0)
         {
             effect->active = 0;
         }

@@ -7,7 +7,7 @@ namespace th08
 {
 
 struct Effect;
-typedef i32(__fastcall *EffectCallback)(Effect *effect);
+typedef i32 (Effect::*EffectCallback)();
 typedef void(__fastcall *EffectDrawCallback)(Effect *effect);
 
 struct Effect
