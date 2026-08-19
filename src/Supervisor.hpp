@@ -322,11 +322,16 @@ struct Supervisor
     u8 lockCounts[4];
     i32 loadingVmsHaveBeenSetup;
 
+    // These are stored as QPC/GTC outputs in the 0x300..0x338 region.
+    // Packed to 4 so the struct keeps its original 4-byte alignment
+    // (otherwise 64-bit LARGE_INTEGER members add 4 bytes of tail padding).
+#pragma pack(push, 4)
     LARGE_INTEGER perfFrequency;
     LARGE_INTEGER prevPerfCounter;
     LARGE_INTEGER curPerfCounter;
     SYSTEMTIME prevTime;
     SYSTEMTIME curTime;
+#pragma pack(pop)
 
     u32 unk0x338;
     u32 unk0x33c;
