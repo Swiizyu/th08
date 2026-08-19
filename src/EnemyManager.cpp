@@ -106,7 +106,7 @@ DIFFABLE_STATIC_ARRAY_ASSIGN(EffectTemplate, 66, g_EffectTemplates) = {
     {102, NULL, &Effect::FUN_00427260},
     {103, NULL, &Effect::FUN_00427260},
     {75, NULL, NULL},
-    {74, NULL, NULL},
+    {74, &Effect::FUN_00426990, &Effect::FUN_00426720},
     {77, &Effect::FUN_00427b50, &Effect::FUN_004272e0},
     {98, &Effect::FUN_004279d0, &Effect::FUN_00427970},
 };
@@ -538,6 +538,57 @@ i32 Effect::FUN_004264f0()
     this->vm.color2.g = (u32)(this->vm.color1.g * g_Background.vm0x844.color1.g) >> 8;
     this->vm.color2.b = (u32)(this->vm.color1.b * g_Background.vm0x844.color1.b) >> 8;
     this->vm.color2.a = (u32)(this->vm.color1.a * g_Background.vm0x844.color1.a) >> 8;
+    return 1;
+}
+
+// FUNCTION: th08 0x426720
+#pragma var_order(cameraLookAtInverse)
+i32 Effect::FUN_00426720()
+{
+    Float3 cameraLookAtInverse;
+
+    cameraLookAtInverse = -g_Background.vectors0x6394.vector1;
+    this->basePosition = g_Background.vectors0x6394.vector1 + g_Background.vectors0x6394.vector0;
+    this->basePosition.x += g_Rng.GetRandomF32SignedInRange(60.0f) + cameraLookAtInverse.x / 2.0f;
+    this->basePosition.y += g_Rng.GetRandomF32SignedInRange(200.0f) - 200.0f + cameraLookAtInverse.y / 2.0f;
+    this->basePosition.z += g_Rng.GetRandomF32InRange(100.0f) - 100.0f + cameraLookAtInverse.z / 2.0f;
+    this->velocity.x = g_Rng.GetRandomF32SignedInRange(0.001f) + this->custom.x;
+    this->velocity.y = g_Rng.GetRandomF32SignedInRange(0.03f) + 0.4f;
+    this->velocity.z = -g_Rng.GetRandomF32InRange(0.1f) - 0.3f + this->custom.z;
+    this->acceleration.x = g_Rng.GetRandomF32SignedInRange(0.0001f);
+    this->acceleration.y = g_Rng.GetRandomF32SignedInRange(0.0001f);
+    this->acceleration.z = -0.0003f;
+    this->velocity = this->velocity * g_Supervisor.framerateMultiplier;
+    this->acceleration = this->acceleration * g_Supervisor.framerateMultiplier;
+    this->drawType = 1;
+    *(f32 *)((u8 *)&this->vm + 0x288) = -9999.0f;
+    *(i32 *)((u8 *)&this->vm + 0x238) = 0;
+    *(i32 *)((u8 *)&this->vm + 0x244) = 0;
+    *(i32 *)((u8 *)&this->vm + 0x248) = 0;
+    *(i32 *)((u8 *)&this->vm + 0x24c) = 0;
+    *(i32 *)((u8 *)&this->vm + 0x250) = 0;
+    *(i32 *)((u8 *)&this->vm + 0x254) = 0;
+    *(i32 *)((u8 *)&this->vm + 0x258) = 0;
+    return 0;
+}
+
+// FUNCTION: th08 0x426990
+#pragma var_order(localPosition, dot)
+i32 Effect::FUN_00426990()
+{
+    Float3 localPosition;
+    f32 dot;
+
+    this->velocity += this->acceleration;
+    this->basePosition += this->velocity;
+    this->position = this->basePosition;
+    localPosition = this->position - g_Background.vectors0x6394.vector0;
+    D3DXVec3Normalize((D3DXVECTOR3 *)&localPosition, (D3DXVECTOR3 *)&localPosition);
+    dot = g_Background.vectors0x6394.vector3.FUN_0040b540(&localPosition);
+    if (dot < 0.94f)
+    {
+        return 0;
+    }
     return 1;
 }
 
