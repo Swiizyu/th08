@@ -1621,15 +1621,34 @@ void Gui::ShowSpellcardBonus(i32 bonus)
     g_Supervisor.unk174 = 2;
 }
 
-// STUB: th08 0x437f5c
-void Gui::CopyEnemyNameTexture(i32 param_1)
+// FUNCTION: th08 0x437f5c
+void __fastcall Gui::CopyEnemyNameTexture(i32 spriteIndex)
 {
+    AnmLoaded *anm = g_AnmManager->GetAnm(10);
+    if (anm == NULL || anm->sprites == NULL) return;
+    AnmLoadedSprite *destination = anm->GetSprite(10);
+    AnmLoadedSprite *source = anm->GetSprite(spriteIndex);
+    RECT destinationRect;
+    destinationRect.left = (LONG)destination->startPixelInclusive.x;
+    destinationRect.top = (LONG)destination->startPixelInclusive.y;
+    destinationRect.right = (LONG)destination->endPixelInclusive.x;
+    destinationRect.bottom = (LONG)destination->endPixelInclusive.y;
+    RECT sourceRect;
+    sourceRect.left = (LONG)source->startPixelInclusive.x;
+    sourceRect.top = (LONG)source->startPixelInclusive.y;
+    sourceRect.right = (LONG)source->endPixelInclusive.x;
+    sourceRect.bottom = (LONG)source->endPixelInclusive.y;
+    g_AnmManager->FUN_00467040(10, 0, 10, 1, &destinationRect, &sourceRect);
 }
 
-// STUB: th08 0x438046
+// FUNCTION: th08 0x438046
 void Gui::FUN_00438046()
 {
-    // Not actually sure this is Gui related, but it's located nearby other Gui functions
+    static const i32 stageNameSprites[8] = {16, 17, 18, 19, 20, 21, 23, 32};
+    i32 stage = g_GameManager.currentStage;
+    if (stage < 0) stage = 0;
+    if (stage > 7) stage = 7;
+    CopyEnemyNameTexture(stageNameSprites[stage]);
 }
 
 // FUNCTION: th08 0x43826b

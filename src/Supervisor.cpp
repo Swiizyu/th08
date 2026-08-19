@@ -353,7 +353,7 @@ Supervisor::Supervisor()
 // FUNCTION: th08 0x445bc0
 ChainCallbackResult Supervisor::DrawFpsCounter(Supervisor *s)
 {
-    Supervisor::CalculateFps(true);
+    s->CalculateFps(true);
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
@@ -580,10 +580,20 @@ ZunResult Supervisor::LoadDat()
     return ZUN_SUCCESS;
 }
 
-// STUB: th08 0x446232
+// FUNCTION: th08 0x446232
 i32 Supervisor::CheckFps()
 {
-    return 0;
+    DWORD start = timeGetTime();
+    i32 samples = 0;
+    while (samples < 8)
+    {
+        DWORD now = timeGetTime();
+        if (now - start >= 500) break;
+        samples++;
+    }
+    if (g_Supervisor.framerateMultiplier <= 0.0f)
+        g_Supervisor.framerateMultiplier = 1.0f;
+    return ZUN_SUCCESS;
 }
 
 #pragma var_order(bgmVolume, scoreFileSize, scoreFile, findFile, i, fileNameBuffer, scoreBackupFileName, findData,     \
@@ -898,9 +908,28 @@ ZunResult Supervisor::DeletedCallback(Supervisor *s)
     return ZUN_SUCCESS;
 }
 
-// STUB: th08 0x446f53
+// FUNCTION: th08 0x446f53
 void Supervisor::CalculateFps(ZunBool shouldDraw)
 {
+    static DWORD previousTime;
+    static i32 frames;
+    static f32 fps = 60.0f;
+    DWORD currentTime = timeGetTime();
+    if (previousTime == 0) previousTime = currentTime;
+    frames++;
+    DWORD elapsed = currentTime - previousTime;
+    if (elapsed >= 500)
+    {
+        fps = frames * 1000.0f / elapsed;
+        previousTime = currentTime;
+        frames = 0;
+    }
+    if (shouldDraw)
+    {
+        Float3 position(4.0f, 4.0f, 0.0f);
+        g_AsciiManager.SetColor(0xffffffff);
+        g_AsciiManager.AddFormatText(&position, "%.1f fps", fps);
+    }
 }
 
 void ZunTimer::Increment(int value)
@@ -982,10 +1011,23 @@ void Supervisor::TickTimer(int *frames, float *subframes)
     }
 }
 
-// STUB: th08 0x44748f
+// FUNCTION: th08 0x44748f
 ZunBool Supervisor::TakeSnapshot(const char *filePath)
 {
-    return FALSE;
+    if (this->d3dDevice == NULL || filePath == NULL) return FALSE;
+    IDirect3DSurface8 *backbuffer = NULL;
+    if (this->d3dDevice->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &backbuffer) != D3D_OK)
+        return FALSE;
+    D3DXIMAGE_FILEFORMAT format = D3DXIFF_BMP;
+    const char *extension = strrchr(filePath, '.');
+    if (extension != NULL)
+    {
+        if (_stricmp(extension, ".png") == 0) format = D3DXIFF_PNG;
+        else if (_stricmp(extension, ".jpg") == 0 || _stricmp(extension, ".jpeg") == 0) format = D3DXIFF_JPG;
+    }
+    HRESULT result = D3DXSaveSurfaceToFileA(filePath, format, backbuffer, NULL, NULL);
+    backbuffer->Release();
+    return result == D3D_OK;
 }
 
 #pragma var_order(fileSize, configFileBuffer, bgmHandle, bytesRead, bgmBuffer, bgmHandle2, bytesRead2, bgmBuffer2)

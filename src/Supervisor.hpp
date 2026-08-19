@@ -133,7 +133,7 @@ struct Supervisor
     static ChainCallbackResult DrawFpsCounter(Supervisor *s);
     static ChainCallbackResult OnDraw2(Supervisor *s);
     static ChainCallbackResult DrawLoadingVms(Supervisor *s);
-    static void CalculateFps(ZunBool shouldDraw);
+    void CalculateFps(ZunBool shouldDraw);
     void FUN_00448972();
     ZunResult CheckVersion(const char *version, i32 exeSize, i32 exeChecksum);
 

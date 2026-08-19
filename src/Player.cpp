@@ -185,6 +185,18 @@ void Player::FUN_004123d0()
     UpdateBombPattern(this, 11, 0xffffc0c0, 360, 12);
 }
 
+// FUNCTION: th08 0x413140
+void Player::FUN_00413140()
+{
+    UpdateBombPattern(this, 14, 0xffa0a0ff, 420, 9);
+}
+
+// FUNCTION: th08 0x413990
+void Player::FUN_00413990()
+{
+    UpdateBombPattern(this, 15, 0xffffa0a0, 480, 9);
+}
+
 // FUNCTION: th08 0x40bf00
 #pragma var_order(effect)
 void Player::FUN_0040bf00()
@@ -2413,9 +2425,28 @@ ZunResult Player::RegisterChain(u32 param)
     return ZUN_SUCCESS;
 }
 
-// STUB: th08 0x44c390
+// FUNCTION: th08 0x44c390
 ChainCallbackResult Player::OnUpdate(Player *player)
 {
+    player->FUN_0044c5b0();
+    player->FUN_0044c650();
+    if (player->playerState == PLAYER_STATE_DEAD)
+    {
+        player->FUN_0044cbf0();
+        player->FUN_0044d180();
+    }
+    else if (player->playerState == PLAYER_STATE_SPAWNING)
+    {
+        player->FUN_0044d180();
+    }
+    player->FUN_0044d2c0();
+    if (player->playerState == PLAYER_STATE_ALIVE)
+        player->FUN_0044aec0();
+    if (player->playerAnm != NULL)
+        g_AnmManager->ExecuteScript(&player->playerSprite);
+    player->FUN_00451150();
+    player->FUN_00451500();
+    player->FUN_0044d420();
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 

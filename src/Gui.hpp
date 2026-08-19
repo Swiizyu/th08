@@ -223,7 +223,7 @@ struct Gui
     void ShowBonusScore(i32 score);
     void ShowPopupText(i32 fmtArg, i32 popupType);
     void ShowSpellcardBonus(i32 bonus);
-    static void CopyEnemyNameTexture(i32 param_1);
+    static void __fastcall CopyEnemyNameTexture(i32 param_1);
     static void FUN_00438046();
     void DrawStageClearScreen();
     void DrawAsciiText();

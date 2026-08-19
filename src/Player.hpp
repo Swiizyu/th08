@@ -147,6 +147,8 @@ struct Player
     void FUN_00412300();
     void FUN_004123d0();
     void FUN_00412fa0();
+    void FUN_00413140();
+    void FUN_00413990();
     ZunBool FUN_00451d50();
     i32 FUN_00449ff0(Float3 *position, Float3 *hitbox);
     i32 FUN_0044a230(Float3 *position, Float3 *hitbox);
