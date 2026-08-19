@@ -8,6 +8,7 @@
 #include "Spellcard.hpp"
 #include "ScreenEffect.hpp"
 #include "ItemManager.hpp"
+#include "Gui.hpp"
 #include "Player.hpp"
 #include "ReplayManager.hpp"
 
@@ -184,6 +185,22 @@ f32 FUN_0042eb10(f32 start, f32 end, f32 factor)
 void ZunTimer::operator+=(i32 value)
 {
     this->Increment(value);
+}
+
+// FUNCTION: th08 0x42c3b0
+#pragma var_order(interval)
+void EnemyManager::FUN_0042c3b0()
+{
+    i32 interval;
+
+    if (!g_Gui.IsDialoguePresent())
+    {
+        interval = 2400 - g_GameManager.GetLives() * 240;
+        if (this->timer.current != this->timer.previous && this->timer.current % interval == 0)
+        {
+            g_GameManager.IncreaseSubrank(100);
+        }
+    }
 }
 
 // FUNCTION: th08 0x42a210

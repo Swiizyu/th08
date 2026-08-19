@@ -1852,6 +1852,7 @@ void Gui::CaptureArcade()
         this->impl->arcadeZoneSprite.loadedSprite->widthPx, this->impl->arcadeZoneSprite.loadedSprite->heightPx);
 }
 
+// FUNCTION: th08 0x439007
 i32 Gui::ShowClockTime()
 {
     this->timesAnm->ExecuteAnmIdx(&this->impl->clockTimeSprite, 2);
@@ -1859,6 +1860,7 @@ i32 Gui::ShowClockTime()
     return 0;
 }
 
+// FUNCTION: th08 0x439050
 i32 Gui::FlashClockTimeSlow()
 {
     this->timesAnm->SetSprite(&this->impl->clockTimeSprite, g_GameManager.GetClockTime());
@@ -1866,6 +1868,7 @@ i32 Gui::FlashClockTimeSlow()
     return 0;
 }
 
+// FUNCTION: th08 0x439093
 i32 Gui::FlashClockTimeFast()
 {
     this->timesAnm->SetSprite(&this->impl->clockTimeSprite, g_GameManager.GetClockTime());

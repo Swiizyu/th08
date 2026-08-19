@@ -150,6 +150,7 @@ struct EnemyManager
     static void CutChain();
 
     i32 DespawnAllEnemies(i32 param_1, i32 param_2);
+    void FUN_0042c3b0();
 
     Enemy enemyTemplate;
     Enemy enemies[481];
