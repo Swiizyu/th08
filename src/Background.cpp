@@ -11,6 +11,7 @@
 namespace th08
 {
 u32 IsDisableResourceReload();
+u8 __fastcall MixColors(u8 color1, u8 color2);
 
 DIFFABLE_STATIC(Background, g_Background);
 DIFFABLE_STATIC(ChainElem, g_BackgroundCalcChain);
@@ -135,9 +136,120 @@ ChainCallbackResult Background::OnUpdate(Background *background)
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
-// STUB: th08 0x409200
+// FUNCTION: th08 0x409200
+#pragma var_order(i, unused1, unused2, clearRect, effect, drawRect, fogColor)
 ChainCallbackResult Background::OnDrawHighPrio(Background *background)
 {
+    i32 i;
+    i32 unused1;
+    i32 unused2;
+    D3DRECT clearRect;
+    ZunRect drawRect;
+    Effect *effect;
+    ZunColor fogColor;
+
+    *(i32 *)((u8 *)background + 0x6478) = 0;
+    for (i = 0; i < 16; i++)
+    {
+        background->positions0x6480[i] = Float3(0.0f, 0.0f, 0.0f);
+    }
+    g_Supervisor.viewport.X = 32;
+    g_Supervisor.viewport.Y = 16;
+    g_Supervisor.viewport.Width = 384;
+    g_Supervisor.viewport.Height = 448;
+    g_AnmManager->ClearVertexBuffer();
+    g_AnmManager->ClearVertexShader();
+    g_AnmManager->ClearSprite();
+    g_AnmManager->ClearTexture();
+    g_AnmManager->ClearColorOp();
+    g_AnmManager->ClearBlendMode();
+    g_AnmManager->ClearZWrite();
+    g_AnmManager->ResetFrameDebugInfo();
+    g_AnmManager->ClearCameraSettings();
+    if (!g_Supervisor.IsFogDisabled())
+    {
+        g_Supervisor.DisableFog();
+    }
+    g_AnmManager->FlushVertexBuffer();
+
+    if (*(i32 *)((u8 *)background + 0xb2c) != 0)
+    {
+        clearRect.x1 = 32;
+        clearRect.y1 = 16;
+        clearRect.x2 = 384;
+        clearRect.y2 = 448;
+        g_Supervisor.d3dDevice->SetViewport((D3DVIEWPORT8 *)&clearRect);
+        g_Supervisor.d3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, 0xff000000, 1.0f, 0);
+        *(i32 *)((u8 *)background + 0xb2c) = 0;
+    }
+    g_Supervisor.d3dDevice->SetViewport(&g_Supervisor.viewport);
+    if (*(u8 *)((u8 *)background + 0x646b) > 0)
+    {
+        g_AnmManager->SetMixColor(*(u32 *)((u8 *)background + 0x6468));
+    }
+    *(u8 *)((u8 *)background + 0x646b) = 0;
+    *(u8 *)((u8 *)background + 0x646a) = 0x80;
+    *(u8 *)((u8 *)background + 0x6469) = 0x80;
+    *(u8 *)((u8 *)background + 0x6468) = 0x80;
+
+    if (*(i32 *)((u8 *)background + 0xb24) <= 1 && !g_Gui.FUN_00437d87())
+    {
+        if (background->vm0x4.activeSpriteIndex > 0)
+        {
+            g_AnmManager->Draw2DAndFlush(&background->vm0x4);
+        }
+        if (background->vm0x2a8.activeSpriteIndex > 0)
+        {
+            g_AnmManager->Draw2DAndFlush(&background->vm0x2a8);
+        }
+        if (*(Effect **)((u8 *)background + 0xae8) != NULL)
+        {
+            effect = *(Effect **)((u8 *)background + 0xae8);
+            effect->drawCallback(effect);
+        }
+    }
+
+    if ((*(u32 *)((u8 *)background + 0x830) & 0xff000000) == 0xff000000)
+    {
+        g_Supervisor.d3dDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,
+                                      *(u32 *)((u8 *)background + 0x830), 1.0f, 0);
+    }
+    else
+    {
+        if (*(u32 *)((u8 *)background + 0x830) != 0)
+        {
+            drawRect.left = 32.0f;
+            drawRect.top = 16.0f;
+            drawRect.right = 416.0f;
+            drawRect.bottom = 464.0f;
+            ScreenEffect::DrawSquare(&drawRect, *(u32 *)((u8 *)background + 0x830));
+        }
+        g_Supervisor.d3dDevice->Clear(0, NULL, D3DCLEAR_ZBUFFER, *(u32 *)((u8 *)background + 0x830), 1.0f, 0);
+    }
+    g_Supervisor.SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+    if (!g_AnmManager->useMixColor)
+    {
+        g_Supervisor.SetRenderState(D3DRS_FOGCOLOR, *(i32 *)((u8 *)background + 0xaf4));
+    }
+    else
+    {
+        fogColor.d3dColor = *(i32 *)((u8 *)background + 0xaf4);
+        fogColor.r = MixColors(fogColor.r, g_AnmManager->color.r);
+        fogColor.g = MixColors(fogColor.g, g_AnmManager->color.g);
+        fogColor.b = MixColors(fogColor.b, g_AnmManager->color.b);
+        g_Supervisor.SetRenderState(D3DRS_FOGCOLOR, fogColor.d3dColor);
+    }
+    g_Supervisor.SetRenderState(D3DRS_FOGSTART, *(u32 *)((u8 *)background + 0xaec));
+    g_Supervisor.SetRenderState(D3DRS_FOGEND, *(u32 *)((u8 *)background + 0xaf0));
+    if (!g_Supervisor.IsFogDisabled())
+    {
+        g_Supervisor.EnableFog();
+    }
+    if (*(i32 *)((u8 *)background + 0xb24) <= 1 && !g_Gui.FUN_00437d87())
+    {
+        background->RenderObjects(0);
+        background->RenderObjects(1);
+    }
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
