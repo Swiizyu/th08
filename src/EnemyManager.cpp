@@ -23,6 +23,7 @@ DIFFABLE_STATIC(EnemyManager, g_EnemyManager);
 DIFFABLE_STATIC(EclManager, g_EclManager);
 DIFFABLE_STATIC(i32, g_EnemyManagerUnknown);
 DIFFABLE_STATIC(EffectManager, g_EffectManager);
+DIFFABLE_STATIC(i32, g_EffectManagerState);
 DIFFABLE_STATIC_ARRAY_ASSIGN(const char *, 9, g_StageEnemyAnms) = {
     "stg1enm.anm", "stg2enm.anm", "stg3enm.anm", "stg4aenm.anm", "stg4benm.anm",
     "stg5enm.anm", "stg6enm.anm", "stg7enm.anm", "stg8enm.anm",
@@ -243,6 +244,18 @@ void Float3::FUN_00428700(float angle, float magnitudeX, float magnitudeY)
 ZunBool AnmVm::FUN_00428720()
 {
     return this->currentInstruction == NULL;
+}
+
+// FUNCTION: th08 0x42fe70
+void __fastcall AnmVm::FUN_0042fe70(AnmVm *other)
+{
+    __asm
+    {
+        mov esi, other
+        mov edi, this
+        mov ecx, 0xa9
+        rep movsd
+    }
 }
 
 // FUNCTION: th08 0x42a410
@@ -994,6 +1007,21 @@ void EclExIns::FUN_00423110(i32 index, i32 value)
 void EclExIns::FUN_00423130(i32 value)
 {
     *(i32 *)((u8 *)this + 0x20) = value;
+}
+
+// FUNCTION: th08 0x424130
+void __fastcall EclExIns::FUN_00424130(void *)
+{
+    g_EffectManager.FUN_004253e0(9)->active = 0;
+    g_EffectManager.FUN_004253e0(10)->active = 0;
+    g_EffectManagerState = 2;
+}
+
+// FUNCTION: th08 0x4246e0
+void __fastcall EclExIns::FUN_004246e0(void *)
+{
+    ScreenEffect::RegisterChain(SCREEN_EFFECT_FULL_FADE_OUT, 30, 5, 0x40ffffff, 0, 21);
+    ScreenEffect::RegisterChain(SCREEN_EFFECT_UNK7, 4, 120, 190, 60, 21);
 }
 
 // FUNCTION: th08 0x424a00

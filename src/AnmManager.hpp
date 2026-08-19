@@ -416,6 +416,7 @@ struct AnmVm : AnmVmBase
     void FUN_0044e0f0();
     void FUN_0044e120();
     ZunBool FUN_00428720();
+    void __fastcall FUN_0042fe70(AnmVm *other);
 
     Float3 pos;
     i16 activeSpriteIndex;
