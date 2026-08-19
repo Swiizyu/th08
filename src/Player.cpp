@@ -152,6 +152,23 @@ void Player::FUN_0040d010()
     }
 }
 
+// FUNCTION: th08 0x40d100
+void Player::FUN_0040d100()
+{
+    ZunTimer *timer = (ZunTimer *)((u8 *)this + 0xff4);
+    if (timer->AsFrames() != 0)
+    {
+        return;
+    }
+    this->FUN_0040be30(-1, 0,
+                         (*(u32 *)((u8 *)&g_GameManager + 0x3dbac) & 0x4000) != 0 ? 40 : 120,
+                         200, 0);
+    g_EffectManager.SpawnEffect(12, &this->position, 1, 0xff4040ff);
+    g_SoundPlayer.PlaySoundByIdx((SoundIdx)13, 0);
+    *(i32 *)((u8 *)this + 0x404) = 0;
+    *(i32 *)((u8 *)this + 0x408) = 0;
+}
+
 // FUNCTION: th08 0x40e610
 #pragma var_order(angle, i, vm)
 void Player::FUN_0040e610()
@@ -316,6 +333,40 @@ void Player::FUN_0040d310()
 void Player::FUN_0040d950()
 {
     this->FUN_0040bc60(0x80404040);
+}
+
+// FUNCTION: th08 0x40dee0
+void Player::FUN_0040dee0()
+{
+    ZunTimer *timer = (ZunTimer *)((u8 *)this + 0xff4);
+    ZunRect rect;
+    D3DCOLOR color;
+
+    if (timer->AsFrames() < 90)
+    {
+        this->FUN_0040bc60(0x802020d0);
+        return;
+    }
+    rect.left = 32.0f;
+    rect.top = 16.0f;
+    rect.right = 416.0f;
+    rect.bottom = 464.0f;
+    if (timer->AsFrames() < 120)
+    {
+        i32 component = (timer->AsFrames() - 90) * 208 / 30;
+        this->FUN_0040bc60(0x80000000 | ((component / 5 + 208) << 16) |
+                           ((component + 32) << 8) | component + 32);
+        color = ((timer->AsFrames() - 90) * 255 / 30) << 24 | 0xffffff;
+        ScreenEffect::DrawSquare(&rect, color);
+    }
+    else if (timer->AsFrames() < 220)
+    {
+        ScreenEffect::DrawSquare(&rect, 0x70ffffff);
+    }
+    else
+    {
+        this->FUN_0040bc60(0x802020d0);
+    }
 }
 
 // FUNCTION: th08 0x40f550
@@ -1059,6 +1110,183 @@ f32 Player::AngleToPlayer(Float3 *position)
     return atan2f(deltaY, deltaX);
 }
 
+static void ResetPlayerEffectState(u8 *data)
+{
+    ZunTimer *timer = (ZunTimer *)(data + 0x2e0);
+    if (timer->AsFrames() == 0)
+    {
+        ((AnmVm *)data)->SetInterrupt(5);
+    }
+    if (timer->AsFrames() > 16)
+    {
+        *(i32 *)(data + 0x2c8) = 0;
+        *(i32 *)(data + 0x2ec) = 0;
+        *(i32 *)(data + 0x2f0) = 0;
+    }
+}
+
+// FUNCTION: th08 0x44e3a0
+i32 __fastcall Player::FUN_0044e3a0(u8 *data)
+{
+    i32 state = *(i32 *)(data + 0x2c8);
+    if (state == 1)
+    {
+        this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)data, 18);
+        *(Float3 *)(data + 0x2a4) = this->position;
+        *(f32 *)(data + 0x2a8) -= 96.0f;
+        if (*(f32 *)(data + 0x2a8) < 32.0f)
+        {
+            *(f32 *)(data + 0x2a8) = 32.0f;
+        }
+        *(i32 *)(data + 0x2c8) = 2;
+        *(void **)((u8 *)this + 0xe2abc) = NULL;
+    }
+    else if (state == 2)
+    {
+        this->FUN_0044e770((Effect *)data);
+        f32 velocityX = *(f32 *)(data + 0x2bc);
+        i32 phase = *(i32 *)(data + 0x2cc);
+        if ((velocityX <= 0.0f && phase == 0) || (velocityX >= 0.0f && phase == 1))
+        {
+            ((AnmVm *)data)->SetInterrupt(2);
+            *(i32 *)(data + 0x2cc) = phase == 0 ? 1 : 2;
+            ((AnmVm *)data)->scale.y = -((AnmVm *)data)->scale.y;
+        }
+    }
+    else if (state == 3)
+    {
+        ResetPlayerEffectState(data);
+    }
+    return 0;
+}
+
+static void InitializePlayerOrb(Player *player, u8 *data, i32 script)
+{
+    player->playerAnm->SetAndExecuteScriptIdx((AnmVm *)data, script);
+    *(i32 *)(data + 0x2c8) = 2;
+    *(Float3 *)(data + 0x2b0) = player->position;
+    i32 mode = *(i32 *)(data + 0x2d0) & 3;
+    f32 xOffsets[4] = {-30.0f, -10.0f, 10.0f, 30.0f};
+    *(f32 *)(data + 0x2b0) += xOffsets[mode];
+    *(f32 *)(data + 0x2b4) -= mode == 0 || mode == 3 ? 96.0f : 32.0f;
+    *(f32 *)(data + 0x2d8) = mode == 1 || mode == 3 ? ZUN_PI : 0.0f;
+}
+
+static void UpdatePlayerOrb(u8 *data)
+{
+    i32 mode = *(i32 *)(data + 0x2d0) & 3;
+    if (((ZunTimer *)(data + 0x2e0))->AsFrames() >= 12)
+    {
+        f32 angularVelocity[4] = {0.02617994f, -0.03490659f, 0.03490659f, -0.02617994f};
+        *(f32 *)(data + 0x2d8) = AddNormalizeAngle(*(f32 *)(data + 0x2d8), angularVelocity[mode]);
+    }
+    ((Float3 *)(data + 0x2a4))->FromAngleMagnitude(*(f32 *)(data + 0x2d8), 8.0f);
+    *(Float3 *)(data + 0x2a4) += *(Float3 *)(data + 0x2b0);
+}
+
+// FUNCTION: th08 0x44eb70
+i32 __fastcall Player::FUN_0044eb70(u8 *data)
+{
+    i32 state = *(i32 *)(data + 0x2c8);
+    if (state == 1)
+    {
+        InitializePlayerOrb(this, data, 24);
+    }
+    else if (state == 2)
+    {
+        UpdatePlayerOrb(data);
+    }
+    else if (state == 3)
+    {
+        ResetPlayerEffectState(data);
+    }
+    return 0;
+}
+
+// FUNCTION: th08 0x44ee70
+i32 __fastcall Player::FUN_0044ee70(u8 *data)
+{
+    i32 state = *(i32 *)(data + 0x2c8);
+    if (state == 1)
+    {
+        InitializePlayerOrb(this, data, 24);
+    }
+    else if (state == 2)
+    {
+        UpdatePlayerOrb(data);
+        *(D3DCOLOR *)(data + 0x1f0) = this->isFocus ? 0xffff8080 : 0xff80ffff;
+    }
+    else if (state == 3)
+    {
+        ResetPlayerEffectState(data);
+    }
+    return 0;
+}
+
+static void InitializePlayerSpiral(Player *player, u8 *data)
+{
+    player->playerAnm->SetAndExecuteScriptIdx((AnmVm *)data, 21);
+    *(i32 *)(data + 0x2c8) = 2;
+    *(Float3 *)(data + 0x2b0) = *(Float3 *)((u8 *)player + 0x380);
+    *(f32 *)(data + 0x2d8) = 0.0f;
+    *(f32 *)(data + 0x2dc) = -ZUN_PI / 2.0f;
+}
+
+static void UpdatePlayerSpiral(Player *player, u8 *data, D3DCOLOR color)
+{
+    *(f32 *)(data + 0x2d8) = AddNormalizeAngle(*(f32 *)(data + 0x2d8), 0.05235988f);
+    ((Float3 *)(data + 0x2a4))->FromAngleMagnitude(*(f32 *)(data + 0x2d8), 8.0f);
+    Float3 target = *(Float3 *)((u8 *)player + 0x380);
+    Float3 delta = target - *(Float3 *)(data + 0x2b0);
+    f32 length = delta.FUN_0040b4c0();
+    if (length != 0.0f)
+    {
+        delta *= 0.05f / length;
+    }
+    *(Float3 *)(data + 0x2b0) += delta;
+    *(Float3 *)(data + 0x2a4) += *(Float3 *)(data + 0x2b0);
+    *(f32 *)(data + 0x2ac) = 0.0f;
+    g_EffectManager.SpawnEffect(47, (Float3 *)(data + 0x2a4), 1, color);
+}
+
+// FUNCTION: th08 0x44f2d0
+i32 __fastcall Player::FUN_0044f2d0(u8 *data)
+{
+    i32 state = *(i32 *)(data + 0x2c8);
+    if (state == 1)
+    {
+        InitializePlayerSpiral(this, data);
+    }
+    else if (state == 2)
+    {
+        UpdatePlayerSpiral(this, data, 0x80405080);
+    }
+    else if (state == 3)
+    {
+        ResetPlayerEffectState(data);
+    }
+    return 0;
+}
+
+// FUNCTION: th08 0x44f5e0
+i32 __fastcall Player::FUN_0044f5e0(u8 *data)
+{
+    i32 state = *(i32 *)(data + 0x2c8);
+    if (state == 1)
+    {
+        InitializePlayerSpiral(this, data);
+    }
+    else if (state == 2)
+    {
+        UpdatePlayerSpiral(this, data, 0xfff05080);
+    }
+    else if (state == 3)
+    {
+        ResetPlayerEffectState(data);
+    }
+    return 0;
+}
+
 // FUNCTION: th08 0x44e770
 #pragma var_order(delta, targetPosition)
 void __fastcall Player::FUN_0044e770(Effect *effect)
@@ -1298,6 +1526,46 @@ i32 __fastcall Player::FUN_0044fdd0(u8 *data, i32 frame, void *shotData)
         return 1;
     }
     return 0;
+}
+
+// FUNCTION: th08 0x44fe20
+#pragma var_order(i, index)
+i32 __fastcall Player::FUN_0044fe20(u8 *data, i32, void *shotData)
+{
+    PlayerShotData *shot = (PlayerShotData *)shotData;
+    i32 index = shot->phase;
+    ZunTimer *slotTimer = (ZunTimer *)((u8 *)this + 0xe2a38 + index * 16);
+    void **owner = (void **)((u8 *)this + 0xe2a44 + index * 16);
+
+    if (*(i32 *)((u8 *)this + 0xfdc) != 0 ||
+        (*(u32 *)((u8 *)&g_GameManager + 0x3dbac) & 0x2000) != 0)
+    {
+        return 0;
+    }
+    if (*owner != NULL)
+    {
+        if (*(void **)((u8 *)this + 0xe2a80 + index * 4) != shotData)
+        {
+            *(i16 *)((u8 *)*owner + 0x1fe) = 1;
+            *owner = NULL;
+        }
+        return 0;
+    }
+    slotTimer->SetCurrent(999);
+    *owner = data;
+    *(i16 *)(data + 0x466) = (i16)index;
+    *(i16 *)(data + 0x468) = shot->option;
+    *(f32 *)(data + 0x444) = shot->offsetX;
+    *(f32 *)(data + 0x448) = shot->offsetY;
+    *(i16 *)(data + 0x46a) = shot->interval;
+    this->FUN_0044fb70(data, shot);
+    for (i32 i = 31; i >= 0; i--)
+    {
+        *(f32 *)(data + 0x2b0 + i * 12) = -999.0f;
+    }
+    *(f32 *)(data + 0x2a4) = -999.0f;
+    *(void **)((u8 *)this + 0xe2a80 + index * 4) = shotData;
+    return 1;
 }
 
 // FUNCTION: th08 0x44ffa0
