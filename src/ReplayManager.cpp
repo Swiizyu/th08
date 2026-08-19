@@ -212,7 +212,7 @@ ChainCallbackResult ReplayManager::OnUpdateHighPrio(ReplayManager *mgr)
     if (mgr->frameId % 30 == 0)
     {
         *mgr->fpsCursor = *(u8 *)&g_Supervisor.curFps | (g_Supervisor.unk0x338 != 0 ? 0x80 : 0);
-        mgr->fpsCursor[1] = *(u8 *)&g_Supervisor.unk198;
+        mgr->fpsCursor[1] = *(u8 *)&g_Supervisor.curFps;
         mgr->fpsStageBookmarks[stage] = mgr->fpsCursor + 2;
         mgr->fpsCursor += 1;
     }
@@ -268,7 +268,7 @@ ChainCallbackResult ReplayManager::OnUpdateHighPrioDemo(ReplayManager *mgr)
 
     if (mgr->frameId % 30 == 0)
     {
-        *(u16 *)&g_Supervisor.unk198 = ((i8)mgr->fpsCursor[1]) & 0x7f;
+        *(u16 *)&g_Supervisor.curFps = ((i8)mgr->fpsCursor[1]) & 0x7f;
         g_Supervisor.unk0x33c = ((i8)mgr->fpsCursor[1]) >> 7;
         mgr->fpsCursor += 1;
     }
@@ -989,7 +989,7 @@ th08::ChainCallbackResult FUN_004526c0(th08::ReplayManager *mgr)
 
     if (mgr->frameId % 30 == 0)
     {
-        *(u16 *)&g_Supervisor.unk198 = ((i8)mgr->fpsCursor[1]) & 0x7f;
+        *(u16 *)&g_Supervisor.curFps = ((i8)mgr->fpsCursor[1]) & 0x7f;
         g_Supervisor.unk0x33c = ((i8)mgr->fpsCursor[1]) >> 7;
         mgr->fpsCursor += 1;
     }
