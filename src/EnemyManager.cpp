@@ -85,6 +85,17 @@ void ZunTimer::operator+=(i32 value)
     this->Increment(value);
 }
 
+// FUNCTION: th08 0x42a210
+EnemyManager::EnemyManager()
+{
+    this->Initialize();
+}
+
+// FUNCTION: th08 0x42a280
+Enemy::Enemy()
+{
+}
+
 // FUNCTION: th08 0x42a450
 EnemyUnkStruct2::EnemyUnkStruct2()
 {

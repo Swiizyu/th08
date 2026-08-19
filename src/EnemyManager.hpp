@@ -1,5 +1,6 @@
 #pragma once
 #include "Global.hpp"
+#include "EclManager.hpp"
 #include "ZunResult.hpp"
 #include "diffbuild.hpp"
 #include "utils.hpp"
@@ -61,8 +62,9 @@ struct EnemyUnkStruct2
     u8 padding[0x80];
     ZunTimer secondTimer;
     EnemyUnkStruct3 entries[8];
+    u8 trailingPadding[0xc];
 };
-C_ASSERT(sizeof(EnemyUnkStruct2) == 0x21c);
+C_ASSERT(sizeof(EnemyUnkStruct2) == 0x228);
 
 struct EnemyUnkStruct4
 {
@@ -78,6 +80,8 @@ C_ASSERT(sizeof(EnemyUnkStruct4) == 0x210);
 
 struct Enemy
 {
+    Enemy();
+
     i32 GetFamiliarCount();
     void FUN_00415c80();
     Enemy *FUN_0041efc0();
@@ -90,14 +94,49 @@ struct Enemy
     void FUN_0042bc90();
     void FUN_0042a820();
 
-    unknown_fields(0x0, 0x3380);
+    u8 unknown0x0[0xc];
+    AnmVm vm;
+    AnmVm vms[2];
+    EnemyUnkStruct2 unk0x7f8;
+    EnemyUnkStruct2 unk0xa20[0x10];
+    void *enemyData;
+    u8 unknown0x2ca4[0x90];
+    Float3 position0x2d34;
+    Float3 position0x2d40;
+    Float3 position0x2d4c;
+    Float3 position0x2d58;
+    Float3 position0x2d64;
+    Float3 position0x2d70;
+    Float3 position0x2d7c;
+    Float3 position0x2d88;
+    u8 unknown0x2d94[0x24];
+    Float3 position0x2db8;
+    Float3 position0x2dc4;
+    Float3 position0x2dd0;
+    ZunTimer timer0x2ddc;
+    u8 unknown0x2de8[0x2c];
+    ZunTimer timer0x2e14;
+    u8 unknown0x2e20[4];
+    EnemyUnkStruct4 unk0x2e24;
+    u8 unknown0x3034[0x30];
+    ZunTimer timer0x3064;
+    EnemyUnkStruct4 unk0x3070;
+    u8 unknown0x3280[0x98];
+    ZunTimer timer0x3318;
+    u8 unknown0x3324[0x5c];
     i32 field98_0x3380;
-    unknown_fields(0x3384, 0x204c);
+    u8 unknown0x3384[0x10];
+    EnemyUnkStruct0x1c unk0x3394[0x60];
+    VertexTex1DiffuseXyzrhw unk0x3e14[0xc2];
+    u8 unknown0x534c[8];
+    ZunTimer timer0x5354;
+    u8 unknown0x5360[0x70];
 };
 C_ASSERT(sizeof(Enemy) == 0x53d0);
 
 struct EnemyManager
 {
+    EnemyManager();
     void Initialize();
     static ZunResult RegisterChain();
     static ChainCallbackResult OnUpdate();
@@ -113,7 +152,10 @@ struct EnemyManager
     Enemy enemyTemplate;
     Enemy enemies[481];
     Enemy *bossIds[8];
-    unknown_fields(0x9dcdc0, 0x150);
+    u8 unknown0x9dcdc0[0x10];
+    EclTimeline timelines[0x10];
+    ZunTimer timer;
+    u8 unknown0x9dcedc[0x34];
 };
 C_ASSERT(sizeof(EnemyManager) == 0x9dcf10);
 
