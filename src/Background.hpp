@@ -20,6 +20,42 @@ struct StdRawHeader
     char songNames[4][128];
     char songPaths[4][128];
 };
+C_ASSERT(sizeof(StdRawHeader) == 0x490);
+
+struct StdRawQuadBasic
+{
+    i16 type;
+    i16 byteSize;
+    i16 anmScript;
+    i16 vmIndex;
+    Float3 position;
+    Float2 size;
+};
+
+struct StdRawObject
+{
+    u16 id;
+    i8 zLevel;
+    i8 flags;
+    Float3 position;
+    Float3 size;
+    StdRawQuadBasic firstQuad;
+};
+
+struct StdRawInstance
+{
+    i16 id;
+    i16 unknown;
+    Float3 position;
+};
+
+struct StdRawInstr
+{
+    i32 frame;
+    i16 opcode;
+    i16 size;
+    i32 args[3];
+};
 
 struct BackgroundUnkVectors
 {
@@ -59,15 +95,21 @@ struct Background
     {
     }
 
-    u8 unknown0x0[4];
+    AnmVm *quadVms;
     AnmVm vm0x4;
     AnmVm vm0x2a8;
     AnmVm vm0x54c;
     AnmLoaded *anm0x7f0;
     StdRawHeader *stdData;
-    u8 unknown0x7f8[0x14];
+    i32 quadCount;
+    i32 objectsCount;
+    StdRawObject **objects;
+    StdRawInstance *objectInstances;
+    StdRawInstr *beginningOfScript;
     ZunTimer timer0x80c;
-    u8 unknown0x818[0xc];
+    i32 instructionIndex;
+    i32 stageFrameCounter;
+    i32 stage;
     Float3 position0x824;
     u8 unknown0x830[8];
     ZunTimer timer0x838;

@@ -277,10 +277,65 @@ void Background::CutChain()
     g_Chain.Cut(&g_BackgroundDrawChainLowPrio);
 }
 
-// STUB: th08 0x409ce0
+// FUNCTION: th08 0x409ce0
+#pragma var_order(vmIdx, i, object, quad)
 ZunResult Background::LoadStageData(const char *path)
 {
-    return ZUN_ERROR;
+    StdRawQuadBasic *quad;
+    StdRawObject *object;
+    i32 i;
+    i32 vmIdx;
+
+    if (!IsDisableResourceReload())
+    {
+        this->stdData = (StdRawHeader *)FileSystem::OpenFile(path, NULL, FALSE);
+        if (this->stdData == NULL)
+        {
+            g_GameErrorContext.Log("\x83\x58\x83\x65\x81\x5b\x83\x57\x83\x66\x81\x5b\x83\x5e\x82\xaa\x8c\xa9\x82\xc2\x82\xa9\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81\x42\x83\x66\x81\x5b\x83\x5e\x82\xaa\x89\xf3\x82\xea\x82\xc4\x82\xa2\x82\xdc\x82\xb7\r\n");
+            return ZUN_ERROR;
+        }
+    }
+
+    this->objectsCount = this->stdData->nbObjects;
+    this->quadCount = this->stdData->nbQuads;
+    this->objectInstances = (StdRawInstance *)(this->stdData->quadsOffset + (i32)this->stdData);
+    this->beginningOfScript = (StdRawInstr *)(this->stdData->scriptOffset + (i32)this->stdData);
+    this->objects = (StdRawObject **)(this->stdData + 1);
+    if (!IsDisableResourceReload())
+    {
+        for (i = 0; i < this->objectsCount; i++)
+        {
+            this->objects[i] = (StdRawObject *)((u8 *)this->objects[i] + (u32)this->stdData);
+        }
+    }
+
+    this->quadVms = (AnmVm *)g_ZunMemory.Alloc(this->quadCount * sizeof(AnmVm), "bgscroll");
+    for (i = 0, vmIdx = 0; i < this->objectsCount; i++)
+    {
+        object = this->objects[i];
+        object->flags = 1;
+        quad = &object->firstQuad;
+        while (quad->type >= 0)
+        {
+            this->anm0x7f0->ExecuteAnmIdx(&this->quadVms[vmIdx], quad->anmScript);
+            quad->vmIndex = vmIdx++;
+            quad = (StdRawQuadBasic *)((u8 *)quad + quad->byteSize);
+        }
+    }
+
+    switch (g_GameManager.currentStage)
+    {
+    case 2:
+        g_Supervisor.textAnm->SetAndExecuteScriptIdx(&this->vm0x844, 33);
+        break;
+    default:
+        g_Supervisor.textAnm->SetAndExecuteScriptIdx(&this->vm0x844, 33);
+        break;
+    }
+    this->vm0x844.SetInterrupt(2);
+    *(u8 *)((u8 *)this + 0x834) = 0;
+    this->timer0x838 = 0;
+    return ZUN_SUCCESS;
 }
 
 }; // Namespace th08
