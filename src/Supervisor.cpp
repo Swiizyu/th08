@@ -30,6 +30,12 @@ DIFFABLE_STATIC(ScreenEffect *, g_SupervisorScreenEffect);
 DIFFABLE_STATIC(Supervisor, g_Supervisor);
 DIFFABLE_STATIC_ARRAY(AnmVm, 3, g_SupervisorLoadingVms);
 
+DIFFABLE_STATIC(u32, g_FpsUpdateCounter);
+DIFFABLE_STATIC(LARGE_INTEGER, g_PerformanceCounter);
+DIFFABLE_STATIC_ARRAY(char, 256, g_ReplayFpsBuffer);
+DIFFABLE_STATIC_ARRAY(char, 256, g_FpsCounterBuffer);
+DIFFABLE_STATIC(u32, g_NumFramesSinceLastTime);
+
 // FUNCTION: th08 0x40b900
 ZunBool KeepStageResources()
 {
@@ -353,7 +359,7 @@ Supervisor::Supervisor()
 // FUNCTION: th08 0x445bc0
 ChainCallbackResult Supervisor::DrawFpsCounter(Supervisor *s)
 {
-    s->CalculateFps(true);
+    Supervisor::CalculateFps(true);
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
@@ -580,20 +586,112 @@ ZunResult Supervisor::LoadDat()
     return ZUN_SUCCESS;
 }
 
+#pragma var_order(i, frameCount, timeStart, fpsArray, fpsCount, timeEnd, timeDiff, fps, unused, j, fpsSum)
 // FUNCTION: th08 0x446232
 i32 Supervisor::CheckFps()
 {
-    DWORD start = timeGetTime();
-    i32 samples = 0;
-    while (samples < 8)
+    i32 i;
+    i32 frameCount;
+    DWORD timeStart;
+    f32 fpsArray[29];
+    i32 fpsCount;
+    DWORD timeEnd;
+    i32 timeDiff;
+    f32 fps;
+    f32 unused;
+    i32 j;
+    f32 fpsSum;
+
+    i = 0;
+    frameCount = 0;
+    fpsCount = 0;
+    timeStart = 0;
+
+    timeBeginPeriod(1);
+    timeStart = timeGetTime();
+    timeEndPeriod(1);
+
+    while (i < 1800 && fpsCount < 8)
     {
-        DWORD now = timeGetTime();
-        if (now - start >= 500) break;
-        samples++;
+        g_Supervisor.d3dDevice->BeginScene();
+        g_AnmManager->CopySurfaceToBackbuffer(8, 0, 0, 0, 0);
+        g_Supervisor.d3dDevice->EndScene();
+        if (FAILED(g_Supervisor.d3dDevice->Present(NULL, NULL, NULL, NULL)))
+        {
+            g_Supervisor.d3dDevice->Reset(&g_Supervisor.presentParameters);
+        }
+
+        i++;
+
+        timeBeginPeriod(1);
+        timeEnd = timeGetTime();
+        timeEndPeriod(1);
+
+        frameCount++;
+        timeDiff = timeEnd - timeStart;
+
+        if (timeDiff >= 700)
+        {
+            timeStart = timeEnd;
+            frameCount = 0;
+        }
+        else if (timeDiff >= 500)
+        {
+            unused = (f32)timeDiff / 1000.0f;
+            fps = frameCount * 1000.0f / (f32)timeDiff;
+
+            if (fps >= 57.0f)
+            {
+                fpsArray[fpsCount] = fps;
+                fpsCount++;
+            }
+
+            timeStart = timeEnd;
+            frameCount = 0;
+        }
     }
-    if (g_Supervisor.framerateMultiplier <= 0.0f)
-        g_Supervisor.framerateMultiplier = 1.0f;
-    return ZUN_SUCCESS;
+
+    if (!g_Supervisor.cfg.opts.disableVsync)
+    {
+        fpsSum = 0.0f;
+        if (fpsCount >= 2)
+        {
+            for (j = 0; j < fpsCount; j++)
+            {
+                fpsSum += fpsArray[j];
+            }
+            fpsSum /= (f32)j;
+        }
+        else
+        {
+            fpsSum = 1000.0f;
+        }
+
+        if (fpsSum > 160.0f)
+        {
+            g_GameErrorContext.Log(
+                "\x90\x82\x92\xBC\x93\xAF\x8A\xFA\x82\xAA\x8E\xE6\x82\xEA\x82\xC4\x82\xC8\x82\xA2\x82\xA9\x81\x41"
+                "\x83\x8A\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x8C\x81\x5B\x83\x67\x82\xAA\x8D\x82\x82\xB7"
+                "\x82\xAC\x82\xDC\x82\xB7\x0D\x0A");
+            g_GameErrorContext.Log("\x8B\xAD\x90\xA7\x82\x55\x82\x4F\x83\x74\x83\x8C\x81\x5B\x83\x80\x83\x82\x81\x5B"
+                                   "\x83\x68\x82\xC5\x93\xAE\x8D\xEC\x82\xB5\x82\xDC\x82\xB7\x0D\x0A");
+            g_Supervisor.disableVsync = 1;
+            return -2;
+        }
+        else if (fpsSum >= 65.0f)
+        {
+            g_GameErrorContext.Log(
+                "\x90\x82\x92\xBC\x93\xAF\x8A\xFA\x82\xAA\x8E\xE6\x82\xEA\x82\xC4\x82\xC8\x82\xA2\x82\xA9\x81\x41"
+                "\x83\x8A\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x8C\x81\x5B\x83\x67\x82\xAA\x8D\x82\x82\xB7"
+                "\x82\xAC\x82\xDC\x82\xB7\x81\x42\x0D\x0A");
+            g_GameErrorContext.Log("\x8B\xAD\x90\xA7\x82\x55\x82\x4F\x83\x74\x83\x8C\x81\x5B\x83\x80\x83\x82\x81\x5B"
+                                   "\x83\x68\x82\xC5\x93\xAE\x8D\xEC\x82\xB5\x82\xDC\x82\xB7\x0D\x0A");
+            g_Supervisor.disableVsync = 1;
+            return -2;
+        }
+    }
+
+    return 0;
 }
 
 #pragma var_order(bgmVolume, scoreFileSize, scoreFile, findFile, i, fileNameBuffer, scoreBackupFileName, findData,     \
@@ -908,27 +1006,124 @@ ZunResult Supervisor::DeletedCallback(Supervisor *s)
     return ZUN_SUCCESS;
 }
 
+#pragma var_order(fps, elapsedTimeInSecs, curTime, targetFps, curPerfCounter, fpsCounterPos,        \
+                  replayFpsCounterPos)
 // FUNCTION: th08 0x446f53
 void Supervisor::CalculateFps(ZunBool shouldDraw)
 {
-    static DWORD previousTime;
-    static i32 frames;
-    static f32 fps = 60.0f;
-    DWORD currentTime = timeGetTime();
-    if (previousTime == 0) previousTime = currentTime;
-    frames++;
-    DWORD elapsed = currentTime - previousTime;
-    if (elapsed >= 500)
+    Float3 replayFpsCounterPos;
+    Float3 fpsCounterPos;
+    LARGE_INTEGER curPerfCounter;
+    f32 targetFps;
+    DWORD curTime;
+    f32 elapsedTimeInSecs;
+    f32 fps;
+
+    if (!g_GameManager.unk2D)
     {
-        fps = frames * 1000.0f / elapsed;
-        previousTime = currentTime;
-        frames = 0;
+        g_NumFramesSinceLastTime = g_NumFramesSinceLastTime + 1 + (u32)g_Supervisor.cfg.frameskipConfig;
+
+        if (g_Supervisor.perfFrequency.LowPart == 0)
+        {
+            static DWORD g_LastTime = timeGetTime();
+
+            curTime = timeGetTime();
+            if (curTime < g_LastTime)
+            {
+                g_LastTime = curTime;
+                g_NumFramesSinceLastTime = 0;
+            }
+            if (curTime - g_LastTime >= 500)
+            {
+                elapsedTimeInSecs = (f32)(curTime - g_LastTime) / 1000.0f;
+                g_LastTime = curTime;
+
+            MERGE:
+                fps = (f32)g_NumFramesSinceLastTime / elapsedTimeInSecs;
+                g_NumFramesSinceLastTime = 0;
+                sprintf(g_FpsCounterBuffer, "%.02ffps", (f64)fps);
+                if (g_GameManager.flags.unk2 && shouldDraw != 0)
+                {
+                    targetFps = 60.0f;
+                    g_Supervisor.lagDenominator = g_Supervisor.lagDenominator + targetFps;
+                    if (targetFps * 0.9f < fps)
+                    {
+                        g_Supervisor.lagNumerator = g_Supervisor.lagNumerator + targetFps;
+                    }
+                    else if (targetFps * 0.7f < fps)
+                    {
+                        g_Supervisor.lagNumerator = g_Supervisor.lagNumerator + targetFps * 0.8f;
+                    }
+                    else if (targetFps * 0.5f < fps)
+                    {
+                        g_Supervisor.lagNumerator = g_Supervisor.lagNumerator + targetFps * 0.6f;
+                    }
+                    else
+                    {
+                        g_Supervisor.lagNumerator = g_Supervisor.lagNumerator + targetFps * 0.5f;
+                    }
+
+                    if (!g_GameManager.flags.isReplay)
+                    {
+                        g_Supervisor.curFps = fps + 0.5f;
+                    }
+                    else
+                    {
+                        sprintf(g_ReplayFpsBuffer, "%2d", (i32)g_Supervisor.curFps);
+                    }
+                }
+            }
+            goto LAB_004471e4;
+        }
+
+        if (g_PerformanceCounter.LowPart == 0)
+        {
+            QueryPerformanceCounter(&g_PerformanceCounter);
+        }
+        QueryPerformanceCounter(&curPerfCounter);
+        if (curPerfCounter.LowPart < g_PerformanceCounter.LowPart)
+        {
+            g_PerformanceCounter.LowPart = curPerfCounter.LowPart;
+            g_PerformanceCounter.HighPart = curPerfCounter.HighPart;
+            g_NumFramesSinceLastTime = 0;
+        }
+        if (curPerfCounter.LowPart >= g_PerformanceCounter.LowPart + (g_Supervisor.perfFrequency.LowPart >> 1))
+        {
+            elapsedTimeInSecs = (f32)(curPerfCounter.LowPart - g_PerformanceCounter.LowPart) /
+                                (f32)g_Supervisor.perfFrequency.LowPart;
+            g_PerformanceCounter.LowPart = curPerfCounter.LowPart;
+            g_PerformanceCounter.HighPart = curPerfCounter.HighPart;
+            g_FpsUpdateCounter++;
+            goto MERGE;
+        }
     }
-    if (shouldDraw)
+
+LAB_004471e4:
+    if (!g_Supervisor.unk178 && shouldDraw != 0)
     {
-        Float3 position(4.0f, 4.0f, 0.0f);
-        g_AsciiManager.SetColor(0xffffffff);
-        g_AsciiManager.AddFormatText(&position, "%.1f fps", fps);
+        fpsCounterPos.x = 512.0f;
+        fpsCounterPos.y = 464.0f;
+        fpsCounterPos.z = 0.0f;
+        g_AsciiManager.AddString(&fpsCounterPos, g_FpsCounterBuffer);
+
+        if (g_GameManager.flags.isReplay && g_GameManager.flags.unk2)
+        {
+            replayFpsCounterPos.x = 384.0f;
+            replayFpsCounterPos.y = 448.0f;
+            replayFpsCounterPos.z = 0.0f;
+
+            if (g_Supervisor.unk0x33c)
+            {
+                g_AsciiManager.color = 0xffff4040;
+            }
+            else
+            {
+                g_AsciiManager.color = 0xffffffd0;
+            }
+
+            g_AsciiManager.AddString(&replayFpsCounterPos, g_ReplayFpsBuffer);
+            g_AsciiManager.color = 0xffffffff;
+        }
     }
 }
 
@@ -1011,23 +1206,103 @@ void Supervisor::TickTimer(int *frames, float *subframes)
     }
 }
 
+#pragma var_order(bmfh, bitmapData, bitmapInfo, backBuffer, stride, srcPixel, dstPixel, y, x,        \
+                  bytesPerRow, lockedRect, bytesWritten, bitmapFile)
 // FUNCTION: th08 0x44748f
 ZunBool Supervisor::TakeSnapshot(const char *filePath)
 {
-    if (this->d3dDevice == NULL || filePath == NULL) return FALSE;
-    IDirect3DSurface8 *backbuffer = NULL;
-    if (this->d3dDevice->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &backbuffer) != D3D_OK)
-        return FALSE;
-    D3DXIMAGE_FILEFORMAT format = D3DXIFF_BMP;
-    const char *extension = strrchr(filePath, '.');
-    if (extension != NULL)
+    HANDLE bitmapFile;
+    DWORD bytesWritten;
+    D3DLOCKED_RECT lockedRect;
+    i32 bytesPerRow;
+    i32 x;
+    i32 y;
+    u8 *dstPixel;
+    u8 *srcPixel;
+    i32 stride;
+    IDirect3DSurface8 *backBuffer;
+    BITMAPINFO *bitmapInfo;
+    void *bitmapData;
+    BITMAPFILEHEADER bmfh;
+
+    bitmapInfo = NULL;
+    bitmapData = NULL;
+    backBuffer = NULL;
+    utils::GuiDebugPrint("SnapShot! %s\n", filePath);
+    this->d3dDevice->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &backBuffer);
+    memset(&bmfh, 0, sizeof(BITMAPFILEHEADER));
+    bmfh.bfType = *(WORD *)"BM";
+    bmfh.bfSize = bmfh.bfOffBits = 54;
+    switch (this->presentParameters.BackBufferFormat)
     {
-        if (_stricmp(extension, ".png") == 0) format = D3DXIFF_PNG;
-        else if (_stricmp(extension, ".jpg") == 0 || _stricmp(extension, ".jpeg") == 0) format = D3DXIFF_JPG;
+    case D3DFMT_X8R8G8B8:
+        bitmapInfo = (BITMAPINFO *)malloc(sizeof(BITMAPINFO));
+        if (bitmapInfo == NULL)
+        {
+            g_GameErrorContext.Log("\x73\x6E\x61\x70\x53\x68\x6F\x74\x53\x63\x72\x65\x65\x6E\x20\x3A\x20\x8A\x6D"
+                                   "\x95\xDB\x82\xB5\x82\xAD\x82\xE8\x0D\x0A");
+            break;
+        }
+        memset(bitmapInfo, 0, sizeof(BITMAPINFO));
+        stride = 1920;
+        bitmapData = malloc(stride * 480);
+        if (bitmapData == NULL)
+        {
+            g_GameErrorContext.Log("\x73\x6E\x61\x70\x53\x68\x6F\x74\x53\x63\x72\x65\x65\x6E\x20\x3A\x20\x8A\x6D"
+                                   "\x95\xDB\x82\xB5\x82\xAD\x82\xE8\x0D\x0A");
+            break;
+        }
+        bmfh.bfSize += stride * 480;
+        bitmapInfo->bmiHeader.biBitCount = 24;
+        bitmapInfo->bmiHeader.biSize = 40;
+        bitmapInfo->bmiHeader.biWidth = 640;
+        bitmapInfo->bmiHeader.biHeight = 480;
+        bitmapInfo->bmiHeader.biPlanes = 1;
+        bitmapInfo->bmiHeader.biCompression = 0;
+        backBuffer->LockRect(&lockedRect, NULL, 0);
+        bytesPerRow = 0;
+        for (y = 479; -1 < y; y--, bytesPerRow++)
+        {
+            dstPixel = (u8 *)((u8 *)bitmapData + stride * bytesPerRow);
+            srcPixel = (u8 *)((u8 *)lockedRect.pBits + lockedRect.Pitch * y);
+            for (x = 0; x < 640; x++)
+            {
+                *dstPixel = *srcPixel;
+                srcPixel++;
+                dstPixel++;
+                *dstPixel = *srcPixel;
+                srcPixel++;
+                dstPixel++;
+                *dstPixel = *srcPixel;
+                srcPixel += 2;
+                dstPixel++;
+            }
+        }
+        backBuffer->UnlockRect();
+        bitmapFile = CreateFileA(filePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        if (bitmapFile == INVALID_HANDLE_VALUE)
+        {
+            break;
+        }
+        WriteFile(bitmapFile, &bmfh, 14, &bytesWritten, NULL);
+        WriteFile(bitmapFile, bitmapInfo, 40, &bytesWritten, NULL);
+        WriteFile(bitmapFile, bitmapData, stride * 480, &bytesWritten, NULL);
+        CloseHandle(bitmapFile);
+        break;
+    case D3DFMT_R5G6B5:
+        utils::GuiDebugPrint("\x31\x36\x62\x69\x74\x20\x82\xCD\x8E\xE6\x82\xE8\x8D\x9E\x82\xDF\x82\xC8\x82\xA2\x0D"
+                             "\x0A");
+        g_GameErrorContext.Log("\x31\x36\x62\x69\x74\x20\x82\xCD\x8E\xE6\x82\xE8\x8D\x9E\x82\xDF\x82\xC8\x82\xA2"
+                               "\x0D\x0A");
+        break;
+    default:
+        g_GameErrorContext.Log("\x65\x72\x72\x6F\x72\x20\x3F\x20\x6D\x6F\x74\x68\x65\x72\x2E\x63\x70\x70\x0D\x0A");
+        return TRUE;
     }
-    HRESULT result = D3DXSaveSurfaceToFileA(filePath, format, backbuffer, NULL, NULL);
-    backbuffer->Release();
-    return result == D3D_OK;
+    SAFE_RELEASE(backBuffer);
+    free(bitmapInfo);
+    free(bitmapData);
+    return FALSE;
 }
 
 #pragma var_order(fileSize, configFileBuffer, bgmHandle, bytesRead, bgmBuffer, bgmHandle2, bytesRead2, bgmBuffer2)
