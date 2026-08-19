@@ -211,7 +211,7 @@ ChainCallbackResult ReplayManager::OnUpdateHighPrio(ReplayManager *mgr)
 
     if (mgr->frameId % 30 == 0)
     {
-        *mgr->fpsCursor = *(u8 *)&g_Supervisor.unk198 | (g_Supervisor.unk0x338 != 0 ? 0x80 : 0);
+        *mgr->fpsCursor = *(u8 *)&g_Supervisor.curFps | (g_Supervisor.unk0x338 != 0 ? 0x80 : 0);
         mgr->fpsCursor[1] = *(u8 *)&g_Supervisor.unk198;
         mgr->fpsStageBookmarks[stage] = mgr->fpsCursor + 2;
         mgr->fpsCursor += 1;

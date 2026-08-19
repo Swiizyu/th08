@@ -305,7 +305,8 @@ struct Supervisor
     MidiOutput *midiOutput;
     float lagNumerator;
     float lagDenominator;
-    u32 unk198;
+    i16 curFps;
+    i16 unk19a;
     AnmLoaded *textAnm;
     AnmLoaded *loadingAnm;
     SupervisorFlags flags;
@@ -321,7 +322,11 @@ struct Supervisor
     u8 lockCounts[4];
     i32 loadingVmsHaveBeenSetup;
 
-    unknown_fields(0x300, 0x38);
+    LARGE_INTEGER perfFrequency;
+    LARGE_INTEGER prevPerfCounter;
+    LARGE_INTEGER curPerfCounter;
+    SYSTEMTIME prevTime;
+    SYSTEMTIME curTime;
 
     u32 unk0x338;
     u32 unk0x33c;
