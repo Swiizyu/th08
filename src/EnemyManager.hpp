@@ -55,6 +55,9 @@ struct Enemy
 {
     i32 GetFamiliarCount();
     ZunBool FUN_0041fd20();
+    void FUN_0042bc50();
+    void FUN_0042bc90();
+    void FUN_0042a820();
 
     unknown_fields(0x0, 0x3380);
     i32 field98_0x3380;

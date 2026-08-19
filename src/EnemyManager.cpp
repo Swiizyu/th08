@@ -12,6 +12,8 @@
 namespace th08
 {
 
+u32 IsDisableResourceReload();
+
 DIFFABLE_STATIC(EnemyManager, g_EnemyManager);
 DIFFABLE_STATIC(EffectManager, g_EffectManager);
 DIFFABLE_STATIC(ChainElem, g_EffectManagerCalcChain);
@@ -19,6 +21,31 @@ DIFFABLE_STATIC(ChainElem, g_EffectManagerDrawChain);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerDrawChainHighPrio);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerDrawChainLowPrio);
+
+// FUNCTION: th08 0x42eb10
+f32 FUN_0042eb10(f32 start, f32 end, f32 factor)
+{
+    f32 distance1;
+    f32 distance2;
+
+    if (start < end)
+    {
+        distance1 = end - start;
+        distance2 = start + ZUN_2PI - end;
+    }
+    else
+    {
+        distance1 = start - end;
+        distance2 = end + ZUN_2PI - start;
+        start = end;
+    }
+
+    if (distance1 < distance2)
+    {
+        return distance1 * factor + start;
+    }
+    return distance2 * factor + start;
+}
 
 // FUNCTION: th08 0x41fdf0
 void ZunTimer::operator+=(i32 value)
@@ -175,6 +202,70 @@ i32 Effect::FUN_00427990()
     return 1;
 }
 
+// FUNCTION: th08 0x4279d0
+i32 Effect::FUN_004279d0()
+{
+    *(i32 *)((u8 *)this + 0x324) = *(i32 *)((u8 *)this + 0x100);
+    *(f32 *)((u8 *)this + 0x334) = (f32)*(i32 *)((u8 *)this + 0x104);
+    *(i32 *)((u8 *)this + 0x320) = *(i32 *)((u8 *)this + 0x18);
+    *(i32 *)((u8 *)this + 0x314) = *(i32 *)((u8 *)this + 0x208);
+    *(i32 *)((u8 *)this + 0x32c) = *(i32 *)((u8 *)this + 0x20c);
+    *(i32 *)((u8 *)this + 0x318) = *(i32 *)((u8 *)this + 0x8);
+    *(i32 *)((u8 *)this + 0x330) = *(i32 *)((u8 *)this + 0x4);
+    *(u8 *)((u8 *)this + 0x356) = 1;
+    return 1;
+}
+
+// FUNCTION: th08 0x427a60
+i32 Effect::FUN_00427a60()
+{
+    *(i32 *)((u8 *)this + 0x324) = 0x20;
+    *(i32 *)((u8 *)this + 0x320) = *(i32 *)((u8 *)this + 0x18);
+    *(i32 *)((u8 *)this + 0x314) = *(i32 *)((u8 *)this + 0x208);
+    *(i32 *)((u8 *)this + 0x32c) = *(i32 *)((u8 *)this + 0x20c);
+    *(u8 *)((u8 *)this + 0x356) = 1;
+    if (*(ZunTimer *)((u8 *)this + 0x338) >= 120)
+    {
+        return 0;
+    }
+    return 1;
+}
+
+// FUNCTION: th08 0x427ae0
+i32 Effect::FUN_00427ae0()
+{
+    *(u8 *)((u8 *)this + 0x356) = 1;
+    *(i32 *)((u8 *)this + 0x320) = *(i32 *)((u8 *)this + 0x18);
+    *(i32 *)((u8 *)this + 0x314) = *(i32 *)((u8 *)this + 0x208);
+    *(i32 *)((u8 *)this + 0x32c) = *(i32 *)((u8 *)this + 0x20c);
+    *(i32 *)((u8 *)this + 0x318) = *(i32 *)((u8 *)this + 0x8);
+    if (*(u8 *)((u8 *)this + 0x1f3) == 0)
+    {
+        return 0;
+    }
+    return 1;
+}
+
+// FUNCTION: th08 0x427b50
+i32 Effect::FUN_00427b50()
+{
+    *(i32 *)((u8 *)this + 0x324) = *(i32 *)((u8 *)this + 0x100);
+    *(f32 *)((u8 *)this + 0x334) = (f32)*(i32 *)((u8 *)this + 0x104);
+    *(i32 *)((u8 *)this + 0x320) = *(i32 *)((u8 *)this + 0x18);
+    *(i32 *)((u8 *)this + 0x314) = *(i32 *)((u8 *)this + 0x114);
+    *(i32 *)((u8 *)this + 0x318) = *(i32 *)((u8 *)this + 0x8);
+    *(i32 *)((u8 *)this + 0x330) = *(i32 *)((u8 *)this + 0x4);
+    *(u8 *)((u8 *)this + 0x356) = 1;
+    *(Float3 *)((u8 *)this + 0x2e0) = *(Float3 *)((u8 *)this + 0x208);
+    return 1;
+}
+
+// FUNCTION: th08 0x4253e0
+Effect *EffectManager::FUN_004253e0(i32 index)
+{
+    return (Effect *)((u8 *)this + (index + 0x280) * 0x360 + 0x1c);
+}
+
 // FUNCTION: th08 0x4230c0
 void EclExIns::FUN_004230c0(i32 value)
 {
@@ -198,6 +289,12 @@ void EclExIns::FUN_00423110(i32 index, i32 value)
 void EclExIns::FUN_00423130(i32 value)
 {
     *(i32 *)((u8 *)this + 0x20) = value;
+}
+
+// FUNCTION: th08 0x424a00
+void __fastcall EclExIns::FUN_00424a00(void *instruction)
+{
+    g_ScreenEffectCounter = *(i32 *)((u8 *)instruction + 0x10);
 }
 
 // FUNCTION: th08 0x4233d0
@@ -287,6 +384,29 @@ EclTimeline *EclManager::GetTimeline(i32 timelineIdx)
     return this->timelineFile->timelines[timelineIdx];
 }
 
+// FUNCTION: th08 0x428590
+#pragma var_order(effect, i)
+ZunResult EffectManager::FUN_00428590()
+{
+    Effect *effect;
+    i32 i;
+
+    effect = (Effect *)((u8 *)this + 0x1c);
+    for (i = 0; i < 0x28d; i++, effect = (Effect *)((u8 *)effect + 0x360))
+    {
+        if (*(void **)((u8 *)effect + 0x358) != NULL)
+        {
+            g_ZunMemory.Free(*(void **)((u8 *)effect + 0x358));
+            *(void **)((u8 *)effect + 0x358) = NULL;
+        }
+    }
+    if (!IsDisableResourceReload())
+    {
+        g_AnmManager->ReleaseAnm(9);
+    }
+    return ZUN_SUCCESS;
+}
+
 // FUNCTION: th08 0x428100
 ChainCallbackResult EffectManager::DrawUnkTypeEffects()
 {
@@ -330,6 +450,46 @@ void EffectManager::CutChain()
 ZunBool Enemy::FUN_0041fd20()
 {
     return *(i32 *)((u8 *)this + 0x2da4) != 0;
+}
+
+// FUNCTION: th08 0x42bc50
+void Enemy::FUN_0042bc50()
+{
+    *(u32 *)this &= ~4;
+    *(u32 *)this |= 8;
+    *(i32 *)((u8 *)this + 0xfc) = 0;
+}
+
+// FUNCTION: th08 0x42bc90
+void Enemy::FUN_0042bc90()
+{
+    i32 i;
+
+    for (i = 0; i < 4; i++)
+    {
+        if (*(void **)((u8 *)this + i * 4 + 0x3384) != NULL)
+        {
+            g_ZunMemory.Free(*(void **)((u8 *)this + i * 4 + 0x3384));
+            *(void **)((u8 *)this + i * 4 + 0x3384) = NULL;
+        }
+    }
+}
+
+// FUNCTION: th08 0x42a820
+void Enemy::FUN_0042a820()
+{
+    i32 i;
+
+    for (i = 0; i < *(i32 *)((u8 *)this + 0x53c0); i++)
+    {
+        if (*(void **)((u8 *)this + i * 4 + 0x5360) == NULL)
+        {
+            continue;
+        }
+        *(u8 *)(*(u8 **)((u8 *)this + i * 4 + 0x5360) + 0x352) = 1;
+        *(void **)((u8 *)this + i * 4 + 0x5360) = NULL;
+    }
+    *(i32 *)((u8 *)this + 0x53c0) = 0;
 }
 
 // STUB: th08 0x41fd40

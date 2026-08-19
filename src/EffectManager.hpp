@@ -18,6 +18,10 @@ struct Effect
     i32 FUN_00426c40();
     i32 FUN_00426c90();
     i32 FUN_00427990();
+    i32 FUN_004279d0();
+    i32 FUN_00427a60();
+    i32 FUN_00427ae0();
+    i32 FUN_00427b50();
 
     AnmVm vm;
     Float3 position;
@@ -32,6 +36,8 @@ struct EffectManager
 {
     void ResetEffects();
     ChainCallbackResult DrawUnkTypeEffects();
+    ZunResult FUN_00428590();
+    Effect *FUN_004253e0(i32 index);
     static void CutChain();
 
     u8 data[0x8acd8];
