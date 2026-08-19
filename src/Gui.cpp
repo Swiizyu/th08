@@ -1584,6 +1584,7 @@ ZunBool Gui::IsDialogueSkippable()
     return this->impl->msg.dialogueSkippable;
 }
 
+// FUNCTION: th08 0x437ddd
 void Gui::ShowBonusScore(i32 score)
 {
     this->impl->bonusScore.pos = Float3(416.0f, 48.0f, 0.0f);
@@ -1593,6 +1594,7 @@ void Gui::ShowBonusScore(i32 score)
     g_Supervisor.unk174 = 2;
 }
 
+// FUNCTION: th08 0x437e5d
 void Gui::ShowPopupText(i32 fmtArg, i32 popupType)
 {
     this->impl->popupText.pos = Float3(416.0f, 168.0f, 0.0f);
@@ -1602,6 +1604,7 @@ void Gui::ShowPopupText(i32 fmtArg, i32 popupType)
     g_Supervisor.unk174 = 2;
 }
 
+// FUNCTION: th08 0x437edc
 void Gui::ShowSpellcardBonus(i32 bonus)
 {
     this->impl->spellcardBonus.pos = Float3(224.0f, 16.0f, 0.0f);

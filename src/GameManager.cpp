@@ -106,6 +106,31 @@ i32 GameManager::GetSongNameSpriteIdx(i32 spellcardNumber)
     return FALSE;
 }
 
+// FUNCTION: th08 0x418220
+void GameManager::AddTimeOrbs(i32 amount)
+{
+    if (amount < 0 && this->globals->currentTimeOrbs < -amount)
+    {
+        goto setToZero;
+    }
+
+    this->globals->currentTimeOrbs = this->globals->currentTimeOrbs + amount;
+    this->globals->totalTimeOrbs = this->globals->totalTimeOrbs + amount;
+    *(i32 *)((u8 *)this + 0x3daac) = *(i32 *)((u8 *)this + 0x3daac) + amount;
+    this->UpdateAntiTamper();
+    if (amount > 0)
+    {
+        amount += this->globals->totalTimeOrbs & 1;
+        this->globals->pointItemValue = this->globals->pointItemValue + amount / 2 * 10;
+    }
+    goto end;
+
+setToZero:
+    this->globals->currentTimeOrbs = 0;
+end:
+    return;
+}
+
 // FUNCTION: th08 0x4399ac
 ZunBool GameManager::IsWithinPlayfield(f32 x, f32 y, f32 width, f32 height)
 {

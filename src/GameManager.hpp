@@ -71,6 +71,8 @@ struct GameManager
 
     static void InitializeAntiTamper();
 
+    void AddTimeOrbs(i32 amount);
+
     i32 GetTimeOrbs()
     {
         return this->globals->currentTimeOrbs;

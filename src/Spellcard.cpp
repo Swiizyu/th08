@@ -38,6 +38,23 @@ void Spellcard::FUN_00416af0()
     this->spellcard_fun_00416160();
 }
 
+// FUNCTION: th08 0x416b10
+void Spellcard::FUN_00416b10(i32 amount)
+{
+    if (!(*(u32 *)this >> 11 & 1))
+    {
+        *(u32 *)((u8 *)this + 0xfc) += amount;
+        if (*(u32 *)((u8 *)this + 0xfc) >= *(u32 *)((u8 *)this + 0x2638))
+        {
+            *(u32 *)((u8 *)this + 0xfc) = *(u32 *)((u8 *)this + 0x2638);
+        }
+        else
+        {
+            *(i32 *)((u8 *)this + 0x100) += amount / 120;
+        }
+    }
+}
+
 // FUNCTION: th08 0x414540
 ZunBool Spellcard::IsLastSpell(i32 spellcardNumber)
 {

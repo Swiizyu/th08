@@ -1,14 +1,19 @@
 #include "th_pch.h"
 
+#include "AsciiManager.hpp"
 #include "BulletManager.hpp"
 #include "GameManager.hpp"
+#include "Gui.hpp"
 #include "ItemManager.hpp"
 #include "Player.hpp"
+#include "SoundPlayer.hpp"
+#include "Spellcard.hpp"
 
 namespace th08
 {
 
 DIFFABLE_STATIC(ItemManager, g_ItemManager);
+DIFFABLE_STATIC_ARRAY_ASSIGN(i32, 6, g_PowerUpThresholds) = {8, 24, 48, 80, 128, 999};
 
 // FUNCTION: th08 0x4337f0
 void ItemManager::FUN_004337f0()
@@ -169,29 +174,238 @@ void ItemManager::OnUpdate()
     // TODO: NEEDS WORK ON Gui
 }
 
-// STUB: th08 0x440cf0
+// FUNCTION: th08 0x440cf0
+#pragma var_order(i, oldPowerLevel)
 void Item::CollectPowerSmall()
 {
+    i32 i;
+    i32 oldPowerLevel;
+
+    if (g_GameManager.GetPower() < 128)
+    {
+        i = 0;
+        while (g_GameManager.GetPower() >= g_PowerUpThresholds[i])
+        {
+            i++;
+        }
+        oldPowerLevel = i;
+        g_Gui.flags.powerDisplayUpdateFrames = 0;
+        g_GameManager.AddPower(1);
+        if (g_GameManager.GetPower() >= 128)
+        {
+            g_GameManager.SetPower(128);
+            if (!g_Spellcard.spellcard_fun_004178a0())
+            {
+                g_BulletManager.FUN_00415c60();
+            }
+            g_Gui.ShowPopupText(0, 1);
+            g_ItemManager.ConvertAllPowerItemsToTimeOrbs(this);
+        }
+        g_GameManager.AddScore(10);
+        g_Gui.flags.powerDisplayUpdateFrames = 2;
+        while (g_GameManager.GetPower() >= g_PowerUpThresholds[i])
+        {
+            i++;
+        }
+        if (i != oldPowerLevel)
+        {
+            g_AsciiManager.CreateScorePopup(&this->currentPosition, -1, 0xffffc0a0);
+            g_SoundPlayer.PlaySoundByIdx(SOUND_POWERUP, 0);
+        }
+        else
+        {
+            g_AsciiManager.CreateScorePopup(&this->currentPosition, 10, 0xffffffff);
+        }
+    }
+    g_GameManager.IncreaseSubrank(1);
 }
 
-// STUB: th08 0x440e40
+// FUNCTION: th08 0x440e40
+#pragma var_order(maximumValue, value, isAbovePoc)
 void Item::CollectPoint()
 {
+    i32 maximumValue;
+    i32 value;
+    ZunBool isAbovePoc;
+
+    maximumValue = g_GameManager.globals->pointItemValue;
+    isAbovePoc = this->currentPosition.y < *(f32 *)((u8 *)g_Player.player1ShtFile + 0x1c);
+    value = isAbovePoc
+                ? maximumValue
+                : maximumValue / 2 -
+                      (i32)(this->currentPosition.y - *(f32 *)((u8 *)g_Player.player1ShtFile + 0x1c)) *
+                          (g_GameManager.globals->pointItemValue / 1000);
+    if (this->isMaxValue == 1)
+    {
+        value = maximumValue;
+    }
+    value -= value % 10;
+    if (g_GameManager.GaugeIsExtremelyHuman())
+    {
+        value += value;
+    }
+    g_AsciiManager.CreateScorePopup(&this->currentPosition, value,
+                                    value >= maximumValue ? 0xffffff00 : 0xffffffff);
+    if (value >= maximumValue)
+    {
+        this->isMaxValue = true;
+    }
+    g_GameManager.AddScore(value);
+    g_GameManager.globals->pointItemsCollectedInStage++;
+    g_GameManager.globals->pointItemsCollected++;
+    g_Gui.flags.pointDisplayUpdateFrames = 2;
+    if (value >= maximumValue)
+    {
+        g_GameManager.IncreaseSubrank(10);
+    }
+    else
+    {
+        g_GameManager.IncreaseSubrank(3);
+    }
+    if (g_GameManager.globals->pointItemExtendsSoFar >= 0)
+    {
+        ItemManager::UpdatePointItemExtendThreshold();
+        while (g_GameManager.globals->pointItemsCollected >=
+               g_GameManager.globals->nextPointItemExtendThreshold)
+        {
+            g_GameManager.CollectExtend();
+            g_GameManager.globals->pointItemExtendsSoFar++;
+        }
+    }
+    (*(i32 *)((u8 *)&g_GameManager + 0x3da94))++;
+    g_GameManager.UpdateAntiTamper();
 }
 
-// STUB: th08 0x441020
+// FUNCTION: th08 0x441020
+#pragma var_order(maximumValue, value, isAbovePoc)
 void Item::CollectPointSmall()
 {
+    i32 maximumValue;
+    i32 value;
+    ZunBool isAbovePoc;
+
+    maximumValue = g_GameManager.globals->pointItemValue;
+    isAbovePoc = this->currentPosition.y < *(f32 *)((u8 *)g_Player.player1ShtFile + 0x1c);
+    value = isAbovePoc
+                ? maximumValue
+                : maximumValue / 2 -
+                      (i32)(this->currentPosition.y - *(f32 *)((u8 *)g_Player.player1ShtFile + 0x1c)) *
+                          (g_GameManager.globals->pointItemValue / 1000);
+    if (this->isMaxValue == 1)
+    {
+        value = maximumValue;
+    }
+    maximumValue /= 10;
+    maximumValue -= maximumValue % 10;
+    value /= 10;
+    value -= value % 10;
+    if (g_GameManager.GaugeIsExtremelyHuman())
+    {
+        value += value;
+    }
+    g_AsciiManager.CreateScorePopup(&this->currentPosition, value,
+                                    value >= maximumValue ? 0xffffff00 : 0xffffffff);
+    g_GameManager.AddScore(value);
+    if (value >= maximumValue)
+    {
+        this->isMaxValue = true;
+    }
 }
 
-// STUB: th08 0x441170
+// FUNCTION: th08 0x441170
+#pragma var_order(i, oldPowerLevel)
 void Item::CollectPowerBig()
 {
+    i32 i;
+    i32 oldPowerLevel;
+
+    if (g_GameManager.GetPower() >= 128)
+    {
+        return;
+    }
+    i = 0;
+    while (g_GameManager.GetPower() >= g_PowerUpThresholds[i])
+    {
+        i++;
+    }
+    oldPowerLevel = i;
+    g_GameManager.AddPower(8);
+    if (g_GameManager.GetPower() >= 128)
+    {
+        g_GameManager.SetPower(128);
+        if (!g_Spellcard.spellcard_fun_004178a0())
+        {
+            g_BulletManager.FUN_00415c60();
+        }
+        g_Gui.ShowPopupText(0, 1);
+        g_ItemManager.ConvertAllPowerItemsToTimeOrbs(this);
+    }
+    g_Gui.flags.powerDisplayUpdateFrames = 2;
+    g_GameManager.AddScore(10);
+    while (g_GameManager.GetPower() >= g_PowerUpThresholds[i])
+    {
+        i++;
+    }
+    if (i != oldPowerLevel)
+    {
+        g_AsciiManager.CreateScorePopup(&this->currentPosition, -1, 0xffffc0a0);
+        g_SoundPlayer.PlaySoundByIdx(SOUND_POWERUP, 0);
+    }
+    else
+    {
+        g_AsciiManager.CreateScorePopup(&this->currentPosition, 10, 0xffffffff);
+    }
 }
 
-// STUB: th08 0x4412b0
+// FUNCTION: th08 0x4412b0
 void Item::CollectTimeOrb()
 {
+    i32 score;
+    i32 gaugeAmount;
+
+    if (*(i32 *)((u8 *)&g_Player + 0xe2a7c) == 0)
+    {
+        if (g_GameManager.globals->pointItemsCollectedInStage >= 2000)
+        {
+            score = 10000;
+        }
+        else
+        {
+            score = g_GameManager.globals->pointItemsCollected / 2 * 10;
+            if (score < 100)
+            {
+                score = 100;
+            }
+        }
+    }
+    else
+    {
+        score = 100;
+    }
+
+    if (this != NULL)
+    {
+        g_AsciiManager.CreatePlayerPointPopup(
+            &this->currentPosition, score,
+            g_GameManager.GetTimeOrbs() < g_GameManager.GetLastSpellTimeOrbThreshold() ? 0xdfffffff : 0xdfffef80);
+    }
+    g_Gui.flags.timeDisplayUpdateFrames = 2;
+    g_GameManager.AddScore(score);
+    g_GameManager.AddTimeOrbs(1);
+    g_Spellcard.FUN_00416b10(8000);
+    if (*(ZunTimer *)((u8 *)&g_Player + 0xe2adc) == 0)
+    {
+        score = 111;
+        if (g_Player.isFocus)
+        {
+            gaugeAmount = score;
+        }
+        else
+        {
+            gaugeAmount = -score;
+        }
+        g_GameManager.AddToYoukaiGauge(gaugeAmount, 0);
+    }
 }
 
 // FUNCTION: th08 0x4413e0
@@ -209,10 +423,27 @@ void ItemManager::AutoCollectAllItems()
     }
 }
 
-// STUB: th08 0x441450
-void ItemManager::ConvertAllPowerItemsToTimeOrbs(Item *item)
+// FUNCTION: th08 0x441450
+void ItemManager::ConvertAllPowerItemsToTimeOrbs(Item *excludedItem)
 {
-    // TODO: NEEDS WORK ON EffectManager
+    Item *item;
+
+    item = this->itemListHead.next;
+    while (item != NULL)
+    {
+        if (item != excludedItem && (item->itemType == ITEM_POWER_SMALL || item->itemType == ITEM_POWER_BIG))
+        {
+            if (item->startPositionOrVelocity.y > -0.5f)
+            {
+                item->startPositionOrVelocity.x = 0.0f;
+                item->startPositionOrVelocity.y = -0.5f;
+                item->startPositionOrVelocity.z = 0.0f;
+            }
+            item->itemType = ITEM_POINT_SMALL;
+            g_BulletManager.bonusAnm->SetAndExecuteScriptIdx(&item->sprite, 69);
+        }
+        item = item->next;
+    }
 }
 
 void ItemManager::CancelAutoCollect()
