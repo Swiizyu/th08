@@ -21,7 +21,10 @@ struct EclExIns
     void FUN_004230e0(i32 index, i32 value0, i32 value1);
     void FUN_00423110(i32 index, i32 value);
     void FUN_00423130(i32 value);
+    void __fastcall FUN_004233d0(void *instruction);
     void __fastcall FUN_00424e00(void *instruction);
+    void __fastcall FUN_00424e20(void *instruction);
+    void __fastcall FUN_00424f60(void *instruction);
     void __fastcall FUN_00424f90(void *instruction);
     void __fastcall FUN_00424fc0(void *instruction);
     void __fastcall FUN_00425020(void *instruction);

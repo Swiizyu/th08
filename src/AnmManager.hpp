@@ -405,6 +405,7 @@ struct AnmVm : AnmVmBase
     void SetZRotation(f32 rotation);
     void FUN_0044e0f0();
     void FUN_0044e120();
+    ZunBool FUN_00428720();
 
     Float3 pos;
     i16 activeSpriteIndex;

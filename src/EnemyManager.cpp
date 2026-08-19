@@ -6,6 +6,8 @@
 #include "EffectManager.hpp"
 #include "EclManager.hpp"
 #include "Spellcard.hpp"
+#include "ScreenEffect.hpp"
+#include "Player.hpp"
 
 namespace th08
 {
@@ -54,6 +56,83 @@ void Float3::FromAngleMagnitude(float angle, float magnitude)
     }
 }
 
+// FUNCTION: th08 0x428700
+void Float3::FUN_00428700(float angle, float magnitudeX, float magnitudeY)
+{
+    __asm
+    {
+        mov eax, this
+        fld angle
+        fsincos
+        fmul [magnitudeX]
+        fstp [eax]
+        fmul [magnitudeY]
+        fstp [eax + 4]
+    }
+}
+
+// FUNCTION: th08 0x428720
+ZunBool AnmVm::FUN_00428720()
+{
+    return this->currentInstruction == NULL;
+}
+
+// FUNCTION: th08 0x425e60
+i32 Effect::FUN_00425e60()
+{
+    *(Float3 *)((u8 *)this + 0x2a4) += *(Float3 *)((u8 *)this + 0x2bc);
+    *(Float3 *)((u8 *)this + 0x2bc) += *(Float3 *)((u8 *)this + 0x2c8);
+    return 1;
+}
+
+// FUNCTION: th08 0x425fe0
+i32 Effect::FUN_00425fe0()
+{
+    *(u8 *)((u8 *)this + 0x354) = 2;
+    *(i32 *)((u8 *)this + 0x2ec) = 0;
+    *(i32 *)((u8 *)this + 0x2f0) = 0;
+    *(i32 *)((u8 *)this + 0x2f4) = 0;
+    *(i32 *)((u8 *)this + 0x314) = 0;
+    return 0;
+}
+
+// FUNCTION: th08 0x426c40
+i32 Effect::FUN_00426c40()
+{
+    if (this->vm.FUN_00428720())
+    {
+        return 0;
+    }
+    this->position = g_Player.position;
+    return 1;
+}
+
+// FUNCTION: th08 0x426d10
+#pragma var_order(effect, i)
+void Float3::FUN_00426d10()
+{
+    Effect *effect;
+    i32 i;
+
+    effect = (Effect *)((u8 *)&g_EffectManager + 0x1c);
+    for (i = 0; i < 0x200; i++, effect = (Effect *)((u8 *)effect + 0x360))
+    {
+        if (*(i8 *)((u8 *)effect + 0x351) == 0x33)
+        {
+            *(Float3 *)((u8 *)effect + 0x2d4) += *this;
+        }
+    }
+}
+
+// FUNCTION: th08 0x427990
+i32 Effect::FUN_00427990()
+{
+    *(u8 *)((u8 *)this + 0x356) = 1;
+    *(i32 *)((u8 *)this + 0x320) = *(i32 *)((u8 *)this + 0x18);
+    *(i32 *)((u8 *)this + 0x314) = *(i32 *)((u8 *)this + 0x208);
+    return 1;
+}
+
 // FUNCTION: th08 0x4230c0
 void EclExIns::FUN_004230c0(i32 value)
 {
@@ -79,10 +158,28 @@ void EclExIns::FUN_00423130(i32 value)
     *(i32 *)((u8 *)this + 0x20) = value;
 }
 
+// FUNCTION: th08 0x4233d0
+void __fastcall EclExIns::FUN_004233d0(void *)
+{
+    ScreenEffect::RegisterChain(SCREEN_EFFECT_FULL_FADE_OUT, 60, 1, -1, 0, 21);
+}
+
 // FUNCTION: th08 0x424e00
 void __fastcall EclExIns::FUN_00424e00(void *)
 {
     g_Background.FUN_00409160(0xffc03030);
+}
+
+// FUNCTION: th08 0x424e20
+void __fastcall EclExIns::FUN_00424e20(void *)
+{
+    ScreenEffect::RegisterChain(SCREEN_EFFECT_UNK7, 16, 20, 20, 20, 21);
+}
+
+// FUNCTION: th08 0x424f60
+void __fastcall EclExIns::FUN_00424f60(void *)
+{
+    ScreenEffect::RegisterChain(SCREEN_EFFECT_FULL_FADE_OUT, 180, 1, -1, 0, 21);
 }
 
 // FUNCTION: th08 0x424f90

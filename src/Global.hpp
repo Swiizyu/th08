@@ -400,6 +400,8 @@ struct Float3
     Float3(float x, float y, float z);
 
     void FromAngleMagnitude(float angle, float magnitude);
+    void FUN_00428700(float angle, float magnitudeX, float magnitudeY);
+    void FUN_00426d10();
 
     void FromRotatedVec2(float angle, float vecX, float vecY)
     {

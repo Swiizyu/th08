@@ -11,6 +11,11 @@ typedef void(__fastcall *EffectDrawCallback)(Effect *effect);
 
 struct Effect
 {
+    i32 FUN_00425e60();
+    i32 FUN_00425fe0();
+    i32 FUN_00426c40();
+    i32 FUN_00427990();
+
     AnmVm vm;
     Float3 position;
     u8 unknown0x2b0[0x9c];
