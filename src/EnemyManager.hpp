@@ -39,6 +39,18 @@ struct EnemyUnkStruct2
 };
 C_ASSERT(sizeof(EnemyUnkStruct2) == 0x21c);
 
+struct EnemyUnkStruct4
+{
+    EnemyUnkStruct4();
+
+    u32 unknown0x0;
+    Float3 position;
+    u8 unknown0x10[0x1f4];
+    i32 unk0x204;
+    u8 unknown0x208[8];
+};
+C_ASSERT(sizeof(EnemyUnkStruct4) == 0x210);
+
 struct Enemy
 {
     i32 GetFamiliarCount();

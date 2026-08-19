@@ -1,9 +1,50 @@
 #include "th_pch.h"
 
 #include "Player.hpp"
+#include "EffectManager.hpp"
 
 namespace th08
 {
+
+// FUNCTION: th08 0x449e50
+PlayerUnkStruct0x2ec::PlayerUnkStruct0x2ec()
+{
+}
+
+// FUNCTION: th08 0x449ea0
+PlayerUnkStruct0xb7858::PlayerUnkStruct0xb7858()
+{
+}
+
+// FUNCTION: th08 0x449ef0
+PlayerUnkStruct0x460::PlayerUnkStruct0x460()
+{
+}
+
+// FUNCTION: th08 0x449f70
+PlayerUnkStruct0x16f0::PlayerUnkStruct0x16f0()
+{
+}
+
+// FUNCTION: th08 0x44e9e0
+i32 __fastcall FUN_0044e9e0(void *, Effect *effect)
+{
+    effect->vm.pos.x = g_GameManager.arcadeRegionTopLeftPos.x + effect->position.x;
+    effect->vm.pos.y = g_GameManager.arcadeRegionTopLeftPos.y + effect->position.y;
+    effect->vm.pos.z = 0.49f;
+    g_AnmManager->Draw2D(&effect->vm);
+    return 0;
+}
+
+// FUNCTION: th08 0x450580
+i32 __fastcall FUN_00450580(void *, void *data)
+{
+    if (*(i16 *)((u8 *)data + 0x462) == 1)
+    {
+        *(f32 *)((u8 *)data + 0x440) -= g_Rng.GetRandomF32InRange(0.1f) + 0.27f;
+    }
+    return 0;
+}
 
 // FUNCTION: th08 0x441850
 void GameManager::AddPower(i32 power)
@@ -51,6 +92,14 @@ void AnmVm::FUN_0044e0f0()
 void AnmVm::FUN_0044e120()
 {
     this->blendMode = 0;
+}
+
+// FUNCTION: th08 0x44cba0
+void Player::FUN_0044cba0()
+{
+    ((PlayerFlags *)this)->flag2 = 0;
+    *(i32 *)((u8 *)this + 0xfc) = 0;
+    ((PlayerFlags *)this)->flag7 = ((PlayerFlags *)this)->flag0;
 }
 
 // FUNCTION: th08 0x44d150

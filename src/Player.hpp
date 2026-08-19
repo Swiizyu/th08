@@ -18,10 +18,76 @@ struct PlayerUnkStruct0x40
 };
 C_ASSERT(sizeof(PlayerUnkStruct0x40) == 0x40);
 
+struct PlayerUnkStruct0x2ec
+{
+    PlayerUnkStruct0x2ec();
+
+    AnmVm vm;
+    Float3 position0;
+    Float3 position1;
+    Float3 position2;
+    u8 unknown0x2c8[0x18];
+    ZunTimer timer;
+};
+C_ASSERT(sizeof(PlayerUnkStruct0x2ec) == 0x2ec);
+
+struct PlayerUnkStruct0x460
+{
+    PlayerUnkStruct0x460();
+
+    AnmVm vm;
+    Float3 position;
+    Float3 positions[0x20];
+    Float3 finalPosition;
+    u8 unknown0x43c[0x18];
+    ZunTimer timer;
+};
+C_ASSERT(sizeof(PlayerUnkStruct0x460) == 0x460);
+
+struct PlayerUnkStruct0x16f0
+{
+    PlayerUnkStruct0x16f0();
+
+    u8 unknown0x0[0x14];
+    Float3 position;
+    Float3 positions[0x20];
+    Float3 position2;
+    Float3 position3;
+    AnmVm vms[8];
+    u8 unknown0x16d8[4];
+    ZunTimer timer;
+    u8 unknown0x16e8[8];
+};
+C_ASSERT(sizeof(PlayerUnkStruct0x16f0) == 0x16f0);
+
+struct PlayerUnkStruct0xb7858
+{
+    PlayerUnkStruct0xb7858();
+
+    u8 unknown0x0[0x18];
+    ZunTimer timer;
+    u8 unknown0x24[0x28];
+    PlayerUnkStruct0x16f0 entries[0x80];
+    Float3 position;
+};
+C_ASSERT(sizeof(PlayerUnkStruct0xb7858) == 0xb7858);
+
 struct PlayerRawShtFile
 {
     unknown_fields(0x0, 0x4); // 0x0
     float bombCount;          // 0x4
+};
+
+struct PlayerFlags
+{
+    u32 flag0 : 1;
+    u32 flag1 : 1;
+    u32 flag2 : 1;
+    u32 flag3 : 1;
+    u32 flag4 : 1;
+    u32 flag5 : 1;
+    u32 flag6 : 1;
+    u32 flag7 : 1;
 };
 
 enum PlayerState
@@ -47,6 +113,7 @@ struct Player
     ZunBool IsHuman();
     ZunBool IsYoukai();
     ZunBool FUN_00451d50();
+    void FUN_0044cba0();
     void FUN_0044d150();
     void FUN_00451640();
 

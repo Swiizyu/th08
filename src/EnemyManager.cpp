@@ -77,6 +77,13 @@ ZunBool AnmVm::FUN_00428720()
     return this->currentInstruction == NULL;
 }
 
+// FUNCTION: th08 0x42a410
+EnemyUnkStruct4::EnemyUnkStruct4()
+{
+    memset(this, 0, sizeof(EnemyUnkStruct4));
+    this->unk0x204 = -1;
+}
+
 // FUNCTION: th08 0x425e60
 i32 Effect::FUN_00425e60()
 {
@@ -96,6 +103,31 @@ i32 Effect::FUN_00425fe0()
     return 0;
 }
 
+// FUNCTION: th08 0x426b20
+i32 Effect::FUN_00426b20()
+{
+    f32 angle;
+
+    *(Float3 *)((u8 *)this + 0x2e0) = this->position;
+    *(f32 *)((u8 *)this + 0x2e8) = 0.0f;
+    angle = g_Rng.GetRandomF32InRange(ZUN_2PI) - ZUN_PI;
+    *(f32 *)((u8 *)this + 0x2ec) = cosf(angle);
+    *(f32 *)((u8 *)this + 0x2f0) = sinf(angle);
+    *(f32 *)((u8 *)this + 0x2f4) = 0.0f;
+    return 0;
+}
+
+// FUNCTION: th08 0x426bb0
+i32 Effect::FUN_00426bb0()
+{
+    f32 distance;
+
+    distance = 256.0f - (f32)*(ZunTimer *)((u8 *)this + 0x338) * 256.0f / 60.0f;
+    this->position = *(Float3 *)((u8 *)this + 0x2ec) * distance + *(Float3 *)((u8 *)this + 0x2e0);
+    this->position.z = 0.0f;
+    return 1;
+}
+
 // FUNCTION: th08 0x426c40
 i32 Effect::FUN_00426c40()
 {
@@ -104,6 +136,16 @@ i32 Effect::FUN_00426c40()
         return 0;
     }
     this->position = g_Player.position;
+    return 1;
+}
+
+// FUNCTION: th08 0x426c90
+i32 Effect::FUN_00426c90()
+{
+    f32 distance;
+
+    distance = 256.0f - (f32)*(ZunTimer *)((u8 *)this + 0x338) * 256.0f / 240.0f;
+    this->position = *(Float3 *)((u8 *)this + 0x2ec) * distance + *(Float3 *)((u8 *)this + 0x2e0);
     return 1;
 }
 
