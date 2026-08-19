@@ -118,6 +118,7 @@ struct Enemy
     void FUN_00424e50(void *instruction);
     void FUN_004250d0(void *instruction);
     void FUN_0042bcf0();
+    void FUN_0042bea0(i32 itemState);
     void FUN_0042c290(Float3 *position, Float3 *hitbox);
     void FUN_0042c420();
     void FUN_0042e010();

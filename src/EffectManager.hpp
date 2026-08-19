@@ -91,6 +91,8 @@ struct EffectManager
     static ZunResult RegisterChain();
     Effect *FUN_004253e0(i32 index);
     Effect *SpawnEffect(i32 effectId, Float3 *position, i32 count, D3DCOLOR color);
+    Effect *FUN_00425650(i32 effectId, Float3 *position, Float3 *custom, i32 count, D3DCOLOR color);
+    Effect *FUN_00425b70(i32 effectId, Float3 *position, i32 count, D3DCOLOR color);
     Effect *SpawnSpecialEffect(i32 effectId, Float3 *position, i32 specialIndex, i32 unused, D3DCOLOR color);
     Effect *SpawnSpecialEffect2(i32 effectId, Float3 *position, Float3 *custom, i32 specialIndex, i32 unused,
                                 D3DCOLOR color);

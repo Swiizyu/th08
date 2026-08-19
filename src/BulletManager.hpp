@@ -93,6 +93,7 @@ struct Bullet
     void FUN_00432830();
     void FUN_004329f0();
     void FUN_00432aa0();
+    void FUN_0042ffc0();
 
     BulletTypeSprites sprites;
     Float3 position;
@@ -142,7 +143,11 @@ struct BulletManager
 
     void FUN_00415c60();
     void RemoveAllBullets(i32 itemState);
+    i32 FUN_0042f5f0(void *bulletConfig, i32 column, i32 row, f32 baseAngle);
+    i32 FUN_00430aa0(i32 itemType, i32 itemState);
     void FUN_00430d30(Float3 *position, f32 radius);
+    i32 FUN_00430e10(void *bulletConfig);
+    Laser *FUN_00430f20(void *laserConfig);
 
     static ZunResult RegisterChain(char *bulletAnmFilename);
     static ChainCallbackResult OnUpdate(BulletManager *bulletManager);

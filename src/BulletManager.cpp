@@ -61,6 +61,142 @@ void BulletManager::FUN_00415c60()
     this->RemoveAllBullets(1);
 }
 
+// FUNCTION: th08 0x42ffc0
+void Bullet::FUN_0042ffc0()
+{
+    while (this->currentExIndex < 18)
+    {
+        BulletEx *ex = &this->ex[this->currentExIndex];
+        if (ex->unk0x10 == 0) return;
+        if (ex->unk0x14 == 0 && this->exFlags != 0) return;
+        if ((this->flags & ex->unk0x10) == 0)
+        {
+            this->currentExIndex++;
+            continue;
+        }
+        this->ex5Float0 = ex->unk0x0;
+        this->ex5Float1 = ex->unk0x4;
+        this->ex5Int0 = ex->unk0x8;
+        this->directionChangeInterval = ex->unk0xc;
+        this->currentExIndex++;
+        return;
+    }
+}
+
+// FUNCTION: th08 0x42f5f0
+int BulletManager::FUN_0042f5f0(void *bulletConfig, i32 column, i32 row, f32 baseAngle)
+{
+    u8 *config = (u8 *)bulletConfig;
+    Bullet *bullet = this->nextBulletSlot;
+    if (bullet == NULL) bullet = &this->bullets[0];
+    i32 i;
+    for (i = 0; i < MAX_BULLETS; i++)
+    {
+        if (bullet->state == 0) break;
+        bullet++;
+        if (bullet >= &this->bullets[MAX_BULLETS]) bullet = &this->bullets[0];
+    }
+    if (i >= MAX_BULLETS) return 1;
+
+    i16 rows = *(i16 *)(config + 0x1f6);
+    f32 speed = *(f32 *)(config + 0x18);
+    if (rows > 1)
+        speed -= (*(f32 *)(config + 0x18) - *(f32 *)(config + 0x1c)) * row / rows;
+    i16 columns = *(i16 *)(config + 0x1f4);
+    f32 angle = *(f32 *)(config + 0x10) + baseAngle;
+    if (columns > 1)
+        angle += (column - (columns - 1) * 0.5f) * *(f32 *)(config + 0x14);
+
+    bullet->state = 1;
+    bullet->unk0xdbc = 1;
+    bullet->isGrazed = 0;
+    bullet->timeSinceBulletFired = 0;
+    bullet->timeActive = 0;
+    bullet->isUnderReisenIllusion = 0;
+    bullet->angle = angle;
+    bullet->speed = speed;
+    bullet->position = *(Float3 *)(config + 4);
+    f32 sine, cosine;
+    fsincos(&sine, &cosine, angle);
+    bullet->velocity = Float3(cosine * speed, sine * speed, 0.0f);
+    bullet->exFlags = *(u32 *)(config + 0x1fc);
+    bullet->flags = bullet->exFlags;
+    bullet->spriteOffset = *(i16 *)(config + 2);
+    bullet->reimuBarrierCooldownFrames = 0;
+    bullet->isGrazed = 0;
+
+    BulletTypeSprites *sprites = *(BulletTypeSprites **)(config + 0x20c);
+    if (sprites != NULL) bullet->sprites = *sprites;
+    bullet->transformSfx = *(i32 *)(config + 0x204);
+    memcpy(bullet->ex, config + 0x20, sizeof(bullet->ex));
+    bullet->currentExIndex = *(i32 *)(config + 0x208);
+    bullet->FUN_0042ffc0();
+    if (this->cancelFramesRemaining != 0 && (bullet->flags & 0x1000) == 0) bullet->state = 5;
+
+    bullet++;
+    if (bullet >= &this->bullets[MAX_BULLETS]) bullet = &this->bullets[0];
+    this->nextBulletSlot = bullet;
+    this->numActiveBullets++;
+    return 0;
+}
+
+// FUNCTION: th08 0x430e10
+int BulletManager::FUN_00430e10(void *bulletConfig)
+{
+    u8 *config = (u8 *)bulletConfig;
+    if (this->numActiveBullets >= MAX_BULLETS) return 0;
+    i16 type = *(i16 *)config;
+    if (type < 0 || type >= 0x20) return 0;
+    *(BulletTypeSprites **)(config + 0x20c) = &this->bulletTypeTemplates[type];
+    f32 baseAngle = g_Player.AngleToPlayer((Float3 *)(config + 4));
+    i16 rows = *(i16 *)(config + 0x1f6);
+    i16 columns = *(i16 *)(config + 0x1f4);
+    for (i32 row = 0; row < rows; row++)
+    {
+        for (i32 column = 0; column < columns; column++)
+        {
+            if (this->FUN_0042f5f0(config, column, row, baseAngle) != 0) return 0;
+        }
+    }
+    if ((*(u32 *)(config + 0x1fc) & 0x200) != 0)
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)*(i32 *)(config + 0x200), 0);
+    return 0;
+}
+
+// FUNCTION: th08 0x430aa0
+int BulletManager::FUN_00430aa0(i32 itemType, i32 itemState)
+{
+    i32 score = 0;
+    i32 value = 2000;
+    for (i32 i = 0; i < MAX_BULLETS; i++)
+    {
+        Bullet *bullet = &this->bullets[i];
+        if (bullet->state == 0) continue;
+        if (g_Player.FUN_00449ff0(&bullet->position, &bullet->sprites.hitboxSize) == 2)
+            g_ItemManager.SpawnItem(&bullet->position, (ItemType)*(i32 *)((u8 *)&g_Player + 0xe2a90), 1);
+        else
+            g_ItemManager.SpawnItem(&bullet->position, (ItemType)this->bonusItemType, 1);
+        g_GameManager.AddScore(value);
+        score += value;
+        value += 20;
+        if (value > itemType) value = itemType;
+        bullet->state = 5;
+    }
+    for (i32 i = 0; i < 0x100; i++)
+    {
+        Laser *laser = &this->lasers[i];
+        if (!laser->isInUse || laser->state >= 2) continue;
+        laser->state = 2;
+        laser->timer = 0;
+        laser->width = laser->width2;
+        if (itemState != 0)
+            g_ItemManager.SpawnItem(&laser->position, (ItemType)this->bonusItemType, 1);
+        laser->stopHitboxTime = 0;
+    }
+    this->cancelFramesRemaining = 10;
+    return score;
+}
+
 // FUNCTION: th08 0x430d30
 #pragma var_order(i, bullet, delta)
 void BulletManager::FUN_00430d30(Float3 *position, f32 radius)
@@ -85,6 +221,50 @@ void BulletManager::FUN_00430d30(Float3 *position, f32 radius)
         g_ItemManager.SpawnItem(&bullet->position, ITEM_POINT_STAR, 1);
         memset(bullet, 0, sizeof(Bullet));
     }
+}
+
+// FUNCTION: th08 0x430f20
+Laser *BulletManager::FUN_00430f20(void *laserConfig)
+{
+    u8 *config = (u8 *)laserConfig;
+    if (this->cancelFramesRemaining != 0 && (*(u32 *)(config + 0x1fc) & 4) == 0)
+    {
+        return &this->lasers[0x100];
+    }
+    Laser *laser = &this->lasers[0];
+    i32 i;
+    for (i = 0; i < 0x100; i++, laser++)
+    {
+        if (!laser->isInUse) break;
+    }
+    if (i >= 0x100) return laser;
+
+    i16 type = *(i16 *)config;
+    i16 color = *(i16 *)(config + 2);
+    this->bonusAnm->SetAndExecuteScriptIdx(&laser->vm0, type + 10);
+    this->bonusAnm->InitializeAndSetSprite(&laser->vm1, color + 0x92);
+    laser->vm1.flags = (laser->vm1.flags & ~0x30) | 0x10;
+    laser->position = *(Float3 *)(config + 4);
+    laser->color = color;
+    laser->isInUse = TRUE;
+    laser->angle = *(f32 *)(config + 0x10);
+    if (*(u16 *)(config + 0x1f8) == 0)
+        laser->angle += g_Player.AngleToPlayer((Float3 *)(config + 4));
+    laser->flags = *(u16 *)(config + 0x1fc);
+    laser->timer = 0;
+    laser->startOffset = *(f32 *)(config + 0x1d0);
+    laser->endOffset = *(f32 *)(config + 0x1d4);
+    laser->length = *(f32 *)(config + 0x1d8);
+    laser->width = *(f32 *)(config + 0x1dc);
+    laser->speed = *(f32 *)(config + 0x18);
+    laser->startTime = *(i32 *)(config + 0x1e0);
+    laser->duration = *(i32 *)(config + 0x1e4);
+    laser->stopTime = *(i32 *)(config + 0x1e8);
+    laser->startHitboxTime = *(i32 *)(config + 0x1ec);
+    laser->stopHitboxTime = *(i32 *)(config + 0x1f0);
+    laser->unk0x599 = 0;
+    laser->state = laser->startTime == 0 ? 1 : 0;
+    return laser;
 }
 
 // FUNCTION: th08 0x430830

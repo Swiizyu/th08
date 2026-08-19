@@ -2034,6 +2034,78 @@ Effect *EffectManager::SpawnEffect(i32 effectId, Float3 *position, i32 count, D3
     return result;
 }
 
+// FUNCTION: th08 0x425650
+Effect *EffectManager::FUN_00425650(i32 effectId, Float3 *position, Float3 *custom, i32 count, D3DCOLOR color)
+{
+    Effect *effect = &this->effects[this->unk0x0];
+    i32 i;
+    for (i = 0; i < 0x200; i++)
+    {
+        this->unk0x0++;
+        if (this->unk0x0 >= 0x200) this->unk0x0 = 0;
+        if (effect->active)
+        {
+            effect = this->unk0x0 == 0 ? &this->effects[0] : effect + 1;
+            continue;
+        }
+        if (effect->resource != NULL) g_ZunMemory.Free(effect->resource);
+        memset(effect, 0, sizeof(Effect));
+        effect->active = 1;
+        effect->effectId = effectId;
+        effect->position = *position;
+        this->effectAnm->SetAndExecuteScriptIdx(&effect->vm, g_EffectTemplates[effectId].scriptIdx);
+        effect->vm.zWriteDisabled = true;
+        effect->vm.color1.d3dColor = color;
+        *(i32 *)((u8 *)&effect->vm + 0x288) = 0;
+        *(i32 *)((u8 *)&effect->vm + 0x28c) = 0;
+        *(i32 *)((u8 *)&effect->vm + 0x290) = 0;
+        effect->updateCallback = g_EffectTemplates[effectId].updateCallback;
+        effect->custom = *custom;
+        if (g_EffectTemplates[effectId].initCallback != NULL &&
+            (effect->*g_EffectTemplates[effectId].initCallback)() != 0)
+            effect->active = 0;
+        if (--count == 0) break;
+        effect = this->unk0x0 == 0 ? &this->effects[0] : effect + 1;
+    }
+    g_ReplayManager->inputFlags |= 0x400;
+    return i >= 0x200 ? &this->effects[0x28d] : effect;
+}
+
+// FUNCTION: th08 0x425b70
+Effect *EffectManager::FUN_00425b70(i32 effectId, Float3 *position, i32 count, D3DCOLOR color)
+{
+    Effect *effect = &this->effects[0x200];
+    i32 i;
+    for (i = 0; i < 0x80; i++, effect++)
+    {
+        if (effect->active) continue;
+        if (effect->resource != NULL) g_ZunMemory.Free(effect->resource);
+        effect->resource = NULL;
+        effect->drawCallback = NULL;
+        effect->drawType = 0;
+        effect->active = 1;
+        effect->effectId = effectId;
+        effect->position = *position;
+        this->effectAnm->SetAndExecuteScriptIdx(&effect->vm, g_EffectTemplates[effectId].scriptIdx);
+        effect->vm.zWriteDisabled = true;
+        effect->vm.color1.d3dColor = color;
+        *(i32 *)((u8 *)&effect->vm + 0x288) = 0;
+        *(i32 *)((u8 *)&effect->vm + 0x28c) = 0;
+        *(i32 *)((u8 *)&effect->vm + 0x290) = 0;
+        effect->updateCallback = g_EffectTemplates[effectId].updateCallback;
+        effect->timer = 0;
+        *(u8 *)((u8 *)effect + 0x352) = 0;
+        *(u8 *)((u8 *)effect + 0x353) = 0;
+        effect->custom = Float3(0.0f, 0.0f, 0.0f);
+        if (g_EffectTemplates[effectId].initCallback != NULL &&
+            (effect->*g_EffectTemplates[effectId].initCallback)() != 0)
+            effect->active = 0;
+        if (--count == 0) break;
+    }
+    g_ReplayManager->inputFlags |= 0x400;
+    return i >= 0x80 ? &this->effects[0x28d] : effect;
+}
+
 // FUNCTION: th08 0x425870
 #pragma var_order(effect)
 Effect *EffectManager::SpawnSpecialEffect(i32 effectId, Float3 *position, i32 specialIndex, i32 unused,
@@ -2589,6 +2661,54 @@ void Enemy::FUN_0042bc90()
             *(void **)((u8 *)this + i * 4 + 0x3384) = NULL;
         }
     }
+}
+
+// FUNCTION: th08 0x42bea0
+void Enemy::FUN_0042bea0(i32 itemState)
+{
+    i32 itemType = *(i32 *)((u8 *)this + 0x3304);
+    if (itemType >= 0)
+    {
+        g_EffectManager.SpawnEffect(*(u8 *)((u8 *)this + 0x3311) + 4, &this->position0x2d88, 3, -1);
+        g_ItemManager.SpawnItem(&this->position0x2d88, (ItemType)itemType,
+                                itemState != 0 ? ITEM_STATE_AUTOCOLLECT : ITEM_STATE_DEFAULT);
+    }
+    else if (itemType == -1)
+    {
+        static u16 dropTimer;
+        static u16 dropIndex;
+        static const u8 dropSequence[32] = {
+            0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0,
+            1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1,
+        };
+        if ((dropTimer % 3) == 0)
+        {
+            g_EffectManager.SpawnEffect(*(u8 *)((u8 *)this + 0x3311) + 4, &this->position0x2d88, 6, -1);
+            g_ItemManager.SpawnItem(&this->position0x2d88, (ItemType)dropSequence[dropIndex],
+                                    itemState != 0 ? ITEM_STATE_AUTOCOLLECT : ITEM_STATE_DEFAULT);
+            if (++dropIndex >= 32) dropIndex = 0;
+        }
+        dropTimer++;
+    }
+    i32 powerDrops = *(i32 *)((u8 *)this + 0x330c);
+    for (i32 i = 0; i < powerDrops; i++)
+    {
+        Float3 position = this->position0x2d88;
+        position.x += g_Rng.GetRandomF32() * 128.0f - 64.0f;
+        position.y += g_Rng.GetRandomF32() * 128.0f - 64.0f;
+        ItemType type = g_GameManager.GetPower() < 128 ? ITEM_POWER_SMALL : ITEM_POINT;
+        g_ItemManager.SpawnItem(&position, type, ITEM_STATE_DEFAULT);
+    }
+    *(i32 *)((u8 *)this + 0x330c) = 0;
+    i32 pointDrops = *(i32 *)((u8 *)this + 0x3308);
+    for (i32 i = 0; i < pointDrops; i++)
+    {
+        Float3 position = this->position0x2d88;
+        position.x += g_Rng.GetRandomF32() * 128.0f - 64.0f;
+        position.y += g_Rng.GetRandomF32() * 128.0f - 64.0f;
+        g_ItemManager.SpawnItem(&position, ITEM_POINT, ITEM_STATE_DEFAULT);
+    }
+    *(i32 *)((u8 *)this + 0x3308) = 0;
 }
 
 // FUNCTION: th08 0x42bcf0
