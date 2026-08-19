@@ -3,6 +3,7 @@
 #include "Player.hpp"
 #include "AsciiManager.hpp"
 #include "EffectManager.hpp"
+#include "SoundPlayer.hpp"
 
 u32 FUN_004338c0();
 u32 FUN_0044e0e0();
@@ -317,6 +318,7 @@ i32 Player::CalcLaserHitbox(Float3 *center, Float3 *size, Float3 *origin, f32 ro
     {
         return 0;
     }
+    this->ScoreGraze(&this->position, 1);
     return 2;
 
 laser_collision:
@@ -324,7 +326,46 @@ laser_collision:
     {
         return 0;
     }
+    this->Die();
     return 1;
+}
+
+// FUNCTION: th08 0x44a930
+#pragma var_order(score, grazePos)
+void Player::ScoreGraze(Float3 *position, i32 suppressTimeOrbEffects)
+{
+    Float3 grazePos;
+    i32 score;
+
+    grazePos = (this->position + *position) / 2.0f;
+    g_EffectManager.SpawnEffect(8, &grazePos, 1, -1);
+    g_GameManager.IncreaseSubrank(6);
+    g_SoundPlayer.PlaySoundPositionedByIdx(SOUND_GRAZE, position->x);
+
+    if (g_GameManager.GaugeIsModeratelyYoukai())
+    {
+        score = 4000;
+    }
+    else
+    {
+        score = 2000;
+    }
+    g_GameManager.AddScore(score);
+
+    if (!suppressTimeOrbEffects && g_GameManager.GaugeIsExtremelyYoukai())
+    {
+        g_EffectManager.SpawnEffect(10, position, 1, -1);
+    }
+}
+
+// FUNCTION: th08 0x44ab40
+void Player::Die()
+{
+    g_GameManager.UpdateAntiTamper();
+    g_EffectManager.SpawnEffect(6, &this->position, 16, -1);
+    this->playerState = PLAYER_STATE_DEAD;
+    ((ZunTimer *)((u8 *)this + 0xe2af4))->SetCurrent(0);
+    g_SoundPlayer.PlaySoundPositionedByIdx(SOUND_PICHUN, this->position.x);
 }
 
 // FUNCTION: th08 0x4512f0

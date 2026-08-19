@@ -115,6 +115,8 @@ struct Player
     ZunBool FUN_00451d50();
     i32 FUN_00449ff0(Float3 *position, Float3 *hitbox);
     i32 CalcLaserHitbox(Float3 *center, Float3 *size, Float3 *origin, f32 rotation, i32 canGraze);
+    void ScoreGraze(Float3 *position, i32 suppressTimeOrbEffects);
+    void Die();
     i32 CalcItemBoxCollision(Float3 *position, Float3 *hitbox);
     void FUN_0044cba0();
     void FUN_0044d150();
