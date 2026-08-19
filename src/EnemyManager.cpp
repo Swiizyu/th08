@@ -2020,6 +2020,141 @@ void Enemy::FUN_0041f0e0(i32 value)
     ((EnemyFlags *)this)->flag11 = value;
 }
 
+// FUNCTION: th08 0x420120
+f32 Enemy::FUN_00420120(f32 value)
+{
+    i32 id = (i32)value;
+    u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
+    if (id >= 10000 && id < 10008)
+    {
+        return (f32)*(i32 *)(context + 0x18 + (id - 10000) * 4);
+    }
+    if (id >= 10008 && id < 10016)
+    {
+        return (f32)*(i32 *)((u8 *)this + 0x2ca8 + (id - 10008) * 4);
+    }
+    if (id >= 10016 && id < 10024)
+    {
+        return *(f32 *)(context + 0x38 + (id - 10016) * 4);
+    }
+    if (id >= 10024 && id < 10032)
+    {
+        return *(f32 *)((u8 *)this + 0x2cc8 + (id - 10024) * 4);
+    }
+    return value;
+}
+
+// FUNCTION: th08 0x420950
+f32 *__fastcall Enemy::FUN_00420950(void *operand, i32 flags, i32 operandIndex)
+{
+    if (operandIndex >= 0 && ((flags >> operandIndex) & 1) == 0)
+    {
+        return (f32 *)operand;
+    }
+    i32 id = (i32)*(f32 *)operand;
+    u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
+    if (id >= 10016 && id < 10024)
+    {
+        return (f32 *)(context + 0x38 + (id - 10016) * 4);
+    }
+    if (id >= 10024 && id < 10096)
+    {
+        return (f32 *)((u8 *)this + 0x2cc8 + (id - 10024) * 4);
+    }
+    return (f32 *)operand;
+}
+
+// FUNCTION: th08 0x421120
+void __fastcall Enemy::FUN_00421120(void *instruction, f32 interpolation)
+{
+    f32 start = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x1c));
+    f32 end = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x20));
+    *this->FUN_00420950((u8 *)instruction + 0x2c, 0, -1) = start + (end - start) * interpolation;
+}
+
+// FUNCTION: th08 0x421180
+void __fastcall Enemy::FUN_00421180(void *instruction, f32 interpolation)
+{
+    f32 p0 = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x1c));
+    f32 p1 = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x20));
+    f32 p2 = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x24));
+    f32 p3 = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x28));
+    f32 t = interpolation;
+    f32 result = (t - 1.0f) * (t - 1.0f) * (2.0f * t + 1.0f) * p0 +
+                 t * t * (3.0f - 2.0f * t) * p1 +
+                 (1.0f - t) * (1.0f - t) * t * p2 +
+                 (t - 1.0f) * t * t * p3;
+    *this->FUN_00420950((u8 *)instruction + 0x2c, 0, -1) = result;
+}
+
+// FUNCTION: th08 0x421280
+void __fastcall Enemy::FUN_00421280(void *instruction)
+{
+    const char *name = (const char *)instruction + 0x14;
+    g_Spellcard.FUN_00415d10(name, this);
+    g_Spellcard.flags.isActive = 1;
+    *(Enemy **)((u8 *)&g_Spellcard + 4) = this;
+    g_GameManager.currentSpellCardNumber = *(u16 *)((u8 *)instruction + 0xe);
+}
+
+// FUNCTION: th08 0x421300
+void __fastcall Enemy::FUN_00421300(void *instruction)
+{
+    u16 flags = *(u16 *)((u8 *)instruction + 0xa);
+    f32 a = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x10));
+    f32 b = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x14));
+    f32 scale = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x18));
+    *this->FUN_00420950((u8 *)instruction + 0xc, flags, 0) = (a - b) * scale + b;
+}
+
+// FUNCTION: th08 0x4213f0
+void __fastcall Enemy::FUN_004213f0(void *instruction)
+{
+    u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
+    u8 *entry = context + 0x9c;
+    f32 key = *(f32 *)((u8 *)instruction + 0xc);
+    for (i32 i = 0; i < 8; i++, entry += 0x30)
+    {
+        if (*(i32 *)entry != 0 && *(f32 *)(entry + 0x2c) != key)
+        {
+            continue;
+        }
+        ((ZunTimer *)(entry + 4))->SetCurrent(0);
+        *(f32 *)(entry + 0x2c) = key;
+        *(i32 *)(entry + 0x10) = (i32)this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x10));
+        *(i32 *)(entry + 0x14) = (i32)this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x14));
+        *(i32 *)(entry + 0x18) = (i32)this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x18));
+        *(f32 *)(entry + 0x1c) = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x1c));
+        *(f32 *)(entry + 0x20) = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x20));
+        *(f32 *)(entry + 0x24) = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x24));
+        *(f32 *)(entry + 0x28) = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x28));
+        *(i32 *)entry = 1;
+        break;
+    }
+}
+
+// FUNCTION: th08 0x421e50
+void __fastcall Enemy::FUN_00421e50(void *instruction)
+{
+    u16 flags = *(u16 *)((u8 *)instruction + 0xa);
+    i32 vmIndex = (flags & 1) ? (i32)this->FUN_00420120(*(f32 *)((u8 *)instruction + 0xc))
+                              : *(i32 *)((u8 *)instruction + 0xc);
+    i32 script = (flags & 2) ? (i32)this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x10))
+                              : *(i32 *)((u8 *)instruction + 0x10);
+    if (vmIndex < 0 || vmIndex >= 2)
+    {
+        return;
+    }
+    if (script < 0)
+    {
+        this->vms[vmIndex].scriptIndex = -1;
+    }
+    else if (this->vms[vmIndex].anmFile != NULL)
+    {
+        this->vms[vmIndex].anmFile->SetAndExecuteScriptIdx(&this->vms[vmIndex], script);
+    }
+}
+
 // FUNCTION: th08 0x421bd0
 void __fastcall Enemy::FUN_00421bd0(void *instruction, i16 timelineIndex)
 {

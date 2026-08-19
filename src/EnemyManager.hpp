@@ -85,6 +85,14 @@ struct Enemy
     i32 GetFamiliarCount();
     void FUN_00415c80();
     Enemy *FUN_0041efc0();
+    f32 FUN_00420120(f32 value);
+    f32 *__fastcall FUN_00420950(void *operand, i32 flags, i32 operandIndex);
+    void __fastcall FUN_00421120(void *instruction, f32 interpolation);
+    void __fastcall FUN_00421180(void *instruction, f32 interpolation);
+    void __fastcall FUN_00421280(void *instruction);
+    void __fastcall FUN_00421300(void *instruction);
+    void __fastcall FUN_004213f0(void *instruction);
+    void __fastcall FUN_00421e50(void *instruction);
     ZunBool FUN_0041f000();
     void FUN_0041f040(i32 x, i32 y, i32 z);
     void FUN_0041f0b0(i32 value);
