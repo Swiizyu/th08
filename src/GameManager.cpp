@@ -9,6 +9,15 @@
 namespace th08
 {
 
+// FUNCTION: th08 0x43be09
+void __fastcall IncrementTruncate(u32 *value, i32)
+{
+    if (*value < 999999)
+    {
+        (*value)++;
+    }
+}
+
 DIFFABLE_STATIC(GameManager, g_GameManager);
 DIFFABLE_STATIC(ChainElem, g_GameManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_GameManagerDrawChain);

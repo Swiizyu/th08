@@ -126,6 +126,29 @@ ZunBool GameManager::IsSoloYoukai()
     return this->shotType >= 4 && (this->shotType & 1) != 0;
 }
 
+// FUNCTION: th08 0x418130
+ZunBool GameManager::IsSpellNumberEqualTo(i32 spellNumber)
+{
+    ZunBool result;
+
+    if (this->flags.isSpellPractice)
+    {
+        result = !(this->currentSpellCardNumber - spellNumber);
+    }
+    else
+    {
+        result = FALSE;
+    }
+    return result;
+}
+
+// FUNCTION: th08 0x418180
+ZunBool GameManager::IsSpellNumberInRange(i32 firstSpellNumber, i32 lastSpellNumber)
+{
+    return this->flags.isSpellPractice && this->currentSpellCardNumber >= firstSpellNumber &&
+           this->currentSpellCardNumber <= lastSpellNumber;
+}
+
 // FUNCTION: th08 0x402130
 AsciiManagerString::AsciiManagerString()
 {

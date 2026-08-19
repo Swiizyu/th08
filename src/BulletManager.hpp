@@ -6,6 +6,16 @@
 namespace th08
 {
 
+struct BulletExState
+{
+    BulletExState();
+
+    ZunTimer timer;
+    u8 unknown[8];
+    Float3 position;
+};
+C_ASSERT(sizeof(BulletExState) == 0x20);
+
 struct BulletTypeSprites
 {
 };

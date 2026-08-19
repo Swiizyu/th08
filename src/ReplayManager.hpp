@@ -32,7 +32,7 @@ struct StageReplayData
     u8 rank;
     u8 character;
     u8 unk0x21;
-    u8 clockTime;
+    i8 clockTime;
 
     unknown_fields(0x23, 0x1d);
 };

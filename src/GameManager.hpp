@@ -207,13 +207,15 @@ struct GameManager
     f32 ScaleFloatBasedOnRank(f32 minValue, f32 maxValue);
     ZunBool IsSoloHuman();
     ZunBool IsSoloYoukai();
+    ZunBool IsSpellNumberEqualTo(i32 spellNumber);
+    ZunBool IsSpellNumberInRange(i32 firstSpellNumber, i32 lastSpellNumber);
 
     i8 GetClockTime()
     {
         return this->globals->clockTime;
     }
 
-    void SetClockTime(i8 time)
+    void SetClockTime(i32 time)
     {
         this->globals->clockTime = time;
     }

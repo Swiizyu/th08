@@ -13,6 +13,20 @@ namespace th08
 DIFFABLE_STATIC(AnmManager *, g_AnmManager);
 DIFFABLE_STATIC_ARRAY(VertexTex1DiffuseXyzrhw, 4, g_QuadVertices);
 
+// FUNCTION: th08 0x40baf0
+void AnmManager::Draw2DAndFlush(AnmVm *vm)
+{
+    this->Draw2D(vm);
+    this->FlushVertexBuffer();
+}
+
+// FUNCTION: th08 0x40ec00
+void AnmVm::SetZRotation(f32 rotation)
+{
+    this->rotation.z = rotation;
+    *(u32 *)((u8 *)this + 0x1f8) |= 4;
+}
+
 // FUNCTION: th08 0x40bb60
 AnmLoaded *AnmManager::GetAnm(i32 anmIdx)
 {

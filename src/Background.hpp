@@ -33,6 +33,8 @@ struct Background
     static ZunResult DeletedCallback();
     static void CutChain();
     ZunResult LoadStageData();
+    void background_fun_00416ad0();
+    void background_fun_00415ce0();
 
     void SetCamera1()
     {

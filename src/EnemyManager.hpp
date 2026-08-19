@@ -7,9 +7,29 @@
 namespace th08
 {
 
+struct EnemyUnkStruct0x1c
+{
+    EnemyUnkStruct0x1c();
+
+    Float3 first;
+    Float3 second;
+    u32 unknown;
+};
+C_ASSERT(sizeof(EnemyUnkStruct0x1c) == 0x1c);
+
+struct EnemyUnkStruct3
+{
+    EnemyUnkStruct3();
+
+    u32 unknown;
+    ZunTimer timer;
+};
+C_ASSERT(sizeof(EnemyUnkStruct3) == 0x10);
+
 struct Enemy
 {
     i32 GetFamiliarCount();
+    ZunBool FUN_0041fd20();
 
     unknown_fields(0x0, 0x3380);
     i32 field98_0x3380;

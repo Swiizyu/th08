@@ -15,6 +15,16 @@ DIFFABLE_STATIC(ChainElem, g_EnemyManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerDrawChainHighPrio);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerDrawChainLowPrio);
 
+// FUNCTION: th08 0x42a490
+EnemyUnkStruct0x1c::EnemyUnkStruct0x1c()
+{
+}
+
+// FUNCTION: th08 0x42a4c0
+EnemyUnkStruct3::EnemyUnkStruct3()
+{
+}
+
 // FUNCTION: th08 0x4286e0
 void Float3::FromAngleMagnitude(float angle, float magnitude)
 {
@@ -58,6 +68,12 @@ void EffectManager::CutChain()
 {
     g_Chain.Cut(&g_EffectManagerCalcChain);
     g_Chain.Cut(&g_EffectManagerDrawChain);
+}
+
+// FUNCTION: th08 0x41fd20
+ZunBool Enemy::FUN_0041fd20()
+{
+    return *(i32 *)((u8 *)this + 0x2da4) != 0;
 }
 
 // STUB: th08 0x41fd40

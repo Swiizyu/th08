@@ -13,6 +13,39 @@ namespace th08
 DIFFABLE_STATIC(Spellcard, g_Spellcard);
 DIFFABLE_STATIC(ChainElem *, g_SpellcardCalcChain);
 
+// FUNCTION: th08 0x416130
+void Spellcard::spellcard_fun_00416130()
+{
+    *(i16 *)((u8 *)this + 0x12f6) = 1;
+    ((AnmVm *)((u8 *)this + 0x1b88))->SetInterrupt(2);
+}
+
+// FUNCTION: th08 0x416160
+void Spellcard::spellcard_fun_00416160()
+{
+    *(i16 *)((u8 *)this + 0x159a) = 1;
+    ((AnmVm *)((u8 *)this + 0x1e2c))->SetInterrupt(2);
+    if (this->flags.unk10 == 0)
+    {
+        ((AnmVm *)((u8 *)this + 0x2374))->SetInterrupt(2);
+    }
+}
+
+// FUNCTION: th08 0x414540
+ZunBool Spellcard::IsLastSpell(i32 spellcardNumber)
+{
+    i32 i;
+
+    for (i = 0; i < g_LastSpellCount; i++)
+    {
+        if (g_LastSpellNumbers[i] == spellcardNumber)
+        {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 // FUNCTION: th08 0x40d410
 i32 ZunTimer::operator%(i32 value)
 {
@@ -382,6 +415,8 @@ DIFFABLE_STATIC_ARRAY_ASSIGN(i32, 43, g_LastSpellNumbers) = {
     // Fujiwara no Mokou
     SPELLCARD_EX_BOSS_LS,
 };
+
+DIFFABLE_STATIC_ASSIGN(i32, g_LastSpellCount) = 43;
 
 DIFFABLE_STATIC_ARRAY_ASSIGN(i32 *, 10, g_SpellcardNumbersPerStage) = {
     g_SpellcardNumbersStage1,     g_SpellcardNumbersStage2,  g_SpellcardNumbersStage3,  g_SpellcardNumbersStage4A,

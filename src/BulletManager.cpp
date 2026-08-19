@@ -9,6 +9,11 @@ DIFFABLE_STATIC(BulletManager, g_BulletManager);
 DIFFABLE_STATIC(ChainElem, g_BulletManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_BulletManagerDrawChain);
 
+// FUNCTION: th08 0x42f5c0
+BulletExState::BulletExState()
+{
+}
+
 // STUB: th08 0x42f360
 void BulletManager::Initialize()
 {

@@ -281,18 +281,19 @@ ChainCallbackResult ReplayManager::OnUpdateHighPrioDemo(ReplayManager *mgr)
 ZunResult ReplayManager::AddedCallback(ReplayManager *mgr)
 {
     i32 i;
-    i32 stage6Cleared;
-    i32 clearState;
-    i32 spellcardNumber;
-    StageReplayData *stageReplay;
     StageReplayData *lastBookmark;
     u8 *fpsReplayData;
+    StageReplayData *stageReplay;
 
     mgr->frameId = 0;
     mgr->unk0xc = NULL;
 
     if (mgr->replayData == NULL)
     {
+        i32 clearState;
+        i32 spellcardNumber;
+        i32 stage6Cleared;
+
         mgr->replayData = ZUN_NEW(ReplayData, "ReplayDataInf");
         memset(mgr->replayData, 0, sizeof(ReplayData));
         mgr->replayData->header.magic = *(u32 *)REPLAY_MAGIC;
@@ -317,28 +318,54 @@ ZunResult ReplayManager::AddedCallback(ReplayManager *mgr)
         }
         mgr->replayData->spellcardNumber = spellcardNumber;
 
-        if (g_GameManager.IsStageClearedWithoutRetries(7, g_GameManager.shotType, 0) ||
-            g_GameManager.IsStageClearedWithoutRetries(7, g_GameManager.shotType, 1) ||
-            g_GameManager.IsStageClearedWithoutRetries(7, g_GameManager.shotType, 2) ||
-            g_GameManager.IsStageClearedWithoutRetries(7, g_GameManager.shotType, 3) || g_GameManager.shotType > 3)
+        if (g_GameManager.IsStageClearedWithoutRetries(7, g_GameManager.shotType, 0))
         {
-            clearState = 2;
+            goto clearStateTwo;
         }
-        else
+        if (g_GameManager.IsStageClearedWithoutRetries(7, g_GameManager.shotType, 1))
         {
-            if (g_GameManager.IsStageClearedWithoutRetries(6, g_GameManager.shotType, 0) ||
-                g_GameManager.IsStageClearedWithoutRetries(6, g_GameManager.shotType, 1) ||
-                g_GameManager.IsStageClearedWithoutRetries(6, g_GameManager.shotType, 2) ||
-                g_GameManager.IsStageClearedWithoutRetries(6, g_GameManager.shotType, 3))
-            {
-                stage6Cleared = 1;
-            }
-            else
-            {
-                stage6Cleared = 0;
-            }
-            clearState = stage6Cleared;
+            goto clearStateTwo;
         }
+        if (g_GameManager.IsStageClearedWithoutRetries(7, g_GameManager.shotType, 2))
+        {
+            goto clearStateTwo;
+        }
+        if (g_GameManager.IsStageClearedWithoutRetries(7, g_GameManager.shotType, 3))
+        {
+            goto clearStateTwo;
+        }
+        if (g_GameManager.shotType > 3)
+        {
+            goto clearStateTwo;
+        }
+
+        if (g_GameManager.IsStageClearedWithoutRetries(6, g_GameManager.shotType, 0))
+        {
+            goto stageSixCleared;
+        }
+        if (g_GameManager.IsStageClearedWithoutRetries(6, g_GameManager.shotType, 1))
+        {
+            goto stageSixCleared;
+        }
+        if (g_GameManager.IsStageClearedWithoutRetries(6, g_GameManager.shotType, 2))
+        {
+            goto stageSixCleared;
+        }
+        if (g_GameManager.IsStageClearedWithoutRetries(6, g_GameManager.shotType, 3))
+        {
+            goto stageSixCleared;
+        }
+        stage6Cleared = 0;
+        goto setClearState;
+
+    stageSixCleared:
+        stage6Cleared = 1;
+    setClearState:
+        clearState = stage6Cleared;
+        goto clearStateDone;
+    clearStateTwo:
+        clearState = 2;
+    clearStateDone:
         mgr->replayData->clearState = clearState;
 
         mgr->replayData->difficulty = g_GameManager.difficulty;
@@ -417,10 +444,10 @@ ZunResult ReplayManager::AddedCallback(ReplayManager *mgr)
 ZunResult ReplayManager::AddedCallbackDemo(ReplayManager *mgr)
 {
     i32 i;
+    u8 *fpsReplayData;
+    StageReplayData *lastBookmark;
     i32 fileSize;
     StageReplayData *stageReplay;
-    StageReplayData *lastBookmark;
-    u8 *fpsReplayData;
 
     mgr->frameId = 0;
 
@@ -461,7 +488,7 @@ ZunResult ReplayManager::AddedCallbackDemo(ReplayManager *mgr)
     fpsReplayData = (u8 *)mgr->replayData->header.stageReplayData2[i];
 
     g_GameManager.shotType = mgr->replayData->shotType;
-    g_GameManager.fullShotType = mgr->replayData->shotType % 2;
+    g_GameManager.fullShotType = mgr->replayData->shotType % 1;
     g_GameManager.shotType = mgr->replayData->shotType;
     g_GameManager.difficulty = mgr->replayData->difficulty;
 

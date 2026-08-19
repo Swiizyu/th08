@@ -19,15 +19,19 @@ struct SpellcardFlags
     u32 unk7 : 1;
     u32 unk8 : 1;
     u32 isCaptured : 1;
+    u32 unk10 : 1;
 };
 
 struct Spellcard
 {
     static i32 GetDifficultyFromSpellCard(i32 spellcardNumber);
+    static ZunBool IsLastSpell(i32 spellcardNumber);
     static void CutChain();
     ZunBool FUN_00405260();
     ZunBool spellcard_fun_00417860();
     ZunBool spellcard_fun_004178a0();
+    void spellcard_fun_00416130();
+    void spellcard_fun_00416160();
     i32 FUN_0041fdd0();
     ZunBool FUN_0042dff0();
 

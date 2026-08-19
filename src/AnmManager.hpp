@@ -391,6 +391,8 @@ struct AnmVm : AnmVmBase
         this->pendingInterrupt = interrupt;
     }
 
+    void SetZRotation(f32 rotation);
+
     Float3 pos;
     i16 activeSpriteIndex;
     i16 anmFileIndex;
@@ -515,6 +517,7 @@ struct AnmManager
     void TranslateRotation(VertexTex1DiffuseXyzrhw *vertex, float x, float y, float sine, float cosine, float xOffset,
                            float yOffset);
     ZunResult Draw2D(AnmVm *vm);
+    void Draw2DAndFlush(AnmVm *vm);
     ZunResult Draw2DNoRound(AnmVm *vm);
     ZunResult DrawNoRotationNoRound(AnmVm *vm);
     void TransformVerticesWorld(AnmVm *vm);

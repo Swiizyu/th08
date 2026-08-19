@@ -6,6 +6,19 @@ namespace th08
 {
 DIFFABLE_STATIC(Background, g_Background);
 
+// FUNCTION: th08 0x415ce0
+void Background::background_fun_00415ce0()
+{
+    *(i32 *)((u8 *)this + 0xb24) = 1;
+    *(i32 *)((u8 *)this + 0xb28) = 0;
+}
+
+// FUNCTION: th08 0x416ad0
+void Background::background_fun_00416ad0()
+{
+    *(i32 *)((u8 *)this + 0xb24) = 0;
+}
+
 // STUB: th08 0x4071a0
 Background::Background()
 {
