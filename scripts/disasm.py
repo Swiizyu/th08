@@ -53,7 +53,7 @@ def main():
         text=True,
     ).stdout
 
-    insn_re = re.compile(r"^\s*([0-9a-f]+):\t((?:[0-9a-f]{2} )+)\s*\t(\S+)(?:\t(.*))?$")
+    insn_re = re.compile(r"^\s*([0-9a-f]+):\s+((?:[0-9a-f]{2} )+)\s+(\S+)(?:\s+(.*))?$")
     count = 0
     for line in out.splitlines():
         m = insn_re.match(line)
