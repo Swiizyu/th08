@@ -6,6 +6,7 @@
 #include "Player.hpp"
 #include "ZunMath.hpp"
 
+u32 FUN_004338b0();
 u32 FUN_004338c0();
 
 namespace th08
@@ -14,6 +15,24 @@ namespace th08
 DIFFABLE_STATIC(BulletManager, g_BulletManager);
 DIFFABLE_STATIC(ChainElem, g_BulletManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_BulletManagerDrawChain);
+
+struct BulletTypeInfo
+{
+    i32 bulletScript;
+    i32 spawnFastScript;
+    i32 spawnNormalScript;
+    i32 spawnSlowScript;
+    i32 despawnScript;
+};
+DIFFABLE_STATIC_ARRAY_ASSIGN(BulletTypeInfo, 21, g_BulletTypeInfos) = {
+    {0, 18, 19, 20, 15},     {1, 21, 22, 23, 16},     {2, 21, 22, 23, 16},
+    {3, 21, 22, 23, 16},     {4, 21, 22, 23, 16},     {5, 21, 22, 23, 16},
+    {6, 21, 22, 23, 16},     {7, 24, 24, 24, 17},     {8, 24, 24, 24, 17},
+    {9, 24, 24, 24, 17},     {25, 27, 27, 27, 26},    {106, 21, 22, 23, 16},
+    {107, 21, 22, 23, 16},   {108, 21, 22, 23, 16},   {109, 24, 24, 24, 17},
+    {110, 24, 24, 24, 17},   {111, 21, 22, 23, 16},   {112, 21, 22, 23, 16},
+    {113, 24, 24, 24, 17},   {114, 24, 24, 24, 17},   {115, 24, 24, 24, 17},
+};
 
 // FUNCTION: th08 0x42ff70
 Float3 *Float3::FUN_0042ff70(const Float3 &other)
@@ -312,9 +331,91 @@ ChainCallbackResult BulletManager::OnDraw(BulletManager *bulletManager)
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
-// STUB: th08 0x433070
+// FUNCTION: th08 0x433070
+#pragma var_order(i)
 ZunResult BulletManager::AddedCallback(BulletManager *bulletManager)
 {
+    u32 i;
+
+    if (FUN_004338b0())
+    {
+        bulletManager->bonusAnm = g_AnmManager->PreloadAnm(6, "etama.anm");
+        if (bulletManager->bonusAnm == NULL)
+        {
+            return ZUN_ERROR;
+        }
+    }
+    else
+    {
+        bulletManager->bonusAnm = g_AnmManager->GetAnm(6);
+    }
+
+    for (i = 0; i < 21; i++)
+    {
+        bulletManager->bonusAnm->SetAndExecuteScriptIdx(&bulletManager->bulletTypeTemplates[i].spriteBullet,
+                                                         g_BulletTypeInfos[i].bulletScript);
+        bulletManager->bonusAnm->SetAndExecuteScriptIdx(&bulletManager->bulletTypeTemplates[i].spriteSpawnEffectFast,
+                                                         g_BulletTypeInfos[i].spawnFastScript);
+        bulletManager->bonusAnm->SetAndExecuteScriptIdx(&bulletManager->bulletTypeTemplates[i].spriteSpawnEffectNormal,
+                                                         g_BulletTypeInfos[i].spawnNormalScript);
+        bulletManager->bonusAnm->SetAndExecuteScriptIdx(&bulletManager->bulletTypeTemplates[i].spriteSpawnEffectSlow,
+                                                         g_BulletTypeInfos[i].spawnSlowScript);
+        bulletManager->bonusAnm->SetAndExecuteScriptIdx(&bulletManager->bulletTypeTemplates[i].spriteDespawnEffect,
+                                                         g_BulletTypeInfos[i].despawnScript);
+        bulletManager->bulletTypeTemplates[i].spriteBullet.zWriteDisabled = true;
+        bulletManager->bulletTypeTemplates[i].spriteSpawnEffectFast.zWriteDisabled = true;
+        bulletManager->bulletTypeTemplates[i].spriteSpawnEffectNormal.zWriteDisabled = true;
+        bulletManager->bulletTypeTemplates[i].spriteSpawnEffectSlow.zWriteDisabled = true;
+        bulletManager->bulletTypeTemplates[i].spriteDespawnEffect.zWriteDisabled = true;
+        bulletManager->bulletTypeTemplates[i].spriteBullet.baseSpriteIndex = bulletManager->bulletTypeTemplates[i].spriteBullet.activeSpriteIndex;
+        bulletManager->bulletTypeTemplates[i].bulletHeight =
+            (u8)bulletManager->bulletTypeTemplates[i].spriteBullet.loadedSprite->heightPx;
+        if (bulletManager->bulletTypeTemplates[i].spriteBullet.loadedSprite->heightPx <= 8.0f)
+        {
+            bulletManager->bulletTypeTemplates[i].hitboxSize.x = 4.0f;
+            bulletManager->bulletTypeTemplates[i].hitboxSize.y = 4.0f;
+            bulletManager->bulletTypeTemplates[i].collisionType = 5;
+        }
+        else if (bulletManager->bulletTypeTemplates[i].spriteBullet.loadedSprite->heightPx <= 16.0f)
+        {
+            i32 script = g_BulletTypeInfos[i].bulletScript;
+            if (script <= 8 || script >= 106)
+            {
+                bulletManager->bulletTypeTemplates[i].hitboxSize.x = 4.0f;
+                bulletManager->bulletTypeTemplates[i].hitboxSize.y = 4.0f;
+                bulletManager->bulletTypeTemplates[i].collisionType = 4;
+            }
+            else
+            {
+                bulletManager->bulletTypeTemplates[i].hitboxSize.x = 6.0f;
+                bulletManager->bulletTypeTemplates[i].hitboxSize.y = 6.0f;
+                bulletManager->bulletTypeTemplates[i].collisionType = 3;
+            }
+        }
+        else if (bulletManager->bulletTypeTemplates[i].spriteBullet.loadedSprite->heightPx <= 32.0f)
+        {
+            i32 script = g_BulletTypeInfos[i].bulletScript;
+            if (script == 8 || script == 9 || script == 113 || script == 114 || script == 115)
+            {
+                bulletManager->bulletTypeTemplates[i].hitboxSize.x = 5.0f;
+                bulletManager->bulletTypeTemplates[i].hitboxSize.y = 5.0f;
+                bulletManager->bulletTypeTemplates[i].collisionType = 2;
+            }
+            else
+            {
+                bulletManager->bulletTypeTemplates[i].hitboxSize.x = 10.0f;
+                bulletManager->bulletTypeTemplates[i].hitboxSize.y = 10.0f;
+                bulletManager->bulletTypeTemplates[i].collisionType = 1;
+            }
+        }
+        else
+        {
+            bulletManager->bulletTypeTemplates[i].collisionType = 0;
+            bulletManager->bulletTypeTemplates[i].hitboxSize.x = 24.0f;
+            bulletManager->bulletTypeTemplates[i].hitboxSize.y = 24.0f;
+        }
+    }
+    g_ItemManager.FUN_004337f0();
     return ZUN_SUCCESS;
 }
 

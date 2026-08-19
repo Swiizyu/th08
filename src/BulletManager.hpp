@@ -45,7 +45,8 @@ struct BulletTypeSprites
     Float3 hitboxSize;
     u8 unk0xd40;
     u8 bulletHeight;
-    u8 padding[2];
+    u8 collisionType;
+    u8 padding;
 };
 C_ASSERT(sizeof(BulletTypeSprites) == 0xd44);
 
