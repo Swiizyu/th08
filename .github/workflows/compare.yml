@@ -9,6 +9,10 @@ on:
       workflow_id:
         required: true
         type: number
+      verbose_addr:
+        required: false
+        type: string
+        description: 'Optional: function VA (e.g. 0x446232) to dump a full reccmp diff for'
 
 env:
   EXPECTED_HASH: 330fbdbf58a710829d65277b4f312cfbb38d5448b3df523e79350b879213d924
@@ -19,6 +23,7 @@ jobs:
 
     permissions:
       statuses: write
+      contents: write
 
     steps:
     - name: Report tests check
@@ -68,6 +73,10 @@ jobs:
           let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
             return artifact.name == "th08"
           })[0];
+          if (!matchArtifact) {
+            core.setFailed('Artifact "th08" not found in the triggering build run (did the Build binary job succeed?)');
+            return;
+          }
           let download = await github.rest.actions.downloadArtifact({
              owner: context.repo.owner,
              repo: context.repo.repo,
@@ -103,7 +112,34 @@ jobs:
         reccmp-project detect --what recompiled
     - name: Create diff summary
       working-directory: recompiled
-      run: python ../scripts/generate_reccmp_diff.py > $env:GITHUB_STEP_SUMMARY
+      run: |
+        python ../scripts/generate_reccmp_diff.py > diff_summary.md
+        Get-Content diff_summary.md | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+    - name: Verbose diff for one function (optional)
+      if: ${{ github.event_name == 'workflow_dispatch' && inputs.verbose_addr != '' }}
+      working-directory: recompiled
+      run: |
+        reccmp-reccmp --target th08 --verbose ${{ inputs.verbose_addr }} > verbose_diff.txt
+    - name: Post diff summary as commit comment
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          let body = '';
+          try {
+            body = fs.readFileSync('recompiled/diff_summary.md', 'utf8').slice(0, 55000);
+          } catch (e) {}
+          let extra = '';
+          try {
+            extra = fs.readFileSync('recompiled/verbose_diff.txt', 'utf8');
+            if (extra) extra = '\n\nVerbose diff:\n```\n' + extra.slice(0, 55000 - body.length) + '\n```';
+          } catch (e) {}
+          await github.rest.repos.createCommitComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            commit_sha: '${{ steps.workflow_run_info.outputs.head_sha }}',
+            body: '📊 `Compare reimplementation` results:\n' + body + extra,
+          });
     - name: Report tests check
       if: ${{ github.event_name == 'workflow_run' && success() }}
       uses: actions/github-script@v6
