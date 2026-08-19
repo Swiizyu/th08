@@ -2,6 +2,7 @@
 
 #include "Background.hpp"
 #include "GameManager.hpp"
+#include "Player.hpp"
 
 namespace th08
 {
@@ -336,6 +337,78 @@ ZunResult Background::LoadStageData(const char *path)
     *(u8 *)((u8 *)this + 0x834) = 0;
     this->timer0x838 = 0;
     return ZUN_SUCCESS;
+}
+
+// FUNCTION: th08 0x409f40
+#pragma var_order(unused, vmCount, i, vm, object, quad)
+u32 Background::FUN_00409f40()
+{
+    StdRawQuadBasic *quad;
+    StdRawObject *object;
+    AnmVm *vm;
+    i32 i;
+    i32 vmCount;
+    StdRawQuadBasic *unused;
+
+    if (*(u8 *)((u8 *)this + 0x834))
+    {
+        if (g_Player.IsHuman())
+        {
+            *(u8 *)((u8 *)this + 0x834) = 0;
+            this->timer0x838 = 0;
+            this->vm0x844.SetInterrupt(2);
+        }
+    }
+    else if (g_Player.IsYoukai())
+    {
+        *(u8 *)((u8 *)this + 0x834) = 1;
+        this->timer0x838 = 0;
+        this->vm0x844.SetInterrupt(1);
+    }
+    this->timer0x838++;
+    g_AnmManager->ExecuteScript(&this->vm0x844);
+
+    for (i = 0; i < this->objectsCount; i++)
+    {
+        object = this->objects[i];
+        if (object->flags & 1)
+        {
+            vmCount = 0;
+            quad = &object->firstQuad;
+            while (quad->type >= 0)
+            {
+                vm = &this->quadVms[quad->vmIndex];
+                switch (quad->type)
+                {
+                case 0:
+                    g_AnmManager->ExecuteScript(vm);
+                    break;
+                case 1:
+                    unused = quad;
+                    g_AnmManager->ExecuteScript(vm);
+                    break;
+                }
+                if (vm->currentInstruction != NULL)
+                {
+                    vmCount++;
+                }
+                quad = (StdRawQuadBasic *)((u8 *)quad + quad->byteSize);
+            }
+            if (vm->type == 1)
+            {
+                *(u32 *)((u8 *)vm + 0x1f8) |= 0x20000;
+                vm->color2.r = (u32)(vm->color1.r * this->vm0x844.color1.r) >> 8;
+                vm->color2.g = (u32)(vm->color1.g * this->vm0x844.color1.g) >> 8;
+                vm->color2.b = (u32)(vm->color1.b * this->vm0x844.color1.b) >> 8;
+                vm->color2.a = (u32)(vm->color1.a * this->vm0x844.color1.a) >> 8;
+            }
+            if (vmCount == 0)
+            {
+                object->flags &= ~1;
+            }
+        }
+    }
+    return 0;
 }
 
 }; // Namespace th08
