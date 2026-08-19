@@ -15,6 +15,46 @@ namespace th08
 
 DIFFABLE_STATIC(Spellcard, g_Spellcard);
 DIFFABLE_STATIC(ChainElem *, g_SpellcardCalcChain);
+static ChainElem *g_SpellcardDrawChain;
+
+// FUNCTION: th08 0x418010
+ChainCallbackResult Spellcard::OnUpdate(Spellcard *spellcard)
+{
+    if (spellcard->flags.isActive)
+    {
+        ZunTimer *timer = (ZunTimer *)((u8 *)spellcard + 0x108);
+        timer->Tick();
+    }
+    return CHAIN_CALLBACK_RESULT_CONTINUE;
+}
+
+// FUNCTION: th08 0x418030
+ChainCallbackResult Spellcard::OnDraw(Spellcard *spellcard)
+{
+    if (!spellcard->flags.isActive) return CHAIN_CALLBACK_RESULT_CONTINUE;
+    for (i32 i = 0; i < 14; i++)
+    {
+        AnmVm *vm = (AnmVm *)((u8 *)spellcard + 0x120 + i * sizeof(AnmVm));
+        if (vm->IsVisible()) g_AnmManager->Draw2D(vm);
+    }
+    return CHAIN_CALLBACK_RESULT_CONTINUE;
+}
+
+// FUNCTION: th08 0x417f60
+ZunResult Spellcard::RegisterChain()
+{
+    g_SpellcardCalcChain = g_Chain.CreateElem((ChainCallback)Spellcard::OnUpdate);
+    g_SpellcardDrawChain = g_Chain.CreateElem((ChainCallback)Spellcard::OnDraw);
+    if (g_SpellcardCalcChain == NULL || g_SpellcardDrawChain == NULL) return ZUN_ERROR;
+    g_SpellcardCalcChain->deletedCallback = (ChainLifetimeCallback)Spellcard::DeletedCallback;
+    g_SpellcardCalcChain->arg = &g_Spellcard;
+    g_SpellcardDrawChain->arg = &g_Spellcard;
+    *(ChainElem **)((u8 *)&g_Spellcard + 0x263c) = g_SpellcardCalcChain;
+    *(ChainElem **)((u8 *)&g_Spellcard + 0x2640) = g_SpellcardDrawChain;
+    g_Chain.AddToCalcChain(g_SpellcardCalcChain, 12);
+    g_Chain.AddToDrawChain(g_SpellcardDrawChain, 15);
+    return ZUN_SUCCESS;
+}
 
 // FUNCTION: th08 0x4143e0
 Spellcard::Spellcard()

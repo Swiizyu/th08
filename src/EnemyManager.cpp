@@ -1231,6 +1231,23 @@ void Enemy::FUN_00423150()
     *(u8 *)((u8 *)this + 0x332e) = (u8)state;
 }
 
+// FUNCTION: th08 0x4235a0
+void FUN_004235a0()
+{
+    Effect *effect9 = g_EffectManager.FUN_004253e0(9);
+    Effect *effect10 = g_EffectManager.FUN_004253e0(10);
+    if (effect9 != NULL && effect9->active)
+    {
+        effect9->vm.pos = effect9->position;
+        g_AnmManager->Draw2D(&effect9->vm);
+    }
+    if (effect10 != NULL && effect10->active)
+    {
+        effect10->vm.pos = effect10->position;
+        g_AnmManager->Draw2D(&effect10->vm);
+    }
+}
+
 // FUNCTION: th08 0x423a60
 void __fastcall Enemy::FUN_00423a60(void *)
 {
@@ -2600,6 +2617,38 @@ void __fastcall Enemy::FUN_004213f0(void *instruction)
     }
 }
 
+// FUNCTION: th08 0x4215f0
+void *__fastcall Enemy::FUN_004215f0(void *instruction)
+{
+    u8 *ins = (u8 *)instruction;
+    u16 mask = *(u16 *)(ins + 0xa);
+    i32 opcode = *(i16 *)(ins + 4);
+    i32 intA = (mask & 1) ? this->FUN_0041f420(*(i32 *)(ins + 0xc)) : *(i32 *)(ins + 0xc);
+    i32 intB = (mask & 2) ? this->FUN_0041f420(*(i32 *)(ins + 0x10)) : *(i32 *)(ins + 0x10);
+    f32 floatA = (mask & 1) ? this->FUN_00420120(*(f32 *)(ins + 0xc)) : *(f32 *)(ins + 0xc);
+    f32 floatB = (mask & 2) ? this->FUN_00420120(*(f32 *)(ins + 0x10)) : *(f32 *)(ins + 0x10);
+    bool condition = false;
+    switch (opcode)
+    {
+    case 40: condition = intA == intB; break;
+    case 41: condition = floatA == floatB; break;
+    case 42: condition = intA != intB; break;
+    case 43: condition = floatA != floatB; break;
+    case 44: condition = intA < intB; break;
+    case 45: condition = floatA < floatB; break;
+    case 46: condition = intA <= intB; break;
+    case 47: condition = floatA <= floatB; break;
+    case 48: condition = intA > intB; break;
+    case 49: condition = floatA > floatB; break;
+    case 50: condition = intA >= intB; break;
+    case 51: condition = floatA >= floatB; break;
+    }
+    if (!condition) return NULL;
+    u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
+    *(i32 *)(context + 0xc) = *(i32 *)(ins + 0x14);
+    return ins + *(i32 *)(ins + 0x18);
+}
+
 // FUNCTION: th08 0x422020
 void __fastcall Enemy::FUN_00422020(void *instruction)
 {
@@ -2645,6 +2694,74 @@ void __fastcall Enemy::FUN_004224a0(void *instruction)
     else
     {
         this->FUN_004222b0(instruction, angle);
+    }
+}
+
+// FUNCTION: th08 0x422720
+void __fastcall Enemy::FUN_00422720(void *instruction)
+{
+    u8 *ins = (u8 *)instruction;
+    u8 *args = ins + 0xc;
+    u8 *config = (u8 *)this + 0x2e24;
+    memset(config, 0, 0x210);
+    u16 mask = *(u16 *)(ins + 0xa);
+    *(i16 *)config = (i16)((mask & 1) ? this->FUN_0041f420(*(i32 *)args) : *(i32 *)args);
+    *(i16 *)(config + 2) = *(i16 *)(args + 2);
+    *(i16 *)(config + 0x1f4) = (i16)((mask & 4) ? this->FUN_0041f420(*(i32 *)(args + 4)) : *(i32 *)(args + 4));
+    *(i16 *)(config + 0x1f6) = (i16)((mask & 8) ? this->FUN_0041f420(*(i32 *)(args + 8)) : *(i32 *)(args + 8));
+    if (*(i16 *)(config + 0x1f4) <= 0) *(i16 *)(config + 0x1f4) = 1;
+    if (*(i16 *)(config + 0x1f6) <= 0) *(i16 *)(config + 0x1f6) = 1;
+    *(i16 *)(config + 0x1f8) = *(i16 *)(ins + 4) - 0x60;
+    *(Float3 *)(config + 4) = this->position0x2d88 - this->position0x2db8;
+    *(f32 *)(config + 0x10) = (mask & 0x10) ? this->FUN_00420120(*(f32 *)(args + 0xc)) : *(f32 *)(args + 0xc);
+    *(f32 *)(config + 0x14) = (mask & 0x40) ? this->FUN_00420120(*(f32 *)(args + 0x14)) : *(f32 *)(args + 0x14);
+    *(f32 *)(config + 0x18) = (mask & 0x20) ? this->FUN_00420120(*(f32 *)(args + 0x10)) : *(f32 *)(args + 0x10);
+    *(f32 *)(config + 0x1c) = *(f32 *)(args + 0x18);
+    *(u32 *)(config + 0x1fc) = *(u32 *)(args + 0x1c);
+    *(i32 *)(config + 0x200) = *(i16 *)(args + 2);
+    g_BulletManager.FUN_00430e10(config);
+}
+
+// FUNCTION: th08 0x422c40
+void Enemy::FUN_00422c40()
+{
+    u32 *flags = (u32 *)((u8 *)this + 0x3324);
+    i32 mode = (*flags >> 12) & 3;
+    if (mode == 1)
+    {
+        *(f32 *)((u8 *)this + 0x2d94) = AddNormalizeAngle(*(f32 *)((u8 *)this + 0x2d94),
+            g_Supervisor.framerateMultiplier * *(f32 *)((u8 *)this + 0x2d98));
+        *(f32 *)((u8 *)this + 0x2da8) += g_Supervisor.framerateMultiplier * *(f32 *)((u8 *)this + 0x2dac);
+        f32 sine, cosine;
+        fsincos(&sine, &cosine, *(f32 *)((u8 *)this + 0x2d94));
+        this->position0x2d4c = Float3(cosine * *(f32 *)((u8 *)this + 0x2da8),
+                                     sine * *(f32 *)((u8 *)this + 0x2da8), 0.0f);
+    }
+    else if (mode == 2)
+    {
+        this->timer0x2ddc.Tick();
+        i32 duration = *(i32 *)((u8 *)this + 0x2de8);
+        f32 t = duration > 0 ? (f32)this->timer0x2ddc.current / duration : 1.0f;
+        if (t > 1.0f) t = 1.0f;
+        Float3 destination = this->position0x2dd0 + this->position0x2dc4;
+        Float3 next = this->position0x2dd0 + this->position0x2dc4 * t;
+        this->position0x2d4c = next - this->position0x2d34;
+        if (t >= 1.0f)
+        {
+            this->position0x2d34 = destination;
+            this->position0x2d4c = Float3(0.0f, 0.0f, 0.0f);
+            *flags &= ~0x3000;
+        }
+    }
+    else if (mode == 3)
+    {
+        *(f32 *)((u8 *)this + 0x2d9c) = AddNormalizeAngle(*(f32 *)((u8 *)this + 0x2d9c),
+            g_Supervisor.framerateMultiplier * *(f32 *)((u8 *)this + 0x2da0));
+        *(f32 *)((u8 *)this + 0x2db0) += g_Supervisor.framerateMultiplier * *(f32 *)((u8 *)this + 0x2db4);
+        f32 sine, cosine;
+        fsincos(&sine, &cosine, *(f32 *)((u8 *)this + 0x2d9c));
+        Float3 next = this->position0x2dd0 + Float3(cosine, sine, 0.0f) * *(f32 *)((u8 *)this + 0x2db0);
+        this->position0x2d4c = next - this->position0x2d34;
     }
 }
 
@@ -2836,6 +2953,57 @@ void Enemy::FUN_0042bc90()
             *(void **)((u8 *)this + i * 4 + 0x3384) = NULL;
         }
     }
+}
+
+// FUNCTION: th08 0x42b930
+int Enemy::FUN_0042b930()
+{
+    i32 transitionFrame = *(i32 *)((u8 *)this + 0x3378);
+    if (transitionFrame < 0 || this->timer0x2e14.current < transitionFrame)
+        return 0;
+    *(i32 *)((u8 *)this + 0x53cc) = 0;
+    i32 bestHealth = 0;
+    i32 bestIndex = -1;
+    for (i32 i = 0; i < 4; i++)
+    {
+        i32 value = *(i32 *)((u8 *)this + 0x3358 + i * 4);
+        if (value >= bestHealth)
+        {
+            bestHealth = value;
+            bestIndex = i;
+        }
+    }
+    if (bestHealth > 0)
+    {
+        *(i32 *)((u8 *)this + 0x2dfc) = bestHealth;
+        *(i32 *)((u8 *)this + 0x2e04) = bestHealth;
+        *(i32 *)((u8 *)this + 0x3358 + bestIndex * 4) = -1;
+    }
+    i16 timeline = *(i16 *)((u8 *)this + 0x337c);
+    g_EclManager.FUN_00418450((EclTimelineContext *)((u8 *)this + 0x7f8), timeline);
+    *(i32 *)((u8 *)this + 0x3378) = -1;
+    *(i32 *)((u8 *)this + 0x337c) = *(i16 *)((u8 *)this + 0x2cee);
+    this->timer0x2e14 = 0;
+    if ((*(u32 *)((u8 *)this + 0x3324) & 0x8000000) == 0)
+        g_BulletManager.RemoveAllBullets(4);
+    for (i32 i = 0; i < 480; i++)
+    {
+        Enemy *enemy = &g_EnemyManager.enemies[i];
+        if ((*(u32 *)((u8 *)enemy + 0x3324) & 1) == 0 ||
+            (*(u32 *)((u8 *)enemy + 0x3324) & 2) != 0)
+            continue;
+        *(i32 *)((u8 *)enemy + 0x2dfc) = 0;
+        i16 enemyTimeline = *(i16 *)((u8 *)enemy + 0x2cee);
+        if (enemyTimeline >= 0)
+        {
+            g_EclManager.FUN_00418450((EclTimelineContext *)((u8 *)enemy + 0x7f8), enemyTimeline);
+            *(i16 *)((u8 *)enemy + 0x2cee) = -1;
+        }
+    }
+    this->FUN_0042bc90();
+    *(i16 *)((u8 *)this + 0x2cea) = 0;
+    *(u32 *)((u8 *)this + 0x3328) &= ~0x30;
+    return 1;
 }
 
 // FUNCTION: th08 0x42bea0

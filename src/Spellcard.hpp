@@ -30,6 +30,9 @@ struct Spellcard
     static i32 GetDifficultyFromSpellCard(i32 spellcardNumber);
     static ZunBool IsLastSpell(i32 spellcardNumber);
     static void CutChain();
+    static ZunResult RegisterChain();
+    static ChainCallbackResult OnUpdate(Spellcard *spellcard);
+    static ChainCallbackResult OnDraw(Spellcard *spellcard);
     static ZunResult DeletedCallback(Spellcard *spellcard);
     ZunBool FUN_00405260();
     ZunBool spellcard_fun_00417860();
