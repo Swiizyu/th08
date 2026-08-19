@@ -19,6 +19,67 @@ DIFFABLE_STATIC(AsciiManager, g_AsciiManager);
 DIFFABLE_STATIC(ChainElem, g_AsciiManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_AsciiManagerDrawChainHighPrio);
 
+// FUNCTION: th08 0x406d10
+ZunBool GameManager::GaugeIsExtremelyHuman()
+{
+    return this->globals->youkaiGauge <= this->youkaiGaugeHumanEffectsThreshold;
+}
+
+// FUNCTION: th08 0x406d40
+ZunBool GameManager::GaugeIsModeratelyHuman()
+{
+    return this->globals->youkaiGauge <= this->youkaiGaugeHumanTintThreshold;
+}
+
+// FUNCTION: th08 0x406d70
+ZunBool GameManager::GaugeIsExtremelyYoukai()
+{
+    return this->globals->youkaiGauge >= this->youkaiGaugeYoukaiEffectsThreshold;
+}
+
+// FUNCTION: th08 0x406da0
+ZunBool GameManager::GaugeIsModeratelyYoukai()
+{
+    return this->globals->youkaiGauge >= this->youkaiGaugeYoukaiTintThreshold;
+}
+
+// FUNCTION: th08 0x422bb0
+void AsciiManager::FUN_00422bb0(i32 bossMarkerIdx, i16 interrupt)
+{
+    this->bossMarkers[bossMarkerIdx].SetInterrupt(interrupt);
+}
+
+// FUNCTION: th08 0x422be0
+void AsciiManager::SetBossMarkerPosition(i32 bossMarkerIdx, Float3 *position)
+{
+    this->bossMarkers[bossMarkerIdx].pos = *position;
+}
+
+// FUNCTION: th08 0x42f2d0
+void AsciiManager::SetBossMarkerState(i32 bossMarkerIdx, i32 state)
+{
+    this->bossMarkerStates[bossMarkerIdx] = state;
+}
+
+// FUNCTION: th08 0x42f320
+bool Gui::IsBossPresent()
+{
+    return this->bossPresent;
+}
+
+// FUNCTION: th08 0x42f340
+void Gui::FUN_0042f340(i32 spellcardSecondsRemaining)
+{
+    this->spellcardSecondsRemaining = spellcardSecondsRemaining;
+}
+
+// FUNCTION: th08 0x422c20
+u8 Gui::FUN_00422c20(u8 bossPresent)
+{
+    *(u8 *)((u8 *)this + 0x2c) = bossPresent;
+    return bossPresent;
+}
+
 // FUNCTION: th08 0x402130
 AsciiManagerString::AsciiManagerString()
 {

@@ -13,6 +13,18 @@ namespace th08
 DIFFABLE_STATIC(AnmManager *, g_AnmManager);
 DIFFABLE_STATIC_ARRAY(VertexTex1DiffuseXyzrhw, 4, g_QuadVertices);
 
+// FUNCTION: th08 0x40bb60
+AnmLoaded *AnmManager::GetAnm(i32 anmIdx)
+{
+    return &this->anmFiles[anmIdx];
+}
+
+// FUNCTION: th08 0x40ba90
+void AnmManager::SetCameraMode(u8 cameraMode)
+{
+    this->cameraMode = cameraMode;
+}
+
 D3DFORMAT g_TextureFormatD3D8Mapping[] = {D3DFMT_UNKNOWN, D3DFMT_A8R8G8B8, D3DFMT_A1R5G5B5,
                                           D3DFMT_R5G6B5,  D3DFMT_R8G8B8,   D3DFMT_A4R4G4B4};
 

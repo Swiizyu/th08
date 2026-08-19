@@ -79,6 +79,29 @@ DIFFABLE_STATIC(Gui, g_Gui);
 DIFFABLE_STATIC(ChainElem, g_GuiCalcChain);
 DIFFABLE_STATIC(ChainElem, g_GuiDrawChain);
 
+// FUNCTION: th08 0x4390d6
+ i32 Gui::FUN_004390d6()
+{
+    *(u8 *)((u8 *)this->impl + 0x2175f) &= 0;
+    return 0;
+}
+
+// FUNCTION: th08 0x4396b8
+void Gui::FUN_004396b8()
+{
+    *(i16 *)((u8 *)this->impl + 0x398c) |= -1;
+    *(i16 *)((u8 *)this->impl + 0x3c30) |= -1;
+    *(i16 *)((u8 *)this->impl + 0x3ed4) |= -1;
+    *(i32 *)((u8 *)this->impl + 0x21810) &= 0;
+}
+
+// FUNCTION: th08 0x437d87
+ZunBool Gui::FUN_00437d87()
+{
+    return *(i16 *)((u8 *)this->impl + 0x398c) >= 0 &&
+           ((AnmVm *)((u8 *)this->impl + 0x3778))->IsStopped();
+}
+
 i32 g_ClearStageBonuses[] = {1000000, 1500000, 2000000, 2500000, 2500000, 3000000, 4000000, 6000000, 6660000};
 // These are all exactly the same??????? Wtf???????????
 COLORREF g_GuiTextColors[][4] = {{0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0}, {0xe8f0ff, 0xf0e8ff, 0xffe8f0, 0xffe8f0},

@@ -577,7 +577,7 @@ void ReplayManager::SaveReplay(const char *replayPath, const char *replayName)
     }
 
     if (!g_GameManager.IsPracticeMode() && g_GameManager.difficulty < 4 &&
-        memcmp(&mgr->replayData->gameConfiguration, &g_Supervisor.cfg, sizeof(GameConfiguration)) != 0)
+        memcmp(&g_Supervisor.cfg, &mgr->replayData->gameConfiguration, sizeof(GameConfiguration)) != 0)
     {
         goto abortSave;
     }

@@ -198,6 +198,12 @@ struct GameManager
         return this->globals->youkaiGauge >= this->youkaiGaugeYoukaiTintThreshold;
     }
 
+    ZunBool GaugeIsExtremelyHuman();
+    ZunBool GaugeIsModeratelyHuman();
+    ZunBool GaugeIsExtremelyYoukai();
+    ZunBool GaugeIsModeratelyYoukai();
+    void SetYoukaiGauge(i16 gauge);
+
     i8 GetClockTime()
     {
         return this->globals->clockTime;

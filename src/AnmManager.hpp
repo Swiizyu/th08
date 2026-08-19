@@ -371,6 +371,16 @@ C_ASSERT(sizeof(AnmVmBase) == 0x208);
 
 struct AnmVm : AnmVmBase
 {
+    ZunBool IsStopped()
+    {
+        return this->stopped;
+    }
+
+    void SetInterrupt(i16 interrupt)
+    {
+        this->pendingInterrupt = interrupt;
+    }
+
     Float3 pos;
     i16 activeSpriteIndex;
     i16 anmFileIndex;
@@ -482,6 +492,8 @@ struct AnmRawScript
 struct AnmManager
 {
     AnmManager();
+    AnmLoaded *GetAnm(i32 anmIdx);
+    void SetCameraMode(u8 cameraMode);
     void SetupVertexBuffer();
 
     ZunBool ExecuteScript(AnmVm *vm);

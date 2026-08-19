@@ -209,6 +209,12 @@ struct Gui
 
     i32 MsgWait();
     i32 IsDialoguePresent();
+    bool IsBossPresent();
+    u8 FUN_00422c20(u8 bossPresent);
+    void FUN_0042f340(i32 opacity);
+    i32 FUN_004390d6();
+    void FUN_004396b8();
+    ZunBool FUN_00437d87();
     void UpdateStageElements();
     void DrawGameScene();
     void DrawStageElements();

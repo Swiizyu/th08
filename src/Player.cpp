@@ -5,6 +5,12 @@
 namespace th08
 {
 
+// FUNCTION: th08 0x44e140
+void GameManager::SetYoukaiGauge(i16 gauge)
+{
+    this->globals->youkaiGauge = gauge;
+}
+
 // FUNCTION: th08 0x40bc20
 ZunBool Player::IsHuman()
 {

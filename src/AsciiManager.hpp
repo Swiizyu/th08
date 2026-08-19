@@ -94,6 +94,9 @@ struct AsciiManager
     void CreateFamiliarPopup(Float3 *position, i32 number, i32 param3, D3DCOLOR color);
     void OnDrawHighPrioImpl();
     void DrawPercentage(Float3 *position, i32 percentage, D3DCOLOR color);
+    void FUN_00422bb0(i32 bossMarkerIdx, i16 interrupt);
+    void SetBossMarkerPosition(i32 bossMarkerIdx, Float3 *position);
+    void SetBossMarkerState(i32 bossMarkerIdx, i32 state);
 
     void Reset();
     void InitializeVms();
