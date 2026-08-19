@@ -5,10 +5,29 @@
 namespace th08
 {
 
+// FUNCTION: th08 0x441830
+ZunBool ZunTimer::operator!=(i32 value)
+{
+    return this->current != value;
+}
+
+// FUNCTION: th08 0x44e350
+void PlayerUnkStruct0x40::FUN_0044e350()
+{
+    this->flag = 0;
+}
+
 // FUNCTION: th08 0x44e140
 void GameManager::SetYoukaiGauge(i16 gauge)
 {
     this->globals->youkaiGauge = gauge;
+}
+
+// FUNCTION: th08 0x451d50
+ZunBool Player::FUN_00451d50()
+{
+    return *(i32 *)((u8 *)this + 0xfdc) != 0 &&
+           *(i32 *)((u8 *)this + 0xfe0) == 4;
 }
 
 // FUNCTION: th08 0x40bc20
@@ -81,3 +100,11 @@ ZunResult Player::LoadShtFile(PlayerRawShtFile **header, const char *path)
 }
 
 } /* namespace th08 */
+
+// FUNCTION: th08 0x44e370
+void FUN_0044e370(void *data)
+{
+    memset(data, 0, 0x40);
+    *(i32 *)((u8 *)data + 0x38) = 1;
+}
+

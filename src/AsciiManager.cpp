@@ -5,6 +5,7 @@
 #include "Player.hpp"
 #include "ResultScreen.hpp"
 #include "ScreenEffect.hpp"
+#include "ScoreDat.hpp"
 #include "SpellCard.hpp"
 #include "ZunMath.hpp"
 
@@ -78,6 +79,51 @@ u8 Gui::FUN_00422c20(u8 bossPresent)
 {
     *(u8 *)((u8 *)this + 0x2c) = bossPresent;
     return bossPresent;
+}
+
+// FUNCTION: th08 0x405280
+void __fastcall PlstPlayCounts::IncrementTotalAttempts(u32 maxAttempts)
+{
+    if (this->attemptsTotal < maxAttempts)
+    {
+        this->attemptsTotal++;
+    }
+}
+
+// FUNCTION: th08 0x421ba0
+i32 GameManager::ScaleIntBasedOnRank(i32 minValue, i32 maxValue)
+{
+    __asm
+    {
+        mov eax, maxValue
+        sub eax, minValue
+        mov ecx, this
+        mov edx, [ecx + 0x3de2c]
+        imul eax, edx
+        cdq
+        and edx, 0x1f
+        add eax, edx
+        sar eax, 5
+        add eax, minValue
+    }
+}
+
+// FUNCTION: th08 0x422b80
+f32 GameManager::ScaleFloatBasedOnRank(f32 minValue, f32 maxValue)
+{
+    return (f32)this->rank * (maxValue - minValue) / 32.0f + minValue;
+}
+
+// FUNCTION: th08 0x42f230
+ZunBool GameManager::IsSoloHuman()
+{
+    return this->shotType >= 4 && (this->shotType & 1) == 0;
+}
+
+// FUNCTION: th08 0x42f270
+ZunBool GameManager::IsSoloYoukai()
+{
+    return this->shotType >= 4 && (this->shotType & 1) != 0;
 }
 
 // FUNCTION: th08 0x402130
@@ -891,12 +937,12 @@ i32 PauseMenu::OnUpdate()
 
         if (!g_GameManager.IsPracticeMode())
         {
-            this->menuSprites[PAUSE_SPRITE_PRACTICE_MODE].SetInvisible();
+            this->menuSprites[PAUSE_SPRITE_PRACTICE_MODE].ClearVisible();
         }
 
         if (!g_GameManager.cfg->slowMode)
         {
-            this->menuSprites[PAUSE_SPRITE_SLOW_MODE].SetInvisible();
+            this->menuSprites[PAUSE_SPRITE_SLOW_MODE].ClearVisible();
         }
 
         if (g_GameManager.IsReplay())
@@ -1077,7 +1123,7 @@ i32 PauseMenu::OnUpdate()
 
             for (i = 0; i < ARRAY_SIZE(this->menuSprites); i++)
             {
-                this->menuSprites[i].SetInvisible();
+                this->menuSprites[i].ClearVisible();
             }
 
             g_SoundPlayer.Unpause();
@@ -1480,7 +1526,7 @@ i32 RetryMenu::OnUpdate()
 
             for (i = 0; i < 4; i++)
             {
-                this->menuSprites[i].SetInvisible();
+                this->menuSprites[i].ClearVisible();
             }
 
             g_GameManager.globals->displayScore = g_GameManager.globals->score;
@@ -1515,7 +1561,7 @@ i32 RetryMenu::OnUpdate()
 
             for (i = 0; i < 4; i++)
             {
-                this->menuSprites[i].SetInvisible();
+                this->menuSprites[i].ClearVisible();
             }
 
             g_GameManager.globals->numRetries++;

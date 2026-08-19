@@ -371,6 +371,16 @@ C_ASSERT(sizeof(AnmVmBase) == 0x208);
 
 struct AnmVm : AnmVmBase
 {
+    ZunBool IsVisible()
+    {
+        return this->visible;
+    }
+
+    void ClearVisible()
+    {
+        this->visible = FALSE;
+    }
+
     ZunBool IsStopped()
     {
         return this->stopped;

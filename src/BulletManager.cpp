@@ -44,4 +44,11 @@ ZunResult BulletManager::DeletedCallback(BulletManager *bulletManager)
     return ZUN_SUCCESS;
 }
 
+// FUNCTION: th08 0x433850
+void BulletManager::CutChain()
+{
+    g_Chain.Cut(&g_BulletManagerCalcChain);
+    g_Chain.Cut(&g_BulletManagerDrawChain);
+}
+
 } /* namespace th08 */

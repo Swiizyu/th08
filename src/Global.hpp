@@ -399,19 +399,7 @@ struct Float3
 
     Float3(float x, float y, float z);
 
-    void FromAngleMagnitude(float angle, float magnitude)
-    {
-        __asm
-        {
-            mov eax, this
-            fld angle
-            fsincos
-            fmul [magnitude]
-            fstp [eax] /* this->x */
-            fmul [magnitude]
-            fstp [eax + 4] /* this->y */
-        }
-    }
+    void FromAngleMagnitude(float angle, float magnitude);
 
     void FromRotatedVec2(float angle, float vecX, float vecY)
     {

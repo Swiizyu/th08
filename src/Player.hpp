@@ -8,6 +8,16 @@
 namespace th08
 {
 
+struct PlayerUnkStruct0x40
+{
+    void FUN_0044e350();
+
+    u8 data[0x3c];
+    u8 flag;
+    u8 padding[3];
+};
+C_ASSERT(sizeof(PlayerUnkStruct0x40) == 0x40);
+
 struct PlayerRawShtFile
 {
     unknown_fields(0x0, 0x4); // 0x0
@@ -36,6 +46,7 @@ struct Player
 
     ZunBool IsHuman();
     ZunBool IsYoukai();
+    ZunBool FUN_00451d50();
 
     i8 playerState;           // 0x0
     unknown_fields(0x1, 0x2); // 0x1

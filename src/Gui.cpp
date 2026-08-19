@@ -18,6 +18,13 @@
 namespace th08
 {
 
+// FUNCTION: th08 0x45a4a0
+ZunBool Catk::WasAttemptedWithShot(i32 shotType)
+{
+    return this->inGameHistory.attempts[shotType] > 0 ||
+           this->spellPracticeHistory.attempts[shotType] != 0;
+}
+
 // FUNCTION: th08 0x437d45
 GuiFormattedText::GuiFormattedText()
 {
@@ -2038,6 +2045,12 @@ void Gui::MsgRead(i32 msgIdx)
 u32 FUN_004338b0()
 {
     return *(u32 *)((u8 *)&th08::g_Supervisor + 356);
+}
+
+// FUNCTION: th08 0x4338c0
+u32 FUN_004338c0()
+{
+    return *(u32 *)((u8 *)&th08::g_Supervisor + 360);
 }
 
 // FUNCTION: th08 0x438fe9

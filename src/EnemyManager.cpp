@@ -1,14 +1,64 @@
 #include "th_pch.h"
 
 #include "EnemyManager.hpp"
+#include "EffectManager.hpp"
+#include "EclManager.hpp"
 
 namespace th08
 {
 
 DIFFABLE_STATIC(EnemyManager, g_EnemyManager);
+DIFFABLE_STATIC(EffectManager, g_EffectManager);
+DIFFABLE_STATIC(ChainElem, g_EffectManagerCalcChain);
+DIFFABLE_STATIC(ChainElem, g_EffectManagerDrawChain);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerDrawChainHighPrio);
 DIFFABLE_STATIC(ChainElem, g_EnemyManagerDrawChainLowPrio);
+
+// FUNCTION: th08 0x4286e0
+void Float3::FromAngleMagnitude(float angle, float magnitude)
+{
+    __asm
+    {
+        mov eax, this
+        fld angle
+        fsincos
+        fmul [magnitude]
+        fstp [eax]
+        fmul [magnitude]
+        fstp [eax + 4]
+    }
+}
+
+// FUNCTION: th08 0x449f50
+EclTimeline::EclTimeline()
+{
+}
+
+// FUNCTION: th08 0x42dfb0
+i32 EclManager::GetTimelineCount()
+{
+    return this->timelineFile->timelineCount;
+}
+
+// FUNCTION: th08 0x42dfd0
+EclTimeline *EclManager::GetTimeline(i32 timelineIdx)
+{
+    return this->timelineFile->timelines[timelineIdx];
+}
+
+// FUNCTION: th08 0x425410
+void EffectManager::ResetEffects()
+{
+    memset(this, 0, sizeof(EffectManager));
+}
+
+// FUNCTION: th08 0x4286b0
+void EffectManager::CutChain()
+{
+    g_Chain.Cut(&g_EffectManagerCalcChain);
+    g_Chain.Cut(&g_EffectManagerDrawChain);
+}
 
 // STUB: th08 0x41fd40
 i32 Enemy::GetFamiliarCount()
@@ -75,3 +125,16 @@ i32 EnemyManager::DespawnAllEnemies(i32 param_1, i32 param_2)
 }
 
 } /* namespace th08 */
+
+// FUNCTION: th08 0x427250
+i32 FUN_00427250(void *)
+{
+    return 1;
+}
+
+// FUNCTION: th08 0x40d3d0
+ZunBool FUN_0040d3d0(void *data)
+{
+    return *((i32 *)data + 2) != *(i32 *)data;
+}
+

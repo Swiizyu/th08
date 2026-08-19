@@ -422,6 +422,9 @@ struct ZunTimer
         return this->current == value;
     }
 
+    i32 operator%(i32 value);
+    ZunBool operator!=(i32 value);
+
     ZunBool operator+=(int value)
     {
         this->Increment(value);

@@ -203,6 +203,10 @@ struct GameManager
     ZunBool GaugeIsExtremelyYoukai();
     ZunBool GaugeIsModeratelyYoukai();
     void SetYoukaiGauge(i16 gauge);
+    i32 ScaleIntBasedOnRank(i32 minValue, i32 maxValue);
+    f32 ScaleFloatBasedOnRank(f32 minValue, f32 maxValue);
+    ZunBool IsSoloHuman();
+    ZunBool IsSoloYoukai();
 
     i8 GetClockTime()
     {

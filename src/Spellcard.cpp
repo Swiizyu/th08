@@ -2,6 +2,7 @@
 
 #include "ScoreDat.hpp"
 #include "Spellcard.hpp"
+#include "Supervisor.hpp"
 #include "utils.hpp"
 
 namespace th08
@@ -10,6 +11,52 @@ namespace th08
 // TODO: stop clang-format from fucking with whitespace formatting
 
 DIFFABLE_STATIC(Spellcard, g_Spellcard);
+DIFFABLE_STATIC(ChainElem *, g_SpellcardCalcChain);
+
+// FUNCTION: th08 0x40d410
+i32 ZunTimer::operator%(i32 value)
+{
+    return this->current % value;
+}
+
+// FUNCTION: th08 0x405260
+ZunBool Spellcard::FUN_00405260()
+{
+    return this->flags.isCaptured;
+}
+
+// FUNCTION: th08 0x4178a0
+ZunBool Spellcard::spellcard_fun_004178a0()
+{
+    return this->flags.isActive;
+}
+
+// FUNCTION: th08 0x417860
+ZunBool Spellcard::spellcard_fun_00417860()
+{
+    return this->spellcard_fun_004178a0() && this->flags.unk5;
+}
+
+// FUNCTION: th08 0x41fdd0
+i32 Spellcard::FUN_0041fdd0()
+{
+    return *(ZunTimer *)((u8 *)this + 0x108);
+}
+
+// FUNCTION: th08 0x42dff0
+ZunBool Spellcard::FUN_0042dff0()
+{
+    return this->flags.unk7;
+}
+
+// FUNCTION: th08 0x4180f0
+void Spellcard::CutChain()
+{
+    if (g_SpellcardCalcChain != NULL)
+    {
+        g_Chain.Cut(g_SpellcardCalcChain);
+    }
+}
 
 DIFFABLE_STATIC_ARRAY_ASSIGN(i32, 42, g_SpellcardNumbersEasy) = {
     // Stage 1
