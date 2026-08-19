@@ -4,6 +4,9 @@
 #include "Spellcard.hpp"
 #include "Supervisor.hpp"
 #include "utils.hpp"
+#include <new>
+
+u32 FUN_004338c0();
 
 namespace th08
 {
@@ -12,6 +15,51 @@ namespace th08
 
 DIFFABLE_STATIC(Spellcard, g_Spellcard);
 DIFFABLE_STATIC(ChainElem *, g_SpellcardCalcChain);
+
+// FUNCTION: th08 0x4143e0
+Spellcard::Spellcard()
+{
+    new ((u8 *)this + 0x108) ZunTimer();
+    new ((u8 *)this + 0x114) ZunTimer();
+    new ((u8 *)this + 0x120) AnmVm();
+    new ((u8 *)this + 0x3c4) AnmVm();
+    new ((u8 *)this + 0x668) AnmVm();
+    new ((u8 *)this + 0x90c) AnmVm();
+    new ((u8 *)this + 0xbb0) AnmVm();
+    new ((u8 *)this + 0xe54) AnmVm();
+    new ((u8 *)this + 0x10f8) AnmVm();
+    new ((u8 *)this + 0x139c) AnmVm();
+    new ((u8 *)this + 0x1640) AnmVm();
+    new ((u8 *)this + 0x18e4) AnmVm();
+    new ((u8 *)this + 0x1b88) AnmVm();
+    new ((u8 *)this + 0x1e2c) AnmVm();
+    new ((u8 *)this + 0x20d0) AnmVm();
+    new ((u8 *)this + 0x2374) AnmVm();
+}
+
+// FUNCTION: th08 0x418050
+ZunResult Spellcard::DeletedCallback(Spellcard *spellcard)
+{
+    if (!KeepStageResources())
+    {
+        g_AnmManager->ReleaseAnm(18);
+        g_AnmManager->ReleaseAnm(19);
+    }
+    if (FUN_004338c0())
+    {
+        g_AnmManager->ReleaseAnm(15);
+        g_AnmManager->ReleaseAnm(16);
+        g_AnmManager->ReleaseAnm(17);
+    }
+    ChainElem *calcChain = *(ChainElem **)((u8 *)spellcard + 0x263c);
+    if (calcChain != NULL)
+    {
+        calcChain->deletedCallback = NULL;
+    }
+    g_Chain.Cut(*(ChainElem **)((u8 *)spellcard + 0x2640));
+    *(ChainElem **)((u8 *)spellcard + 0x2640) = NULL;
+    return ZUN_SUCCESS;
+}
 
 // FUNCTION: th08 0x416130
 void Spellcard::spellcard_fun_00416130()

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ZunBool.hpp"
+#include "ZunResult.hpp"
 #include "diffbuild.hpp"
 #include "inttypes.hpp"
 
@@ -24,9 +25,12 @@ struct SpellcardFlags
 
 struct Spellcard
 {
+    Spellcard();
+
     static i32 GetDifficultyFromSpellCard(i32 spellcardNumber);
     static ZunBool IsLastSpell(i32 spellcardNumber);
     static void CutChain();
+    static ZunResult DeletedCallback(Spellcard *spellcard);
     ZunBool FUN_00405260();
     ZunBool spellcard_fun_00417860();
     ZunBool spellcard_fun_004178a0();
