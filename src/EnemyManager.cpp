@@ -62,7 +62,7 @@ DIFFABLE_STATIC_ARRAY_ASSIGN(EffectTemplate, 66, g_EffectTemplates) = {
     {0, NULL, NULL},
     {32, &Effect::FUN_00426bb0, &Effect::FUN_00426b20},
     {33, &Effect::FUN_00426c90, &Effect::FUN_00426b20},
-    {51, NULL, NULL},
+    {51, &Effect::FUN_00426d70, NULL},
     {56, NULL, NULL},
     {52, NULL, NULL},
     {54, &Effect::FUN_00426c40, NULL},
@@ -412,6 +412,31 @@ i32 Effect::FUN_00426c90()
 
     distance = 256.0f - (f32)*(ZunTimer *)((u8 *)this + 0x338) * 256.0f / 240.0f;
     this->position = *(Float3 *)((u8 *)this + 0x2ec) * distance + *(Float3 *)((u8 *)this + 0x2e0);
+    return 1;
+}
+
+// FUNCTION: th08 0x426d70
+#pragma var_order(localPosition, dot)
+i32 Effect::FUN_00426d70()
+{
+    Float3 localPosition;
+    f32 dot;
+
+    this->velocity += this->acceleration;
+    this->basePosition += this->velocity;
+    this->position = this->basePosition;
+    localPosition = this->position - g_Background.vectors0x6394.vector0;
+    D3DXVec3Normalize((D3DXVECTOR3 *)&localPosition, (D3DXVECTOR3 *)&localPosition);
+    dot = g_Background.vectors0x6394.vector3.FUN_0040b540(&localPosition);
+    if (dot < 0.94f)
+    {
+        return 0;
+    }
+    this->vm.SetZRotation(AddNormalizeAngle(this->vm.rotation.z, this->vm.rotation.x));
+    if (this->position.z >= 0.0f)
+    {
+        return 0;
+    }
     return 1;
 }
 

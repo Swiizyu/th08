@@ -25,6 +25,7 @@ struct Effect
     i32 FUN_00426bb0();
     i32 FUN_00426c40();
     i32 FUN_00426c90();
+    i32 FUN_00426d70();
     i32 FUN_00427990();
     i32 FUN_004279d0();
     i32 FUN_00427a60();
