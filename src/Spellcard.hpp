@@ -31,6 +31,11 @@ struct Spellcard
     static ZunBool IsLastSpell(i32 spellcardNumber);
     static void CutChain();
     static ZunResult RegisterChain();
+    ZunResult Init();
+    void StartSpell(i32 spellcardNumber, const char *spellName, i32 duration, i32 bonus,
+                    void *owner, const char *ownerName, const char *comment1, const char *comment2);
+    ChainCallbackResult OnUpdateImpl();
+    ChainCallbackResult OnDrawImpl();
     static ChainCallbackResult OnUpdate(Spellcard *spellcard);
     static ChainCallbackResult OnDraw(Spellcard *spellcard);
     static ZunResult DeletedCallback(Spellcard *spellcard);

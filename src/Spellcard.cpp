@@ -1,6 +1,7 @@
 #include "th_pch.h"
 
 #include "ScoreDat.hpp"
+#include "GameManager.hpp"
 #include "Spellcard.hpp"
 #include "Supervisor.hpp"
 #include "utils.hpp"
@@ -17,32 +18,98 @@ DIFFABLE_STATIC(Spellcard, g_Spellcard);
 DIFFABLE_STATIC(ChainElem *, g_SpellcardCalcChain);
 static ChainElem *g_SpellcardDrawChain;
 
-// FUNCTION: th08 0x418010
-ChainCallbackResult Spellcard::OnUpdate(Spellcard *spellcard)
+// FUNCTION: th08 0x414590
+ZunResult Spellcard::Init()
 {
-    if (spellcard->flags.isActive)
+    this->flags.isActive = FALSE;
+    this->flags.isCaptured = FALSE;
+    *(void **)((u8 *)this + 4) = NULL;
+    *(i32 *)((u8 *)this + 8) = -1;
+    *(i32 *)((u8 *)this + 0xfc) = 0;
+    *(i32 *)((u8 *)this + 0x100) = 0;
+    ((ZunTimer *)((u8 *)this + 0x108))->Initialize();
+    ((ZunTimer *)((u8 *)this + 0x114))->Initialize();
+    for (i32 i = 0; i < 14; i++)
+        ((AnmVm *)((u8 *)this + 0x120 + i * sizeof(AnmVm)))->Initialize();
+    return ZUN_SUCCESS;
+}
+
+// FUNCTION: th08 0x4152a0
+void Spellcard::StartSpell(i32 spellcardNumber, const char *spellName, i32 faceScript, i32 bonus,
+                           void *owner, const char *ownerName, const char *comment1, const char *comment2)
+{
+    this->flags.isActive = TRUE;
+    this->flags.isCaptured = TRUE;
+    this->flags.unk4 = FALSE;
+    *(i32 *)((u8 *)this + 8) = spellcardNumber;
+    *(void **)((u8 *)this + 4) = owner;
+    *(i32 *)((u8 *)this + 0xc) = owner != NULL ? *(i32 *)((u8 *)owner + 0x2e0c) : -1;
+    *(i32 *)((u8 *)this + 0xfc) = bonus;
+    *(i32 *)((u8 *)this + 0x2638) = bonus;
+    ((ZunTimer *)((u8 *)this + 0x108))->SetCurrent(0);
+    ((ZunTimer *)((u8 *)this + 0x114))->SetCurrent(0);
+    if (owner != NULL) *(u32 *)((u8 *)owner + 0x3324) |= 0x08000000;
+    if (spellcardNumber >= 0 && spellcardNumber < SPELLCARD_COUNT_SPELLCARDS)
     {
-        ZunTimer *timer = (ZunTimer *)((u8 *)spellcard + 0x108);
-        timer->Tick();
+        Catk *catk = &g_GameManager.catkData[spellcardNumber];
+        catk->spellcardNumber = (u16)spellcardNumber;
+        catk->difficulty = (u8)g_GameManager.difficulty;
+        if (spellName != NULL) strncpy(catk->spellName, spellName, sizeof(catk->spellName) - 1);
+        if (ownerName != NULL) strncpy(catk->spellOwnerName, ownerName, sizeof(catk->spellOwnerName) - 1);
+        if (comment1 != NULL) strncpy(catk->spellCommentLine1, comment1, sizeof(catk->spellCommentLine1) - 1);
+        if (comment2 != NULL) strncpy(catk->spellCommentLine2, comment2, sizeof(catk->spellCommentLine2) - 1);
+        catk->inGameHistory.attempts[g_GameManager.character]++;
+        catk->inGameHistory.attempts[SHOT_ALL]++;
     }
+    if (spellName != NULL) this->FUN_00415f00(faceScript, spellName, 0);
+}
+
+// FUNCTION: th08 0x416b90
+ChainCallbackResult Spellcard::OnUpdateImpl()
+{
+    if (!this->flags.isActive) return CHAIN_CALLBACK_RESULT_CONTINUE;
+    ((ZunTimer *)((u8 *)this + 0x108))->Tick();
+    ((ZunTimer *)((u8 *)this + 0x114))->Tick();
+    for (i32 i = 0; i < 14; i++)
+    {
+        AnmVm *vm = (AnmVm *)((u8 *)this + 0x120 + i * sizeof(AnmVm));
+        if (vm->beginningOfScript != NULL) g_AnmManager->ExecuteScript(vm);
+    }
+    void *owner = *(void **)((u8 *)this + 4);
+    if (owner != NULL && ((*(u32 *)((u8 *)owner + 0x3324) & 1) == 0 ||
+                          *(i32 *)((u8 *)this + 0xc) != *(i32 *)((u8 *)owner + 0x2e0c)))
+        this->FUN_00416af0();
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
-// FUNCTION: th08 0x418030
-ChainCallbackResult Spellcard::OnDraw(Spellcard *spellcard)
+// FUNCTION: th08 0x4178c0
+ChainCallbackResult Spellcard::OnDrawImpl()
 {
-    if (!spellcard->flags.isActive) return CHAIN_CALLBACK_RESULT_CONTINUE;
+    if (!this->flags.isActive) return CHAIN_CALLBACK_RESULT_CONTINUE;
     for (i32 i = 0; i < 14; i++)
     {
-        AnmVm *vm = (AnmVm *)((u8 *)spellcard + 0x120 + i * sizeof(AnmVm));
+        AnmVm *vm = (AnmVm *)((u8 *)this + 0x120 + i * sizeof(AnmVm));
         if (vm->IsVisible()) g_AnmManager->Draw2D(vm);
     }
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
+// FUNCTION: th08 0x418010
+ChainCallbackResult Spellcard::OnUpdate(Spellcard *spellcard)
+{
+    return spellcard->OnUpdateImpl();
+}
+
+// FUNCTION: th08 0x418030
+ChainCallbackResult Spellcard::OnDraw(Spellcard *spellcard)
+{
+    return spellcard->OnDrawImpl();
+}
+
 // FUNCTION: th08 0x417f60
 ZunResult Spellcard::RegisterChain()
 {
+    if (g_Spellcard.Init() != ZUN_SUCCESS) return ZUN_ERROR;
     g_SpellcardCalcChain = g_Chain.CreateElem((ChainCallback)Spellcard::OnUpdate);
     g_SpellcardDrawChain = g_Chain.CreateElem((ChainCallback)Spellcard::OnDraw);
     if (g_SpellcardCalcChain == NULL || g_SpellcardDrawChain == NULL) return ZUN_ERROR;

@@ -1727,6 +1727,15 @@ ZunResult AnmManager::DrawTriangleFan(AnmVm *vm, VertexDiffuseXyzrhw *vertices, 
     return ZUN_SUCCESS;
 }
 
+AnmManager::~AnmManager()
+{
+}
+
+void ForceAnmManagerScalarDeletingDestructor(AnmManager *manager)
+{
+    delete manager;
+}
+
 // FUNCTION: th08 0x465070
 AnmManager::AnmManager()
 {

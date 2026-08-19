@@ -86,6 +86,7 @@ struct EclManager
     ZunResult Load(const char *path);
     void FUN_00418420();
     i32 FUN_00418450(EclTimelineContext *context, i16 timelineIndex);
+    u32 RunEcl(void *enemyData);
     i32 GetTimelineCount();
     EclTimeline *GetTimeline(i32 timelineIdx);
 

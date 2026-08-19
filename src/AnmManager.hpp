@@ -534,6 +534,7 @@ struct AnmRawScript
 struct AnmManager
 {
     AnmManager();
+    ~AnmManager();
     AnmLoaded *GetAnm(i32 anmIdx);
     void SetCameraMode(u8 cameraMode);
     void SetupVertexBuffer();

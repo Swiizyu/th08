@@ -1761,6 +1761,42 @@ i32 EclManager::FUN_00418450(EclTimelineContext *context, i16 timelineIndex)
     return 0;
 }
 
+// FUNCTION: th08 0x4184b0
+u32 EclManager::RunEcl(void *enemyData)
+{
+    if (enemyData == NULL) return 1;
+    EclTimelineContext *context = (EclTimelineContext *)((u8 *)enemyData + 0x7f8);
+    u8 *instruction = (u8 *)context->timeline;
+    if (instruction == NULL) return 1;
+    for (i32 guard = 0; guard < 256; guard++)
+    {
+        i32 time = *(i32 *)instruction;
+        if (time < 0)
+        {
+            context->timeline = NULL;
+            return 1;
+        }
+        if (context->timer1.current < time) break;
+        i16 opcode = *(i16 *)(instruction + 4);
+        u8 size = *(u8 *)(instruction + 6);
+        if (size < 8)
+        {
+            context->timeline = NULL;
+            return 1;
+        }
+        if (opcode == 0 || opcode == 1)
+        {
+            context->timeline = NULL;
+            return 1;
+        }
+        instruction += size;
+        context->timeline = instruction;
+    }
+    context->timer1.Tick();
+    context->timer2.Tick();
+    return 0;
+}
+
 // FUNCTION: th08 0x449f50
 EclTimeline::EclTimeline()
 {
@@ -3539,9 +3575,46 @@ ZunResult EnemyManager::RegisterChain()
     return ZUN_SUCCESS;
 }
 
-// STUB: th08 0x42c660
+// FUNCTION: th08 0x42c660
 ChainCallbackResult EnemyManager::OnUpdate()
 {
+    EnemyManager *enemyManager = &g_EnemyManager;
+    if (g_GameManager.flags.unk10) return CHAIN_CALLBACK_RESULT_CONTINUE;
+    enemyManager->FUN_0042c3b0();
+    Enemy **layerHeads = (Enemy **)enemyManager->unknown0x9dcedc;
+    for (i32 i = 0; i < 4; i++) layerHeads[i] = NULL;
+    if (g_EclManager.timelineFile != NULL)
+    {
+        i32 count = g_EclManager.GetTimelineCount();
+        if (count > ARRAY_SIZE_SIGNED(enemyManager->timelines)) count = ARRAY_SIZE_SIGNED(enemyManager->timelines);
+        for (i32 i = 0; i < count; i++) enemyManager->timelines[i].FUN_0042a8a0();
+    }
+    for (i32 i = 0; i < 480; i++)
+    {
+        Enemy *enemy = &enemyManager->enemies[i];
+        u32 *flags = (u32 *)((u8 *)enemy + 0x3324);
+        if ((*flags & 1) == 0) continue;
+        g_EclManager.RunEcl(enemy);
+        enemy->position0x2d34 += enemy->position0x2d4c * g_Supervisor.framerateMultiplier;
+        enemy->FUN_0042c180();
+        enemy->position0x2d88 = enemy->position0x2d34;
+        if (enemy->vm.beginningOfScript != NULL) g_AnmManager->ExecuteScript(&enemy->vm);
+        for (i32 j = 0; j < 2; j++)
+            if (enemy->vms[j].beginningOfScript != NULL) g_AnmManager->ExecuteScript(&enemy->vms[j]);
+        enemy->timer0x2ddc.Tick();
+        enemy->timer0x2e14.Tick();
+        enemy->timer0x3064.Tick();
+        enemy->timer0x3318.Tick();
+        enemy->timer0x5354.Tick();
+        if ((*flags & 0x10) == 0)
+        {
+            u8 layer = *(u8 *)((u8 *)enemy + 0x332f);
+            if (layer > 3) layer = 3;
+            *(Enemy **)enemy = layerHeads[layer];
+            layerHeads[layer] = enemy;
+        }
+    }
+    enemyManager->timer.Tick();
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
