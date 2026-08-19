@@ -1,12 +1,20 @@
 #include "th_pch.h"
 
 #include "GameManager.hpp"
+#include "AsciiManager.hpp"
+#include "Background.hpp"
+#include "BulletManager.hpp"
+#include "EffectManager.hpp"
+#include "EnemyManager.hpp"
 #include "Global.hpp"
 #include "Gui.hpp"
 #include "Player.hpp"
 #include "ReplayManager.hpp"
+#include "ScreenEffect.hpp"
 #include "SoundPlayer.hpp"
 #include "SpellCard.hpp"
+
+void FUN_004531a0(void);
 
 struct RankParams
 {
@@ -40,6 +48,7 @@ void GameManager::InitRankParams()
 }
 
 DIFFABLE_STATIC(GameManager, g_GameManager);
+DIFFABLE_STATIC(i32, g_GameManagerUnknown4e3d28);
 DIFFABLE_STATIC(ChainElem, g_GameManagerCalcChain);
 DIFFABLE_STATIC(ChainElem, g_GameManagerDrawChain);
 
@@ -340,9 +349,60 @@ void GameManager::InitializeAntiTamper()
     g_GameManager.antiTamperExpectedValue = (f32)sum + (f32)g_GameManager.globals->rng7[3];
 }
 
-// STUB: th08 0x43be2c
+// FUNCTION: th08 0x43be2c
 ZunResult GameManager::DeletedCallback(GameManager *gameManager)
 {
+    MidiOutput *midiOutput;
+
+    g_ScreenEffectCounter = 1;
+    g_GameManagerUnknown4e3d28 = 0;
+    if (g_Supervisor.curState != SupervisorState_GameManagerReInit &&
+        g_Supervisor.curState != SupervisorState_SpellcardPracticeRestart &&
+        g_Supervisor.curState != SupervisorState_GameManagerNextStageWeird)
+    {
+        g_Supervisor.keepStageResources = TRUE;
+    }
+    else
+    {
+        g_Supervisor.keepStageResources = FALSE;
+    }
+
+    if (!g_GameManager.flags.isSpellPractice || g_Supervisor.keepStageResources)
+    {
+        g_Supervisor.StopAudio();
+        if (g_Supervisor.cfg.musicMode == 2 && g_Supervisor.midiOutput != NULL)
+        {
+            midiOutput = g_Supervisor.midiOutput;
+            midiOutput->StopPlayback();
+            midiOutput->ParseFile(30);
+            midiOutput->Play();
+        }
+    }
+    while (g_SoundPlayer.ProcessQueues() != 0)
+    {
+    }
+
+    Spellcard::CutChain();
+    Background::CutChain();
+    BulletManager::CutChain();
+    Player::CutChain();
+    EnemyManager::CutChain();
+    EffectManager::CutChain();
+    Gui::CutChain();
+    if (!g_GameManager.flags.isReplay)
+    {
+        ::FUN_004531a0();
+    }
+    if (!g_GameManager.flags.isReplay)
+    {
+        g_Supervisor.UpdateGameTime();
+    }
+    *(i32 *)((u8 *)&g_Supervisor + 0x1ac) = 0;
+    g_Supervisor.UpdatePlayTime();
+    gameManager->flags.unk2 = 0;
+    g_AsciiManager.Reset();
+    *(u8 *)((u8 *)&g_GameManager + 0x2d) = 0;
+    g_GameManager.unk3ddc0 = 0;
     return ZUN_SUCCESS;
 }
 

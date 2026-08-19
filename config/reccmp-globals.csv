@@ -89,6 +89,7 @@ FLOAT_0.5_004c9fd0,0x4c9fd0,global
 FLOAT_3.0_004c9fe0,0x4c9fe0,global
 th08::g_AsciiManagerDrawChainLowPrio,0x4cce00,global
 th08::g_AsciiManager,0x4cce20,global
+th08::g_GameManagerUnknown4e3d28,0x4e3d28,global
 th08::g_AsciiManagerCalcChain,0x4e3fd0,global
 th08::g_AsciiManagerDrawChainHighPrio,0x4e3ff0,global
 th08::g_BackgroundDrawChainHighPrio,0x4e4010,global
