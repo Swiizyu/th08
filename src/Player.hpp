@@ -8,6 +8,8 @@
 namespace th08
 {
 
+struct Effect;
+
 struct PlayerUnkStruct0x40
 {
     void FUN_0044e350();
@@ -117,6 +119,8 @@ struct Player
     void FUN_0040d950();
     void FUN_0040f550();
     void FUN_0040fcb0();
+    void FUN_00412300();
+    void FUN_00412fa0();
     ZunBool FUN_00451d50();
     i32 FUN_00449ff0(Float3 *position, Float3 *hitbox);
     i32 CalcLaserHitbox(Float3 *center, Float3 *size, Float3 *origin, f32 rotation, i32 canGraze);
@@ -126,6 +130,7 @@ struct Player
     i32 CalcItemBoxCollision(Float3 *position, Float3 *hitbox);
     void FUN_0044cba0();
     void FUN_0044d150();
+    i32 __fastcall FUN_00450ee0(Effect *effect, Float3 *position);
     void FUN_004512f0();
     void FUN_00451400();
     void FUN_00451640();

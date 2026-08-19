@@ -5,6 +5,7 @@
 #include "Background.hpp"
 #include "EffectManager.hpp"
 #include "SoundPlayer.hpp"
+#include "ScreenEffect.hpp"
 
 u32 FUN_004338c0();
 u32 FUN_0044e0e0();
@@ -83,6 +84,74 @@ void Player::FUN_0040f550()
 void Player::FUN_0040fcb0()
 {
     this->FUN_0040bc60(0x80f00000);
+}
+
+// FUNCTION: th08 0x412300
+#pragma var_order(color, rect, bomb)
+void Player::FUN_00412300()
+{
+    u8 *bomb = (u8 *)this + 0xfdc;
+    ZunRect rect;
+    D3DCOLOR color;
+    ZunTimer *timer = (ZunTimer *)(bomb + 0x18);
+
+    this->FUN_0040bc60(0x80404040);
+    if (*timer >= 70)
+    {
+        this->FUN_0040bc60(0x80000030);
+        rect.left = 32.0f;
+        rect.top = 16.0f;
+        rect.right = 416.0f;
+        rect.bottom = 464.0f;
+        color = 0x00ffffff;
+        if (*timer < 100)
+        {
+            color |= 0xff000000;
+        }
+        else if (*timer < 160)
+        {
+            color |= (255 - (timer->AsFrames() - 100) * 255 / 60) << 24;
+        }
+        else
+        {
+            return;
+        }
+        ScreenEffect::DrawSquare(&rect, color);
+    }
+}
+
+// FUNCTION: th08 0x412fa0
+#pragma var_order(color, rect, bomb)
+void Player::FUN_00412fa0()
+{
+    u8 *bomb = (u8 *)this + 0xfdc;
+    ZunRect rect;
+    D3DCOLOR color;
+    ZunTimer *timer = (ZunTimer *)(bomb + 0x18);
+
+    this->FUN_0040bc60(0x80404040);
+    if (*timer >= 70)
+    {
+        this->FUN_0040bc60(0x80000030);
+        rect.left = 32.0f;
+        rect.top = 16.0f;
+        rect.right = 416.0f;
+        rect.bottom = 464.0f;
+        color = 0x00ff0000;
+        if (*timer < 100)
+        {
+            color |= 0xff000000;
+        }
+        else if (*timer < 160)
+        {
+            color |= (255 - (timer->AsFrames() - 100) * 255 / 60) << 24;
+        }
+        else
+        {
+            return;
+        }
+        ScreenEffect::DrawSquare(&rect, color);
+    }
 }
 
 // FUNCTION: th08 0x449e50
@@ -457,6 +526,22 @@ f32 Player::AngleToPlayer(Float3 *position)
         return 1.5707964f;
     }
     return atan2f(deltaY, deltaX);
+}
+
+// FUNCTION: th08 0x450ee0
+#pragma var_order(spawnPosition)
+i32 __fastcall Player::FUN_00450ee0(Effect *effect, Float3 *position)
+{
+    Float3 spawnPosition;
+
+    (*(u8 *)((u8 *)this + 0xe2a94))++;
+    if ((*(u8 *)((u8 *)this + 0xe2a94) & 7) == 0)
+    {
+        spawnPosition = *position;
+        spawnPosition.x = effect->position.x;
+        g_EffectManager.SpawnEffect(5, &spawnPosition, 1, -1);
+    }
+    return 0;
 }
 
 // FUNCTION: th08 0x451ce0

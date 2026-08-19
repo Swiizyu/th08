@@ -1265,6 +1265,29 @@ void __fastcall EclExIns::FUN_00425390(void *)
     }
 }
 
+// FUNCTION: th08 0x42deb0
+void EclExIns::FUN_0042deb0()
+{
+    *(Float3 *)((u8 *)this + 0x2d64) =
+        *(Float3 *)((u8 *)this + 0x2d34) - *(Float3 *)((u8 *)this + 0x2d58);
+    *(Float3 *)((u8 *)this + 0x2d58) = *(Float3 *)((u8 *)this + 0x2d34);
+
+    if ((*(u32 *)((u8 *)this + 0x3324) & 0x40000) == 0)
+    {
+        *(f32 *)((u8 *)this + 0x2d34) +=
+            *(f32 *)((u8 *)&g_Supervisor + 0x188) * *(f32 *)((u8 *)this + 0x2d4c);
+    }
+    else
+    {
+        *(f32 *)((u8 *)this + 0x2d34) -=
+            *(f32 *)((u8 *)&g_Supervisor + 0x188) * *(f32 *)((u8 *)this + 0x2d4c);
+    }
+    *(f32 *)((u8 *)this + 0x2d38) +=
+        *(f32 *)((u8 *)&g_Supervisor + 0x188) * *(f32 *)((u8 *)this + 0x2d50);
+    *(f32 *)((u8 *)this + 0x2d3c) +=
+        *(f32 *)((u8 *)&g_Supervisor + 0x188) * *(f32 *)((u8 *)this + 0x2d54);
+}
+
 // FUNCTION: th08 0x423390
 void __fastcall EclExIns::MystiaNightBlindness(void *)
 {

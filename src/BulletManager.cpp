@@ -60,6 +60,32 @@ void BulletManager::FUN_00415c60()
     this->RemoveAllBullets(1);
 }
 
+// FUNCTION: th08 0x430d30
+#pragma var_order(i, bullet, delta)
+void BulletManager::FUN_00430d30(Float3 *position, f32 radius)
+{
+    Float3 delta;
+    Bullet *bullet;
+    i32 i;
+
+    radius *= radius;
+    bullet = &this->bullets[0];
+    for (i = 0; i < MAX_BULLETS; i++, bullet++)
+    {
+        if (bullet->state == 0 || bullet->state == 5)
+        {
+            continue;
+        }
+        delta = bullet->position - *position;
+        if (delta.FUN_0040b500() >= radius)
+        {
+            continue;
+        }
+        g_ItemManager.SpawnItem(&bullet->position, ITEM_POINT_STAR, 1);
+        memset(bullet, 0, sizeof(Bullet));
+    }
+}
+
 // FUNCTION: th08 0x430830
 #pragma var_order(position, collisionResult, i, sine, bullet, laser, cosine, offset)
 void BulletManager::RemoveAllBullets(i32 itemState)

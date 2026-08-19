@@ -133,6 +133,7 @@ struct BulletManager
 
     void FUN_00415c60();
     void RemoveAllBullets(i32 itemState);
+    void FUN_00430d30(Float3 *position, f32 radius);
 
     static ZunResult RegisterChain(char *bulletAnmFilename);
     static ChainCallbackResult OnUpdate(BulletManager *bulletManager);
