@@ -90,6 +90,233 @@ char *__fastcall ConvertToFullWidthDigits(i32 value, i32 digits)
     return buffer;
 }
 
+// FUNCTION: th08 0x477024
+D3DXVECTOR3 *WINAPI FUN_00477024(D3DXVECTOR3 *out, const D3DXVECTOR3 *v1, const D3DXVECTOR3 *v2,
+                                 const D3DXVECTOR3 *v3, FLOAT f, FLOAT g)
+{
+    return ::D3DXVec3BaryCentric(out, v1, v2, v3, f, g);
+}
+
+// FUNCTION: th08 0x477081
+D3DXVECTOR4 *WINAPI FUN_00477081(D3DXVECTOR4 *out, const D3DXVECTOR3 *v, const D3DXMATRIX *matrix)
+{
+    return ::D3DXVec3Transform(out, v, matrix);
+}
+
+// FUNCTION: th08 0x47717e
+D3DXVECTOR4 *WINAPI FUN_0047717e(D3DXVECTOR4 *out, const D3DXVECTOR4 *v1, const D3DXVECTOR4 *v2,
+                                 const D3DXVECTOR4 *v3)
+{
+    return ::D3DXVec4Cross(out, v1, v2, v3);
+}
+
+// FUNCTION: th08 0x47726e
+D3DXVECTOR4 *WINAPI FUN_0047726e(D3DXVECTOR4 *out, const D3DXVECTOR4 *v1, const D3DXVECTOR4 *t1,
+                                 const D3DXVECTOR4 *v2, const D3DXVECTOR4 *t2, FLOAT s)
+{
+    return ::D3DXVec4Hermite(out, v1, t1, v2, t2, s);
+}
+
+// FUNCTION: th08 0x47733f
+D3DXVECTOR4 *WINAPI FUN_0047733f(D3DXVECTOR4 *out, const D3DXVECTOR4 *v0, const D3DXVECTOR4 *v1,
+                                 const D3DXVECTOR4 *v2, const D3DXVECTOR4 *v3, FLOAT s)
+{
+    return ::D3DXVec4CatmullRom(out, v0, v1, v2, v3, s);
+}
+
+// FUNCTION: th08 0x477432
+D3DXVECTOR4 *WINAPI FUN_00477432(D3DXVECTOR4 *out, const D3DXVECTOR4 *v1, const D3DXVECTOR4 *v2,
+                                 const D3DXVECTOR4 *v3, FLOAT f, FLOAT g)
+{
+    return ::D3DXVec4BaryCentric(out, v1, v2, v3, f, g);
+}
+
+// FUNCTION: th08 0x4774a9
+D3DXVECTOR4 *WINAPI FUN_004774a9(D3DXVECTOR4 *out, const D3DXVECTOR4 *v, const D3DXMATRIX *matrix)
+{
+    return ::D3DXVec4Transform(out, v, matrix);
+}
+
+// FUNCTION: th08 0x477548
+FLOAT WINAPI FUN_00477548(const D3DXMATRIX *matrix)
+{
+    D3DXMATRIX inverse;
+    FLOAT determinant;
+    ::D3DXMatrixInverse(&inverse, &determinant, matrix);
+    return determinant;
+}
+
+// FUNCTION: th08 0x477618
+D3DXMATRIX *WINAPI FUN_00477618(D3DXMATRIX *out, const D3DXMATRIX *m1, const D3DXMATRIX *m2)
+{
+    return ::D3DXMatrixMultiply(out, m1, m2);
+}
+
+// FUNCTION: th08 0x477854
+D3DXMATRIX *WINAPI FUN_00477854(D3DXMATRIX *out, const D3DXMATRIX *matrix)
+{
+    return ::D3DXMatrixTranspose(out, matrix);
+}
+
+// FUNCTION: th08 0x4778c1
+D3DXMATRIX *WINAPI FUN_004778c1(D3DXMATRIX *out, const D3DXMATRIX *m1, const D3DXMATRIX *m2)
+{
+    return ::D3DXMatrixMultiplyTranspose(out, m1, m2);
+}
+
+// FUNCTION: th08 0x477afd
+D3DXMATRIX *WINAPI FUN_00477afd(D3DXMATRIX *out, FLOAT *determinant, const D3DXMATRIX *matrix)
+{
+    return ::D3DXMatrixInverse(out, determinant, matrix);
+}
+
+// FUNCTION: th08 0x477ee6
+D3DXMATRIX *WINAPI FUN_00477ee6(D3DXMATRIX *out, FLOAT x, FLOAT y, FLOAT z)
+{
+    return ::D3DXMatrixScaling(out, x, y, z);
+}
+
+// FUNCTION: th08 0x477f48
+D3DXMATRIX *WINAPI FUN_00477f48(D3DXMATRIX *out, FLOAT angle)
+{
+    return ::D3DXMatrixRotationX(out, angle);
+}
+
+// FUNCTION: th08 0x477fc8
+D3DXMATRIX *WINAPI FUN_00477fc8(D3DXMATRIX *out, FLOAT angle)
+{
+    return ::D3DXMatrixRotationY(out, angle);
+}
+
+// FUNCTION: th08 0x478049
+D3DXMATRIX *WINAPI FUN_00478049(D3DXMATRIX *out, FLOAT angle)
+{
+    return ::D3DXMatrixRotationZ(out, angle);
+}
+
+// FUNCTION: th08 0x4780c5
+D3DXMATRIX *WINAPI FUN_004780c5(D3DXMATRIX *out, const D3DXVECTOR3 *axis, FLOAT angle)
+{
+    return ::D3DXMatrixRotationAxis(out, axis, angle);
+}
+
+// FUNCTION: th08 0x4781cd
+D3DXMATRIX *WINAPI FUN_004781cd(D3DXMATRIX *out, const D3DXQUATERNION *rotation)
+{
+    return ::D3DXMatrixRotationQuaternion(out, rotation);
+}
+
+// FUNCTION: th08 0x4782af
+D3DXMATRIX *WINAPI FUN_004782af(D3DXMATRIX *out, FLOAT scaling, const D3DXVECTOR3 *rotationCenter,
+                                 const D3DXQUATERNION *rotation, const D3DXVECTOR3 *translation)
+{
+    return ::D3DXMatrixAffineTransformation(out, scaling, rotationCenter, rotation, translation);
+}
+
+// FUNCTION: th08 0x478395
+D3DXMATRIX *WINAPI D3DXMatrixLookAtLH(D3DXMATRIX *out, const D3DXVECTOR3 *eye, const D3DXVECTOR3 *at,
+                                      const D3DXVECTOR3 *up)
+{
+    return ::D3DXMatrixLookAtLH(out, eye, at, up);
+}
+
+// FUNCTION: th08 0x4784dd
+D3DXMATRIX *WINAPI D3DXMatrixPerspectiveFovLH(D3DXMATRIX *out, FLOAT fovY, FLOAT aspect, FLOAT zn, FLOAT zf)
+{
+    return ::D3DXMatrixPerspectiveFovLH(out, fovY, aspect, zn, zf);
+}
+
+// FUNCTION: th08 0x478571
+void WINAPI FUN_00478571(const D3DXQUATERNION *q, D3DXVECTOR3 *axis, FLOAT *angle)
+{
+    ::D3DXQuaternionToAxisAngle(q, axis, angle);
+}
+
+// FUNCTION: th08 0x47860e
+D3DXQUATERNION *WINAPI FUN_0047860e(D3DXQUATERNION *out, const D3DXMATRIX *matrix)
+{
+    return ::D3DXQuaternionRotationMatrix(out, matrix);
+}
+
+// FUNCTION: th08 0x478742
+D3DXQUATERNION *WINAPI FUN_00478742(D3DXQUATERNION *out, const D3DXVECTOR3 *axis, FLOAT angle)
+{
+    return ::D3DXQuaternionRotationAxis(out, axis, angle);
+}
+
+// FUNCTION: th08 0x4787a4
+D3DXQUATERNION *WINAPI FUN_004787a4(D3DXQUATERNION *out, FLOAT yaw, FLOAT pitch, FLOAT roll)
+{
+    return ::D3DXQuaternionRotationYawPitchRoll(out, yaw, pitch, roll);
+}
+
+// FUNCTION: th08 0x478883
+D3DXQUATERNION *WINAPI FUN_00478883(D3DXQUATERNION *out, const D3DXQUATERNION *q1,
+                                    const D3DXQUATERNION *q2)
+{
+    return ::D3DXQuaternionMultiply(out, q1, q2);
+}
+
+// FUNCTION: th08 0x47891f
+D3DXQUATERNION *WINAPI FUN_0047891f(D3DXQUATERNION *out, const D3DXQUATERNION *q)
+{
+    return ::D3DXQuaternionNormalize(out, q);
+}
+
+// FUNCTION: th08 0x478afe
+D3DXQUATERNION *WINAPI FUN_00478afe(D3DXQUATERNION *out, const D3DXQUATERNION *q1,
+                                    const D3DXQUATERNION *q2, FLOAT t)
+{
+    return ::D3DXQuaternionSlerp(out, q1, q2, t);
+}
+
+// FUNCTION: th08 0x478be1
+D3DXQUATERNION *WINAPI FUN_00478be1(D3DXQUATERNION *out, const D3DXQUATERNION *q1,
+                                    const D3DXQUATERNION *q2, const D3DXQUATERNION *q3, FLOAT f, FLOAT g)
+{
+    return ::D3DXQuaternionBaryCentric(out, q1, q2, q3, f, g);
+}
+
+// FUNCTION: th08 0x478c38
+D3DXQUATERNION *WINAPI FUN_00478c38(D3DXQUATERNION *out, const D3DXQUATERNION *q1,
+                                    const D3DXQUATERNION *q2, const D3DXQUATERNION *q3,
+                                    const D3DXQUATERNION *q4, FLOAT t)
+{
+    return ::D3DXQuaternionSquad(out, q1, q2, q3, q4, t);
+}
+
+// FUNCTION: th08 0x478cc9
+D3DXQUATERNION *WINAPI FUN_00478cc9(D3DXQUATERNION *out, const D3DXQUATERNION *q)
+{
+    return ::D3DXQuaternionExp(out, q);
+}
+
+// FUNCTION: th08 0x478d6d
+D3DXVECTOR3 *WINAPI FUN_00478d6d(D3DXVECTOR3 *out, const D3DXPLANE *plane,
+                                 const D3DXVECTOR3 *p1, const D3DXVECTOR3 *p2)
+{
+    return ::D3DXPlaneIntersectLine(out, plane, p1, p2);
+}
+
+// FUNCTION: th08 0x478e47
+D3DXPLANE *WINAPI FUN_00478e47(D3DXPLANE *out, const D3DXVECTOR3 *p1,
+                               const D3DXVECTOR3 *p2, const D3DXVECTOR3 *p3)
+{
+    return ::D3DXPlaneFromPoints(out, p1, p2, p3);
+}
+
+// FUNCTION: th08 0x478ee9
+D3DXPLANE *WINAPI FUN_00478ee9(D3DXPLANE *out, const D3DXPLANE *plane, const D3DXMATRIX *matrix)
+{
+    return ::D3DXPlaneTransform(out, plane, matrix);
+}
+
+// FUNCTION: th08 0x478f88
+D3DXPLANE *WINAPI FUN_00478f88(D3DXPLANE *out, const D3DXPLANE *plane)
+{
+    return ::D3DXPlaneNormalize(out, plane);
+}
+
 namespace utils
 {
 void DebugPrint(char *fmt, ...)
