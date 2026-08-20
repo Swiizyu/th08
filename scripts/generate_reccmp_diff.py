@@ -13,8 +13,8 @@ import tempfile
 WATCHLIST = os.path.join(os.path.dirname(__file__), "..", "config", "verbose_watch.txt")
 VERBOSE_OUT = "verbose_diff.txt"
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
-PER_FUNCTION_CAP = 12000
-TOTAL_CAP = 48000
+PER_FUNCTION_CAP = 8000
+TOTAL_CAP = 46000
 
 
 def list_watch():
@@ -67,10 +67,20 @@ def main():
 
     print("# Report")
     print()
+
+    rows = reccmp_data["data"]
+    perfect = [f for f in rows if f["matching"] >= 0.999999]
+    imperfect = [f for f in rows if f["matching"] < 0.999999]
+
+    print("functions compared: %d | 100%% matches: %d | remaining: %d" % (len(rows), len(perfect), len(imperfect)))
+    print()
+    # Only list imperfect rows: the compare.yml commit-comment budget (55000
+    # chars) is shared with the verbose dumps below, and the full table
+    # crowded them out when nearly everything matched.
     print("name | result")
     print("-----|-------")
 
-    for function in reccmp_data["data"]:
+    for function in imperfect:
         print(function["name"] + " | " + format(function["matching"], ".2%"))
 
     dump_verbose(list_watch())

@@ -146,6 +146,12 @@ th08::g_DummyMidiTimerPerformanceCounter,0x17ce744,global
 th08::g_SupervisorScreenEffect,0x17ce750,global
 th08::g_Supervisor,0x17ce758,global
 th08::g_SupervisorLoadingVms,0x17ceac0,global
+th08::g_PerformanceCounter,0x17cf2b0,global
+th08::g_ReplayFpsBuffer,0x17cf2b8,global
+th08::g_FpsCounterBuffer,0x17cf3b8,global
+g_LastTime,0x17cf4b8,global
+$S5,0x17cf4bc,global
+th08::g_NumFramesSinceLastTime,0x17cf4c0,global
 th08::g_MusicRoom,0x17cf4c8,global
 th08::g_Player,0x17d5ef8,global
 th08::g_EnemyManagerUnknown,0x18b8a24,global
