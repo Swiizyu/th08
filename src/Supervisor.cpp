@@ -1520,21 +1520,58 @@ ZunBool Supervisor::PlayMusic(i32 param_1, i32 param_2)
 {
     if (g_Supervisor.cfg.musicMode == MIDI)
     {
+        if (g_Supervisor.midiOutput != NULL)
+        {
+            g_Supervisor.midiOutput->StopPlayback();
+            g_Supervisor.midiOutput->ParseFile(param_1);
+            g_Supervisor.midiOutput->Play();
+        }
+
+        if (!g_GameManager.flags.isReplay && !g_GameManager.flags.isDemoMode)
+        {
+            g_GameManager.plst.bgmUnlocked[param_2] = 1;
+        }
+
+        return FALSE;
     }
     else if (g_Supervisor.cfg.musicMode == WAV)
     {
+        if (g_Supervisor.cfg.opts.preloadMusic)
+        {
+            g_SoundPlayer.QueueCommand(4, 0, "dummy");
+        }
         g_SoundPlayer.QueueCommand(2, param_1, "dummy");
+
+        if (!g_GameManager.flags.isReplay && !g_GameManager.flags.isDemoMode)
+        {
+            g_GameManager.plst.bgmUnlocked[param_2] = 1;
+        }
     }
 
-    return TRUE;
+    return FALSE;
 }
 
+#pragma var_order(periodLoc, wavPathBuf)
 ZunResult Supervisor::PlayAudio(char *path, i32 param_2)
 {
     char wavPathBuf[256];
     char *periodLoc;
 
-    if (g_Supervisor.cfg.musicMode == WAV)
+    if (g_Supervisor.cfg.musicMode == MIDI)
+    {
+        if (g_Supervisor.midiOutput != NULL)
+        {
+            g_Supervisor.midiOutput->StopPlayback();
+            g_Supervisor.midiOutput->LoadFile(path);
+            g_Supervisor.midiOutput->Play();
+        }
+
+        if (!g_GameManager.flags.isReplay && !g_GameManager.flags.isDemoMode)
+        {
+            g_GameManager.plst.bgmUnlocked[param_2] = 1;
+        }
+    }
+    else if (g_Supervisor.cfg.musicMode == WAV)
     {
         strcpy(wavPathBuf, path);
 
@@ -1544,6 +1581,15 @@ ZunResult Supervisor::PlayAudio(char *path, i32 param_2)
         periodLoc[3] = 'v';
 
         g_SoundPlayer.QueueCommand(2, -1, wavPathBuf);
+
+        if (!g_GameManager.flags.isReplay && !g_GameManager.flags.isDemoMode)
+        {
+            g_GameManager.plst.bgmUnlocked[param_2] = 1;
+        }
+    }
+    else
+    {
+        return ZUN_ERROR;
     }
 
     return ZUN_SUCCESS;
