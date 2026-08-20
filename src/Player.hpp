@@ -246,5 +246,6 @@ struct Player
 C_ASSERT(sizeof(Player) == 0xe2b30);
 
 DIFFABLE_EXTERN(Player, g_Player);
+DIFFABLE_EXTERN_ARRAY(u8 *, 8, g_PlayerObjPtrs);
 
 } /* namespace th08 */

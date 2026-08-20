@@ -1093,7 +1093,7 @@ void Player::FUN_0040d100()
 {
     u8 *bomb;
     Effect *effect;
-    i32 i;
+    u32 i;
 
     bomb = (u8 *)this + 0xfdc;
     if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
@@ -1134,9 +1134,9 @@ void Player::FUN_0040d100()
         *(i32 *)((u8 *)this + 0x404) = 0;
         for (i = 0; i < 8; i++)
         {
-            if (*(u8 **)(0xf54cc0 + i * 4) != NULL)
+            if (g_PlayerObjPtrs[i] != NULL)
             {
-                *(u32 *)(*(u8 **)(0xf54cc0 + i * 4) + 0x3324) &= ~0x40;
+                *(u32 *)(g_PlayerObjPtrs[i] + 0x3324) &= ~0x40;
             }
         }
     }
@@ -1572,6 +1572,7 @@ ZunBool Player::IsYoukai()
 }
 
 DIFFABLE_STATIC(Player, g_Player);
+DIFFABLE_STATIC_ARRAY(u8 *, 8, g_PlayerObjPtrs)
 
 struct PlayerCollisionObject
 {
