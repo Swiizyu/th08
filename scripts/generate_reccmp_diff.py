@@ -61,9 +61,7 @@ def probe_recomp_bytes():
 
     exe = os.path.join(os.path.dirname(__file__), "..", "recompiled", "th08.exe")
     # (label, rva, nbytes) — set as needed for the current investigation.
-    probes = [
-        ("TitleScreen::RegisterChain recomp VA 0x451e16 (len 0x120)", 0x451E16, 0x120),
-    ]
+    probes = []
     if not os.path.exists(exe):
         print("probe: %s not found" % exe)
         return
