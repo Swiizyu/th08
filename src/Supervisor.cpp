@@ -923,8 +923,8 @@ ZunResult Supervisor::SetupDInput()
     {
         this->controller->SetDataFormat(&c_dfDIJoystick2);
         this->controller->SetCooperativeLevel(this->hwndGameWindow, DISCL_BACKGROUND | DISCL_NONEXCLUSIVE);
-        this->controllerCaps.dwSize = sizeof(DIDEVCAPS);
-        this->controller->GetCapabilities(&this->controllerCaps);
+        g_Supervisor.controllerCaps.dwSize = sizeof(DIDEVCAPS);
+        this->controller->GetCapabilities(&g_Supervisor.controllerCaps);
         this->controller->EnumObjects(ControllerCallback, NULL, 0);
         g_GameErrorContext.Log("\x97\x4C\x8C\xF8\x82\xC8\x83\x70\x83\x62\x83\x68\x82\xF0\x94\xAD\x8C\xA9\x82\xB5\x82\xDC\x82\xB5\x82\xBD\r\n");
     }
@@ -1682,8 +1682,8 @@ void Supervisor::UpdateGameTime()
     }
     if (g_GameManager.plst.gameSeconds >= 60)
     {
-        g_GameManager.plst.gameMinutes += (g_GameManager.plst.gameMilliseconds / 60);
-        g_GameManager.plst.gameSeconds = (g_GameManager.plst.gameMilliseconds % 60);
+        g_GameManager.plst.gameMinutes += (g_GameManager.plst.gameSeconds / 60);
+        g_GameManager.plst.gameSeconds = (g_GameManager.plst.gameSeconds % 60);
     }
     if (g_GameManager.plst.gameMinutes >= 60)
     {
@@ -1724,8 +1724,8 @@ void Supervisor::UpdatePlayTime()
     }
     if (g_GameManager.plst.totalSeconds >= 60)
     {
-        g_GameManager.plst.totalMinutes += (g_GameManager.plst.totalMilliseconds / 60);
-        g_GameManager.plst.totalSeconds = (g_GameManager.plst.totalMilliseconds % 60);
+        g_GameManager.plst.totalMinutes += (g_GameManager.plst.totalSeconds / 60);
+        g_GameManager.plst.totalSeconds = (g_GameManager.plst.totalSeconds % 60);
     }
     if (g_GameManager.plst.totalMinutes >= 60)
     {

@@ -1215,6 +1215,7 @@ FUN_0047a586,0x47a586,library
 FUN_0047a668,0x47a668,library
 FUN_0047a73b,0x47a73b,library
 FUN_0047aa65,0x47aa65,library
+_DirectInput8Create@20,0x476ce0,library
 _D3DXCreateTexture@32,0x47aa8d,library
 _D3DXLoadSurfaceFromFileInMemory@36,0x47aaf3,library
 _D3DXLoadSurfaceFromSurface@32,0x47abab,library

@@ -10,7 +10,10 @@ th08::CStreamingSound::`vftable',0x4b96c0,vtable
 th08::CPbgFile::`vftable',0x4b98b4,vtable
 th08::IPbgFile::`vftable',0x4b98d8,vtable
 th08::g_PbgFileSeekModes,0x4b98f8,global
+c_dfDIJoystick2,0x4b9b94,global
+c_dfDIKeyboard,0x4b9d9c,global
 IID_IDirectSoundNotify,0x4bd610,global
+GUID_SysKeyboard,0x4bd620,global
 IID_IDirectInput8A,0x4bd6c0,global
 IID_IShellLinkA,0x4bd6d0,global
 CLSID_ShellLink,0x4bd6e0,global
