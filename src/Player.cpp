@@ -280,7 +280,7 @@ void Player::FUN_0040c910()
 }
 
 // FUNCTION: th08 0x40d430
-#pragma var_order(bomb, entry, t, v, bombGfx, effect, effect1, effect2, effect3, effect4)
+#pragma var_order(bomb, entry, t, v, effect, bombGfx, effect1, effect2, effect3, effect4)
 void Player::FUN_0040d430()
 {
     u8 *bomb;
@@ -408,7 +408,7 @@ void Player::FUN_0040d430()
 }
 
 // FUNCTION: th08 0x40d970
-#pragma var_order(bomb, entry, t, v, bombGfx, effect, pos, effect1, effect2, effect3, effect4)
+#pragma var_order(bomb, entry, t, v, effect, bombGfx, pos, effect1, effect2, effect3, effect4)
 void Player::FUN_0040d970()
 {
     u8 *bomb;
