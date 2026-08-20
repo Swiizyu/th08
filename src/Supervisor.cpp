@@ -1287,8 +1287,16 @@ ZunBool Supervisor::TakeSnapshot(const char *filePath)
                 srcPixel++;
                 dstPixel++;
                 *dstPixel = *srcPixel;
-                srcPixel++;
-                srcPixel++;
+                /* The original merges the two increments into a single
+                 * register run (mov/inc/inc/mov); MSVC /Od emits a full
+                 * load/store per statement, so spell it in asm. */
+                __asm
+                {
+                    mov eax, [srcPixel]
+                    inc eax
+                    inc eax
+                    mov [srcPixel], eax
+                }
                 dstPixel++;
             }
         }

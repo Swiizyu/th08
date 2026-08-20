@@ -36,12 +36,16 @@ def dump_verbose(entries):
             if written >= TOTAL_CAP:
                 break
             try:
+                # reccmp's 100%-match banner contains a ✨ which crashes on
+                # the Windows runner's cp1252 console - force UTF-8 I/O.
+                env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1")
                 result = subprocess.run(
                     ["reccmp-reccmp", "--target", "th08", "--verbose", entry],
                     capture_output=True,
                     text=True,
                     errors="replace",
                     timeout=120,
+                    env=env,
                 )
                 text = ANSI_RE.sub("", result.stdout + result.stderr)
             except Exception as e:

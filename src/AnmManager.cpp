@@ -2585,7 +2585,7 @@ i32 AnmManager::LoadExternalTextureData(AnmLoaded *anmLoaded, i32 entryNumber, i
             data = FileSystem::OpenFile(path, &fileSize, TRUE);
             if (data == NULL)
             {
-                g_GameErrorContext.Fatal(TH_ERR_ANMMANAGER_EXTERN_TEXTURE_CORRUPTED, path);
+                g_GameErrorContext.Fatal(TH_ERR_ANMMANAGER_EXTERN_TEXTURE_NOT_LOADED, path);
                 return ZUN_ERROR;
             }
             anmLoaded->textures[entryNumber].size = fileSize;
@@ -2875,13 +2875,17 @@ void AnmManager::DrawTextRight(AnmVm *vm, COLORREF textColor, COLORREF shadowCol
 }
 
 // FUNCTION: th08 0x466650
-#pragma var_order(args, x, buf, fontWidth)
+#pragma var_order(args, x, y, buf, fontWidth)
 void AnmManager::DrawTextCentered(AnmVm *vm, COLORREF textColor, COLORREF shadowColor, const char *fmt, ...)
 {
     char buf[64];
     i32 fontWidth;
     i32 x;
+    i32 y;
     va_list args;
+
+    /* ZUN declared an unused local here; it still takes a stack slot. */
+    (void)y;
 
     fontWidth = vm->fontWidth <= 0 ? 15 : vm->fontWidth;
     va_start(args, fmt);
