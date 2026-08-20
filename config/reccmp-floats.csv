@@ -240,11 +240,6 @@ address,type,size
 0x4b9dcc,float,4
 0x4b9dd0,float,4
 0x4b9dd4,float,4
-0x4c7fe8,float,4
-0x4c7fec,float,4
-0x4c7ff0,float,4
-0x4c7ff4,float,4
-0x4c7ff8,float,4
 0x4c9fd0,float,4
 0x4c9fe0,float,4
 0x4ca180,float,4

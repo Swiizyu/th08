@@ -1766,7 +1766,7 @@ FUN_004a584f,0x4a584f,library
 _Strftime,0x4a58f3,library
 strftime,0x4a5925,library
 localtime,0x4a5940,library
-_time32,0x4a5ac0,library
+time,0x4a5ac0,library
 rename,0x4a5af9,library
 _chdir,0x4a5b27,library
 strchr,0x4a5be0,library

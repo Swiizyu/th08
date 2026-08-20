@@ -2,6 +2,7 @@ name,address,type
 th08::MidiTimer::`vftable',0x4b6550,vtable
 th08::MidiOutput::`vftable',0x4b6554,vtable
 th08::DummyMidiTimer::`vftable',0x4b677c,vtable
+g_DifficultyWeightList,0x4b7b14,global
 th08::g_TextureFormatD3D8Mapping,0x4b8480,global
 th08::g_TextureFormatBytesPerPixel,0x4b8498,global
 th08::g_TitleCharacterSpriteIndices,0x4b8cd8,global
