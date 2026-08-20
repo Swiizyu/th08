@@ -111,6 +111,7 @@ def probe_recomp_symbols():
             sz = row.get("size") or "0"
             sz = int(sz, 16) if isinstance(sz, str) and sz.startswith("0x") else int(sz)
             rows.append((o, r, sz, name))
+    rows = [t for t in rows if t[3].startswith("th08::")]
     rows.sort()
     prev_o = prev_r = None
     for o, r, size, name in rows:
