@@ -1735,8 +1735,8 @@ FUN_004a42ce,0x4a42ce,library
 FUN_004a42fa,0x4a42fa,library
 FUN_004a431a,0x4a431a,library
 atol,0x4a4342,library
-operator delete,0x4a43cf,library
-operator new,0x4a43d4,library
+operator delete(void *),0x4a43cf,library
+operator new(unsigned int),0x4a43d4,library
 JumpToContinuation,0x4a43e2,library
 CallMemberFunction1,0x4a4412,library
 UnwindNestedFrames,0x4a4419,library
