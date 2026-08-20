@@ -3870,9 +3870,18 @@ ChainCallbackResult TitleScreen::OnUpdateReplayMenu()
 /* This is matching functionally but there is some unexplained stack nonsense
  * from AnmLoaded::InitializeAndSetSprite.
  */
+#pragma var_order(showVm, vm1, anm1, vm2, anm2, vm3, anm3, vm4, anm4)
 ChainCallbackResult TitleScreen::DrawCompletionStatusText()
 {
     ZunBool showVm = FALSE;
+    AnmVm *vm1;
+    AnmLoaded *anm1;
+    AnmVm *vm2;
+    AnmLoaded *anm2;
+    AnmVm *vm3;
+    AnmLoaded *anm3;
+    AnmVm *vm4;
+    AnmLoaded *anm4;
 
     if (this->stateTimer2 > 8)
     {
@@ -3880,16 +3889,16 @@ ChainCallbackResult TitleScreen::DrawCompletionStatusText()
             g_GameManager.IsStageClearedWithRetries(STAGE6A, this->cursor, g_Supervisor.cfg.defaultDifficulty))
         {
             showVm = TRUE;
-            AnmLoaded *anm = this->titleAnm;
-            AnmVm *vm = &this->spellCardNameVms[0];
-            anm->InitializeAndSetSprite(vm, 146);
+            anm1 = this->titleAnm;
+            vm1 = &this->spellCardNameVms[0];
+            anm1->InitializeAndSetSprite(vm1, 146);
         }
         else if (g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, g_Supervisor.cfg.defaultDifficulty))
         {
             showVm = TRUE;
-            AnmLoaded *anm = this->titleAnm;
-            AnmVm *vm = &this->spellCardNameVms[0];
-            anm->InitializeAndSetSprite(vm, 148);
+            anm2 = this->titleAnm;
+            vm2 = &this->spellCardNameVms[0];
+            anm2->InitializeAndSetSprite(vm2, 148);
         }
         else if (g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, EASY) ||
                  g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, NORMAL) ||
@@ -3897,9 +3906,9 @@ ChainCallbackResult TitleScreen::DrawCompletionStatusText()
                  g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, LUNATIC) || this->cursor > 3)
         {
             showVm = TRUE;
-            AnmLoaded *anm = this->titleAnm;
-            AnmVm *vm = &this->spellCardNameVms[0];
-            anm->InitializeAndSetSprite(vm, 147);
+            anm3 = this->titleAnm;
+            vm3 = &this->spellCardNameVms[0];
+            anm3->InitializeAndSetSprite(vm3, 147);
         }
         else if (g_GameManager.IsStageClearedWithRetries(STAGE6A, this->cursor, EASY) ||
                  g_GameManager.IsStageClearedWithRetries(STAGE6A, this->cursor, NORMAL) ||
@@ -3907,9 +3916,9 @@ ChainCallbackResult TitleScreen::DrawCompletionStatusText()
                  g_GameManager.IsStageClearedWithRetries(STAGE6A, this->cursor, LUNATIC))
         {
             showVm = TRUE;
-            AnmLoaded *anm = this->titleAnm;
-            AnmVm *vm = &this->spellCardNameVms[0];
-            anm->InitializeAndSetSprite(vm, 145);
+            anm4 = this->titleAnm;
+            vm4 = &this->spellCardNameVms[0];
+            anm4->InitializeAndSetSprite(vm4, 145);
         }
     }
 
