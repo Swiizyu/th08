@@ -109,7 +109,7 @@ ZunResult AnmManager::FUN_004639e0(AnmVm *vm)
 #pragma var_order(halfWidth, halfHeight, screenCenterY, halfLength, sinZ, matrix, z, \
                   projectRight, projectCenter, projectRightOffset, cosZ, origin)
 // FUNCTION: th08 0x4640e0
-ZunResult AnmManager::FUN_004640e0(AnmVm *vm, void (*callback)(AnmVm *, Float3 *))
+ZunResult AnmManager::TransformVerticesWorldWithCallback(AnmVm *vm, void (*callback)(AnmVm *, Float3 *))
 {
     f32 halfWidth;
     f32 halfHeight;
@@ -1778,7 +1778,7 @@ ZunResult AnmManager::DrawWorld(AnmVm *vm)
 }
 
 // FUNCTION: th08 0x464400
-ZunResult AnmManager::FUN_00464400(AnmVm *vm, void (*callback)(AnmVm *, Float3 *))
+ZunResult AnmManager::DrawWithCallback(AnmVm *vm, void (*callback)(AnmVm *, Float3 *))
 {
     if (!vm->IsVisible())
     {
@@ -1795,7 +1795,7 @@ ZunResult AnmManager::FUN_00464400(AnmVm *vm, void (*callback)(AnmVm *, Float3 *
         return ZUN_ERROR;
     }
 
-    if (this->FUN_004640e0(vm, callback) != ZUN_SUCCESS)
+    if (this->TransformVerticesWorldWithCallback(vm, callback) != ZUN_SUCCESS)
     {
         return ZUN_ERROR;
     }
