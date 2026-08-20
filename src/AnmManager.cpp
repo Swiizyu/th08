@@ -1924,27 +1924,47 @@ ZunResult AnmManager::Draw3D(AnmVm *vm)
     return ZUN_SUCCESS;
 }
 
+#pragma var_order(v, i, cur, u, t, step, uRange)
 // FUNCTION: th08 0x4649a0
 ZunResult AnmManager::FUN_004649a0(AnmVm *vm, VertexTex1DiffuseXyzrhw *vertices, i32 vertexCount)
 {
-    if (vertexCount < 3 || vm->loadedSprite == NULL)
+    f32 v;
+    i32 i;
+    VertexTex1DiffuseXyzrhw *cur;
+    f32 u;
+    f32 t;
+    f32 step;
+    f32 uRange;
+
+    if (vertexCount < 3)
     {
         return ZUN_ERROR;
     }
-    i32 pairs = (vertexCount + 1) / 2 - 1;
-    f32 step = pairs > 0 ? (vm->loadedSprite->uvEnd.x - vm->loadedSprite->uvStart.x) / pairs : 0.0f;
-    f32 u = vm->loadedSprite->uvEnd.x + vm->spriteSize.y;
-    for (i32 i = 0; i < vertexCount; i++)
+
+    u = vm->loadedSprite->uvEnd.x + vm->uvScrollPos.x;
+    uRange = vm->loadedSprite->uvEnd.x - vm->loadedSprite->uvStart.x;
+    v = vm->loadedSprite->uvStart.y + vm->uvScrollPos.y;
+    cur = vertices;
+    step = uRange / ((vertexCount + 1) / 2 - 1);
+
+    for (i = 0, t = u; i < vertexCount; i += 2, cur += 2, t -= step)
     {
-        vertices[i].textureUV.x = u;
-        vertices[i].textureUV.y = (i & 1) ? vm->loadedSprite->uvStart.y : vm->loadedSprite->uvEnd.y;
-        vertices[i].diffuse = vm->color1.d3dColor;
-        vertices[i].w = 1.0f;
-        if (i & 1)
-        {
-            u -= step;
-        }
+        cur->textureUV.x = t;
+        cur->textureUV.y = v;
+        cur->diffuse = vm->color1.d3dColor;
+        cur->w = 1.0f;
     }
+
+    v = vm->loadedSprite->uvEnd.y + vm->uvScrollPos.y;
+    cur = vertices + 1;
+    for (i = 1, t = u; i < vertexCount; i += 2, cur += 2, t -= step)
+    {
+        cur->textureUV.x = t;
+        cur->textureUV.y = v;
+        cur->diffuse = vm->color1.d3dColor;
+        cur->w = 1.0f;
+    }
+
     return ZUN_SUCCESS;
 }
 
