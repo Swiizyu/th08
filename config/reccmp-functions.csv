@@ -1147,7 +1147,7 @@ FUN_004780c5,0x4780c5,library
 FUN_004781cd,0x4781cd,library
 FUN_004782af,0x4782af,library
 _D3DXMatrixLookAtLH@16,0x478395,library
-_D3DXMatrixPerspectiveFovLH@16,0x4784dd,library
+_D3DXMatrixPerspectiveFovLH@20,0x4784dd,library
 FUN_00478571,0x478571,library
 FUN_0047860e,0x47860e,library
 FUN_00478742,0x478742,library
