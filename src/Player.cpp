@@ -25,7 +25,6 @@ namespace th08
 DIFFABLE_STATIC(i32, g_BackgroundTintActive);
 
 // FUNCTION: th08 0x40bc60
-#pragma var_order(result, blue, green, red, factor)
 #pragma var_order(color2, result)
 void __fastcall Player::FUN_0040bc60(D3DCOLOR color)
 {
@@ -61,7 +60,6 @@ void __fastcall Player::FUN_0040bc60(D3DCOLOR color)
 }
 
 // FUNCTION: th08 0x40be30
-#pragma var_order(i, entry, bomb)
 #pragma var_order(i, bomb, entry)
 void __fastcall Player::FUN_0040be30(i32 a0, const char *a1, i32 arg2, i32 duration, i32 a4)
 {
@@ -72,11 +70,10 @@ void __fastcall Player::FUN_0040be30(i32 a0, const char *a1, i32 arg2, i32 durat
     bomb = (u8 *)this + 0xfdc;
     g_Spellcard.FUN_00415d60(a0, a1, a4);
     *(i32 *)(bomb + 8) = arg2;
-    ((ZunTimer *)((u8 *)this + 0xe2af4))->SetCurrent(duration);
+    *(ZunTimer *)((u8 *)this + 0xe2af4) = duration;
     this->playerState = 3;
     this->FUN_0040bf00();
-    entry = bomb + 0x4c;
-    for (i = 0; i < 0x80; i++, entry += 0x16f0)
+    for (i = 0, entry = bomb + 0x4c; i < 0x80; i++, entry += 0x16f0)
     {
         *(i32 *)entry = 0;
     }
@@ -122,20 +119,17 @@ void Player::FUN_0040c910()
 }
 
 // FUNCTION: th08 0x40d430
-#pragma var_order(bomb, entry, t, v, effect, effect1, effect2)
+#pragma var_order(bomb, entry, t, v, effect, bombGfx, effect1, effect2, effect3, effect4)
 void Player::FUN_0040d430()
 {
     u8 *bomb;
     u8 *entry;
     f32 t;
-    Effect *effect;
-    Effect *effect1;
-    Effect *effect2;
 
     bomb = (u8 *)this + 0xfdc;
     entry = bomb + 0x4c;
 
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040d3d0() && *(ZunTimer *)((u8 *)this + 0xff4) == 0)
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
     {
         this->FUN_0040be30(1, "魔符「アーティフルサクリファイス」", 0xd2, 0xfa, 0);
 
@@ -144,129 +138,11 @@ void Player::FUN_0040d430()
         g_SoundPlayer.PlaySoundByIdx((SoundIdx)6, 0);
     }
 
-    if (*(ZunTimer *)((u8 *)this + 0xff4) < 60)
+    if (*(ZunTimer *)(bomb + 0x18) < 60)
     {
         Float3 v(192.0f, 224.0f, 0.0f);
 
-        t = (f32)*(ZunTimer *)((u8 *)this + 0xff4) / 60.0f;
-        t = t * t;
-
-        *(Float3 *)((u8 *)this + 0x6b0) = v + (*(Float3 *)(entry + 0x14) - v) * t;
-
-        *(f32 *)((u8 *)this + 0x414) += (-ZUN_PI) / 10.0f;
-
-        this->FUN_0044df00((Float2 *)((u8 *)this + 0x6b0), 32.0f, 0.0f, 0, 6);
-        this->FUN_0044e040((Float2 *)((u8 *)this + 0x6b0), 32.0f, 0.0f, 40, 0);
-        return;
-    }
-
-    *(f32 *)((u8 *)this + 0x414) = 0.0f;
-    *(f32 *)((u8 *)this + 0x6b0) = 192.0f;
-    *(f32 *)((u8 *)this + 0x6b4) = 224.0f;
-
-    if (*(ZunTimer *)((u8 *)this + 0xff4) >= 150)
-    {
-        *(u8 *)((u8 *)this + 0x5ff) = 0;
-    }
-
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(60))
-    {
-        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
-        return;
-    }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(64))
-    {
-        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffffd0d0);
-        return;
-    }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(68))
-    {
-        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffffb0b0);
-        return;
-    }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(72))
-    {
-        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff8080);
-        return;
-    }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(76))
-    {
-        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff4040);
-        return;
-    }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(90))
-    {
-        void *bombGfx;
-
-        g_SoundPlayer.PlaySoundByIdx((SoundIdx)15, 0);
-        g_EffectManager.SpawnEffect(42, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
-        effect = g_EffectManager.SpawnEffect(43, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
-        effect = g_EffectManager.SpawnEffect(44, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
-        bombGfx = this->FUN_0044df00((Float2 *)effect, 1.0f, 5.0f, 110, 6);
-        this->FUN_0044e040((Float2 *)bombGfx, 1.0f, 5.0f, 70, 110);
-        g_EffectManager.SpawnEffect(21, (Float3 *)((u8 *)this + 0x6b0), 0, 0x80000000);
-        g_EffectManager.SpawnEffect(21, (Float3 *)((u8 *)this + 0x6b0), 1, 0x8fffffff);
-        return;
-    }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(100))
-    {
-        g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
-        return;
-    }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(110))
-    {
-        g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffffd0d0);
-        return;
-    }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(120))
-    {
-        effect1 = g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff8080);
-        return;
-    }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(130))
-    {
-        effect2 = g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff0000);
-        return;
-    }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(150))
-    {
-        ScreenEffect::RegisterChain((ScreenEffectType)3, 8, 1, 0x80000000, 0, 21);
-        ScreenEffect::RegisterChain((ScreenEffectType)1, 24, 8, 0, 0, 21);
-        g_SoundPlayer.PlaySoundByIdx((SoundIdx)0x19, 0);
-        return;
-    }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(0xd1))
-    {
-        *(i32 *)((u8 *)this + 0x6d4) = 1;
-        ((ZunTimer *)((u8 *)this + 0x6ec))->SetCurrent(0);
-    }
-}
-
-// FUNCTION: th08 0x40d970
-#pragma var_order(bomb, entry, t, v, effect, bombGfx, pos, effect1, effect2, effect3, effect4)
-void Player::FUN_0040d970()
-{
-    u8 *bomb;
-    u8 *entry;
-    f32 t;
-
-    bomb = (u8 *)this + 0xfdc;
-    entry = bomb + 0x4c;
-
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040d3d0() && *(ZunTimer *)((u8 *)this + 0xff4) == 0)
-    {
-        this->FUN_0040be30(1, "魔操「リターンイナニメトネス」", 0xe6, 0x118, 1);
-
-        g_SoundPlayer.PlaySoundByIdx((SoundIdx)13, 0);
-        *(Float3 *)(entry + 0x14) = this->position;
-        g_SoundPlayer.PlaySoundByIdx((SoundIdx)6, 0);
-    }
-
-    if (*(ZunTimer *)((u8 *)this + 0xff4) < 60)
-    {
-        Float3 v(192.0f, 224.0f, 0.0f);
-
-        t = (f32)*(ZunTimer *)((u8 *)this + 0xff4) / 60.0f;
+        t = (f32)*(ZunTimer *)(bomb + 0x18) / 60.0f;
         t = t * t;
 
         *(Float3 *)((u8 *)this + 0x6b0) = (v - *(Float3 *)(entry + 0x14)) * t + *(Float3 *)(entry + 0x14);
@@ -282,37 +158,164 @@ void Player::FUN_0040d970()
     *(f32 *)((u8 *)this + 0x6b0) = 192.0f;
     *(f32 *)((u8 *)this + 0x6b4) = 224.0f;
 
-    if (*(ZunTimer *)((u8 *)this + 0xff4) >= 128)
+    if (*(ZunTimer *)(bomb + 0x18) >= 150)
     {
         *(u8 *)((u8 *)this + 0x5ff) = 0;
     }
 
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(60))
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(60))
     {
         g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
         return;
     }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(64))
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(64))
     {
         g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffffd0d0);
         return;
     }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(68))
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(68))
     {
         g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffffb0b0);
         return;
     }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(72))
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(72))
     {
         g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff8080);
         return;
     }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(76))
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(76))
     {
         g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff4040);
         return;
     }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(120))
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(90))
+    {
+        Effect *effect;
+        void *bombGfx;
+
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)15, 0);
+        effect = g_EffectManager.SpawnEffect(42, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
+        effect = g_EffectManager.SpawnEffect(43, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
+        effect = g_EffectManager.SpawnEffect(44, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
+        this->FUN_0044df00((Float2 *)((u8 *)this + 0x6b0), 1.0f, 5.0f, 110, 6);
+        bombGfx = this->FUN_0044e040((Float2 *)((u8 *)this + 0x6b0), 1.0f, 5.0f, 70, 110);
+        *(i32 *)((u8 *)bombGfx + 0x38) = 5;
+        ScreenEffect::RegisterChain((ScreenEffectType)1, 24, 8, 0, 0, 21);
+        ScreenEffect::RegisterChain((ScreenEffectType)3, 8, 1, 0x8fffffff, 0, 21);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(100))
+    {
+        Effect *effect1;
+
+        effect1 = g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(110))
+    {
+        Effect *effect2;
+
+        effect2 = g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffffd0d0);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(120))
+    {
+        Effect *effect3;
+
+        effect3 = g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff8080);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(130))
+    {
+        Effect *effect4;
+
+        effect4 = g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff0000);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(150))
+    {
+        ScreenEffect::RegisterChain((ScreenEffectType)3, 8, 1, 0x8fffffff, 0, 21);
+        ScreenEffect::RegisterChain((ScreenEffectType)1, 24, 8, 0, 0, 21);
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)0x19, 0);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0xd1))
+    {
+        *(i32 *)((u8 *)this + 0x6d4) = 1;
+        *(ZunTimer *)((u8 *)this + 0x6ec) = 0;
+    }
+}
+
+// FUNCTION: th08 0x40d970
+#pragma var_order(bomb, entry, t, v, effect, bombGfx, pos, effect1, effect2, effect3, effect4)
+void Player::FUN_0040d970()
+{
+    u8 *bomb;
+    u8 *entry;
+    f32 t;
+
+    bomb = (u8 *)this + 0xfdc;
+    entry = bomb + 0x4c;
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
+    {
+        this->FUN_0040be30(1, "魔操「リターンイナニメトネス」", 0xe6, 0x118, 1);
+
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)13, 0);
+        *(Float3 *)(entry + 0x14) = this->position;
+    }
+
+    if (*(ZunTimer *)(bomb + 0x18) < 60)
+    {
+        Float3 v(192.0f, 224.0f, 0.0f);
+
+        t = (f32)*(ZunTimer *)(bomb + 0x18) / 60.0f;
+        t = t * t;
+
+        *(Float3 *)((u8 *)this + 0x6b0) = (v - *(Float3 *)(entry + 0x14)) * t + *(Float3 *)(entry + 0x14);
+
+        *(f32 *)((u8 *)this + 0x414) += (-ZUN_PI) / 10.0f;
+
+        this->FUN_0044df00((Float2 *)((u8 *)this + 0x6b0), 32.0f, 0.0f, 0, 6);
+        this->FUN_0044e040((Float2 *)((u8 *)this + 0x6b0), 32.0f, 0.0f, 40, 0);
+        return;
+    }
+
+    *(f32 *)((u8 *)this + 0x414) = 0.0f;
+    *(f32 *)((u8 *)this + 0x6b0) = 192.0f;
+    *(f32 *)((u8 *)this + 0x6b4) = 224.0f;
+
+    if (*(ZunTimer *)(bomb + 0x18) >= 128)
+    {
+        *(u8 *)((u8 *)this + 0x5ff) = 0;
+    }
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(60))
+    {
+        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(64))
+    {
+        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffffd0d0);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(68))
+    {
+        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffffb0b0);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(72))
+    {
+        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff8080);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(76))
+    {
+        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff4040);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(120))
     {
         Effect *effect;
         void *bombGfx;
@@ -337,42 +340,42 @@ void Player::FUN_0040d970()
         *(i32 *)((u8 *)bombGfx + 0x38) = 5;
         return;
     }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(0x82))
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x82))
     {
         Effect *effect1;
 
         effect1 = g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
         return;
     }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(0x8c))
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x8c))
     {
         Effect *effect2;
 
         effect2 = g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffffd0d0);
         return;
     }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(0x96))
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x96))
     {
         Effect *effect3;
 
         effect3 = g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff8080);
         return;
     }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(0xa0))
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0xa0))
     {
         Effect *effect4;
 
         effect4 = g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff0000);
         return;
     }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(0xb4))
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0xb4))
     {
         ScreenEffect::RegisterChain((ScreenEffectType)3, 8, 1, -1, 0, 21);
         ScreenEffect::RegisterChain((ScreenEffectType)1, 24, 8, 0, 0, 21);
         g_SoundPlayer.PlaySoundByIdx((SoundIdx)0x19, 0);
         return;
     }
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(0xe5))
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0xe5))
     {
         *(i32 *)((u8 *)this + 0x6d4) = 1;
         *(ZunTimer *)((u8 *)this + 0x6ec) = 0;
@@ -403,7 +406,7 @@ void Player::FUN_0040ee10()
     bomb = (u8 *)this + 0xfdc;
     entry = bomb + 0x4c;
 
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040d3d0() && *(ZunTimer *)((u8 *)this + 0xff4) == 0)
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
     {
         this->FUN_0040be30(1, "紅符「不夜城レッド」", 0xf0, 0x122, 0);
 
@@ -419,9 +422,9 @@ void Player::FUN_0040ee10()
         *(f32 *)((u8 *)this + 0x404) = 0.0f;
     }
 
-    if (*(ZunTimer *)((u8 *)this + 0xff4) < 60)
+    if (*(ZunTimer *)(bomb + 0x18) < 60)
     {
-        t = (f32)*(ZunTimer *)((u8 *)this + 0xff4) / 60.0f;
+        t = (f32)*(ZunTimer *)(bomb + 0x18) / 60.0f;
         t = t * t;
 
         Float3 pos;
@@ -440,7 +443,7 @@ void Player::FUN_0040ee10()
 
         return;
     }
-    else if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(60))
+    else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(60))
     {
         *(f32 *)((u8 *)this + 0x408) = 2.0f;
         *(f32 *)((u8 *)this + 0x404) = 2.0f;
@@ -466,7 +469,7 @@ void Player::FUN_0040ee10()
 
     *(void **)(entry + 0x16ec) = this->FUN_0044df00((Float2 *)&this->position, 96.0f, 0.0f, 0, 6);
 
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040ebc0(10))
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040ebc0(10))
     {
         effect = g_EffectManager.SpawnSpecialEffect(53, &this->position, (*(i32 *)(bomb + 0x14) % 4) + 4, 1, -1);
         *(i32 *)((u8 *)effect + 0x324) = 0x20;
@@ -505,7 +508,7 @@ void Player::FUN_0040ee10()
         *(void **)(entry + 0x16ec) = this->FUN_0044de60((Float2 *)&this->position, 800.0f, 96.0f, 6, 0);
     }
 
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(0xef))
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0xef))
     {
         *(i32 *)((u8 *)this + 0x6d4) = 1;
         *(ZunTimer *)((u8 *)this + 0x6ec) = 0;
@@ -530,7 +533,7 @@ void Player::FUN_0040f570()
     bomb = (u8 *)this + 0xfdc;
     entry = bomb + 0x4c;
 
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040d3d0() && *(ZunTimer *)((u8 *)this + 0xff4) == 0)
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
     {
         this->FUN_0040be30(1, "紅魔「スカーレットデビル」", 0x118, 0x140, 1);
 
@@ -546,9 +549,9 @@ void Player::FUN_0040f570()
         *(f32 *)((u8 *)this + 0x404) = 0.0f;
     }
 
-    if (*(ZunTimer *)((u8 *)this + 0xff4) < 60)
+    if (*(ZunTimer *)(bomb + 0x18) < 60)
     {
-        t = (f32)*(ZunTimer *)((u8 *)this + 0xff4) / 60.0f;
+        t = (f32)*(ZunTimer *)(bomb + 0x18) / 60.0f;
         t = t * t;
 
         Float3 pos;
@@ -567,7 +570,7 @@ void Player::FUN_0040f570()
 
         return;
     }
-    else if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(60))
+    else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(60))
     {
         *(f32 *)((u8 *)this + 0x408) = 3.0f;
         *(f32 *)((u8 *)this + 0x404) = 3.0f;
@@ -593,7 +596,7 @@ void Player::FUN_0040f570()
     pos2.y -= 16.0f;
     *(Float3 *)((u8 *)this + 0xf98) = pos2;
 
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040ebc0(10))
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040ebc0(10))
     {
         effect = g_EffectManager.SpawnSpecialEffect(53, &this->position, (*(i32 *)(bomb + 0x14) % 4) + 4, 1, -1);
         *(i32 *)((u8 *)effect + 0x324) = 0x20;
@@ -632,7 +635,7 @@ void Player::FUN_0040f570()
         *(void **)(entry + 0x16ec) = this->FUN_0044de60((Float2 *)&this->position, 800.0f, 96.0f, 6, 0);
     }
 
-    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(0x117))
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x117))
     {
         *(i32 *)((u8 *)this + 0x6d4) = 1;
         *(ZunTimer *)((u8 *)this + 0x6ec) = 0;
