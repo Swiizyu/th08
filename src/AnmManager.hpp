@@ -793,7 +793,7 @@ struct AnmManager
     u32 surfaceDataSizes[32];
     ZunImageInfo surfaceInfo[32];
 
-    unknown_fields(0x24b8, 0x4);
+    u32 unk0x24b8;
 
     IDirect3DTexture8 *currentTexture;
     u8 currentBlendMode;
@@ -801,7 +801,8 @@ struct AnmManager
     u8 currentVertexShader;
     u8 disableZWrite;
     u8 cameraMode;
-    unknown_fields(0x24c5, 3); // Padding?
+    u8 unk0x24c5;
+    unknown_fields(0x24c6, 2);
     void *currentSprite;
     IDirect3DVertexBuffer8 *quadVertexBuffer;
     VertexDiffuseXyzrhw untexturedVector[4];

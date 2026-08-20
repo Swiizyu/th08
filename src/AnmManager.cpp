@@ -12,6 +12,7 @@
 namespace th08
 {
 f32 FUN_004031e0(f32 value);
+u8 MixColors(u8 color1, u8 color2);
 
 DIFFABLE_STATIC(AnmManager *, g_AnmManager);
 DIFFABLE_STATIC_ARRAY(VertexTex1DiffuseXyzrhw, 4, g_QuadVertices);
@@ -26,11 +27,104 @@ AnmVmBase::AnmVmBase()
 // FUNCTION: th08 0x4623c0
 void AnmManager::SetRenderStateForVm3D(AnmVm *vm)
 {
-    this->SetRenderStateForVm(vm);
-    if (vm->loadedSprite != NULL && vm->anmFile != NULL)
+    ZunColor color;
+
+    if (this->currentBlendMode != vm->blendMode)
     {
-        this->currentTexture = vm->loadedSprite->texture;
+        this->FlushVertexBuffer();
+        this->currentBlendMode = vm->blendMode;
+
+        switch (this->currentBlendMode)
+        {
+        case AnmBlendMode_Normal:
+            g_Supervisor.d3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+            break;
+        case AnmBlendMode_Additive:
+            g_Supervisor.d3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+            break;
+        }
     }
+
+    color.d3dColor = vm->flag17 ? vm->color2.d3dColor : vm->color1.d3dColor;
+
+    if (this->unk0x24c5)
+    {
+        this->unk0x24c5 = 0;
+        if (!g_Supervisor.IsVertexBufferDisabled())
+        {
+            this->FlushVertexBuffer();
+            g_Supervisor.d3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_TFACTOR);
+            g_Supervisor.d3dDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_TFACTOR);
+        }
+    }
+
+    if (!g_Supervisor.IsVertexBufferDisabled())
+    {
+        if (this->useMixColor != 0)
+        {
+            color.r = MixColors(color.r, this->color.r);
+            color.g = MixColors(color.g, this->color.g);
+            color.b = MixColors(color.b, this->color.b);
+            color.a = MixColors(color.a, this->color.a);
+        }
+
+        if (this->unk0x24b8 != color.d3dColor)
+        {
+            this->FlushVertexBuffer();
+            this->unk0x24b8 = color.d3dColor;
+            g_Supervisor.d3dDevice->SetRenderState(D3DRS_TEXTUREFACTOR, this->unk0x24b8);
+        }
+    }
+    else
+    {
+        if (this->useMixColor != 0)
+        {
+            color.r = MixColors(color.r, this->color.r);
+            color.g = MixColors(color.g, this->color.g);
+            color.b = MixColors(color.b, this->color.b);
+            color.a = MixColors(color.a, this->color.a);
+        }
+
+        g_QuadVertices[0].diffuse = color.d3dColor;
+        g_QuadVertices[1].diffuse = color.d3dColor;
+        g_QuadVertices[2].diffuse = color.d3dColor;
+        g_QuadVertices[3].diffuse = color.d3dColor;
+        g_BackgroundQuadVertices[0].diffuse = color.d3dColor;
+        g_BackgroundQuadVertices[1].diffuse = color.d3dColor;
+        g_BackgroundQuadVertices[2].diffuse = color.d3dColor;
+        g_BackgroundQuadVertices[3].diffuse = color.d3dColor;
+    }
+
+    if (!g_Supervisor.IsDepthTestDisabled() && this->disableZWrite != vm->zWriteDisabled)
+    {
+        this->FlushVertexBuffer();
+        this->disableZWrite = vm->zWriteDisabled;
+        if (!this->disableZWrite)
+        {
+            g_Supervisor.d3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+        }
+        else
+        {
+            g_Supervisor.d3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+        }
+    }
+
+    if (this->cameraMode != vm->flag15)
+    {
+        this->FlushVertexBuffer();
+        this->cameraMode = vm->flag15;
+        if (!this->cameraMode)
+        {
+            g_Background.SetCamera1();
+            g_Supervisor.d3dDevice->SetViewport(&g_Supervisor.viewport);
+        }
+        else
+        {
+            g_Background.SetCamera2();
+            g_Supervisor.d3dDevice->SetViewport(&g_Supervisor.viewport);
+        }
+    }
+
     this->renderStateChangesThisFrame++;
 }
 
