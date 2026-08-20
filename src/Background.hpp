@@ -115,8 +115,8 @@ struct Background
     AnmVm vm0x844;
     u8 unknown0xae8[0x2c];
     ZunTimer timer0xb14;
-    u8 unknown0xb20[4];
     u8 skyFogNeedsSetup; // Leftover from earlier games. Never checked in IN
+    u8 unknown0xb21[4];
     u8 unknown0xb25[0xf];
     i32 unk_b34;
     AnmVm vms0xb38[0x20];

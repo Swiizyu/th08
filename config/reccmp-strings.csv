@@ -119,6 +119,7 @@ address,type,x-text
 0x4b4f00,string,"Clear = %8d0"
 0x4b4f10,string,"All Clear!"
 0x4b4f1c,string,"Stage Clear"
+0x4b4f2c,string,"+%d"
 0x4b4f30,string,"Spell Card Bonus!"
 0x4b4f48,string,"Last Spell Failed"
 0x4b4f5c,string,"Spell Bonus Failed"
