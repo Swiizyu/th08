@@ -62,13 +62,15 @@ void __fastcall Player::FUN_0040bc60(D3DCOLOR color)
 
 // FUNCTION: th08 0x40be30
 #pragma var_order(i, entry, bomb)
-void __fastcall Player::FUN_0040be30(i32, i32, i32 arg2, i32 duration, i32)
+#pragma var_order(i, bomb, entry)
+void __fastcall Player::FUN_0040be30(i32 a0, i32 a1, i32 arg2, i32 duration, i32 a4)
 {
     u8 *bomb;
     u8 *entry;
-    i32 i;
+    u32 i;
 
     bomb = (u8 *)this + 0xfdc;
+    g_Spellcard.FUN_00415d60(a0, (const char *)a1, a4);
     *(i32 *)(bomb + 8) = arg2;
     ((ZunTimer *)((u8 *)this + 0xe2af4))->SetCurrent(duration);
     this->playerState = 3;
