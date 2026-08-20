@@ -2333,7 +2333,7 @@ ChainCallbackResult TitleScreen::OnUpdateSpellCardSelect()
             }
 
             this->FormatSpellCardInfo();
-            this->unk0xc29c = 0;
+            this->currentNumberOfSpellCards = 0;
         }
 
         if (this->stateTimer2 == 8)
@@ -2458,7 +2458,7 @@ ChainCallbackResult TitleScreen::OnUpdateSpellCardSelect()
                 this->spellCardInfoVms[i2].color1.a = 0;
             }
 
-            this->unk0xc29c = 21;
+            this->currentNumberOfSpellCards = 21;
         }
 
         this->FormatSpellCardInfo();
