@@ -2491,6 +2491,14 @@ ChainCallbackResult TitleScreen::OnUpdateSpellCardSelect()
 
 /* This function checks the conditions needed to unlock certain Last Word spell cards. */
 // FUNCTION: th08 0x46cbbb
+#pragma var_order(i, captures, stagesCleared2, stagesCleared3, i2, lastWordCaptures15, stagesCleared4, i3, \
+                  normalCapturesShot6, i4, stagesCleared6, i5, extraStagesCleared, i6, lastWordCaptures30, \
+                  spellCd, spellCe, spellCf, spellD2, spellD1, spellD0, spellD3, spellD4, spellD5, catk6, \
+                  spellD6, spellD7, spellD8, spellD9, spellDa, spellDb, spellDc, spellDd, \
+                  condD1, condD3a, condD3b, condD3c, condD4a, condD4b, condD4c, \
+                  condD5a, condD5b, condD5c, condD5d, condD6, \
+                  condDda, condDdb, condDdc, condDdd, condDde, condDdf, condDdg, condDdh, condDdi, condDdj, \
+                  condDdk, condDdl, condDdm, condDdn, condDdo, condDdp)
 void TitleScreen::UnlockLastWordSpellCards()
 {
     i32 i;
@@ -2508,17 +2516,65 @@ void TitleScreen::UnlockLastWordSpellCards()
     i32 extraStagesCleared;
     i32 i6;
     i32 lastWordCaptures30;
+    i32 spellCd;
+    i32 spellCe;
+    i32 spellCf;
+    i32 spellD2;
+    i32 spellD1;
+    i32 spellD0;
+    i32 spellD3;
+    i32 spellD4;
+    i32 spellD5;
+    Catk *catk6;
+    i32 spellD6;
+    i32 spellD7;
+    i32 spellD8;
+    i32 spellD9;
+    i32 spellDa;
+    i32 spellDb;
+    i32 spellDc;
+    i32 spellDd;
+    ZunBool condD1;
+    ZunBool condD3a;
+    ZunBool condD3b;
+    ZunBool condD3c;
+    ZunBool condD4a;
+    ZunBool condD4b;
+    ZunBool condD4c;
+    ZunBool condD5a;
+    ZunBool condD5b;
+    ZunBool condD5c;
+    ZunBool condD5d;
+    ZunBool condD6;
+    ZunBool condDda;
+    ZunBool condDdb;
+    ZunBool condDdc;
+    ZunBool condDdd;
+    ZunBool condDde;
+    ZunBool condDdf;
+    ZunBool condDdg;
+    ZunBool condDdh;
+    ZunBool condDdi;
+    ZunBool condDdj;
+    ZunBool condDdk;
+    ZunBool condDdl;
+    ZunBool condDdm;
+    ZunBool condDdn;
+    ZunBool condDdo;
+    ZunBool condDdp;
 
-#define UNLOCK_LAST_WORD(num)                                                                                          \
-    {                                                                                                                  \
-        i32 spell = (num);                                                                                             \
-        g_GameManager.flsp.unlockedLastWordSpellCards[spell - SPELLCARD_LAST_WORD_START] = spell;                      \
+#define SPELL_GT_12(arr, idx) (0 < g_GameManager.catkData[idx].arr[SHOT_ALL])
+#define SPELL_NE_12(arr, idx) (g_GameManager.catkData[idx].arr[SHOT_ALL] != 0)
+#define UNLOCK_SPELL(var, num)                                                                                  \
+    {                                                                                                           \
+        var = (num);                                                                                            \
+        g_GameManager.flsp.unlockedLastWordSpellCards[var - SPELLCARD_LAST_WORD_START] = var;                   \
     }
 
     captures = 0;
     for (i = 0; i < SPELLCARD_COUNT_SPELLCARDS; i++)
     {
-        if (g_GameManager.catkData[i].spellPracticeHistory.captures[SHOT_ALL] > 0)
+        if (0 < g_GameManager.catkData[i].spellPracticeHistory.captures[SHOT_ALL])
         {
             captures++;
         }
@@ -2536,7 +2592,9 @@ void TitleScreen::UnlockLastWordSpellCards()
         }
     }
     if (stagesCleared2 >= 2)
-    UNLOCK_LAST_WORD(0xcd)
+    {
+        UNLOCK_SPELL(spellCd, 0xcd)
+    }
 
     stagesCleared3 = 0;
     for (i = 0; i < SHOT_ALL; i++)
@@ -2550,25 +2608,33 @@ void TitleScreen::UnlockLastWordSpellCards()
         }
     }
     if (stagesCleared3 >= 3)
-    UNLOCK_LAST_WORD(0xce)
+    {
+        UNLOCK_SPELL(spellCe, 0xce)
+    }
 
     if (captures >= 50)
-    UNLOCK_LAST_WORD(0xcf)
+    {
+        UNLOCK_SPELL(spellCf, 0xcf)
+    }
 
     lastWordCaptures15 = 0;
     for (i2 = 0; i2 < g_LastSpellCount; i2++)
     {
-        if (g_GameManager.catkData[g_LastSpellNumbers[i2]].spellPracticeHistory.captures[SHOT_ALL] > 0)
+        if (0 < g_GameManager.catkData[g_LastSpellNumbers[i2]].spellPracticeHistory.captures[SHOT_ALL])
         {
             lastWordCaptures15++;
         }
     }
     if (lastWordCaptures15 >= 15)
-    UNLOCK_LAST_WORD(0xd2)
+    {
+        UNLOCK_SPELL(spellD2, 0xd2)
+    }
 
-    if (g_GameManager.catkData[137].inGameHistory.captures[SHOT_ALL] > 0 ||
-        g_GameManager.catkData[137].spellPracticeHistory.captures[SHOT_ALL] > 0)
-    UNLOCK_LAST_WORD(0xd1)
+    condD1 = (SPELL_GT_12(inGameHistory.captures, 137) || SPELL_GT_12(spellPracticeHistory.captures, 137));
+    if (condD1)
+    {
+        UNLOCK_SPELL(spellD1, 0xd1)
+    }
 
     stagesCleared4 = 0;
     for (i3 = 0; i3 < SHOT_ALL; i3++)
@@ -2582,53 +2648,61 @@ void TitleScreen::UnlockLastWordSpellCards()
         }
     }
     if (stagesCleared4 >= 4)
-    UNLOCK_LAST_WORD(0xd0)
+    {
+        UNLOCK_SPELL(spellD0, 0xd0)
+    }
 
-    if ((g_GameManager.catkData[195].inGameHistory.captures[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[195].spellPracticeHistory.captures[SHOT_ALL] > 0) &&
-        (g_GameManager.catkData[204].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[204].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[145].inGameHistory.captures[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[145].spellPracticeHistory.captures[SHOT_ALL] > 0))
-    UNLOCK_LAST_WORD(0xd3)
+    condD3a = (SPELL_GT_12(inGameHistory.captures, 195) || SPELL_GT_12(spellPracticeHistory.captures, 195));
+    condD3b = (SPELL_GT_12(inGameHistory.attempts, 204) || SPELL_NE_12(spellPracticeHistory.attempts, 204));
+    condD3c = (SPELL_GT_12(inGameHistory.captures, 145) || SPELL_GT_12(spellPracticeHistory.captures, 145));
+    if (condD3a && condD3b && condD3c)
+    {
+        UNLOCK_SPELL(spellD3, 0xd3)
+    }
 
-    if ((g_GameManager.catkData[208].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[208].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[209].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[209].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[210].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[210].spellPracticeHistory.attempts[SHOT_ALL] != 0))
-    UNLOCK_LAST_WORD(0xd4)
+    condD4a = (SPELL_GT_12(inGameHistory.attempts, 208) || SPELL_NE_12(spellPracticeHistory.attempts, 208));
+    condD4b = (SPELL_GT_12(inGameHistory.attempts, 209) || SPELL_NE_12(spellPracticeHistory.attempts, 209));
+    condD4c = (SPELL_GT_12(inGameHistory.attempts, 210) || SPELL_NE_12(spellPracticeHistory.attempts, 210));
+    if (condD4a && condD4b && condD4c)
+    {
+        UNLOCK_SPELL(spellD4, 0xd4)
+    }
 
-    if ((g_GameManager.catkData[205].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[205].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[206].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[206].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[207].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[207].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[211].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[211].spellPracticeHistory.attempts[SHOT_ALL] != 0))
-    UNLOCK_LAST_WORD(0xd5)
+    condD5a = (SPELL_GT_12(inGameHistory.attempts, 205) || SPELL_NE_12(spellPracticeHistory.attempts, 205));
+    condD5b = (SPELL_GT_12(inGameHistory.attempts, 206) || SPELL_NE_12(spellPracticeHistory.attempts, 206));
+    condD5c = (SPELL_GT_12(inGameHistory.attempts, 207) || SPELL_NE_12(spellPracticeHistory.attempts, 207));
+    condD5d = (SPELL_GT_12(inGameHistory.attempts, 211) || SPELL_NE_12(spellPracticeHistory.attempts, 211));
+    if (condD5a && condD5b && condD5c && condD5d)
+    {
+        UNLOCK_SPELL(spellD5, 0xd5)
+    }
 
     normalCapturesShot6 = 0;
     normalCapturesShot6 = 0;
     for (i4 = 0; i4 < g_SpellcardCountsPerDifficulty[1]; i4++)
     {
-        Catk *catk = &g_GameManager.catkData[g_SpellcardNumbersNormal[i4]];
-        if (catk->inGameHistory.captures[6] > 0 || catk->spellPracticeHistory.captures[6] > 0)
+        catk6 = &g_GameManager.catkData[g_SpellcardNumbersNormal[i4]];
+        condD6 = (0 < catk6->inGameHistory.captures[6] || 0 < catk6->spellPracticeHistory.captures[6]);
+        if (condD6)
         {
             normalCapturesShot6++;
         }
     }
     if (normalCapturesShot6 == g_SpellcardCountsPerDifficulty[1])
-    UNLOCK_LAST_WORD(0xd6)
+    {
+        UNLOCK_SPELL(spellD6, 0xd6)
+    }
 
     if (IS_STAGE_CLEARED(g_GameManager.clrdData[4].difficultiesClearedWithoutRetries[2], 14) ||
         IS_STAGE_CLEARED(g_GameManager.clrdData[4].difficultiesClearedWithoutRetries[3], 14))
-    UNLOCK_LAST_WORD(0xd7)
+    {
+        UNLOCK_SPELL(spellD7, 0xd7)
+    }
 
     if (captures >= 120)
-    UNLOCK_LAST_WORD(0xd8)
+    {
+        UNLOCK_SPELL(spellD8, 0xd8)
+    }
 
     stagesCleared6 = 0;
     for (i5 = 0; i5 < SHOT_ALL; i5++)
@@ -2642,7 +2716,9 @@ void TitleScreen::UnlockLastWordSpellCards()
         }
     }
     if (stagesCleared6 >= 6)
-    UNLOCK_LAST_WORD(0xd9)
+    {
+        UNLOCK_SPELL(spellD9, 0xd9)
+    }
 
     extraStagesCleared = 0;
     for (i6 = 0; i6 < SHOT_ALL; i6++)
@@ -2653,55 +2729,49 @@ void TitleScreen::UnlockLastWordSpellCards()
         }
     }
     if (extraStagesCleared >= 3)
-    UNLOCK_LAST_WORD(0xda)
+    {
+        UNLOCK_SPELL(spellDa, 0xda)
+    }
 
     lastWordCaptures30 = 0;
     for (i = 0; i < g_LastSpellCount; i++)
     {
-        if (g_GameManager.catkData[g_LastSpellNumbers[i]].spellPracticeHistory.captures[SHOT_ALL] > 0)
+        if (0 < g_GameManager.catkData[g_LastSpellNumbers[i]].spellPracticeHistory.captures[SHOT_ALL])
         {
             lastWordCaptures30++;
         }
     }
     if (lastWordCaptures30 >= 30)
-    UNLOCK_LAST_WORD(0xdb)
+    {
+        UNLOCK_SPELL(spellDb, 0xdb)
+    }
 
     if (IS_STAGE_CLEARED(g_GameManager.clrdData[SHOT_ALL].difficultiesClearedWithRetries[3], 14))
-    UNLOCK_LAST_WORD(0xdc)
+    {
+        UNLOCK_SPELL(spellDc, 0xdc)
+    }
 
-    if ((g_GameManager.catkData[205].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[205].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[206].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[206].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[207].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[207].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[208].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[208].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[209].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[209].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[210].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[210].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[211].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[211].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[212].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[212].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[213].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[213].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[214].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[214].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[215].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[215].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[216].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[216].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[217].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[217].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[218].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[218].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[219].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[219].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
-        (g_GameManager.catkData[220].inGameHistory.attempts[SHOT_ALL] > 0 ||
-         g_GameManager.catkData[220].spellPracticeHistory.attempts[SHOT_ALL] != 0))
-    UNLOCK_LAST_WORD(0xdd)
+    condDda = (SPELL_GT_12(inGameHistory.attempts, 205) || SPELL_NE_12(spellPracticeHistory.attempts, 205));
+    condDdb = (SPELL_GT_12(inGameHistory.attempts, 206) || SPELL_NE_12(spellPracticeHistory.attempts, 206));
+    condDdc = (SPELL_GT_12(inGameHistory.attempts, 207) || SPELL_NE_12(spellPracticeHistory.attempts, 207));
+    condDdd = (SPELL_GT_12(inGameHistory.attempts, 208) || SPELL_NE_12(spellPracticeHistory.attempts, 208));
+    condDde = (SPELL_GT_12(inGameHistory.attempts, 209) || SPELL_NE_12(spellPracticeHistory.attempts, 209));
+    condDdf = (SPELL_GT_12(inGameHistory.attempts, 210) || SPELL_NE_12(spellPracticeHistory.attempts, 210));
+    condDdg = (SPELL_GT_12(inGameHistory.attempts, 211) || SPELL_NE_12(spellPracticeHistory.attempts, 211));
+    condDdh = (SPELL_GT_12(inGameHistory.attempts, 212) || SPELL_NE_12(spellPracticeHistory.attempts, 212));
+    condDdi = (SPELL_GT_12(inGameHistory.attempts, 213) || SPELL_NE_12(spellPracticeHistory.attempts, 213));
+    condDdj = (SPELL_GT_12(inGameHistory.attempts, 214) || SPELL_NE_12(spellPracticeHistory.attempts, 214));
+    condDdk = (SPELL_GT_12(inGameHistory.attempts, 215) || SPELL_NE_12(spellPracticeHistory.attempts, 215));
+    condDdl = (SPELL_GT_12(inGameHistory.attempts, 216) || SPELL_NE_12(spellPracticeHistory.attempts, 216));
+    condDdm = (SPELL_GT_12(inGameHistory.attempts, 217) || SPELL_NE_12(spellPracticeHistory.attempts, 217));
+    condDdn = (SPELL_GT_12(inGameHistory.attempts, 218) || SPELL_NE_12(spellPracticeHistory.attempts, 218));
+    condDdo = (SPELL_GT_12(inGameHistory.attempts, 219) || SPELL_NE_12(spellPracticeHistory.attempts, 219));
+    condDdp = (SPELL_GT_12(inGameHistory.attempts, 220) || SPELL_NE_12(spellPracticeHistory.attempts, 220));
+    if (condDda && condDdb && condDdc && condDdd && condDde && condDdf && condDdg && condDdh && condDdi && condDdj &&
+        condDdk && condDdl && condDdm && condDdn && condDdo && condDdp)
+    {
+        UNLOCK_SPELL(spellDd, 0xdd)
+    }
 }
 
 #pragma var_order(vm, i2, i, position)
