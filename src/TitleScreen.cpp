@@ -2136,14 +2136,14 @@ ChainCallbackResult TitleScreen::OnUpdateSpellStageSelect()
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
-#pragma var_order(spellCardNumber, i, oldCursor, spellCardNumber2, i, oldPageIdx, spellCardNumber3)
+#pragma var_order(spellCardNumber, i, oldCursor, spellCardNumber2, i2, oldPageIdx, spellCardNumber3)
 ChainCallbackResult TitleScreen::OnUpdateSpellCardSelect()
 {
     i32 spellCardNumber;
     i32 spellCardNumber3;
     i32 spellCardNumber2;
     i32 i;
-    i32 i;
+    i32 i2;
     i32 oldCursor;
     i32 oldPageIdx;
 
@@ -2321,29 +2321,29 @@ ChainCallbackResult TitleScreen::OnUpdateSpellCardSelect()
 
         if (oldPageIdx != this->currentPageSpellCardSelect)
         {
-            for (i = 0; i < TITLE_SPELL_CARD_SPELLCARDS_PER_PAGE; i++)
+            for (i2 = 0; i2 < TITLE_SPELL_CARD_SPELLCARDS_PER_PAGE; i2++)
             {
-                if ((i + this->currentPageSpellCardSelect * TITLE_SPELL_CARD_SPELLCARDS_PER_PAGE) >=
+                if ((i2 + this->currentPageSpellCardSelect * TITLE_SPELL_CARD_SPELLCARDS_PER_PAGE) >=
                     this->currentNumberOfSpellCards)
                 {
                     break;
                 }
 
-                this->resultTextAnm->InitializeAndSetSprite(&this->spellCardNameVms[i], i + 2);
-                this->spellCardNameVms[i].pos = Float3(0, 0, 0);
-                this->spellCardNameVms[i].anchor = 3;
+                this->resultTextAnm->InitializeAndSetSprite(&this->spellCardNameVms[i2], i2 + 2);
+                this->spellCardNameVms[i2].pos = Float3(0, 0, 0);
+                this->spellCardNameVms[i2].anchor = 3;
                 /* Similar copy paste mistake as before? */
                 this->spellCardInfoVms[0].fontWidth = 15;
-                this->spellCardNameVms[i].fontHeight = 15;
+                this->spellCardNameVms[i2].fontHeight = 15;
 
                 spellCardNumber2 = g_SpellcardNumbersPerStage[g_GameManager.currentStage]
-                                                             [i + this->currentPageSpellCardSelect *
+                                                             [i2 + this->currentPageSpellCardSelect *
                                                                        TITLE_SPELL_CARD_SPELLCARDS_PER_PAGE];
 
                 /* Why does ZUN use this helper method here, and in the initialization , use direct access? */
                 if (g_GameManager.HasSpellCardBeenEncountered(spellCardNumber2, SHOT_ALL))
                 {
-                    g_AnmManager->DrawTextLeft(&this->spellCardNameVms[i], COLOR_TEXT_WHITE, 0,
+                    g_AnmManager->DrawTextLeft(&this->spellCardNameVms[i2], COLOR_TEXT_WHITE, 0,
                                                g_GameManager.catkData[spellCardNumber2].spellName);
                 }
                 else
@@ -2351,40 +2351,40 @@ ChainCallbackResult TitleScreen::OnUpdateSpellCardSelect()
                     if (Spellcard::GetDifficultyFromSpellCard(spellCardNumber2) <= EXTRA ||
                         !g_GameManager.IsLastWordSpellCardAttempted(spellCardNumber2))
                     {
-                        g_AnmManager->DrawTextLeft(&this->spellCardNameVms[i], COLOR_TEXT_WHITE, 0,
+                        g_AnmManager->DrawTextLeft(&this->spellCardNameVms[i2], COLOR_TEXT_WHITE, 0,
                                                    TH_TITLE_SPELLCARD_NOT_UNLOCKED);
                     }
                     else
                     {
-                        g_AnmManager->DrawTextLeft(&this->spellCardNameVms[i], COLOR_TEXT_WHITE, 0,
+                        g_AnmManager->DrawTextLeft(&this->spellCardNameVms[i2], COLOR_TEXT_WHITE, 0,
                                                    TH_TITLE_SPELLCARD_AVAILABLE);
                     }
                 }
 
-                this->spellCardNameVms[i].color1.a = 255;
-                this->spellCardNameVms[i].color1.r = 96;
-                this->spellCardNameVms[i].color1.g = 96;
-                this->spellCardNameVms[i].color1.b = 96;
+                this->spellCardNameVms[i2].color1.a = 255;
+                this->spellCardNameVms[i2].color1.r = 96;
+                this->spellCardNameVms[i2].color1.g = 96;
+                this->spellCardNameVms[i2].color1.b = 96;
             }
         }
 
         if (oldCursor != this->cursor)
         {
-            for (i = 0; i < TITLE_SPELL_CARD_SPELLCARDS_PER_PAGE; i++)
+            for (i2 = 0; i2 < TITLE_SPELL_CARD_SPELLCARDS_PER_PAGE; i2++)
             {
-                this->spellCardNameVms[i].color1.r = 96;
-                this->spellCardNameVms[i].color1.g = 96;
-                this->spellCardNameVms[i].color1.b = 96;
+                this->spellCardNameVms[i2].color1.r = 96;
+                this->spellCardNameVms[i2].color1.g = 96;
+                this->spellCardNameVms[i2].color1.b = 96;
             }
 
-            i = this->cursor - (this->currentPageSpellCardSelect * TITLE_SPELL_CARD_SPELLCARDS_PER_PAGE);
-            this->spellCardNameVms[i].color1.r = 255;
-            this->spellCardNameVms[i].color1.g = 255;
-            this->spellCardNameVms[i].color1.b = 255;
+            i2 = this->cursor - (this->currentPageSpellCardSelect * TITLE_SPELL_CARD_SPELLCARDS_PER_PAGE);
+            this->spellCardNameVms[i2].color1.r = 255;
+            this->spellCardNameVms[i2].color1.g = 255;
+            this->spellCardNameVms[i2].color1.b = 255;
 
-            for (i = 0; i < 7; i++)
+            for (i2 = 0; i2 < 7; i2++)
             {
-                this->spellCardInfoVms[i].color1.a = 0;
+                this->spellCardInfoVms[i2].color1.a = 0;
             }
 
             this->unk0xc29c = 21;
@@ -2510,18 +2510,18 @@ void TitleScreen::UnlockLastWordSpellCards()
     }
 }
 
-#pragma var_order(vm, i, i, position)
+#pragma var_order(vm, i2, i, position)
 ChainCallbackResult TitleScreen::DrawReplayMenu()
 {
     i32 i;
-    i32 i;
+    i32 i2;
     AnmVm *vm = &this->vms[79];
     Float3 position;
 
     g_AsciiManager.AddFormatText(&vm->pos, "No.   Name       Date  Player   Rank");
 
-    for (i = this->selectedReplay - (this->selectedReplay % TITLE_REPLAYS_PER_PAGE), i = i + TITLE_REPLAYS_PER_PAGE;
-         i < i; i++)
+    for (i = this->selectedReplay - (this->selectedReplay % TITLE_REPLAYS_PER_PAGE), i2 = i + TITLE_REPLAYS_PER_PAGE;
+         i < i2; i++)
     {
         if (i >= this->replayCount)
         {
@@ -2575,15 +2575,15 @@ ChainCallbackResult TitleScreen::DrawReplayMenu()
 
         if (this->currentReplay->spellcardNumber < 0)
         {
-            for (i = 0; i < ARRAY_SIZE(g_StageNames); i++, i++)
+            for (i2 = 0; i2 < ARRAY_SIZE(g_StageNames); i2++, i++)
             {
                 vm++;
 
                 if (this->currentScreenState != 3)
                 {
-                    g_AsciiManager.SetIsSelected(i == this->selectedReplayStage);
+                    g_AsciiManager.SetIsSelected(i2 == this->selectedReplayStage);
 
-                    if (i == this->selectedReplayStage)
+                    if (i2 == this->selectedReplayStage)
                     {
                         g_AsciiManager.SetColor(0xffffffff);
                     }
@@ -2594,7 +2594,7 @@ ChainCallbackResult TitleScreen::DrawReplayMenu()
                 }
                 else
                 {
-                    if (i == this->selectedReplayStage)
+                    if (i2 == this->selectedReplayStage)
                     {
                         g_AsciiManager.SetColor(0x60ffffff);
                     }
@@ -2606,14 +2606,14 @@ ChainCallbackResult TitleScreen::DrawReplayMenu()
 
                 position = vm->pos;
 
-                if (this->currentReplay->header.stageReplayData[i] != NULL)
+                if (this->currentReplay->header.stageReplayData[i2] != NULL)
                 {
-                    g_AsciiManager.AddFormatText(&position, "%s %9d0", g_StageNames[i],
-                                                 this->currentReplay->header.stageReplayData[i]->score);
+                    g_AsciiManager.AddFormatText(&position, "%s %9d0", g_StageNames[i2],
+                                                 this->currentReplay->header.stageReplayData[i2]->score);
                 }
                 else
                 {
-                    g_AsciiManager.AddFormatText(&position, "%s ----------", g_StageNames[i]);
+                    g_AsciiManager.AddFormatText(&position, "%s ----------", g_StageNames[i2]);
                 }
             }
         }
