@@ -302,6 +302,11 @@ EnemyUnkStruct4::EnemyUnkStruct4()
 
 // FUNCTION: th08 0x40e350
 #pragma var_order(result)
+ZunBool ZunTimer::FUN_0040d3d0()
+{
+    return this->current != this->previous;
+}
+
 ZunBool ZunTimer::FUN_0040e350(i32 value)
 {
     ZunBool result;

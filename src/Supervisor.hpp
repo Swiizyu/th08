@@ -434,6 +434,7 @@ struct ZunTimer
     }
 
     i32 AsFrames();
+    ZunBool FUN_0040d3d0();
     ZunBool FUN_0040e350(i32 value);
     ZunBool FUN_0040ebc0(i32 value);
     i32 operator%(i32 value);
