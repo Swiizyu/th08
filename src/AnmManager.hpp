@@ -23,7 +23,11 @@ struct VertexDiffuseXyzrhw
 struct VertexTex1Xyzrhw
 {
     Float3 pos;
-    f32 w;
+    union
+    {
+        f32 w;
+        D3DCOLOR diffuse;
+    };
     Float2 textureUV;
 };
 C_ASSERT(sizeof(VertexTex1Xyzrhw) == 0x18);
