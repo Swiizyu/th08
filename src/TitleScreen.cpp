@@ -3541,7 +3541,7 @@ ChainCallbackResult TitleScreen::DrawCompletionStatusText()
         else if (g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, EASY) ||
                  g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, NORMAL) ||
                  g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, HARD) ||
-                 g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, LUNATIC) && this->cursor > 3)
+                 g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, LUNATIC) || this->cursor > 3)
         {
             showVm = TRUE;
             this->titleAnm->InitializeAndSetSprite(&this->spellCardNameVms[0], 147);
