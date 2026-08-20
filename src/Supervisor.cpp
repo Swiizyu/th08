@@ -1239,8 +1239,17 @@ ZunBool Supervisor::TakeSnapshot(const char *filePath)
     bmfh.bfSize = bmfh.bfOffBits = 54;
     switch (this->presentParameters.BackBufferFormat)
     {
+    case D3DFMT_R5G6B5:
+        utils::GuiDebugPrint("\x31\x36\x62\x69\x74\x20\x82\xCD\x8E\xE6\x82\xE8\x8D\x9E\x82\xDF\x82\xC8\x82\xA2\x0D"
+                             "\x0A");
+        g_GameErrorContext.Log("\x31\x36\x62\x69\x74\x20\x82\xCD\x8E\xE6\x82\xE8\x8D\x9E\x82\xDF\x82\xC8\x82\xA2"
+                               "\x0D\x0A");
+        break;
     case D3DFMT_X8R8G8B8:
-        bitmapInfo = (BITMAPINFO *)malloc(sizeof(BITMAPINFO));
+    {
+        i32 bitmapInfoSize;
+        bitmapInfoSize = sizeof(BITMAPINFO);
+        bitmapInfo = (BITMAPINFO *)malloc(bitmapInfoSize);
         if (bitmapInfo == NULL)
         {
             g_GameErrorContext.Log("\x73\x6E\x61\x70\x53\x68\x6F\x74\x53\x63\x72\x65\x65\x6E\x20\x3A\x20\x8A\x6D"
@@ -1278,7 +1287,8 @@ ZunBool Supervisor::TakeSnapshot(const char *filePath)
                 srcPixel++;
                 dstPixel++;
                 *dstPixel = *srcPixel;
-                srcPixel += 2;
+                srcPixel++;
+                srcPixel++;
                 dstPixel++;
             }
         }
@@ -1293,12 +1303,7 @@ ZunBool Supervisor::TakeSnapshot(const char *filePath)
         WriteFile(bitmapFile, bitmapData, stride * 480, &bytesWritten, NULL);
         CloseHandle(bitmapFile);
         break;
-    case D3DFMT_R5G6B5:
-        utils::GuiDebugPrint("\x31\x36\x62\x69\x74\x20\x82\xCD\x8E\xE6\x82\xE8\x8D\x9E\x82\xDF\x82\xC8\x82\xA2\x0D"
-                             "\x0A");
-        g_GameErrorContext.Log("\x31\x36\x62\x69\x74\x20\x82\xCD\x8E\xE6\x82\xE8\x8D\x9E\x82\xDF\x82\xC8\x82\xA2"
-                               "\x0D\x0A");
-        break;
+    }
     default:
         g_GameErrorContext.Log("\x65\x72\x72\x6F\x72\x20\x3F\x20\x6D\x6F\x74\x68\x65\x72\x2E\x63\x70\x70\x0D\x0A");
         return TRUE;

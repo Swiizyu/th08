@@ -565,8 +565,8 @@ struct AnmManager
     ZunResult Draw3D(AnmVm *vm);
     ZunResult FUN_004649a0(AnmVm *vm, VertexTex1DiffuseXyzrhw *vertices, i32 vertexCount);
     ZunResult FUN_00464b00(AnmVm *vm, VertexTex1DiffuseXyzrhw *vertices, i32 vertexCount);
-    ZunResult FUN_00464c60(AnmVm *vm, VertexDiffuseXyzrhw *vertices, i32 vertexCount);
-    ZunResult FUN_00464dd0(AnmVm *vm, i32 flags);
+    ZunResult DrawVertices(AnmVm *vm, VertexTex1DiffuseXyzrhw *vertices, i32 vertexCount);
+    ZunResult FUN_00464dd0(AnmVm *vm, VertexTex1DiffuseXyzrhw *vertices);
     void DrawPlayerBullet(AnmVm *vm);
     ZunResult DrawTriangleFan(AnmVm *vm, VertexDiffuseXyzrhw *vertices, i32 vertexCount);
     ZunResult CreateTextureFromFile(IDirect3DTexture8 **outTexture, i32 format, i32 colorKey);
