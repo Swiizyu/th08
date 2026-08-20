@@ -1144,23 +1144,27 @@ void Player::FUN_0040d100()
 
 // FUNCTION: th08 0x40e610
 #pragma var_order(angle, i, vm)
+#pragma var_order(vm, i, angleStep, angle)
 void Player::FUN_0040e610()
 {
-    f32 angleStep = 0.20943952f;
-    AnmVm *vm = (AnmVm *)((u8 *)this + 0x11e0);
+    AnmVm *vm;
+    i32 i;
+    f32 angleStep;
+    f32 angle;
 
     this->FUN_0040bc60(0x80404040);
-    for (i32 i = 0; i < 5; i++, vm++)
+    angleStep = 0.20943952f;
+    vm = (AnmVm *)((u8 *)this + 0x11e0);
+    for (i = 0; i < 5; i++, vm++)
     {
-        f32 angle = i * angleStep - ZUN_PI / 2.0f - angleStep * 2.0f;
+        angle = i * angleStep - ZUN_PI / 2.0f - angleStep * 2.0f;
         if (angle < -ZUN_PI)
         {
             angle += ZUN_2PI;
         }
         vm->pos = this->position;
-        f32 radius = vm->loadedSprite->widthPx * vm->scale.y / 2.0f;
-        vm->pos.x += cosf(angle) * radius;
-        vm->pos.y += sinf(angle) * radius;
+        vm->pos.x += cosf(angle) * vm->loadedSprite->widthPx * vm->scale.y / 2.0f;
+        vm->pos.y += sinf(angle) * vm->loadedSprite->widthPx * vm->scale.y / 2.0f;
         vm->SetZRotation(angle);
         vm->pos.x += g_GameManager.arcadeRegionTopLeftPos.x;
         vm->pos.y += g_GameManager.arcadeRegionTopLeftPos.y;
