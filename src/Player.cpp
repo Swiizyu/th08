@@ -885,15 +885,15 @@ void Player::FUN_0040fcd0()
             vm = (AnmVm *)(entry + 0x1b8);
             this->playerAnm->ExecuteAnmIdx(vm, 0x16);
 
-            angle = (f32)i * ZUN_PI * 2.0f / 96.0f - ZUN_PI;
+            angle = (f32)i * 6.2831855f / 96.0f - ZUN_PI;
             *(f32 *)(entry + 0x10) = angle;
             *(f32 *)(entry + 0xc) = g_Rng.GetRandomF32InRange(1.0f) + 0.5f;
             *(f32 *)(entry + 8) = g_Rng.GetRandomF32InRange(0.1f) + 0.03f;
             *(f32 *)(entry + 0x1ac) =
                 g_Rng.GetRandomU16InRange(1) != 0 ? ZUN_PI / 20.0f : -(ZUN_PI / 20.0f);
 
-            *(f32 *)(entry + 0x1a0) = sinf(*(f32 *)(entry + 0x10)) * 24.0f;
-            *(f32 *)(entry + 0x1a4) = cosf(*(f32 *)(entry + 0x10)) * 24.0f;
+            *(f32 *)(entry + 0x1a0) = cosf(*(f32 *)(entry + 0x10)) * 24.0f;
+            *(f32 *)(entry + 0x1a4) = sinf(*(f32 *)(entry + 0x10)) * 24.0f;
             *(Float3 *)(entry + 0x14) = this->position + *(Float3 *)(entry + 0x1a0);
 
             *(ZunTimer *)(entry + 0x16dc) = 0;
@@ -930,8 +930,8 @@ void Player::FUN_0040fcd0()
             }
 
             *(f32 *)(entry + 0xc) += *(f32 *)(entry + 8);
-            *(f32 *)(entry + 0x1a0) = sinf(*(f32 *)(entry + 0x10)) * *(f32 *)(entry + 0xc);
-            *(f32 *)(entry + 0x1a4) = cosf(*(f32 *)(entry + 0x10)) * *(f32 *)(entry + 0xc);
+            *(f32 *)(entry + 0x1a0) = cosf(*(f32 *)(entry + 0x10)) * *(f32 *)(entry + 0xc);
+            *(f32 *)(entry + 0x1a4) = sinf(*(f32 *)(entry + 0x10)) * *(f32 *)(entry + 0xc);
         }
         else
         {
