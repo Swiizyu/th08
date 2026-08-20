@@ -64,13 +64,13 @@ def probe_recomp_bytes():
     probes = [
         ("TitleScreen::RegisterChain recomp VA 0x451e16 (len 0x120)", 0x451E16, 0x120),
     ]
-    image_base = struct.unpack_from("<I", data, pe + 24 + 28)[0]
     if not os.path.exists(exe):
         print("probe: %s not found" % exe)
         return
     with open(exe, "rb") as f:
         data = f.read()
     pe = struct.unpack_from("<I", data, 0x3C)[0]
+    image_base = struct.unpack_from("<I", data, pe + 24 + 28)[0]
     nsec = struct.unpack_from("<H", data, pe + 6)[0]
     opt_size = struct.unpack_from("<H", data, pe + 20)[0]
     sec0 = pe + 24 + opt_size
