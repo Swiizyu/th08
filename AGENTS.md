@@ -87,5 +87,23 @@ Issues are disabled on the repo. Use **comments on PR #2**:
 - `FSINCOS`: ST0=cos, ST1=sin (first `fstp` = cos). Prefer the project's `sincos()` helper.
 - `Float3` has a folded `operator float*()`: `(f32 *)obj` then `[eax+n*4]` indexing.
   Class-returning methods: ecx=this, hidden ret-ptr = FIRST stack arg.
+- **Nested-scope (non-function-level) locals are laid out by NAME HASH, NOT declaration
+  order** (two compare cycles of evidence: decl-order swaps changed nothing; renames moved
+  slots predictably). C1XX keeps a fresh 16-bucket hash table (`hash & 15`) per block
+  scope; the pragma plugin only rewrites the FIRST scope it sees (normally the function
+  body) — deeper blocks go through vanilla insertion. Bucket walk ascending → offsets
+  descending contiguously (first-walked = highest address, closest to ebp). Child scopes
+  start below the parent's lowest var; sibling scopes later in source start lower still.
+  Practical fix: RENAME the locals so bucket order == original layout (renames don't
+  change the binary). Known bucket chains (walk order): `dy < target < t < dx`,
+  `v1 < v2 < effect`. Single-letter/simple names collide into predictable pairs; collect
+  more chains from compare diffs.
+- Compiler temps (sret buffers for `Float3 operator+`, ternary results, the ecx `this`
+  spill) land at the BOTTOM of the frame, below named locals — a lone temp at
+  `[ebp-0x28]`-style slots under all pragma'd vars usually means an anonymous ternary
+  (`cond ? A : B` stored straight into a struct field) or the hidden sret pointer,
+  not a missing named local.
+- SJIS spell-name literals: write EVERY byte as `\xXX`. `"\x8eE"` parses as hex `0x8ee`
+  (greedy escape) and fails with C2022 — `"\x8e\x45"` is the correct form.
 - Globals normalize by demangled name; `BSS`/`!BSS` sizes in `config/globals.csv` must
   match the original layout or every reference mismatches.

@@ -848,7 +848,7 @@ void Player::FUN_0040fcd0()
 
     if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
     {
-        this->FUN_0040be30(0, "\x8c\xb6\x95\x84\x81u\x8eE\x90l\x83h\x81[\x83\x8b\x81v", 0xfa, 0x122, 0);
+        this->FUN_0040be30(0, "\x8c\xb6\x95\x84\x81\x75\x8e\x45\x90\x6c\x83\x68\x81\x5b\x83\x8b\x81\x76", 0xfa, 0x122, 0);
 
         for (entry = bomb + 0x4c, i = 0; i < 0x60; i++, entry += 0x16f0)
         {
