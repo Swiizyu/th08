@@ -1288,17 +1288,17 @@ void Player::FUN_004142c0()
 #pragma var_order(color)
 void Player::FUN_0040d310()
 {
+    u8 *bomb = (u8 *)this + 0xfdc;
     i32 color;
-    ZunTimer *timer = (ZunTimer *)((u8 *)this + 0xff4);
 
-    if (*timer < 60)
+    if (*(ZunTimer *)(bomb + 0x18) < 60)
     {
         this->FUN_0040bc60(0x80404040);
     }
     else
     {
-        color = (timer->AsFrames() - 60) * 176 / 60 + 64;
-        this->FUN_0040bc60(0x80000000 | color << 16 | color << 8 | color);
+        color = (((ZunTimer *)(bomb + 0x18))->AsFrames() - 60) * 176 / 60 + 64;
+        this->FUN_0040bc60(color << 16 | 0x80000000 | color << 8 | color);
     }
 }
 
@@ -1309,32 +1309,51 @@ void Player::FUN_0040d950()
 }
 
 // FUNCTION: th08 0x40dee0
+#pragma var_order(bomb, unused, rect, component, color, color2, rect2)
 void Player::FUN_0040dee0()
 {
-    ZunTimer *timer = (ZunTimer *)((u8 *)this + 0xff4);
+    u8 *bomb = (u8 *)this + 0xfdc;
+    u8 *unused = (u8 *)this + 0x1028;
     ZunRect rect;
+    i32 component;
     D3DCOLOR color;
+    D3DCOLOR color2;
+    ZunRect rect2;
 
-    if (timer->AsFrames() < 90)
+    if (*(ZunTimer *)(bomb + 0x18) < 90)
     {
         this->FUN_0040bc60(0x802020d0);
         return;
     }
-    rect.left = 32.0f;
-    rect.top = 16.0f;
-    rect.right = 416.0f;
-    rect.bottom = 464.0f;
-    if (timer->AsFrames() < 120)
+    if (*(ZunTimer *)(bomb + 0x18) <= 120)
     {
-        i32 component = (timer->AsFrames() - 90) * 208 / 30;
-        this->FUN_0040bc60(0x80000000 | ((component / 5 + 208) << 16) |
-                           ((component + 32) << 8) | component + 32);
-        color = ((timer->AsFrames() - 90) * 255 / 30) << 24 | 0xffffff;
+        component = (((ZunTimer *)(bomb + 0x18))->AsFrames() - 90) * 208 / 30;
+        ((u8 *)&color)[2] = component / 5 + 208;
+        ((u8 *)&color)[1] = component + 32;
+        ((u8 *)&color)[0] = component + 32;
+        ((u8 *)&color)[3] = 0x80;
+        this->FUN_0040bc60(color);
+        rect.left = 32.0f;
+        rect.top = 16.0f;
+        rect.right = 416.0f;
+        rect.bottom = 464.0f;
+        ((u8 *)&color)[2] = 0xff;
+        ((u8 *)&color)[1] = 0xff;
+        ((u8 *)&color)[0] = 0xff;
+        ((u8 *)&color)[3] = (((ZunTimer *)(bomb + 0x18))->AsFrames() - 90) * 255 / 30;
         ScreenEffect::DrawSquare(&rect, color);
     }
-    else if (timer->AsFrames() < 220)
+    else if (*(ZunTimer *)(bomb + 0x18) <= 220)
     {
-        ScreenEffect::DrawSquare(&rect, 0x70ffffff);
+        rect2.left = 32.0f;
+        rect2.top = 16.0f;
+        rect2.right = 416.0f;
+        rect2.bottom = 464.0f;
+        ((u8 *)&color2)[2] = 0xff;
+        ((u8 *)&color2)[1] = 0xff;
+        ((u8 *)&color2)[0] = 0xff;
+        ((u8 *)&color2)[3] = 0x70;
+        ScreenEffect::DrawSquare(&rect2, color2);
     }
     else
     {
