@@ -3487,7 +3487,7 @@ i32 TitleScreen::MoveCursorHorizontal(i32 menuLength)
     return 0;
 }
 
-#pragma var_order(spell, i, attemptsTotal, comment, comment1, comment2, catkA, catkB, catkC, catkD, self,                      \
+#pragma var_order(spell, i, attemptsTotal, comment, comment1, comment2, catkA, catkB, catkC, catkD,                      \
                   nameStr, mark, ownerName, condA, condB, condC, condText1, condD, condText2)
 // FUNCTION: th08 0x46d7f9
 void TitleScreen::FormatSpellCardInfo()
@@ -3502,7 +3502,6 @@ void TitleScreen::FormatSpellCardInfo()
     Catk *catkB;
     Catk *catkC;
     Catk *catkD;
-    TitleScreen *self;
     const char *nameStr;
     const char *mark;
     const char *ownerName;
@@ -3513,43 +3512,41 @@ void TitleScreen::FormatSpellCardInfo()
     ZunBool condD;
     const char *condText2;
 
-    self = this;
-
-    if (self->currentScreenState == TitleCurrentScreenState_Ready && self->currentNumberOfSpellCards == 0)
+    if (this->currentScreenState == TitleCurrentScreenState_Ready && this->currentNumberOfSpellCards == 0)
     {
         return;
     }
 
-    spell = g_SpellcardNumbersPerStage[g_GameManager.currentStage][self->cursor];
+    spell = g_SpellcardNumbersPerStage[g_GameManager.currentStage][this->cursor];
 
     attemptsTotal = g_GameManager.catkData[spell].spellPracticeHistory.attempts[SHOT_ALL] +
                     g_GameManager.catkData[spell].inGameHistory.attempts[SHOT_ALL];
 
     /* No. line: fullwidth spell number + name (or ?? if never attempted) */
-    if (self->currentScreenState == TitleCurrentScreenState_Init || self->currentNumberOfSpellCards == 11)
+    if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 11)
     {
         nameStr = attemptsTotal == 0 ? "\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48"
                                      : g_GameManager.catkData[spell].spellName;
-        g_AnmManager->DrawTextLeft(&self->spellCardInfoVms[0], COLOR_TEXT_WHITE, 0,
+        g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[0], COLOR_TEXT_WHITE, 0,
                                    "\x82\x6d\x82\x8f\x81\x44%s\x81\x40\x81\x40%s",
                                    ConvertToFullWidthDigits(spell + 1, 3), nameStr);
     }
 
     /* Owner line: owner name + difficulty + "Last" mark for last spells */
-    if (self->currentScreenState == TitleCurrentScreenState_Init || self->currentNumberOfSpellCards == 9)
+    if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 9)
     {
         mark = Spellcard::IsLastSpell(spell) != 0 ? "Last" : " ";
         ownerName = attemptsTotal == 0 ? "\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48"
                                        : g_GameManager.catkData[spell].spellOwnerName;
-        g_AnmManager->DrawTextLeft(&self->spellCardInfoVms[1], COLOR_TEXT_WHITE, 0,
+        g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[1], COLOR_TEXT_WHITE, 0,
                                    "\x8e\x67\x97\x70\x8e\xd2  %s\x81\x40\x81\x40%s %s", ownerName,
                                    g_LastWordDifficultyNames[Spellcard::GetDifficultyFromSpellCard(spell)], mark);
     }
 
     /* Catches/attempts header with current character name */
-    if (self->currentScreenState == TitleCurrentScreenState_Init)
+    if (this->currentScreenState == TitleCurrentScreenState_Init)
     {
-        g_AnmManager->DrawTextLeft(&self->spellCardInfoVms[2], COLOR_TEXT_WHITE, 0,
+        g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[2], COLOR_TEXT_WHITE, 0,
                                    "\x8e\xe6\x93\xbe\x90\x94/\x92\xa7\x90\xed\x90\x94[\x8d\xc5\x8d\x82\x93\x5f]"
                                    "\x81\x40%s\x81\x40\x91\x53\x8e\xe5\x90\x6c\x8c\xf6\x8d\x87\x8c\x76",
                                    ResultScreen::GetCharacterName(g_GameManager.character));
@@ -3562,10 +3559,10 @@ void TitleScreen::FormatSpellCardInfo()
         condA = catkA->inGameHistory.attempts[SHOT_ALL] > 0 || catkA->spellPracticeHistory.attempts[SHOT_ALL] != 0;
         if (condA)
         {
-            if (self->currentScreenState == TitleCurrentScreenState_Init || self->currentNumberOfSpellCards == 7)
+            if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 7)
             {
                 g_AnmManager->DrawTextLeft(
-                    &self->spellCardInfoVms[3], COLOR_TEXT_WHITE, 0,
+                    &this->spellCardInfoVms[3], COLOR_TEXT_WHITE, 0,
                     "\x81\x40\x81\x40%3d/%3d(%3d/%3d)[%.8d]\x81\x40\x81\x40%3d/%3d(%3d/%3d)[%.8d]",
                     catkA->spellPracticeHistory.captures[g_GameManager.character],
                     catkA->spellPracticeHistory.attempts[g_GameManager.character],
@@ -3581,9 +3578,9 @@ void TitleScreen::FormatSpellCardInfo()
         }
         else
         {
-            if (self->currentScreenState == TitleCurrentScreenState_Init || self->currentNumberOfSpellCards == 7)
+            if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 7)
             {
-                g_AnmManager->DrawTextLeft(&self->spellCardInfoVms[3], COLOR_TEXT_WHITE, 0,
+                g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[3], COLOR_TEXT_WHITE, 0,
                                            "\x81\x40\x81\x40---/---(---/---)[--------]\x81\x40\x81\x40"
                                            "---/---(---/---)[--------]");
             }
@@ -3596,10 +3593,10 @@ void TitleScreen::FormatSpellCardInfo()
         condB = catkB->inGameHistory.attempts[SHOT_ALL] > 0 || catkB->spellPracticeHistory.attempts[SHOT_ALL] != 0;
         if (condB)
         {
-            if (self->currentScreenState == TitleCurrentScreenState_Init || self->currentNumberOfSpellCards == 7)
+            if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 7)
             {
                 g_AnmManager->DrawTextLeft(
-                    &self->spellCardInfoVms[3], COLOR_TEXT_WHITE, 0,
+                    &this->spellCardInfoVms[3], COLOR_TEXT_WHITE, 0,
                     "\x81\x40\x81\x40%3d/%3d(---/---)[%.8d]\x81\x40\x81\x40%3d/%3d(---/---)[%.8d]",
                     catkB->spellPracticeHistory.captures[g_GameManager.character],
                     catkB->spellPracticeHistory.attempts[g_GameManager.character],
@@ -3611,23 +3608,23 @@ void TitleScreen::FormatSpellCardInfo()
         }
         else
         {
-            if (self->currentScreenState == TitleCurrentScreenState_Init || self->currentNumberOfSpellCards == 7)
+            if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 7)
             {
-                g_AnmManager->DrawTextLeft(&self->spellCardInfoVms[3], COLOR_TEXT_WHITE, 0,
+                g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[3], COLOR_TEXT_WHITE, 0,
                                            "\x81\x40\x81\x40---/---(---/---)[--------]\x81\x40\x81\x40"
                                            "---/---(---/---)[--------]");
             }
         }
     }
 
-    if (self->currentScreenState == TitleCurrentScreenState_Init)
+    if (this->currentScreenState == TitleCurrentScreenState_Init)
     {
-        g_AnmManager->DrawTextLeft(&self->spellCardInfoVms[4], COLOR_TEXT_WHITE, 0,
+        g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[4], COLOR_TEXT_WHITE, 0,
                                    "\x83\x4a\x81\x5b\x83\x68\x82\xcc\x95\xe2\x8d\x80");
     }
 
     /* Comment line 1: unlock condition for locked last words, else the spell comment */
-    if (self->currentScreenState == TitleCurrentScreenState_Init || self->currentNumberOfSpellCards == 5)
+    if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 5)
     {
         catkC = &g_GameManager.catkData[spell];
         condC = catkC->inGameHistory.attempts[SHOT_ALL] > 0 || catkC->spellPracticeHistory.attempts[SHOT_ALL] != 0;
@@ -3638,7 +3635,7 @@ void TitleScreen::FormatSpellCardInfo()
         if (spell >= 204 && spell <= 221 && !g_GameManager.IsLastWordSpellCardAttempted(spell))
         {
             g_AnmManager->DrawTextLeft(
-                &self->spellCardInfoVms[5], COLOR_TEXT_WHITE, 0, g_LastWordHelpText[spell - 204].line1,
+                &this->spellCardInfoVms[5], COLOR_TEXT_WHITE, 0, g_LastWordHelpText[spell - 204].line1,
                 g_LastWordHelpText[spell - 204].nums1[0] + 1, g_LastWordHelpText[spell - 204].nums1[1] + 1,
                 g_LastWordHelpText[spell - 204].nums1[2] + 1, g_LastWordHelpText[spell - 204].nums1[3] + 1,
                 g_LastWordHelpText[spell - 204].nums1[4] + 1);
@@ -3651,12 +3648,12 @@ void TitleScreen::FormatSpellCardInfo()
             condText1 = catkC->spellPracticeHistory.captures[SHOT_ALL] == 0
                             ? "\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48"
                             : comment1;
-            g_AnmManager->DrawTextLeft(&self->spellCardInfoVms[5], COLOR_TEXT_WHITE, 0, condText1);
+            g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[5], COLOR_TEXT_WHITE, 0, condText1);
         }
     }
 
     /* Comment line 2 */
-    if (self->currentScreenState == TitleCurrentScreenState_Init || self->currentNumberOfSpellCards == 3)
+    if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 3)
     {
         catkD = &g_GameManager.catkData[spell];
         condD = catkD->inGameHistory.attempts[SHOT_ALL] > 0 || catkD->spellPracticeHistory.attempts[SHOT_ALL] != 0;
@@ -3667,7 +3664,7 @@ void TitleScreen::FormatSpellCardInfo()
         if (spell >= 204 && spell <= 221 && !g_GameManager.IsLastWordSpellCardAttempted(spell))
         {
             g_AnmManager->DrawTextLeft(
-                &self->spellCardInfoVms[6], COLOR_TEXT_WHITE, 0, g_LastWordHelpText[spell - 204].line2,
+                &this->spellCardInfoVms[6], COLOR_TEXT_WHITE, 0, g_LastWordHelpText[spell - 204].line2,
                 g_LastWordHelpText[spell - 204].nums2[0] + 1, g_LastWordHelpText[spell - 204].nums2[1] + 1,
                 g_LastWordHelpText[spell - 204].nums2[2] + 1, g_LastWordHelpText[spell - 204].nums2[3] + 1,
                 g_LastWordHelpText[spell - 204].nums2[4] + 1);
@@ -3680,24 +3677,24 @@ void TitleScreen::FormatSpellCardInfo()
             condText2 = catkD->spellPracticeHistory.captures[SHOT_ALL] == 0
                             ? "\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48"
                             : comment2;
-            g_AnmManager->DrawTextLeft(&self->spellCardInfoVms[6], COLOR_TEXT_WHITE, 0, condText2);
+            g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[6], COLOR_TEXT_WHITE, 0, condText2);
         }
     }
 
-    self->spellCardInfoVms[5].pos.x = 96.0f;
-    self->spellCardInfoVms[6].pos.x = 96.0f;
+    this->spellCardInfoVms[5].pos.x = 96.0f;
+    this->spellCardInfoVms[6].pos.x = 96.0f;
 
-    if (self->currentScreenState == TitleCurrentScreenState_Init || self->currentNumberOfSpellCards == 3)
+    if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 3)
     {
         for (i = 0; i < 7; i++)
         {
-            self->spellCardInfoVms[i].color1.a = 0xff;
+            this->spellCardInfoVms[i].color1.a = 0xff;
         }
     }
 
-    if (self->currentNumberOfSpellCards != 0)
+    if (this->currentNumberOfSpellCards != 0)
     {
-        self->currentNumberOfSpellCards--;
+        this->currentNumberOfSpellCards--;
     }
 }
 
