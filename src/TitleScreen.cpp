@@ -3510,7 +3510,6 @@ void TitleScreen::FormatSpellCardInfo()
     const char *condText1;
     ZunBool condD;
     const char *condText2;
-    char comment2[4];
 
     if (this->currentScreenState == TitleCurrentScreenState_Ready && this->currentNumberOfSpellCards == 0)
     {
