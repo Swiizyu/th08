@@ -3487,7 +3487,7 @@ i32 TitleScreen::MoveCursorHorizontal(i32 menuLength)
     return 0;
 }
 
-#pragma var_order(spell, i, attemptsTotal, comment, comment1, comment2, catkA, catkB, catkC, catkD)
+#pragma var_order(spell, i, attemptsTotal, comment, comment1, comment2)
 // FUNCTION: th08 0x46d7f9
 void TitleScreen::FormatSpellCardInfo()
 {
@@ -3496,11 +3496,7 @@ void TitleScreen::FormatSpellCardInfo()
     i32 attemptsTotal;
     char comment[128];
     char comment1[128];
-    char comment2[4];
-    Catk *catkA;
-    Catk *catkB;
-    Catk *catkC;
-    Catk *catkD;
+    char comment2[0x38];
 
     if (this->currentScreenState == TitleCurrentScreenState_Ready && this->currentNumberOfSpellCards == 0)
     {
@@ -3545,7 +3541,7 @@ void TitleScreen::FormatSpellCardInfo()
     /* Statistics line */
     if (Spellcard::GetDifficultyFromSpellCard(spell) <= 4)
     {
-        catkA = &g_GameManager.catkData[spell];
+        Catk *catkA = &g_GameManager.catkData[spell];
         ZunBool condA = catkA->inGameHistory.attempts[SHOT_ALL] > 0 || catkA->spellPracticeHistory.attempts[SHOT_ALL] != 0;
         if (condA)
         {
@@ -3579,7 +3575,7 @@ void TitleScreen::FormatSpellCardInfo()
     else
     {
         /* Last Word spell: no in-game history */
-        catkB = &g_GameManager.catkData[spell];
+        Catk *catkB = &g_GameManager.catkData[spell];
         ZunBool condB = catkB->inGameHistory.attempts[SHOT_ALL] > 0 || catkB->spellPracticeHistory.attempts[SHOT_ALL] != 0;
         if (condB)
         {
@@ -3616,7 +3612,7 @@ void TitleScreen::FormatSpellCardInfo()
     /* Comment line 1: unlock condition for locked last words, else the spell comment */
     if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 5)
     {
-        catkC = &g_GameManager.catkData[spell];
+        Catk *catkC = &g_GameManager.catkData[spell];
         ZunBool condC = catkC->inGameHistory.attempts[SHOT_ALL] > 0 || catkC->spellPracticeHistory.attempts[SHOT_ALL] != 0;
         if (condC)
         {
@@ -3645,7 +3641,7 @@ void TitleScreen::FormatSpellCardInfo()
     /* Comment line 2 */
     if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 3)
     {
-        catkD = &g_GameManager.catkData[spell];
+        Catk *catkD = &g_GameManager.catkData[spell];
         ZunBool condD = catkD->inGameHistory.attempts[SHOT_ALL] > 0 || catkD->spellPracticeHistory.attempts[SHOT_ALL] != 0;
         if (condD)
         {
