@@ -1364,12 +1364,6 @@ void AnmManager::SetRenderStateForVm(AnmVm *vm)
 
 static const f32 g_ZeroPointFive = 0.5;
 
-/* The original draws from a pooled 0.5f constant at VA 0x4b847c. Referencing
- * it as a raw absolute in the inline asm (instead of a named symbol) makes
- * the recomp side show the same value-based float fallback as the original.
- */
-#define ZUN_POOLED_ZERO_POINT_FIVE 04b847ch
-
 #pragma var_order(triangleY1, triangleY2, triangleX2, triangleX1, color)
 ZunResult AnmManager::DrawInner(AnmVm *vm, i32 flags)
 {
@@ -1392,16 +1386,16 @@ ZunResult AnmManager::DrawInner(AnmVm *vm, i32 flags)
         {
             fld g_QuadVertices[0 * TYPE g_QuadVertices].pos.x
             frndint
-            fsub dword ptr ds : [ZUN_POOLED_ZERO_POINT_FIVE]
+            fsub g_ZeroPointFive
             fld g_QuadVertices[1 * TYPE g_QuadVertices].pos.x
             frndint
-            fsub dword ptr ds : [ZUN_POOLED_ZERO_POINT_FIVE]
+            fsub g_ZeroPointFive
             fld g_QuadVertices[0 * TYPE g_QuadVertices].pos.y
             frndint
-            fsub dword ptr ds : [ZUN_POOLED_ZERO_POINT_FIVE]
+            fsub g_ZeroPointFive
             fld g_QuadVertices[2 * TYPE g_QuadVertices].pos.y
             frndint
-            fsub dword ptr ds : [ZUN_POOLED_ZERO_POINT_FIVE]
+            fsub g_ZeroPointFive
             fst g_QuadVertices[2 * TYPE g_QuadVertices].pos.y
             fstp g_QuadVertices[3 * TYPE g_QuadVertices].pos.y
             fst g_QuadVertices[0 * TYPE g_QuadVertices].pos.y
