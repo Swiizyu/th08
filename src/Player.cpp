@@ -26,35 +26,36 @@ DIFFABLE_STATIC(i32, g_BackgroundTintActive);
 
 // FUNCTION: th08 0x40bc60
 #pragma var_order(result, blue, green, red, factor)
+#pragma var_order(color2, result)
 void __fastcall Player::FUN_0040bc60(D3DCOLOR color)
 {
-    i32 factor;
-    i32 red;
-    i32 green;
-    i32 blue;
     D3DCOLOR result;
-    i32 timer = ((ZunTimer *)((u8 *)this + 0xe2af4))->AsFrames();
-    i32 duration = *(i32 *)((u8 *)this + 0xe2ae4);
+    D3DCOLOR color2 = color;
 
-    red = (color >> 16) & 0xff;
-    green = (color >> 8) & 0xff;
-    blue = color & 0xff;
-    if (timer < 60)
+    if (*(ZunTimer *)((u8 *)this + 0xff4) < 60)
     {
-        factor = timer;
+        ((u8 *)&result)[2] =
+            0x80 - ((0x80 - ((u8 *)&color2)[2]) * (i32)*(ZunTimer *)((u8 *)this + 0xff4) / 60);
+        ((u8 *)&result)[1] =
+            0x80 - ((0x80 - ((u8 *)&color2)[1]) * (i32)*(ZunTimer *)((u8 *)this + 0xff4) / 60);
+        ((u8 *)&result)[0] =
+            0x80 - ((0x80 - ((u8 *)&color2)[0]) * (i32)*(ZunTimer *)((u8 *)this + 0xff4) / 60);
     }
-    else if (timer > duration - 60)
+    else if (*(ZunTimer *)((u8 *)this + 0xff4) >= *(i32 *)((u8 *)this + 0xfe4) - 60)
     {
-        factor = duration - timer;
+        ((u8 *)&result)[2] = 0x80 - ((0x80 - ((u8 *)&color2)[2]) *
+                                     (*(i32 *)((u8 *)this + 0xfe4) - (i32)*(ZunTimer *)((u8 *)this + 0xff4)) / 60);
+        ((u8 *)&result)[1] = 0x80 - ((0x80 - ((u8 *)&color2)[1]) *
+                                     (*(i32 *)((u8 *)this + 0xfe4) - (i32)*(ZunTimer *)((u8 *)this + 0xff4)) / 60);
+        ((u8 *)&result)[0] = 0x80 - ((0x80 - ((u8 *)&color2)[0]) *
+                                     (*(i32 *)((u8 *)this + 0xfe4) - (i32)*(ZunTimer *)((u8 *)this + 0xff4)) / 60);
     }
     else
     {
-        factor = 60;
+        result = color2;
     }
-    red = 128 - (128 - red) * factor / 60;
-    green = 128 - (128 - green) * factor / 60;
-    blue = 128 - (128 - blue) * factor / 60;
-    result = 0x80000000 | (red << 16) | (green << 8) | blue;
+    ((u8 *)&result)[3] = 0x80;
+    g_AnmManager->SetMixColorDefault();
     g_Background.FUN_00409160(result);
     g_BackgroundTintActive = 1;
 }
