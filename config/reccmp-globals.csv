@@ -91,7 +91,6 @@ th08::g_LastWordDifficultyNames,0x4c8628,global
 th08::g_StartMenuHelpText,0x4c8640,global
 th08::g_OptionsHelpText,0x4c8664,global
 th08::g_LastKeyChanged,0x4c868c,global
-th08::g_KeyConfgHelperText,0x4c8690,global
 th08::g_KeyConfigHelpText,0x4c8690,global
 th08::g_ReplayCharacterNames,0x4c86c0,global
 th08::g_ReplayDifficulties,0x4c86f0,global
