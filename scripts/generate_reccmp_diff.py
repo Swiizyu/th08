@@ -55,7 +55,41 @@ def dump_verbose(entries):
             written += len(text)
 
 
+
+
+def probe_recomp_bytes():
+    import struct
+    exe = os.path.join(os.path.dirname(__file__), "..", "recompiled", "th08.exe")
+    probes = [
+        ("DrawCompletionStatusText recomp VA 0x4519fe", 0x4519FE, 0x360),
+    ]
+    if not os.path.exists(exe):
+        print("probe: exe not found"); return
+    with open(exe, "rb") as f:
+        data = f.read()
+    pe = struct.unpack_from("<I", data, 0x3C)[0]
+    image_base = struct.unpack_from("<I", data, pe + 24 + 28)[0]
+    nsec = struct.unpack_from("<H", data, pe + 6)[0]
+    opt = struct.unpack_from("<H", data, pe + 20)[0]
+    sec0 = pe + 24 + opt
+    for label, va, nbytes in probes:
+        rva = va - image_base
+        for i in range(nsec):
+            off = sec0 + i * 40
+            vsize, vaddr, rawsize, rawptr = struct.unpack_from("<IIII", data, off + 8)
+            if vaddr <= rva < vaddr + max(vsize, rawsize):
+                fo = rawptr + (rva - vaddr)
+                print("probe %s bytes=%s" % (label, data[fo:fo + nbytes].hex()))
+                break
+        else:
+            print("probe %s NOT MAPPED" % label)
+
 def main():
+    try:
+        probe_recomp_bytes()
+    except Exception as e:
+        print("probe error:", e)
+
     report_filename = tempfile.mktemp()
 
     subprocess.run(
