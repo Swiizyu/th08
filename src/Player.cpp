@@ -119,7 +119,7 @@ void Player::FUN_0040c910()
 }
 
 // FUNCTION: th08 0x40d430
-#pragma var_order(bomb, entry, t, v, effect, bombGfx, effect1, effect2, effect3, effect4)
+#pragma var_order(bomb, entry, t, v, bombGfx, effect, effect1, effect2, effect3, effect4)
 void Player::FUN_0040d430()
 {
     u8 *bomb;
@@ -190,8 +190,8 @@ void Player::FUN_0040d430()
     }
     if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(90))
     {
-        void *bombGfx;
         Effect *effect;
+        void *bombGfx;
 
         g_SoundPlayer.PlaySoundByIdx((SoundIdx)15, 0);
         effect = g_EffectManager.SpawnEffect(42, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
@@ -247,7 +247,7 @@ void Player::FUN_0040d430()
 }
 
 // FUNCTION: th08 0x40d970
-#pragma var_order(bomb, entry, t, v, effect, bombGfx, pos, effect1, effect2, effect3, effect4)
+#pragma var_order(bomb, entry, t, v, bombGfx, effect, pos, effect1, effect2, effect3, effect4)
 void Player::FUN_0040d970()
 {
     u8 *bomb;
@@ -317,8 +317,8 @@ void Player::FUN_0040d970()
     }
     if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(120))
     {
-        void *bombGfx;
         Effect *effect;
+        void *bombGfx;
 
         g_SoundPlayer.PlaySoundByIdx((SoundIdx)15, 0);
         effect = g_EffectManager.SpawnEffect(42, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
@@ -452,19 +452,21 @@ void Player::FUN_0040ee10()
         ((AnmVm *)((u8 *)this + 0xce8))->SetInterrupt(2);
     }
 
-    Float3 pos2;
+    {
+        Float3 pos2;
 
-    pos2 = this->position;
-    pos2.x -= 16.0f;
-    *(Float3 *)((u8 *)this + 0x6bc) = pos2;
-    pos2.x += 16.0f;
-    pos2.y -= 16.0f;
-    *(Float3 *)((u8 *)this + 0x9b0) = pos2;
-    pos2.y += 32.0f;
-    *(Float3 *)((u8 *)this + 0xca4) = pos2;
-    pos2.x += 16.0f;
-    pos2.y -= 16.0f;
-    *(Float3 *)((u8 *)this + 0xf98) = pos2;
+        pos2 = this->position;
+        pos2.x -= 16.0f;
+        *(Float3 *)((u8 *)this + 0x6bc) = pos2;
+        pos2.x += 16.0f;
+        pos2.y -= 16.0f;
+        *(Float3 *)((u8 *)this + 0x9b0) = pos2;
+        pos2.y += 32.0f;
+        *(Float3 *)((u8 *)this + 0xca4) = pos2;
+        pos2.x += 16.0f;
+        pos2.y -= 16.0f;
+        *(Float3 *)((u8 *)this + 0xf98) = pos2;
+    }
 
     *(void **)(entry + 0x16ec) = this->FUN_0044df00((Float2 *)&this->position, 96.0f, 0.0f, 0, 6);
 
@@ -580,21 +582,23 @@ void Player::FUN_0040f570()
         ((AnmVm *)((u8 *)this + 0xce8))->SetInterrupt(2);
     }
 
-    Float3 pos2;
+    {
+        Float3 pos2;
 
-    *(void **)(entry + 0x16ec) = this->FUN_0044df00((Float2 *)&this->position, 96.0f, 0.0f, 0, 6);
+        *(void **)(entry + 0x16ec) = this->FUN_0044df00((Float2 *)&this->position, 96.0f, 0.0f, 0, 6);
 
-    pos2 = this->position;
-    pos2.x -= 16.0f;
-    *(Float3 *)((u8 *)this + 0x6bc) = pos2;
-    pos2.x += 16.0f;
-    pos2.y -= 16.0f;
-    *(Float3 *)((u8 *)this + 0x9b0) = pos2;
-    pos2.y += 32.0f;
-    *(Float3 *)((u8 *)this + 0xca4) = pos2;
-    pos2.x += 16.0f;
-    pos2.y -= 16.0f;
-    *(Float3 *)((u8 *)this + 0xf98) = pos2;
+        pos2 = this->position;
+        pos2.x -= 16.0f;
+        *(Float3 *)((u8 *)this + 0x6bc) = pos2;
+        pos2.x += 16.0f;
+        pos2.y -= 16.0f;
+        *(Float3 *)((u8 *)this + 0x9b0) = pos2;
+        pos2.y += 32.0f;
+        *(Float3 *)((u8 *)this + 0xca4) = pos2;
+        pos2.x += 16.0f;
+        pos2.y -= 16.0f;
+        *(Float3 *)((u8 *)this + 0xf98) = pos2;
+    }
 
     if (((ZunTimer *)(bomb + 0x18))->FUN_0040ebc0(10))
     {
