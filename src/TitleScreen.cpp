@@ -3880,12 +3880,14 @@ ChainCallbackResult TitleScreen::DrawCompletionStatusText()
             g_GameManager.IsStageClearedWithRetries(STAGE6A, this->cursor, g_Supervisor.cfg.defaultDifficulty))
         {
             showVm = TRUE;
-            this->titleAnm->InitializeAndSetSprite(&this->spellCardNameVms[0], 146);
+            AnmLoaded *anm = this->titleAnm;
+            anm->InitializeAndSetSprite(&this->spellCardNameVms[0], 146);
         }
         else if (g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, g_Supervisor.cfg.defaultDifficulty))
         {
             showVm = TRUE;
-            this->titleAnm->InitializeAndSetSprite(&this->spellCardNameVms[0], 148);
+            AnmLoaded *anm = this->titleAnm;
+            anm->InitializeAndSetSprite(&this->spellCardNameVms[0], 148);
         }
         else if (g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, EASY) ||
                  g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, NORMAL) ||
@@ -3893,7 +3895,8 @@ ChainCallbackResult TitleScreen::DrawCompletionStatusText()
                  g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, LUNATIC) || this->cursor > 3)
         {
             showVm = TRUE;
-            this->titleAnm->InitializeAndSetSprite(&this->spellCardNameVms[0], 147);
+            AnmLoaded *anm = this->titleAnm;
+            anm->InitializeAndSetSprite(&this->spellCardNameVms[0], 147);
         }
         else if (g_GameManager.IsStageClearedWithRetries(STAGE6A, this->cursor, EASY) ||
                  g_GameManager.IsStageClearedWithRetries(STAGE6A, this->cursor, NORMAL) ||
@@ -3901,7 +3904,8 @@ ChainCallbackResult TitleScreen::DrawCompletionStatusText()
                  g_GameManager.IsStageClearedWithRetries(STAGE6A, this->cursor, LUNATIC))
         {
             showVm = TRUE;
-            this->titleAnm->InitializeAndSetSprite(&this->spellCardNameVms[0], 145);
+            AnmLoaded *anm = this->titleAnm;
+            anm->InitializeAndSetSprite(&this->spellCardNameVms[0], 145);
         }
     }
 
