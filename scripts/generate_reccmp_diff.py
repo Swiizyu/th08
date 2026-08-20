@@ -62,7 +62,7 @@ def probe_recomp_bytes():
     exe = os.path.join(os.path.dirname(__file__), "..", "recompiled", "th08.exe")
     # (label, rva, nbytes) — set as needed for the current investigation.
     probes = [
-        ("OnUpdateOptions color push @recomp VA 0x44a041", 0x44A041, 8),
+        ("TitleScreen::RegisterChain recomp VA 0x451e16 (len 0x120)", 0x451E16, 0x120),
     ]
     image_base = struct.unpack_from("<I", data, pe + 24 + 28)[0]
     if not os.path.exists(exe):
