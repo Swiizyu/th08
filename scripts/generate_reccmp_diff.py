@@ -84,7 +84,48 @@ def probe_recomp_bytes():
         else:
             print("probe %s NOT MAPPED" % label)
 
+
+
+def probe_recomp_symbols():
+    import csv as csvmod
+    import subprocess as spmod
+    out = spmod.run(["reccmp-roadmap", "--target", "th08", "--csv", "roadmap_probe.csv"],
+                    capture_output=True, text=True, timeout=600)
+    if out.returncode != 0:
+        print("roadmap probe failed:", out.stderr[-1500:]); return
+    rows = []
+    with open("roadmap_probe.csv") as f:
+        for row in csvmod.DictReader(f):
+            if row.get("row_type") not in ("dat", "poi", "vta", "str", "flo", "off", "lab", "imp"):
+                continue
+            name = row.get("name") or ""
+            orig = row.get("orig_addr") or ""
+            rec = row.get("recomp_addr") or ""
+            if not orig or not rec or not name:
+                continue
+            try:
+                o = int(orig, 16) if orig.startswith("0x") else int(orig)
+                r = int(rec, 16) if rec.startswith("0x") else int(rec)
+            except ValueError:
+                continue
+            rows.append((o, r, int(row.get("size") or 0), name))
+    rows.sort()
+    prev_o = prev_r = None
+    for o, r, size, name in rows:
+        gap_note = ""
+        if prev_o is not None:
+            go, gr = o - prev_o, r - prev_r
+            if go != gr:
+                gap_note = "   <== GAPDIFF orig+%d recomp+%d (missing %d bytes)" % (go, gr, go - gr)
+        print("sym %-46s orig=0x%08x rec=0x%08x sz=%#x%s" % (name, o, r, size, gap_note))
+        prev_o, prev_r = o, r
+
 def main():
+    try:
+        probe_recomp_symbols()
+    except Exception as e:
+        print("symbol probe error:", e)
+
     try:
         probe_recomp_bytes()
     except Exception as e:
