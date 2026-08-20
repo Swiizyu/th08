@@ -3502,7 +3502,7 @@ void TitleScreen::FormatSpellCardInfo()
     const char *ownerName;
     const char *commentText;
 
-    if (this->currentScreenState == TitleCurrentScreenState_Init && this->currentNumberOfSpellCards == 0)
+    if (this->currentScreenState == TitleCurrentScreenState_Ready && this->currentNumberOfSpellCards == 0)
     {
         return;
     }
