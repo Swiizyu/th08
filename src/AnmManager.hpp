@@ -385,7 +385,16 @@ C_ASSERT(sizeof(AnmVmBase) == 0x208);
 
 struct AnmVm : AnmVmBase
 {
-    void Initialize();
+    void Initialize()
+    {
+        memset(this, 0, sizeof(AnmVmBase));
+        this->scale.x = 1.0f;
+        this->scale.y = 1.0f;
+        this->color1.d3dColor = COLOR_WHITE;
+        D3DXMatrixIdentity(&this->matrix1);
+        this->flags = 7;
+        this->currentTimeInScript.Initialize();
+    }
 
     ZunBool IsVisible()
     {
