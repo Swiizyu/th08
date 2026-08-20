@@ -13,8 +13,8 @@ import tempfile
 WATCHLIST = os.path.join(os.path.dirname(__file__), "..", "config", "verbose_watch.txt")
 VERBOSE_OUT = "verbose_diff.txt"
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
-PER_FUNCTION_CAP = 12000
-TOTAL_CAP = 48000
+PER_FUNCTION_CAP = 30000
+TOTAL_CAP = 32000
 
 
 def list_watch():
@@ -75,13 +75,13 @@ def probe_recomp_bytes():
     sec0 = pe + 24 + opt_size
     for i in range(nsec):
         off = sec0 + i * 40
-        vsize, vaddr, rawsize, rawptr = struct.unpack_from("<IIII", off + 8, data)
+        vsize, vaddr, rawsize, rawptr = struct.unpack_from("<IIII", data, off + 8)
         print("section %-8s va=0x%08x vsize=0x%x rawsize=0x%x" %
               (data[off:off + 8].rstrip(b'\0').decode(), vaddr, vsize, rawsize))
     for label, rva, nbytes in probes:
         for i in range(nsec):
             off = sec0 + i * 40
-            vsize, vaddr, rawsize, rawptr = struct.unpack_from("<IIII", off + 8, data)
+            vsize, vaddr, rawsize, rawptr = struct.unpack_from("<IIII", data, off + 8)
             if vaddr <= rva < vaddr + max(vsize, rawsize):
                 fo = rawptr + (rva - vaddr)
                 print("probe %-44s rva=0x%08x bytes=%s" % (label, rva, data[fo:fo + nbytes].hex()))
@@ -106,7 +106,7 @@ def probe_recomp_symbols():
     rows = []
     with open("roadmap_probe.csv") as f:
         for row in csvmod.DictReader(f):
-            if row.get("row_type") not in ("data", "pointer", "vtable"):
+            if row.get("row_type") not in ("dat", "poi", "vta", "str", "flo", "off", "lab", "imp"):
                 continue
             name = row.get("name") or ""
             orig = row.get("orig_addr") or ""
@@ -149,10 +149,22 @@ def main():
 
     print("# Report")
     print()
+    total = 0
+    perfect = 0
+    imperfect = []
+    for function in reccmp_data["data"]:
+        total += 1
+        if function["matching"] >= 1.0:
+            perfect += 1
+        else:
+            imperfect.append(function)
+
+    print("%d/%d functions at 100.00%%; %d below:" % (perfect, total, len(imperfect)))
+    print()
     print("name | result")
     print("-----|-------")
 
-    for function in reccmp_data["data"]:
+    for function in imperfect:
         print(function["name"] + " | " + format(function["matching"], ".2%"))
 
     dump_verbose(list_watch())

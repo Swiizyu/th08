@@ -84,6 +84,7 @@ address,type,x-text
 0x4b4ac8,string,"enemy.anm"
 0x4b4ca0,string,"etama.anm"
 0x4b4cac,string,"msg start %d\n\r"
+0x4b4cbc,string," "
 0x4b4cdc,string,"/"
 0x4b4ce0,string,"%d"
 0x4b4cec,string,"%.9d"
