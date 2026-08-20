@@ -837,7 +837,7 @@ th08::ReplayManager::DeletedCallback,0x453080,function
 th08::ReplayManager::ReplayManager,0x453160,function
 FUN_004531a0,0x4531a0,function
 th08::ReplayManager::SaveReplay,0x4531f0,function
-sprintf,0x453b80,function
+SprintfReturnEnd,0x453b80,function
 th08::Rng::SetSeed,0x453be0,function
 th08::Rng::ResetGenerationCount,0x453c00,function
 th08::Rng::GetSeed,0x453c20,function
@@ -849,7 +849,7 @@ FUN_00453cc0,0x453cc0,function
 th08::ResultScreen::GetStageName,0x453cd1,function
 th08::ResultScreen::GetCharacterName,0x453cfa,function
 th08::ResultScreen::WriteScore,0x453d0d,function
-sprintf,0x454269,function
+FUN_00454269,0x454269,function
 th08::ResultScreen::LogScoreDataToFile,0x454298,function
 th08::ResultScreen::LinkScoreEx,0x454c59,function
 th08::ResultScreen::FreeScore,0x454c87,function
