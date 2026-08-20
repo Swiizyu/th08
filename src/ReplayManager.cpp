@@ -187,7 +187,7 @@ ChainCallbackResult ReplayManager::OnUpdateHighPrio(ReplayManager *mgr)
     {
         return CHAIN_CALLBACK_RESULT_CONTINUE;
     }
-    if (g_Supervisor.IsClearBackBufferOnRefreshEnabled())
+    if (g_Supervisor.IsSpeedhackDetected())
     {
         return CHAIN_CALLBACK_RESULT_CONTINUE;
     }

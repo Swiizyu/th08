@@ -77,10 +77,12 @@ th08::g_ShtFileDrawCallbacks,0x4c7f1c,global
 th08::g_ShtFileHitCallbacks,0x4c7f24,global
 th08::g_AlphabetList,0x4c7f48,global
 th08::g_CharacterList,0x4c7f4c,global
+th08::g_ResultStageNumbers,0x4c7f80,global
 th08::g_ResultsStageList,0x4c7fac,global
 th08::g_ResultsDifficultyList,0x4c7fd4,global
 th08::g_SpellcardsWeightList,0x4c7fe8,global
 th08::g_RightAlignedDifficultyList,0x4c7ffc,global
+th08::g_ResultsCharacterNames,0x4c8010,global
 th08::g_SoundBufferIdxVol,0x4c8040,global
 th08::g_SFXList,0x4c81b0,global
 th08::g_DemoReplayFiles,0x4c8240,global

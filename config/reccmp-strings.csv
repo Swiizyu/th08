@@ -887,3 +887,5 @@ address,type,x-text
 0x4b9960,string,"info : %s error\r\n"
 0x4b9974,string,"ファイル %s のオープン中にエラーが発生しました\r\n"
 0x4ba550,string,"1.0.5"
+0x4b692c,string,"%2d"
+0x4b7cc8,string,"%8s"

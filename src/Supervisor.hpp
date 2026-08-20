@@ -181,11 +181,6 @@ struct Supervisor
         return this->flags.speedhackDetected;
     }
 
-    ZunBool IsClearBackBufferOnRefreshEnabled()
-    {
-        return this->flags.speedhackDetected;
-    }
-
     ZunBool IsSoftwareTexturing()
     {
         return this->cfg.opts.disableColorCompositing | this->cfg.opts.useSwTextureBlending;
