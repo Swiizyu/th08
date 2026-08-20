@@ -19,3 +19,5 @@ void DebugPrint(char *fmt, ...);
 void GuiDebugPrint(char *fmt, ...);
 }; // namespace utils
 }; // namespace th08
+
+char *ConvertToFullWidthDigits(i32 value, i32 digits);

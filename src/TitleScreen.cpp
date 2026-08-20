@@ -7,6 +7,7 @@
 #include "SoundPlayer.hpp"
 #include "Spellcard.hpp"
 #include "TitleScreen.hpp"
+#include "ResultScreen.hpp"
 #include "ZunMath.hpp"
 #include "i18n.hpp"
 
