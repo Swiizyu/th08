@@ -135,11 +135,8 @@ ZunBool GameManager::IsSpellNumberEqualTo(i32 spellNumber)
 // FUNCTION: th08 0x418180
 ZunBool GameManager::IsSpellNumberInRange(i32 firstSpellNumber, i32 lastSpellNumber)
 {
-    ZunBool result;
-
-    result = this->flags.isSpellPractice && this->currentSpellCardNumber >= firstSpellNumber &&
-             this->currentSpellCardNumber <= lastSpellNumber;
-    return result;
+    return this->flags.isSpellPractice && this->currentSpellCardNumber >= firstSpellNumber &&
+           this->currentSpellCardNumber <= lastSpellNumber;
 }
 
 // FUNCTION: th08 0x402130
