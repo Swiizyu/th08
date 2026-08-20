@@ -62,8 +62,9 @@ def probe_recomp_bytes():
     exe = os.path.join(os.path.dirname(__file__), "..", "recompiled", "th08.exe")
     # (label, rva, nbytes) — set as needed for the current investigation.
     probes = [
-        ("OnUpdateOptions color push @recomp 0x44a041", 0x44A041, 8),
+        ("OnUpdateOptions color push @recomp VA 0x44a041", 0x44A041, 8),
     ]
+    image_base = struct.unpack_from("<I", data, pe + 24 + 28)[0]
     if not os.path.exists(exe):
         print("probe: %s not found" % exe)
         return
@@ -79,6 +80,7 @@ def probe_recomp_bytes():
         print("section %-8s va=0x%08x vsize=0x%x rawsize=0x%x" %
               (data[off:off + 8].rstrip(b'\0').decode(), vaddr, vsize, rawsize))
     for label, rva, nbytes in probes:
+        rva = rva - image_base
         for i in range(nsec):
             off = sec0 + i * 40
             vsize, vaddr, rawsize, rawptr = struct.unpack_from("<IIII", data, off + 8)
@@ -118,8 +120,9 @@ def probe_recomp_symbols():
             except ValueError:
                 continue
             rows.append((o, r, row.get("size") or "", name))
+    rows = [t for t in rows if t[3].startswith("th08::g_")]
     rows.sort()
-    for o, r, size, name in rows:
+    for o, r, size, name in rows[:150]:
         delta = r - o
         flag = "  <== SHIFT %d (0x%x)" % (delta, delta & 0xFFFFFFFF) if delta else ""
         print("sym %-40s orig=0x%08x recomp=0x%08x size=%s%s" % (name, o, r, size, flag))
