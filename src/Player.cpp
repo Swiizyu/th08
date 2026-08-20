@@ -561,9 +561,96 @@ void Player::FUN_0040e3b0()
 }
 
 // FUNCTION: th08 0x40e780
+#pragma var_order(bomb, entry, angle)
 void Player::FUN_0040e780()
 {
-    UpdateBombPattern(this, 35, 0xffffd0d0, 380, 10);
+    u8 *bomb;
+    u8 *entry;
+    f32 angle;
+
+    bomb = (u8 *)this + 0xfdc;
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
+    {
+        this->FUN_0040be30(0, "\x96\x82\x96\x43\x81\x75\x83\x74\x83\x40\x83\x43\x83\x69\x83\x8b\x83\x58\x83\x70\x81\x5b\x83\x4e\x81\x76", 0x15e, 0x17c, 1);
+        angle = -ZUN_PI;
+        entry = bomb + 0x4c;
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)0xd, 0);
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)0x13, 0);
+        *(Float3 *)(entry + 0x14) = this->position;
+        this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)(bomb + 0x204), 0x23);
+        this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)(bomb + 0x4a8), 0x24);
+        this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)(bomb + 0x74c), 0x25);
+        this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)(bomb + 0x9f0), 0x26);
+        this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)(bomb + 0xc94), 0x27);
+        ScreenEffect::RegisterChain((ScreenEffectType)7, 16, 120, 60, 120, 21);
+        *(f32 *)((u8 *)this + 0x408) = 0.2f;
+        *(f32 *)((u8 *)this + 0x404) = 0.2f;
+        *(i32 *)(bomb + 0x14) = 0;
+    }
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040ebc0(10))
+    {
+        Effect *target;
+
+        target = g_EffectManager.SpawnSpecialEffect(0x35, &this->position, (*(i32 *)(bomb + 0x14) % 4) + 4, 1, -1);
+        if (*(i32 *)(bomb + 0x14) & 1)
+        {
+            g_EffectManager.effectAnm->SetAndExecuteScriptIdx((AnmVm *)target, 0x5c);
+        }
+        *(i32 *)((u8 *)target + 0x324) = 0x20;
+        *(i32 *)((u8 *)target + 0x334) = 0;
+
+        Float3 dx;
+        Float3 t;
+
+        dx.x = 0.0f;
+        dx.y = 0.0f;
+        dx.z = 0.0f;
+        t.x = 128.0f;
+        t.y = 0.0f;
+        t.z = 0.0f;
+        ((AnmVm *)target)->FUN_0040ec30(0x1e, 4, &dx, &t);
+
+        {
+            Float2 a;
+            {
+                Float2 b;
+
+                b.x = 32.0f;
+                b.y = 0.0f;
+                a.x = 64.0f;
+                a.y = 0.0f;
+                ((AnmVm *)target)->FUN_0040eda0(0x1e, 1, &b, &a);
+                ((AnmVm *)target)->FUN_0040ed50(0x1e, 3, 0xff, 0);
+                ((AnmVm *)target)->FUN_0040eca0(0x1e, 0, -1, 0xffff0000);
+            }
+        }
+
+        g_AnmManager->ExecuteScript((AnmVm *)target);
+        *(i32 *)(bomb + 0x14) += 1;
+        g_SoundPlayer.PlaySoundPositionedByIdx((SoundIdx)0x11, this->position.x);
+    }
+
+    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040d3d0() &&
+        ((ZunTimer *)((u8 *)this + 0xff4))->AsFrames() % 4 != 0)
+    {
+        void *e;
+        Float3 pos2;
+
+        pos2 = this->position;
+        pos2.x = 192.0f;
+        pos2.y = pos2.y / 2.0f;
+        this->FUN_0044de60((Float2 *)&pos2, 384.0f, pos2.y + pos2.y, 6, 0);
+        pos2 = this->position;
+        pos2.y = pos2.y / 2.0f;
+        e = this->FUN_0044dfa0((Float2 *)&pos2, 128.0f, pos2.y + pos2.y, 0xc, 0);
+        *(u8 *)((u8 *)e + 0x3d) = 1;
+        pos2.x = 192.0f;
+        e = this->FUN_0044dfa0((Float2 *)&pos2, 384.0f, pos2.y + pos2.y, 7, 0);
+        *(u8 *)((u8 *)e + 0x3d) = 1;
+    }
+
+    g_AnmManager->ExecuteScriptArray((AnmVm *)(bomb + 0x204), 5);
 }
 
 // FUNCTION: th08 0x40ee10
@@ -1290,6 +1377,7 @@ void Player::FUN_004142c0()
 
 // FUNCTION: th08 0x40d310
 #pragma var_order(color)
+#pragma var_order(bomb, color)
 void Player::FUN_0040d310()
 {
     u8 *bomb = (u8 *)this + 0xfdc;
