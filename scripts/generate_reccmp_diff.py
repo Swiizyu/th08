@@ -61,7 +61,7 @@ def probe_recomp_bytes():
     import struct
     exe = os.path.join(os.path.dirname(__file__), "..", "recompiled", "th08.exe")
     probes = [
-        ("DrawCompletionStatusText recomp VA 0x4519fe", 0x4519FE, 0x360),
+        ("FormatSpellCardInfo recomp VA 0x452ce4", 0x452CE4, 0x940),
     ]
     if not os.path.exists(exe):
         print("probe: exe not found"); return
