@@ -131,7 +131,7 @@ void Player::FUN_0040d430()
 
     if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
     {
-        this->FUN_0040be30(1, "魔符「アーティフルサクリファイス」", 0xd2, 0xfa, 0);
+        this->FUN_0040be30(1, "\x96\x82\x95\x84\x81\x75\x83\x41\x81\x5b\x83\x65\x83\x42\x83\x74\x83\x8b\x83\x54\x83\x4e\x83\x8a\x83\x74\x83\x40\x83\x43\x83\x58\x81\x76", 0xd2, 0xfa, 0);
 
         g_SoundPlayer.PlaySoundByIdx((SoundIdx)13, 0);
         *(Float3 *)(entry + 0x14) = *(Float3 *)((u8 *)this + 0x6b0);
@@ -190,8 +190,8 @@ void Player::FUN_0040d430()
     }
     if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(90))
     {
-        Effect *effect;
         void *bombGfx;
+        Effect *effect;
 
         g_SoundPlayer.PlaySoundByIdx((SoundIdx)15, 0);
         effect = g_EffectManager.SpawnEffect(42, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
@@ -259,7 +259,7 @@ void Player::FUN_0040d970()
 
     if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
     {
-        this->FUN_0040be30(1, "魔操「リターンイナニメトネス」", 0xe6, 0x118, 1);
+        this->FUN_0040be30(1, "\x96\x82\x91\x80\x81\x75\x83\x8a\x83\x5e\x81\x5b\x83\x93\x83\x43\x83\x69\x83\x6a\x83\x81\x83\x67\x83\x6c\x83\x58\x81\x76", 0xe6, 0x118, 1);
 
         g_SoundPlayer.PlaySoundByIdx((SoundIdx)13, 0);
         *(Float3 *)(entry + 0x14) = this->position;
@@ -317,8 +317,8 @@ void Player::FUN_0040d970()
     }
     if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(120))
     {
-        Effect *effect;
         void *bombGfx;
+        Effect *effect;
 
         g_SoundPlayer.PlaySoundByIdx((SoundIdx)15, 0);
         effect = g_EffectManager.SpawnEffect(42, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
@@ -401,14 +401,13 @@ void Player::FUN_0040ee10()
     u8 *bomb;
     u8 *entry;
     f32 t;
-    Effect *effect;
 
     bomb = (u8 *)this + 0xfdc;
     entry = bomb + 0x4c;
 
     if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
     {
-        this->FUN_0040be30(1, "紅符「不夜城レッド」", 0xf0, 0x122, 0);
+        this->FUN_0040be30(1, "\x8d\x67\x95\x84\x81\x75\x95\x73\x96\xe9\x8f\xe9\x83\x8c\x83\x62\x83\x68\x81\x76", 0xf0, 0x122, 0);
 
         g_SoundPlayer.PlaySoundByIdx((SoundIdx)13, 0);
         *(Float3 *)(entry + 0x14) = *(Float3 *)((u8 *)this + 0x6bc);
@@ -471,6 +470,8 @@ void Player::FUN_0040ee10()
 
     if (((ZunTimer *)(bomb + 0x18))->FUN_0040ebc0(10))
     {
+        Effect *effect;
+
         effect = g_EffectManager.SpawnSpecialEffect(53, &this->position, (*(i32 *)(bomb + 0x14) % 4) + 4, 1, -1);
         *(i32 *)((u8 *)effect + 0x324) = 0x20;
         *(f32 *)((u8 *)effect + 0x334) = 4.0f;
@@ -528,14 +529,13 @@ void Player::FUN_0040f570()
     u8 *bomb;
     u8 *entry;
     f32 t;
-    Effect *effect;
 
     bomb = (u8 *)this + 0xfdc;
     entry = bomb + 0x4c;
 
     if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
     {
-        this->FUN_0040be30(1, "紅魔「スカーレットデビル」", 0x118, 0x140, 1);
+        this->FUN_0040be30(1, "\x8d\x67\x96\x82\x81\x75\x83\x58\x83\x4a\x81\x5b\x83\x8c\x83\x62\x83\x67\x83\x66\x83\x72\x83\x8b\x81\x76", 0x118, 0x140, 1);
 
         g_SoundPlayer.PlaySoundByIdx((SoundIdx)13, 0);
         *(Float3 *)(entry + 0x14) = *(Float3 *)((u8 *)this + 0x6bc);
@@ -598,6 +598,8 @@ void Player::FUN_0040f570()
 
     if (((ZunTimer *)(bomb + 0x18))->FUN_0040ebc0(10))
     {
+        Effect *effect;
+
         effect = g_EffectManager.SpawnSpecialEffect(53, &this->position, (*(i32 *)(bomb + 0x14) % 4) + 4, 1, -1);
         *(i32 *)((u8 *)effect + 0x324) = 0x20;
         *(f32 *)((u8 *)effect + 0x334) = 4.0f;
