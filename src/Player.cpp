@@ -146,7 +146,7 @@ void Player::FUN_0040e780()
 }
 
 // FUNCTION: th08 0x40ee10
-#pragma var_order(effect, pos, pos2, t, entry, bomb, b, a, v1, v2)
+#pragma var_order(bomb, entry, t, pos, pos2, effect, v2, v1, b, a)
 void Player::FUN_0040ee10()
 {
     u8 *bomb;
@@ -194,6 +194,8 @@ void Player::FUN_0040ee10()
         pos.x += 16.0f;
         pos.y -= 16.0f;
         *(Float3 *)((u8 *)this + 0xf98) = (pos - *(Float3 *)(entry + 0x44e4)) * t + *(Float3 *)(entry + 0x44e4);
+
+        return;
     }
     else if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350(60))
     {
@@ -218,7 +220,7 @@ void Player::FUN_0040ee10()
         pos2.y -= 16.0f;
         *(Float3 *)((u8 *)this + 0xf98) = pos2;
 
-        this->FUN_0044df00((Float2 *)&this->position, 96.0f, 0.0f, 0, 6);
+        *(void **)(entry + 0x16ec) = this->FUN_0044df00((Float2 *)&this->position, 96.0f, 0.0f, 0, 6);
 
         if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040ebc0(10))
         {
@@ -249,7 +251,7 @@ void Player::FUN_0040ee10()
 
         if (*(ZunTimer *)((u8 *)this + 0xe2ac4) >= 5)
         {
-            this->FUN_0044de60((Float2 *)&this->position, 800.0f, 96.0f, 6, 0);
+            *(void **)(entry + 0x16ec) = this->FUN_0044de60((Float2 *)&this->position, 800.0f, 96.0f, 6, 0);
         }
     }
 
