@@ -13,11 +13,10 @@
 
 namespace th08
 {
+char *__fastcall ConvertToFullWidthDigits(i32 value, i32 digits);
 namespace utils
 {
 void DebugPrint(char *fmt, ...);
 void GuiDebugPrint(char *fmt, ...);
 }; // namespace utils
 }; // namespace th08
-
-char *__fastcall ConvertToFullWidthDigits(i32 value, i32 digits);
