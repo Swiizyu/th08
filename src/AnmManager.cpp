@@ -1,6 +1,7 @@
 #include "th_pch.h"
 
 #include "AnmManager.hpp"
+#include "Background.hpp"
 #include "TextHelper.hpp"
 #include "ZunMath.hpp"
 #include "i18n.hpp"
@@ -10,6 +11,8 @@
 
 namespace th08
 {
+f32 FUN_004031e0(f32 value);
+
 DIFFABLE_STATIC(AnmManager *, g_AnmManager);
 DIFFABLE_STATIC_ARRAY(VertexTex1DiffuseXyzrhw, 4, g_QuadVertices);
 DIFFABLE_STATIC_ARRAY(VertexTex1Xyzrhw, 4, g_UnknownQuadVertices);
@@ -31,23 +34,153 @@ void AnmManager::FUN_004623c0(AnmVm *vm)
     this->renderStateChangesThisFrame++;
 }
 
+#pragma var_order(halfWidth, halfHeight, screenCenterY, halfLength, sinZ, matrix, z, \
+                  projectRight, projectCenter, projectRightOffset, cosZ, origin)
 // FUNCTION: th08 0x4639e0
 ZunResult AnmManager::FUN_004639e0(AnmVm *vm)
 {
-    if (vm == NULL || !vm->IsVisible() || !vm->flag1 || vm->color1.a == 0)
+    f32 halfWidth;
+    f32 halfHeight;
+    f32 screenCenterY;
+    f32 halfLength; // also used as screen center x
+    f32 sinZ;
+    f32 z = vm->rotation.z;
+    f32 cosZ;
+
+    sincos(z, sinZ, cosZ);
+
+    D3DXMATRIX matrix;
+    Float3 projectCenter;
+    Float3 projectRight;
+    Float3 projectRightOffset;
+    Float3 origin(0.0f, 0.0f, 0.0f);
+
+    D3DXMatrixIdentity(&matrix);
+    matrix.m[3][0] = ((f32 *)vm->pos)[0];
+    matrix.m[3][1] = ((f32 *)vm->pos)[1];
+    matrix.m[3][2] = ((f32 *)vm->pos)[2];
+
+    D3DXVec3Project((D3DXVECTOR3 *)&projectCenter, (D3DXVECTOR3 *)&origin, &g_Supervisor.viewport,
+                    &g_Supervisor.projectionMatrix, &g_Supervisor.viewMatrix, &matrix);
+
+    if (projectCenter.z < 0.0f || projectCenter.z > 1.0f)
+    {
         return ZUN_ERROR;
-    this->TransformVerticesWorld(vm);
-    return this->DrawInner(vm, 0);
+    }
+
+    D3DXVec3Project((D3DXVECTOR3 *)&projectRight, (D3DXVECTOR3 *)&g_Background.vectors0x6394.vector4,
+                    &g_Supervisor.viewport, &g_Supervisor.projectionMatrix, &g_Supervisor.viewMatrix, &matrix);
+
+    projectRightOffset = projectRight - projectCenter;
+
+    halfLength = projectRightOffset.FUN_0040b4c0() * 0.5f;
+    halfWidth = halfLength * vm->spriteSize.x * vm->scale.x;
+    halfHeight = halfLength * vm->spriteSize.y * vm->scale.y;
+
+    halfLength = projectCenter.x; // used as screen center x here
+    screenCenterY = projectCenter.y;
+
+    this->TranslateRotation(&g_QuadVertices[0], -halfWidth, -halfHeight, sinZ, cosZ, halfLength, screenCenterY);
+    this->TranslateRotation(&g_QuadVertices[1], halfWidth, -halfHeight, sinZ, cosZ, halfLength, screenCenterY);
+    this->TranslateRotation(&g_QuadVertices[2], -halfWidth, halfHeight, sinZ, cosZ, halfLength, screenCenterY);
+    this->TranslateRotation(&g_QuadVertices[3], halfWidth, halfHeight, sinZ, cosZ, halfLength, screenCenterY);
+
+    g_QuadVertices[0].pos.z = g_QuadVertices[1].pos.z = g_QuadVertices[2].pos.z = g_QuadVertices[3].pos.z =
+        projectCenter.z;
+
+    if ((vm->anchor & 1) != 0)
+    {
+        g_QuadVertices[0].pos.x += halfWidth;
+        g_QuadVertices[1].pos.x += halfWidth;
+        g_QuadVertices[2].pos.x += halfWidth;
+        g_QuadVertices[3].pos.x += halfWidth;
+    }
+    if ((vm->anchor & 2) != 0)
+    {
+        g_QuadVertices[0].pos.y += halfHeight;
+        g_QuadVertices[1].pos.y += halfHeight;
+        g_QuadVertices[2].pos.y += halfHeight;
+        g_QuadVertices[3].pos.y += halfHeight;
+    }
+
+    return ZUN_SUCCESS;
 }
 
+#pragma var_order(halfWidth, halfHeight, screenCenterY, halfLength, sinZ, matrix, z, \
+                  projectRight, projectCenter, projectRightOffset, cosZ, origin)
 // FUNCTION: th08 0x4640e0
-ZunResult AnmManager::FUN_004640e0(AnmVm *vm)
+ZunResult AnmManager::FUN_004640e0(AnmVm *vm, void (*callback)(AnmVm *, Float3 *))
 {
-    if (vm == NULL || !vm->IsVisible() || !vm->flag1 || vm->color1.a == 0)
+    f32 halfWidth;
+    f32 halfHeight;
+    f32 screenCenterY;
+    f32 halfLength; // also used as screen center x
+    f32 sinZ;
+    f32 z = vm->rotation.z;
+    f32 cosZ;
+
+    sincos(z, sinZ, cosZ);
+
+    D3DXMATRIX matrix;
+    Float3 projectCenter;
+    Float3 projectRight;
+    Float3 projectRightOffset;
+    Float3 origin(0.0f, 0.0f, 0.0f);
+
+    D3DXMatrixIdentity(&matrix);
+    matrix.m[3][0] = ((f32 *)vm->pos)[0];
+    matrix.m[3][1] = ((f32 *)vm->pos)[1];
+    matrix.m[3][2] = ((f32 *)vm->pos)[2];
+
+    D3DXVec3Project((D3DXVECTOR3 *)&projectCenter, (D3DXVECTOR3 *)&origin, &g_Supervisor.viewport,
+                    &g_Supervisor.projectionMatrix, &g_Supervisor.viewMatrix, &matrix);
+
+    if (projectCenter.z < 0.0f || projectCenter.z > 1.0f)
+    {
         return ZUN_ERROR;
-    this->TransformVerticesWorld(vm);
-    i32 flags = (vm->anchor & 3) != 0 ? 1 : 0;
-    return this->DrawInner(vm, flags);
+    }
+
+    D3DXVec3Project((D3DXVECTOR3 *)&projectRight, (D3DXVECTOR3 *)&g_Background.vectors0x6394.vector4,
+                    &g_Supervisor.viewport, &g_Supervisor.projectionMatrix, &g_Supervisor.viewMatrix, &matrix);
+
+    projectRightOffset = projectRight - projectCenter;
+
+    halfLength = projectRightOffset.FUN_0040b4c0() * 0.5f;
+    halfWidth = halfLength * vm->spriteSize.x * vm->scale.x;
+    halfHeight = halfLength * vm->spriteSize.y * vm->scale.y;
+
+    if (callback != NULL)
+    {
+        callback(vm, &projectCenter);
+    }
+
+    halfLength = projectCenter.x; // used as screen center x here
+    screenCenterY = projectCenter.y;
+
+    this->TranslateRotation(&g_QuadVertices[0], -halfWidth, -halfHeight, sinZ, cosZ, halfLength, screenCenterY);
+    this->TranslateRotation(&g_QuadVertices[1], halfWidth, -halfHeight, sinZ, cosZ, halfLength, screenCenterY);
+    this->TranslateRotation(&g_QuadVertices[2], -halfWidth, halfHeight, sinZ, cosZ, halfLength, screenCenterY);
+    this->TranslateRotation(&g_QuadVertices[3], halfWidth, halfHeight, sinZ, cosZ, halfLength, screenCenterY);
+
+    g_QuadVertices[0].pos.z = g_QuadVertices[1].pos.z = g_QuadVertices[2].pos.z = g_QuadVertices[3].pos.z =
+        projectCenter.z;
+
+    if ((vm->anchor & 1) != 0)
+    {
+        g_QuadVertices[0].pos.x += halfWidth;
+        g_QuadVertices[1].pos.x += halfWidth;
+        g_QuadVertices[2].pos.x += halfWidth;
+        g_QuadVertices[3].pos.x += halfWidth;
+    }
+    if ((vm->anchor & 2) != 0)
+    {
+        g_QuadVertices[0].pos.y += halfHeight;
+        g_QuadVertices[1].pos.y += halfHeight;
+        g_QuadVertices[2].pos.y += halfHeight;
+        g_QuadVertices[3].pos.y += halfHeight;
+    }
+
+    return ZUN_SUCCESS;
 }
 
 // FUNCTION: th08 0x464070
@@ -1556,20 +1689,67 @@ ZunResult AnmManager::DrawNoRotationNoRound(AnmVm *vm)
     return this->DrawInner(vm, 0);
 }
 
+#pragma var_order(rot, world)
 // FUNCTION: th08 0x463d60
 void AnmManager::TransformVerticesWorld(AnmVm *vm)
 {
-    D3DXMATRIX scale;
-    D3DXMATRIX rotation;
-    D3DXMATRIX translation;
-    D3DXMatrixScaling(&scale, vm->scale.x, vm->scale.y, 1.0f);
-    D3DXMatrixRotationYawPitchRoll(&rotation, vm->rotation.y, vm->rotation.x, vm->rotation.z);
-    Float3 position = vm->pos + vm->pos2;
-    D3DXMatrixTranslation(&translation, position.x, position.y, position.z);
-    vm->matrix2 = scale * rotation * vm->matrix1 * translation;
-    vm->matrix3 = vm->matrix2;
-    vm->updateRotation = false;
-    vm->updateScale = false;
+    D3DXMATRIX world;
+    D3DXMATRIX rot;
+
+    if (vm->flag16 == 0 && (vm->updateScale || vm->updateRotation))
+    {
+        vm->matrix2 = vm->matrix1;
+        vm->matrix2.m[0][0] *= vm->scale.x;
+        vm->matrix2.m[1][1] *= vm->scale.y;
+        vm->updateScale = 0;
+        if (vm->rotation.x != 0.0)
+        {
+            D3DXMatrixRotationX(&rot, vm->rotation.x);
+            D3DXMatrixMultiply(&vm->matrix2, &vm->matrix2, &rot);
+        }
+        if (vm->rotation.y != 0.0)
+        {
+            D3DXMatrixRotationY(&rot, vm->rotation.y);
+            D3DXMatrixMultiply(&vm->matrix2, &vm->matrix2, &rot);
+        }
+        if (vm->rotation.z != 0.0)
+        {
+            D3DXMatrixRotationZ(&rot, vm->rotation.z);
+            D3DXMatrixMultiply(&vm->matrix2, &vm->matrix2, &rot);
+        }
+        vm->updateRotation = 0;
+    }
+
+    world = vm->matrix2;
+    if ((vm->anchor & 1) == 0)
+    {
+        world.m[3][0] = vm->pos.x;
+    }
+    else
+    {
+        world.m[3][0] = FUN_004031e0(vm->spriteSize.x * vm->scale.x / 2.0f) + vm->pos.x;
+    }
+
+    if ((vm->anchor & 2) == 0)
+    {
+        world.m[3][1] = vm->pos.y;
+    }
+    else
+    {
+        world.m[3][1] = FUN_004031e0(vm->spriteSize.y * vm->scale.y / 2.0f) + vm->pos.y;
+    }
+    world.m[3][2] = vm->pos.z;
+
+    D3DXVec3Project((D3DXVECTOR3 *)&g_QuadVertices[0].pos, (D3DXVECTOR3 *)&this->untexturedVector[0].pos,
+                    &g_Supervisor.viewport, &g_Supervisor.projectionMatrix, &g_Supervisor.viewMatrix, &world);
+    D3DXVec3Project((D3DXVECTOR3 *)&g_QuadVertices[1].pos, (D3DXVECTOR3 *)&this->untexturedVector[1].pos,
+                    &g_Supervisor.viewport, &g_Supervisor.projectionMatrix, &g_Supervisor.viewMatrix, &world);
+    D3DXVec3Project((D3DXVECTOR3 *)&g_QuadVertices[2].pos, (D3DXVECTOR3 *)&this->untexturedVector[2].pos,
+                    &g_Supervisor.viewport, &g_Supervisor.projectionMatrix, &g_Supervisor.viewMatrix, &world);
+    D3DXVec3Project((D3DXVECTOR3 *)&g_QuadVertices[3].pos, (D3DXVECTOR3 *)&this->untexturedVector[3].pos,
+                    &g_Supervisor.viewport, &g_Supervisor.projectionMatrix, &g_Supervisor.viewMatrix, &world);
+
+    this->unk0x1c24 = world;
 }
 
 // FUNCTION: th08 0x463cf0
@@ -1590,18 +1770,36 @@ ZunResult AnmManager::DrawWorld(AnmVm *vm)
         return ZUN_ERROR;
     }
 
-    TransformVerticesWorld(vm);
+    if (this->FUN_004639e0(vm) != ZUN_SUCCESS)
+    {
+        return ZUN_ERROR;
+    }
     return DrawInner(vm, 0);
 }
 
 // FUNCTION: th08 0x464400
-ZunResult AnmManager::FUN_00464400(AnmVm *vm, i32 flags)
+ZunResult AnmManager::FUN_00464400(AnmVm *vm, void (*callback)(AnmVm *, Float3 *))
 {
-    if (!vm->FUN_00428720() || !vm->flag1 || vm->color1.a == 0)
+    if (!vm->IsVisible())
     {
         return ZUN_ERROR;
     }
-    return this->DrawInner(vm, flags);
+
+    if (!vm->flag1)
+    {
+        return ZUN_ERROR;
+    }
+
+    if (vm->color1.a == 0)
+    {
+        return ZUN_ERROR;
+    }
+
+    if (this->FUN_004640e0(vm, callback) != ZUN_SUCCESS)
+    {
+        return ZUN_ERROR;
+    }
+    return DrawInner(vm, 0);
 }
 
 // FUNCTION: th08 0x464470

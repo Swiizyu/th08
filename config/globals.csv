@@ -5,6 +5,10 @@ _g_ControllerMapping,       0x004c78c8
 _g_DecryptParams,           0x004c78e0
 _g_CryptSignature,          0x004c7940
 _g_FormatInfoArray,         0x004c7948
+_g_ShtFileFireCallbacks,     0x004c7ee0
+_g_ShtFileUpdateCallbacks,   0x004c7f04
+_g_ShtFileDrawCallbacks,     0x004c7f1c
+_g_ShtFileHitCallbacks,      0x004c7f24
 _g_SoundBufferIdxVol,       0x004c8040
 _g_SFXList,                 0x004c81b0
 _g_Stage,                   0x004e4030
