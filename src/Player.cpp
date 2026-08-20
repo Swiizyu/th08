@@ -555,9 +555,53 @@ void Player::FUN_0040d970()
 }
 
 // FUNCTION: th08 0x40e3b0
+#pragma var_order(bomb, entry, angle)
 void Player::FUN_0040e3b0()
 {
-    UpdateBombPattern(this, 30, 0xffd0d0ff, 350, 21);
+    u8 *bomb;
+    u8 *entry;
+    f32 angle;
+
+    bomb = (u8 *)this + 0xfdc;
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
+    {
+        this->FUN_0040be30(0, "\x97\xf6\x95\x84\x81\x75\x83\x7d\x83\x58\x83\x5e\x81\x5b\x83\x58\x83\x70\x81\x5b\x83\x4e\x81\x76", 0x12c, 0x15e, 0);
+        angle = -ZUN_PI;
+        entry = bomb + 0x4c;
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)0x13, 0);
+        *(Float3 *)(entry + 0x14) = this->position;
+        this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)(bomb + 0x204), 0x1e);
+        this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)(bomb + 0x4a8), 0x1f);
+        this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)(bomb + 0x74c), 0x20);
+        this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)(bomb + 0x9f0), 0x21);
+        this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)(bomb + 0xc94), 0x22);
+        *(f32 *)((u8 *)this + 0x408) = 0.2f;
+        *(f32 *)((u8 *)this + 0x404) = 0.2f;
+        ScreenEffect::RegisterChain((ScreenEffectType)7, 16, 120, 60, 120, 21);
+    }
+
+    if (((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040d3d0() &&
+        ((ZunTimer *)((u8 *)this + 0xff4))->AsFrames() % 4 != 0)
+    {
+        void *e;
+        {
+            Float3 pos2;
+
+            pos2 = this->position;
+            pos2.x = 192.0f;
+            pos2.y = pos2.y / 2.0f;
+            this->FUN_0044de60((Float2 *)&pos2, 384.0f, pos2.y * 2, 6, 0);
+            pos2 = this->position;
+            pos2.y = pos2.y / 2.0f;
+            e = this->FUN_0044dfa0((Float2 *)&pos2, 128.0f, pos2.y * 2, 0xc, 0);
+            *(u8 *)((u8 *)e + 0x3d) = 1;
+            pos2.x = 192.0f;
+            e = this->FUN_0044dfa0((Float2 *)&pos2, 384.0f, pos2.y * 2, 6, 0);
+            *(u8 *)((u8 *)e + 0x3d) = 1;
+        }
+    }
+
+    g_AnmManager->ExecuteScriptArray((AnmVm *)(bomb + 0x204), 5);
 }
 
 // FUNCTION: th08 0x40e780
