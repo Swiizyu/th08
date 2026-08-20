@@ -300,13 +300,13 @@ EnemyUnkStruct4::EnemyUnkStruct4()
     this->unk0x204 = -1;
 }
 
-// FUNCTION: th08 0x40e350
-#pragma var_order(result)
+// FUNCTION: th08 0x40d3d0
 ZunBool ZunTimer::FUN_0040d3d0()
 {
     return this->current != this->previous;
 }
 
+// FUNCTION: th08 0x40e350
 ZunBool ZunTimer::FUN_0040e350(i32 value)
 {
     ZunBool result;
@@ -323,7 +323,6 @@ ZunBool ZunTimer::FUN_0040e350(i32 value)
 }
 
 // FUNCTION: th08 0x40ebc0
-#pragma var_order(result)
 ZunBool ZunTimer::FUN_0040ebc0(i32 value)
 {
     ZunBool result;

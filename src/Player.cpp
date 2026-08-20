@@ -729,8 +729,7 @@ void Player::FUN_0040c820()
     AnmVm *vm;
 
     this->FUN_0040bc60(0x80404040);
-    entry = (u8 *)this + 0x1028;
-    for (i = 0; i < 16; i++, entry += 0x16f0)
+    for (i = 0, entry = (u8 *)this + 0x1028; i < 16; i++, entry += 0x16f0)
     {
         if (*(i32 *)entry == 0)
         {
@@ -750,12 +749,11 @@ void Player::FUN_0040c820()
 void Player::FUN_0040d010()
 {
     u8 *entry;
-    i32 i;
+    u32 i;
     AnmVm *vm;
 
     this->FUN_0040bc60(0x802020d0);
-    entry = (u8 *)this + 0x1028;
-    for (i = 0; i < 128; i++, entry += 0x16f0)
+    for (i = 0, entry = (u8 *)this + 0x1028; i < 128; i++, entry += 0x16f0)
     {
         if (*(i32 *)entry == 0)
         {
