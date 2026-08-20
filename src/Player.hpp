@@ -247,5 +247,6 @@ C_ASSERT(sizeof(Player) == 0xe2b30);
 
 DIFFABLE_EXTERN(Player, g_Player);
 DIFFABLE_EXTERN_ARRAY(u8 *, 8, g_PlayerObjPtrs);
+DIFFABLE_EXTERN_ARRAY(void *, 7, g_DreamSealFuncTable);
 
 } /* namespace th08 */

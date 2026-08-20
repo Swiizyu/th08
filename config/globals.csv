@@ -1,4 +1,5 @@
 _g_PbgFileSeekModes,        0x004b98f8
+_g_DreamSealFuncTable,      0x004c6100
 _g_PbgFileOpenModes,        0x004c8704
 _g_AsciiManager,            0x004cce20
 _g_ControllerMapping,       0x004c78c8
