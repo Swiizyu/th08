@@ -865,6 +865,8 @@ address,type,x-text
 0x4b95d8,string,"%sTotal"
 0x4b95e0,string,"%3d(%3d)/%3d/%3d"
 0x4b95fc,string,"%s%s"
+0x4b9604,string,"*"
+0x4b9608,string,"@"
 0x4b9614,string,"%3d/%3d(%3d/%3d)"
 0x4b962c,string,"%sNo.%.3d"
 0x4b9640,string,"title/info01.jpg"

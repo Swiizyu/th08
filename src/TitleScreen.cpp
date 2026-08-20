@@ -3025,7 +3025,7 @@ ChainCallbackResult TitleScreen::DrawSpellCardSelect()
             break;
         }
 
-        g_AsciiManager.color.d3dColor = this->spellCardNameVms[i].color1.d3dColor;
+        g_AsciiManager.SetColor(this->spellCardNameVms[i].color1.d3dColor);
 
         spellCardNumber =
             g_SpellcardNumbersPerStage[g_GameManager.currentStage]
