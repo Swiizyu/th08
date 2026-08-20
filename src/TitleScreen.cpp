@@ -2493,21 +2493,215 @@ ChainCallbackResult TitleScreen::OnUpdateSpellCardSelect()
 // FUNCTION: th08 0x46cbbb
 void TitleScreen::UnlockLastWordSpellCards()
 {
-    i32 captures = 0;
-    for (i32 i = 0; i < SPELLCARD_COUNT_SPELLCARDS; i++)
+    i32 i;
+    i32 captures;
+    i32 stagesCleared2;
+    i32 stagesCleared3;
+    i32 i2;
+    i32 lastWordCaptures15;
+    i32 stagesCleared4;
+    i32 i3;
+    i32 normalCapturesShot6;
+    i32 i4;
+    i32 stagesCleared6;
+    i32 i5;
+    i32 extraStagesCleared;
+    i32 i6;
+    i32 lastWordCaptures30;
+
+#define UNLOCK_LAST_WORD(num)                                                                                          \
+    {                                                                                                                  \
+        i32 spell = (num);                                                                                             \
+        g_GameManager.flsp.unlockedLastWordSpellCards[spell - SPELLCARD_LAST_WORD_START] = spell;                      \
+    }
+
+    captures = 0;
+    for (i = 0; i < SPELLCARD_COUNT_SPELLCARDS; i++)
     {
-        if (g_GameManager.catkData[i].inGameHistory.captures[SHOT_ALL] != 0 ||
-            g_GameManager.catkData[i].spellPracticeHistory.captures[SHOT_ALL] != 0)
+        if (g_GameManager.catkData[i].spellPracticeHistory.captures[SHOT_ALL] > 0)
+        {
             captures++;
+        }
     }
-    for (i32 i = 0; i < SPELLCARD_COUNT_LAST_WORD_SPELLCARDS; i++)
+
+    stagesCleared2 = 0;
+    for (i = 0; i < SHOT_ALL; i++)
     {
-        i32 spell = g_SpellcardNumbersPerStage[9][i];
-        Catk *catk = &g_GameManager.catkData[spell];
-        if (catk->inGameHistory.attempts[SHOT_ALL] != 0 ||
-            catk->spellPracticeHistory.attempts[SHOT_ALL] != 0 || captures >= (i + 1) * 10)
-            g_GameManager.flsp.unlockedLastWordSpellCards[i] = TRUE;
+        if (IS_STAGE_CLEARED(g_GameManager.clrdData[i].difficultiesClearedWithoutRetries[0], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i].difficultiesClearedWithoutRetries[1], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i].difficultiesClearedWithoutRetries[2], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i].difficultiesClearedWithoutRetries[3], 14))
+        {
+            stagesCleared2++;
+        }
     }
+    if (stagesCleared2 >= 2)
+    UNLOCK_LAST_WORD(0xcd)
+
+    stagesCleared3 = 0;
+    for (i = 0; i < SHOT_ALL; i++)
+    {
+        if (IS_STAGE_CLEARED(g_GameManager.clrdData[i].difficultiesClearedWithoutRetries[0], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i].difficultiesClearedWithoutRetries[1], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i].difficultiesClearedWithoutRetries[2], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i].difficultiesClearedWithoutRetries[3], 14))
+        {
+            stagesCleared3++;
+        }
+    }
+    if (stagesCleared3 >= 3)
+    UNLOCK_LAST_WORD(0xce)
+
+    if (captures >= 50)
+    UNLOCK_LAST_WORD(0xcf)
+
+    lastWordCaptures15 = 0;
+    for (i2 = 0; i2 < g_LastSpellCount; i2++)
+    {
+        if (g_GameManager.catkData[g_LastSpellNumbers[i2]].spellPracticeHistory.captures[SHOT_ALL] > 0)
+        {
+            lastWordCaptures15++;
+        }
+    }
+    if (lastWordCaptures15 >= 15)
+    UNLOCK_LAST_WORD(0xd2)
+
+    if (g_GameManager.catkData[137].inGameHistory.captures[SHOT_ALL] > 0 ||
+        g_GameManager.catkData[137].spellPracticeHistory.captures[SHOT_ALL] > 0)
+    UNLOCK_LAST_WORD(0xd1)
+
+    stagesCleared4 = 0;
+    for (i3 = 0; i3 < SHOT_ALL; i3++)
+    {
+        if (IS_STAGE_CLEARED(g_GameManager.clrdData[i3].difficultiesClearedWithoutRetries[0], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i3].difficultiesClearedWithoutRetries[1], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i3].difficultiesClearedWithoutRetries[2], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i3].difficultiesClearedWithoutRetries[3], 14))
+        {
+            stagesCleared4++;
+        }
+    }
+    if (stagesCleared4 >= 4)
+    UNLOCK_LAST_WORD(0xd0)
+
+    if ((g_GameManager.catkData[195].inGameHistory.captures[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[195].spellPracticeHistory.captures[SHOT_ALL] > 0) &&
+        (g_GameManager.catkData[204].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[204].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[145].inGameHistory.captures[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[145].spellPracticeHistory.captures[SHOT_ALL] > 0))
+    UNLOCK_LAST_WORD(0xd3)
+
+    if ((g_GameManager.catkData[208].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[208].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[209].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[209].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[210].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[210].spellPracticeHistory.attempts[SHOT_ALL] != 0))
+    UNLOCK_LAST_WORD(0xd4)
+
+    if ((g_GameManager.catkData[205].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[205].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[206].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[206].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[207].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[207].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[211].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[211].spellPracticeHistory.attempts[SHOT_ALL] != 0))
+    UNLOCK_LAST_WORD(0xd5)
+
+    normalCapturesShot6 = 0;
+    normalCapturesShot6 = 0;
+    for (i4 = 0; i4 < g_SpellcardCountsPerDifficulty[1]; i4++)
+    {
+        Catk *catk = &g_GameManager.catkData[g_SpellcardNumbersNormal[i4]];
+        if (catk->inGameHistory.captures[6] > 0 || catk->spellPracticeHistory.captures[6] > 0)
+        {
+            normalCapturesShot6++;
+        }
+    }
+    if (normalCapturesShot6 == g_SpellcardCountsPerDifficulty[1])
+    UNLOCK_LAST_WORD(0xd6)
+
+    if (IS_STAGE_CLEARED(g_GameManager.clrdData[4].difficultiesClearedWithoutRetries[2], 14) ||
+        IS_STAGE_CLEARED(g_GameManager.clrdData[4].difficultiesClearedWithoutRetries[3], 14))
+    UNLOCK_LAST_WORD(0xd7)
+
+    if (captures >= 120)
+    UNLOCK_LAST_WORD(0xd8)
+
+    stagesCleared6 = 0;
+    for (i5 = 0; i5 < SHOT_ALL; i5++)
+    {
+        if (IS_STAGE_CLEARED(g_GameManager.clrdData[i5].difficultiesClearedWithoutRetries[0], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i5].difficultiesClearedWithoutRetries[1], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i5].difficultiesClearedWithoutRetries[2], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i5].difficultiesClearedWithoutRetries[3], 14))
+        {
+            stagesCleared6++;
+        }
+    }
+    if (stagesCleared6 >= 6)
+    UNLOCK_LAST_WORD(0xd9)
+
+    extraStagesCleared = 0;
+    for (i6 = 0; i6 < SHOT_ALL; i6++)
+    {
+        if (IS_STAGE_CLEARED(g_GameManager.clrdData[i6].difficultiesClearedWithoutRetries[4], EXTRASTAGE))
+        {
+            extraStagesCleared++;
+        }
+    }
+    if (extraStagesCleared >= 3)
+    UNLOCK_LAST_WORD(0xda)
+
+    lastWordCaptures30 = 0;
+    for (i = 0; i < g_LastSpellCount; i++)
+    {
+        if (g_GameManager.catkData[g_LastSpellNumbers[i]].spellPracticeHistory.captures[SHOT_ALL] > 0)
+        {
+            lastWordCaptures30++;
+        }
+    }
+    if (lastWordCaptures30 >= 30)
+    UNLOCK_LAST_WORD(0xdb)
+
+    if (IS_STAGE_CLEARED(g_GameManager.clrdData[SHOT_ALL].difficultiesClearedWithRetries[3], 14))
+    UNLOCK_LAST_WORD(0xdc)
+
+    if ((g_GameManager.catkData[205].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[205].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[206].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[206].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[207].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[207].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[208].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[208].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[209].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[209].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[210].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[210].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[211].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[211].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[212].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[212].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[213].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[213].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[214].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[214].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[215].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[215].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[216].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[216].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[217].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[217].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[218].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[218].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[219].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[219].spellPracticeHistory.attempts[SHOT_ALL] != 0) &&
+        (g_GameManager.catkData[220].inGameHistory.attempts[SHOT_ALL] > 0 ||
+         g_GameManager.catkData[220].spellPracticeHistory.attempts[SHOT_ALL] != 0))
+    UNLOCK_LAST_WORD(0xdd)
 }
 
 #pragma var_order(vm, i2, i, position)
