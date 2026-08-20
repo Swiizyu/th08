@@ -1,5 +1,5 @@
 # reccmp verbose-diff watchlist (one per line: address or reccmp name)
-0x446f53
-0x465070
-0x467180
-0x4628b0
+0x44748f
+0x466650
+0x465ac0
+0x4655e0
