@@ -133,7 +133,7 @@ ZunBool GameManager::IsSpellNumberEqualTo(i32 spellNumber)
 
     if (this->flags.isSpellPractice)
     {
-        result = !(this->currentSpellCardNumber - spellNumber);
+        result = this->currentSpellCardNumber == spellNumber;
     }
     else
     {
@@ -145,8 +145,20 @@ ZunBool GameManager::IsSpellNumberEqualTo(i32 spellNumber)
 // FUNCTION: th08 0x418180
 ZunBool GameManager::IsSpellNumberInRange(i32 firstSpellNumber, i32 lastSpellNumber)
 {
-    return this->flags.isSpellPractice && this->currentSpellCardNumber >= firstSpellNumber &&
-           this->currentSpellCardNumber <= lastSpellNumber;
+    ZunBool inRange;
+    ZunBool result;
+
+    if (this->flags.isSpellPractice)
+    {
+        inRange = this->currentSpellCardNumber >= firstSpellNumber &&
+                  this->currentSpellCardNumber <= lastSpellNumber;
+        result = inRange;
+    }
+    else
+    {
+        result = FALSE;
+    }
+    return result;
 }
 
 // FUNCTION: th08 0x402130
