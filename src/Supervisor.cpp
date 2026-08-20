@@ -843,7 +843,7 @@ void Supervisor::StartupThread(Supervisor *s)
             FindClose(findFile);
         }
 
-        time(&currentTime);
+        _time32(&currentTime);
         currentLocalTime = localtime(&currentTime);
         strftime(fileNameBuffer, 128, "score_1.%y%m%d.bak", currentLocalTime);
 
@@ -1522,9 +1522,10 @@ ZunBool Supervisor::PlayMusic(i32 param_1, i32 param_2)
     {
         if (g_Supervisor.midiOutput != NULL)
         {
-            g_Supervisor.midiOutput->StopPlayback();
-            g_Supervisor.midiOutput->ParseFile(param_1);
-            g_Supervisor.midiOutput->Play();
+            MidiOutput *midiOut = g_Supervisor.midiOutput;
+            midiOut->StopPlayback();
+            midiOut->ParseFile(param_1);
+            midiOut->Play();
         }
 
         if (!g_GameManager.flags.isReplay && !g_GameManager.flags.isDemoMode)
@@ -1551,7 +1552,7 @@ ZunBool Supervisor::PlayMusic(i32 param_1, i32 param_2)
     return FALSE;
 }
 
-#pragma var_order(periodLoc, wavPathBuf)
+#pragma var_order(periodLoc, wavPathBuf, midiOut)
 ZunResult Supervisor::PlayAudio(char *path, i32 param_2)
 {
     char wavPathBuf[256];
@@ -1561,9 +1562,10 @@ ZunResult Supervisor::PlayAudio(char *path, i32 param_2)
     {
         if (g_Supervisor.midiOutput != NULL)
         {
-            g_Supervisor.midiOutput->StopPlayback();
-            g_Supervisor.midiOutput->LoadFile(path);
-            g_Supervisor.midiOutput->Play();
+            MidiOutput *midiOut = g_Supervisor.midiOutput;
+            midiOut->StopPlayback();
+            midiOut->LoadFile(path);
+            midiOut->Play();
         }
 
         if (!g_GameManager.flags.isReplay && !g_GameManager.flags.isDemoMode)
@@ -1952,7 +1954,7 @@ void Supervisor::InitializeCriticalSections()
 
 void Supervisor::DeleteCriticalSections()
 {
-    for (int i = 0; i < ARRAY_SIZE_SIGNED(this->criticalSections); i++)
+    for (u32 i = 0; i < ARRAY_SIZE_SIGNED(this->criticalSections); i++)
     {
         DeleteCriticalSection(&this->criticalSections[i]);
     }
