@@ -923,8 +923,8 @@ ZunResult Supervisor::SetupDInput()
     {
         this->controller->SetDataFormat(&c_dfDIJoystick2);
         this->controller->SetCooperativeLevel(this->hwndGameWindow, DISCL_BACKGROUND | DISCL_NONEXCLUSIVE);
-        this->controllerCaps.dwSize = sizeof(DIDEVCAPS);
-        this->controller->GetCapabilities(&this->controllerCaps);
+        g_Supervisor.controllerCaps.dwSize = sizeof(DIDEVCAPS);
+        this->controller->GetCapabilities(&g_Supervisor.controllerCaps);
         this->controller->EnumObjects(ControllerCallback, NULL, 0);
         g_GameErrorContext.Log("\x97\x4C\x8C\xF8\x82\xC8\x83\x70\x83\x62\x83\x68\x82\xF0\x94\xAD\x8C\xA9\x82\xB5\x82\xDC\x82\xB5\x82\xBD\r\n");
     }
@@ -1239,8 +1239,17 @@ ZunBool Supervisor::TakeSnapshot(const char *filePath)
     bmfh.bfSize = bmfh.bfOffBits = 54;
     switch (this->presentParameters.BackBufferFormat)
     {
+    case D3DFMT_R5G6B5:
+        utils::GuiDebugPrint("\x31\x36\x62\x69\x74\x20\x82\xCD\x8E\xE6\x82\xE8\x8D\x9E\x82\xDF\x82\xC8\x82\xA2\x0D"
+                             "\x0A");
+        g_GameErrorContext.Log("\x31\x36\x62\x69\x74\x20\x82\xCD\x8E\xE6\x82\xE8\x8D\x9E\x82\xDF\x82\xC8\x82\xA2"
+                               "\x0D\x0A");
+        break;
     case D3DFMT_X8R8G8B8:
-        bitmapInfo = (BITMAPINFO *)malloc(sizeof(BITMAPINFO));
+    {
+        i32 bitmapInfoSize;
+        bitmapInfoSize = sizeof(BITMAPINFO);
+        bitmapInfo = (BITMAPINFO *)malloc(bitmapInfoSize);
         if (bitmapInfo == NULL)
         {
             g_GameErrorContext.Log("\x73\x6E\x61\x70\x53\x68\x6F\x74\x53\x63\x72\x65\x65\x6E\x20\x3A\x20\x8A\x6D"
@@ -1278,7 +1287,16 @@ ZunBool Supervisor::TakeSnapshot(const char *filePath)
                 srcPixel++;
                 dstPixel++;
                 *dstPixel = *srcPixel;
-                srcPixel += 2;
+                /* The original merges the two increments into a single
+                 * register run (mov/inc/inc/mov); MSVC /Od emits a full
+                 * load/store per statement, so spell it in asm. */
+                __asm
+                {
+                    mov eax, [srcPixel]
+                    inc eax
+                    inc eax
+                    mov [srcPixel], eax
+                }
                 dstPixel++;
             }
         }
@@ -1293,12 +1311,7 @@ ZunBool Supervisor::TakeSnapshot(const char *filePath)
         WriteFile(bitmapFile, bitmapData, stride * 480, &bytesWritten, NULL);
         CloseHandle(bitmapFile);
         break;
-    case D3DFMT_R5G6B5:
-        utils::GuiDebugPrint("\x31\x36\x62\x69\x74\x20\x82\xCD\x8E\xE6\x82\xE8\x8D\x9E\x82\xDF\x82\xC8\x82\xA2\x0D"
-                             "\x0A");
-        g_GameErrorContext.Log("\x31\x36\x62\x69\x74\x20\x82\xCD\x8E\xE6\x82\xE8\x8D\x9E\x82\xDF\x82\xC8\x82\xA2"
-                               "\x0D\x0A");
-        break;
+    }
     default:
         g_GameErrorContext.Log("\x65\x72\x72\x6F\x72\x20\x3F\x20\x6D\x6F\x74\x68\x65\x72\x2E\x63\x70\x70\x0D\x0A");
         return TRUE;
@@ -1507,21 +1520,60 @@ ZunBool Supervisor::PlayMusic(i32 param_1, i32 param_2)
 {
     if (g_Supervisor.cfg.musicMode == MIDI)
     {
+        if (g_Supervisor.midiOutput != NULL)
+        {
+            MidiOutput *midiOut = g_Supervisor.midiOutput;
+            midiOut->StopPlayback();
+            midiOut->ParseFile(param_1);
+            midiOut->Play();
+        }
+
+        if (!g_GameManager.flags.isReplay && !g_GameManager.flags.isDemoMode)
+        {
+            g_GameManager.plst.bgmUnlocked[param_2] = 1;
+        }
+
+        return FALSE;
     }
     else if (g_Supervisor.cfg.musicMode == WAV)
     {
+        if (g_Supervisor.cfg.opts.preloadMusic)
+        {
+            g_SoundPlayer.QueueCommand(4, 0, "dummy");
+        }
         g_SoundPlayer.QueueCommand(2, param_1, "dummy");
+
+        if (!g_GameManager.flags.isReplay && !g_GameManager.flags.isDemoMode)
+        {
+            g_GameManager.plst.bgmUnlocked[param_2] = 1;
+        }
     }
 
-    return TRUE;
+    return FALSE;
 }
 
+#pragma var_order(periodLoc, wavPathBuf, midiOut)
 ZunResult Supervisor::PlayAudio(char *path, i32 param_2)
 {
     char wavPathBuf[256];
     char *periodLoc;
 
-    if (g_Supervisor.cfg.musicMode == WAV)
+    if (g_Supervisor.cfg.musicMode == MIDI)
+    {
+        if (g_Supervisor.midiOutput != NULL)
+        {
+            MidiOutput *midiOut = g_Supervisor.midiOutput;
+            midiOut->StopPlayback();
+            midiOut->LoadFile(path);
+            midiOut->Play();
+        }
+
+        if (!g_GameManager.flags.isReplay && !g_GameManager.flags.isDemoMode)
+        {
+            g_GameManager.plst.bgmUnlocked[param_2] = 1;
+        }
+    }
+    else if (g_Supervisor.cfg.musicMode == WAV)
     {
         strcpy(wavPathBuf, path);
 
@@ -1531,6 +1583,15 @@ ZunResult Supervisor::PlayAudio(char *path, i32 param_2)
         periodLoc[3] = 'v';
 
         g_SoundPlayer.QueueCommand(2, -1, wavPathBuf);
+
+        if (!g_GameManager.flags.isReplay && !g_GameManager.flags.isDemoMode)
+        {
+            g_GameManager.plst.bgmUnlocked[param_2] = 1;
+        }
+    }
+    else
+    {
+        return ZUN_ERROR;
     }
 
     return ZUN_SUCCESS;
@@ -1669,8 +1730,8 @@ void Supervisor::UpdateGameTime()
     }
     if (g_GameManager.plst.gameSeconds >= 60)
     {
-        g_GameManager.plst.gameMinutes += (g_GameManager.plst.gameMilliseconds / 60);
-        g_GameManager.plst.gameSeconds = (g_GameManager.plst.gameMilliseconds % 60);
+        g_GameManager.plst.gameMinutes += (g_GameManager.plst.gameSeconds / 60);
+        g_GameManager.plst.gameSeconds = (g_GameManager.plst.gameSeconds % 60);
     }
     if (g_GameManager.plst.gameMinutes >= 60)
     {
@@ -1711,8 +1772,8 @@ void Supervisor::UpdatePlayTime()
     }
     if (g_GameManager.plst.totalSeconds >= 60)
     {
-        g_GameManager.plst.totalMinutes += (g_GameManager.plst.totalMilliseconds / 60);
-        g_GameManager.plst.totalSeconds = (g_GameManager.plst.totalMilliseconds % 60);
+        g_GameManager.plst.totalMinutes += (g_GameManager.plst.totalSeconds / 60);
+        g_GameManager.plst.totalSeconds = (g_GameManager.plst.totalSeconds % 60);
     }
     if (g_GameManager.plst.totalMinutes >= 60)
     {
@@ -1848,6 +1909,12 @@ void Supervisor::HideLoadingVms(void)
         g_SupervisorLoadingVms[2].SetInterrupt(1);
         this->loadingVmsHaveBeenSetup = 0;
     }
+
+    if (g_SupervisorScreenEffect != NULL)
+    {
+        ScreenEffect::FUN_0045c160(g_SupervisorScreenEffect);
+        g_SupervisorScreenEffect = NULL;
+    }
 }
 
 void Supervisor::SetupLoadingVmsAndInitCapture(Float3 *position)
@@ -1872,8 +1939,8 @@ void Supervisor::StartEffect(i32 idx)
 {
     if (g_SupervisorScreenEffect == NULL)
     {
-        // g_SupervisorScreenEffect = ScreenEffect::RegisterChain(((ScreenEffectType) idx) + SCREEN_EFFECT_UNK5, 60, 0,
-        // 0, 0, 1);
+        g_SupervisorScreenEffect =
+            ScreenEffect::RegisterChain((ScreenEffectType)(idx + SCREEN_EFFECT_UNK5), 60, 0, 0, 0, 1);
     }
 }
 
@@ -1887,7 +1954,7 @@ void Supervisor::InitializeCriticalSections()
 
 void Supervisor::DeleteCriticalSections()
 {
-    for (int i = 0; i < ARRAY_SIZE_SIGNED(this->criticalSections); i++)
+    for (u32 i = 0; i < ARRAY_SIZE_SIGNED(this->criticalSections); i++)
     {
         DeleteCriticalSection(&this->criticalSections[i]);
     }

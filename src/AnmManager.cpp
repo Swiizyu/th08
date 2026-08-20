@@ -12,6 +12,7 @@
 namespace th08
 {
 f32 FUN_004031e0(f32 value);
+u8 MixColors(u8 color1, u8 color2);
 
 DIFFABLE_STATIC(AnmManager *, g_AnmManager);
 DIFFABLE_STATIC_ARRAY(VertexTex1DiffuseXyzrhw, 4, g_QuadVertices);
@@ -24,13 +25,106 @@ AnmVmBase::AnmVmBase()
 }
 
 // FUNCTION: th08 0x4623c0
-void AnmManager::FUN_004623c0(AnmVm *vm)
+void AnmManager::SetRenderStateForVm3D(AnmVm *vm)
 {
-    this->SetRenderStateForVm(vm);
-    if (vm->loadedSprite != NULL && vm->anmFile != NULL)
+    ZunColor color;
+
+    if (this->currentBlendMode != vm->blendMode)
     {
-        this->currentTexture = vm->loadedSprite->texture;
+        this->FlushVertexBuffer();
+        this->currentBlendMode = vm->blendMode;
+
+        switch (this->currentBlendMode)
+        {
+        case AnmBlendMode_Normal:
+            g_Supervisor.d3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+            break;
+        case AnmBlendMode_Additive:
+            g_Supervisor.d3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+            break;
+        }
     }
+
+    color.d3dColor = vm->flag17 ? vm->color2.d3dColor : vm->color1.d3dColor;
+
+    if (this->unk0x24c5)
+    {
+        this->unk0x24c5 = 0;
+        if (!g_Supervisor.IsVertexBufferDisabled())
+        {
+            this->FlushVertexBuffer();
+            g_Supervisor.d3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_TFACTOR);
+            g_Supervisor.d3dDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_TFACTOR);
+        }
+    }
+
+    if (!g_Supervisor.IsVertexBufferDisabled())
+    {
+        if (this->useMixColor != 0)
+        {
+            color.r = MixColors(color.r, this->color.r);
+            color.g = MixColors(color.g, this->color.g);
+            color.b = MixColors(color.b, this->color.b);
+            color.a = MixColors(color.a, this->color.a);
+        }
+
+        if (this->unk0x24b8 != color.d3dColor)
+        {
+            this->FlushVertexBuffer();
+            this->unk0x24b8 = color.d3dColor;
+            g_Supervisor.d3dDevice->SetRenderState(D3DRS_TEXTUREFACTOR, this->unk0x24b8);
+        }
+    }
+    else
+    {
+        if (this->useMixColor != 0)
+        {
+            color.r = MixColors(color.r, this->color.r);
+            color.g = MixColors(color.g, this->color.g);
+            color.b = MixColors(color.b, this->color.b);
+            color.a = MixColors(color.a, this->color.a);
+        }
+
+        g_QuadVertices[0].diffuse = color.d3dColor;
+        g_QuadVertices[1].diffuse = color.d3dColor;
+        g_QuadVertices[2].diffuse = color.d3dColor;
+        g_QuadVertices[3].diffuse = color.d3dColor;
+        g_BackgroundQuadVertices[0].diffuse = color.d3dColor;
+        g_BackgroundQuadVertices[1].diffuse = color.d3dColor;
+        g_BackgroundQuadVertices[2].diffuse = color.d3dColor;
+        g_BackgroundQuadVertices[3].diffuse = color.d3dColor;
+    }
+
+    if (!g_Supervisor.IsDepthTestDisabled() && this->disableZWrite != vm->zWriteDisabled)
+    {
+        this->FlushVertexBuffer();
+        this->disableZWrite = vm->zWriteDisabled;
+        if (!this->disableZWrite)
+        {
+            g_Supervisor.d3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+        }
+        else
+        {
+            g_Supervisor.d3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+        }
+    }
+
+    if (this->cameraMode != vm->flag15)
+    {
+        this->FlushVertexBuffer();
+        this->cameraMode = vm->flag15;
+        if (!this->cameraMode)
+        {
+            g_Background.SetCamera1();
+            g_Supervisor.d3dDevice->SetViewport(&g_Supervisor.viewport);
+        }
+        else
+        {
+            g_Background.SetCamera2();
+            g_Supervisor.d3dDevice->SetViewport(&g_Supervisor.viewport);
+        }
+    }
+
     this->renderStateChangesThisFrame++;
 }
 
@@ -109,7 +203,7 @@ ZunResult AnmManager::FUN_004639e0(AnmVm *vm)
 #pragma var_order(halfWidth, halfHeight, screenCenterY, halfLength, sinZ, matrix, z, \
                   projectRight, projectCenter, projectRightOffset, cosZ, origin)
 // FUNCTION: th08 0x4640e0
-ZunResult AnmManager::FUN_004640e0(AnmVm *vm, void (*callback)(AnmVm *, Float3 *))
+ZunResult AnmManager::TransformVerticesWorldWithCallback(AnmVm *vm, void (*callback)(AnmVm *, Float3 *))
 {
     f32 halfWidth;
     f32 halfHeight;
@@ -1778,7 +1872,7 @@ ZunResult AnmManager::DrawWorld(AnmVm *vm)
 }
 
 // FUNCTION: th08 0x464400
-ZunResult AnmManager::FUN_00464400(AnmVm *vm, void (*callback)(AnmVm *, Float3 *))
+ZunResult AnmManager::DrawWithCallback(AnmVm *vm, void (*callback)(AnmVm *, Float3 *))
 {
     if (!vm->IsVisible())
     {
@@ -1795,89 +1889,296 @@ ZunResult AnmManager::FUN_00464400(AnmVm *vm, void (*callback)(AnmVm *, Float3 *
         return ZUN_ERROR;
     }
 
-    if (this->FUN_004640e0(vm, callback) != ZUN_SUCCESS)
+    if (this->TransformVerticesWorldWithCallback(vm, callback) != ZUN_SUCCESS)
     {
         return ZUN_ERROR;
     }
     return DrawInner(vm, 0);
 }
 
+#pragma var_order(texMatrix, rot, world)
 // FUNCTION: th08 0x464470
-ZunResult AnmManager::FUN_00464470(AnmVm *vm)
+ZunResult AnmManager::Draw3D(AnmVm *vm)
 {
-    if (vm == NULL || !vm->FUN_00428720() || !vm->flag1 || vm->color1.a == 0)
+    D3DMATRIX texMatrix;
+    D3DXMATRIX rot;
+    D3DXMATRIX world;
+
+    if (!vm->IsVisible())
+    {
         return ZUN_ERROR;
-    this->SetRenderStateForVm(vm);
-    return this->DrawInner(vm, 0);
+    }
+
+    if (!vm->flag1)
+    {
+        return ZUN_ERROR;
+    }
+
+    if (vm->color1.a == 0)
+    {
+        return ZUN_ERROR;
+    }
+
+    if (this->spritesToDraw != 0)
+    {
+        this->FlushVertexBuffer();
+    }
+
+    if (vm->flag16 == 0 && (vm->updateScale || vm->updateRotation))
+    {
+        vm->matrix2 = vm->matrix1;
+        vm->matrix2.m[0][0] *= vm->scale.x;
+        vm->matrix2.m[1][1] *= vm->scale.y;
+        vm->updateScale = 0;
+        if (vm->rotation.x != 0.0)
+        {
+            D3DXMatrixRotationX(&rot, vm->rotation.x);
+            D3DXMatrixMultiply(&vm->matrix2, &vm->matrix2, &rot);
+        }
+        if (vm->rotation.y != 0.0)
+        {
+            D3DXMatrixRotationY(&rot, vm->rotation.y);
+            D3DXMatrixMultiply(&vm->matrix2, &vm->matrix2, &rot);
+        }
+        if (vm->rotation.z != 0.0)
+        {
+            D3DXMatrixRotationZ(&rot, vm->rotation.z);
+            D3DXMatrixMultiply(&vm->matrix2, &vm->matrix2, &rot);
+        }
+        vm->updateRotation = 0;
+    }
+
+    world = vm->matrix2;
+    if ((vm->anchor & 1) == 0)
+    {
+        world.m[3][0] = vm->pos.x;
+    }
+    else
+    {
+        world.m[3][0] = FUN_004031e0(vm->spriteSize.x * vm->scale.x / 2.0f) + vm->pos.x;
+    }
+
+    if ((vm->anchor & 2) == 0)
+    {
+        world.m[3][1] = vm->pos.y;
+    }
+    else
+    {
+        world.m[3][1] = FUN_004031e0(vm->spriteSize.y * vm->scale.y / 2.0f) + vm->pos.y;
+    }
+    world.m[3][0] += this->screenShakeOffset.x;
+    world.m[3][1] += this->screenShakeOffset.y;
+
+    this->SetRenderStateForVm3D(vm);
+    world.m[3][2] = vm->pos.z;
+
+    g_Supervisor.d3dDevice->SetTransform(D3DTS_WORLD, &world);
+
+    if (this->currentSprite != vm->loadedSprite || vm->uvScrollPos.x != 0.0f || vm->uvScrollPos.x != 0.0f)
+    {
+        this->currentSprite = vm->loadedSprite;
+        texMatrix = vm->matrix3;
+        texMatrix.m[2][0] = vm->loadedSprite->uvStart.x + vm->uvScrollPos.x;
+        texMatrix.m[2][1] = vm->loadedSprite->uvStart.y + vm->uvScrollPos.y;
+        g_Supervisor.d3dDevice->SetTransform(D3DTS_TEXTURE0, &texMatrix);
+
+        if (this->currentTexture != vm->loadedSprite->texture)
+        {
+            this->currentTexture = vm->loadedSprite->texture;
+            g_Supervisor.d3dDevice->SetTexture(0, this->currentTexture);
+        }
+    }
+
+    if (this->currentVertexShader != 2)
+    {
+        if (!g_Supervisor.IsVertexBufferDisabled())
+        {
+            g_Supervisor.d3dDevice->SetVertexShader(D3DFVF_XYZ | D3DFVF_TEX1);
+            g_Supervisor.d3dDevice->SetStreamSource(0, this->quadVertexBuffer, sizeof(VertexDiffuseXyzrhw));
+        }
+        else
+        {
+            g_Supervisor.d3dDevice->SetVertexShader(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+        }
+        g_Supervisor.d3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_TFACTOR);
+        g_Supervisor.d3dDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_TFACTOR);
+        this->currentVertexShader = 2;
+    }
+
+    if (!g_Supervisor.IsVertexBufferDisabled())
+    {
+        g_Supervisor.d3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+    }
+    else
+    {
+        g_Supervisor.d3dDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, g_BackgroundQuadVertices,
+                                                sizeof(VertexTex1Xyzrhw));
+    }
+
+    return ZUN_SUCCESS;
 }
 
+#pragma var_order(v, i, cur, u, t, step, uRange)
 // FUNCTION: th08 0x4649a0
 ZunResult AnmManager::FUN_004649a0(AnmVm *vm, VertexTex1DiffuseXyzrhw *vertices, i32 vertexCount)
 {
-    if (vertexCount < 3 || vm->loadedSprite == NULL)
+    f32 v;
+    i32 i;
+    VertexTex1DiffuseXyzrhw *cur;
+    f32 u;
+    f32 t;
+    f32 step;
+    f32 uRange;
+
+    if (vertexCount < 3)
     {
         return ZUN_ERROR;
     }
-    i32 pairs = (vertexCount + 1) / 2 - 1;
-    f32 step = pairs > 0 ? (vm->loadedSprite->uvEnd.x - vm->loadedSprite->uvStart.x) / pairs : 0.0f;
-    f32 u = vm->loadedSprite->uvEnd.x + vm->spriteSize.y;
-    for (i32 i = 0; i < vertexCount; i++)
+
+    u = vm->loadedSprite->uvEnd.x + vm->uvScrollPos.x;
+    uRange = vm->loadedSprite->uvEnd.x - vm->loadedSprite->uvStart.x;
+    v = vm->loadedSprite->uvStart.y + vm->uvScrollPos.y;
+    cur = vertices;
+    step = uRange / ((vertexCount + 1) / 2 - 1);
+
+    for (i = 0, t = u; i < vertexCount; i += 2, cur += 2, t -= step)
     {
-        vertices[i].textureUV.x = u;
-        vertices[i].textureUV.y = (i & 1) ? vm->loadedSprite->uvStart.y : vm->loadedSprite->uvEnd.y;
-        vertices[i].diffuse = vm->color1.d3dColor;
-        vertices[i].w = 1.0f;
-        if (i & 1)
-        {
-            u -= step;
-        }
+        cur->textureUV.x = t;
+        cur->textureUV.y = v;
+        cur->diffuse = vm->color1.d3dColor;
+        cur->w = 1.0f;
     }
+
+    v = vm->loadedSprite->uvEnd.y + vm->uvScrollPos.y;
+    cur = vertices + 1;
+    for (i = 1, t = u; i < vertexCount; i += 2, cur += 2, t -= step)
+    {
+        cur->textureUV.x = t;
+        cur->textureUV.y = v;
+        cur->diffuse = vm->color1.d3dColor;
+        cur->w = 1.0f;
+    }
+
     return ZUN_SUCCESS;
 }
 
 // FUNCTION: th08 0x464b00
+#pragma var_order(u, i, cur, v0, v, step, vRange)
 ZunResult AnmManager::FUN_00464b00(AnmVm *vm, VertexTex1DiffuseXyzrhw *vertices, i32 vertexCount)
 {
-    if (vertexCount < 3 || vm->loadedSprite == NULL)
+    f32 u;
+    i32 i;
+    VertexTex1DiffuseXyzrhw *cur;
+    f32 v0;
+    f32 v;
+    f32 step;
+    f32 vRange;
+
+    if (vertexCount < 3)
     {
         return ZUN_ERROR;
     }
-    i32 pairs = (vertexCount + 1) / 2 - 1;
-    f32 step = pairs > 0 ? (vm->loadedSprite->uvEnd.y - vm->loadedSprite->uvStart.y) / pairs : 0.0f;
-    f32 v = vm->loadedSprite->uvEnd.y + vm->spriteSize.y;
-    for (i32 i = 0; i < vertexCount; i++)
+
+    v0 = vm->loadedSprite->uvEnd.y + vm->uvScrollPos.y;
+    vRange = vm->loadedSprite->uvEnd.y - vm->loadedSprite->uvStart.y;
+    u = vm->loadedSprite->uvStart.x + vm->uvScrollPos.x;
+    cur = vertices;
+    step = vRange / ((vertexCount + 1) / 2 - 1);
+
+    for (i = 0, v = v0; i < vertexCount; i += 2, cur += 2, v -= step)
     {
-        vertices[i].textureUV.x = (i & 1) ? vm->loadedSprite->uvStart.x : vm->loadedSprite->uvEnd.x;
-        vertices[i].textureUV.y = v;
-        vertices[i].diffuse = vm->color1.d3dColor;
-        vertices[i].w = 1.0f;
-        if (i & 1)
-        {
-            v -= step;
-        }
+        cur->textureUV.y = v;
+        cur->textureUV.x = u;
+        cur->diffuse = vm->color1.d3dColor;
+        cur->w = 1.0f;
     }
+
+    u = vm->loadedSprite->uvEnd.x + vm->uvScrollPos.x;
+    cur = vertices + 1;
+    for (i = 1, v = v0; i < vertexCount; i += 2, cur += 2, v -= step)
+    {
+        cur->textureUV.y = v;
+        cur->textureUV.x = u;
+        cur->diffuse = vm->color1.d3dColor;
+        cur->w = 1.0f;
+    }
+
     return ZUN_SUCCESS;
 }
 
 // FUNCTION: th08 0x464c60
-ZunResult AnmManager::FUN_00464c60(AnmVm *vm, VertexDiffuseXyzrhw *vertices, i32 vertexCount)
+ZunResult AnmManager::DrawVertices(AnmVm *vm, VertexTex1DiffuseXyzrhw *vertices, i32 vertexCount)
 {
-    if (!vm->FUN_00428720() || !vm->flag1 || vm->color1.a == 0)
+    if (!vm->IsVisible())
     {
         return ZUN_ERROR;
     }
-    return this->DrawTriangleFan(vm, vertices, vertexCount);
+    if (!vm->flag1)
+    {
+        return ZUN_ERROR;
+    }
+    if (*(u8 *)((u8 *)vm + 0x1f3) == 0)
+    {
+        return ZUN_ERROR;
+    }
+    if (this->spritesToDraw != 0)
+    {
+        this->FlushVertexBuffer();
+    }
+    if (this->currentTexture != vm->loadedSprite->texture)
+    {
+        this->currentTexture = vm->loadedSprite->texture;
+        g_Supervisor.d3dDevice->SetTexture(0, this->currentTexture);
+    }
+    if (this->currentVertexShader != 3)
+    {
+        g_Supervisor.d3dDevice->SetVertexShader(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+        this->currentVertexShader = 3;
+    }
+    this->SetRenderStateForVm(vm);
+    if (this->unk0x24c5 == 0)
+    {
+        this->unk0x24c5 = 1;
+        if (!g_Supervisor.IsVertexBufferDisabled())
+        {
+            g_Supervisor.d3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+            g_Supervisor.d3dDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        }
+    }
+    g_Supervisor.d3dDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, vertexCount - 2, vertices,
+                                            sizeof(VertexTex1DiffuseXyzrhw));
+    return ZUN_SUCCESS;
 }
 
 // FUNCTION: th08 0x464dd0
-ZunResult AnmManager::FUN_00464dd0(AnmVm *vm, i32 flags)
+ZunResult AnmManager::FUN_00464dd0(AnmVm *vm, VertexTex1DiffuseXyzrhw *vertices)
 {
-    if (!vm->FUN_00428720() || !vm->flag1 || vm->color1.a == 0)
+    if (!vm->IsVisible())
     {
         return ZUN_ERROR;
     }
+    if (!vm->flag1)
+    {
+        return ZUN_ERROR;
+    }
+    if (*(u8 *)((u8 *)vm + 0x1f3) == 0)
+    {
+        return ZUN_ERROR;
+    }
+    if (this->currentTexture != vm->loadedSprite->texture)
+    {
+        this->currentTexture = vm->loadedSprite->texture;
+        this->FlushVertexBuffer();
+        g_Supervisor.d3dDevice->SetTexture(0, this->currentTexture);
+    }
+    if (this->currentVertexShader != 1)
+    {
+        this->FlushVertexBuffer();
+        this->currentVertexShader = 1;
+    }
     this->SetRenderStateForVm(vm);
-    return this->DrawInner(vm, flags);
+    this->AddSpriteToDrawBuffer(vertices);
+    return ZUN_SUCCESS;
 }
 
 ZunResult AnmManager::DrawTriangleFan(AnmVm *vm, VertexDiffuseXyzrhw *vertices, i32 vertexCount)
@@ -1929,9 +2230,16 @@ AnmManager::~AnmManager()
 {
 }
 
+/* The original AnmManager has no non-trivial destructor work, so MSVC's
+ * linker folded its empty destructor together with other empty functions.
+ * Nulling the global (which the real Clear path also does) forces an
+ * actual store into our ~AnmManager, keeping both it and the compiler-
+ * generated scalar deleting destructor byte-identical to the original.
+ */
 void ForceAnmManagerScalarDeletingDestructor(AnmManager *manager)
 {
     delete manager;
+    g_AnmManager = NULL;
 }
 
 // FUNCTION: th08 0x465070
@@ -1964,7 +2272,7 @@ AnmManager::AnmManager()
     this->currentTexture = NULL;
     this->currentBlendMode = 0;
     this->currentColorOp = 0;
-    *(i32 *)this->unk0x24b8 = 1;
+    this->unk0x24b8 = 1;
     this->currentVertexShader = 0;
     this->cameraMode = 0xff;
     this->disableZWrite = 0;
@@ -1977,18 +2285,16 @@ void AnmManager::SetupVertexBuffer()
 {
     void *vertexData;
 
-    this->untexturedVector[2].pos.x = this->untexturedVector[0].pos.x = -128.0f;
-    this->untexturedVector[3].pos.x = this->untexturedVector[1].pos.x = 128.0f;
-    this->untexturedVector[1].pos.y = this->untexturedVector[0].pos.y = -128.0f;
-    this->untexturedVector[3].pos.y = this->untexturedVector[2].pos.y = 128.0f;
-    this->untexturedVector[3].pos.z = this->untexturedVector[2].pos.z =
-        this->untexturedVector[1].pos.z = this->untexturedVector[0].pos.z = 0.0f;
-    this->untexturedVector[2].w = this->untexturedVector[0].w = 0.0f;
-    this->untexturedVector[3].w = this->untexturedVector[1].w = 1.0f;
-    *(f32 *)&this->untexturedVector[0].diffuse = 0.0f;
-    *(f32 *)&this->untexturedVector[1].diffuse = 0.0f;
-    *(f32 *)&this->untexturedVector[2].diffuse = 1.0f;
-    *(f32 *)&this->untexturedVector[3].diffuse = 1.0f;
+    this->untexturedVector[0].pos.x = this->untexturedVector[2].pos.x = -128.0f;
+    this->untexturedVector[1].pos.x = this->untexturedVector[3].pos.x = 128.0f;
+    this->untexturedVector[0].pos.y = this->untexturedVector[1].pos.y = -128.0f;
+    this->untexturedVector[2].pos.y = this->untexturedVector[3].pos.y = 128.0f;
+    this->untexturedVector[0].pos.z = this->untexturedVector[1].pos.z =
+        this->untexturedVector[2].pos.z = this->untexturedVector[3].pos.z = 0.0f;
+    this->untexturedVector[0].w = this->untexturedVector[2].w = 0.0f;
+    this->untexturedVector[1].w = this->untexturedVector[3].w = 1.0f;
+    *(f32 *)&this->untexturedVector[0].diffuse = *(f32 *)&this->untexturedVector[1].diffuse = 0.0f;
+    *(f32 *)&this->untexturedVector[2].diffuse = *(f32 *)&this->untexturedVector[3].diffuse = 1.0f;
 
     g_BackgroundQuadVertices[0].pos = this->untexturedVector[0].pos;
     g_BackgroundQuadVertices[1].pos = this->untexturedVector[1].pos;
@@ -2009,7 +2315,7 @@ void AnmManager::SetupVertexBuffer()
         this->quadVertexBuffer->Lock(0, 0, (BYTE **)&vertexData, 0);
         memcpy(vertexData, this->untexturedVector, 0x50);
         this->quadVertexBuffer->Unlock();
-        g_Supervisor.d3dDevice->SetStreamSource(0, this->quadVertexBuffer, 0x14);
+        g_Supervisor.d3dDevice->SetStreamSource(0, g_AnmManager->quadVertexBuffer, 0x14);
     }
 }
 
@@ -2279,7 +2585,7 @@ i32 AnmManager::LoadExternalTextureData(AnmLoaded *anmLoaded, i32 entryNumber, i
             data = FileSystem::OpenFile(path, &fileSize, TRUE);
             if (data == NULL)
             {
-                g_GameErrorContext.Fatal(TH_ERR_ANMMANAGER_EXTERN_TEXTURE_CORRUPTED, path);
+                g_GameErrorContext.Fatal(TH_ERR_ANMMANAGER_EXTERN_TEXTURE_NOT_LOADED, path);
                 return ZUN_ERROR;
             }
             anmLoaded->textures[entryNumber].size = fileSize;
@@ -2548,6 +2854,7 @@ void AnmManager::DrawTextLeft(AnmVm *vm, COLORREF textColor, COLORREF shadowColo
     vm->visible = true;
 }
 
+#pragma var_order(args, x, buf, fontWidth)
 // FUNCTION: th08 0x4664a0
 void AnmManager::DrawTextRight(AnmVm *vm, COLORREF textColor, COLORREF shadowColor, const char *fmt, ...)
 {
@@ -2559,7 +2866,7 @@ void AnmManager::DrawTextRight(AnmVm *vm, COLORREF textColor, COLORREF shadowCol
     va_end(args);
     i32 x = (i32)(vm->loadedSprite->startPixelInclusive.x +
                     vm->loadedSprite->widthPx * vm->loadedSprite->scaleFactor.x -
-                    strlen(buf) * fontWidth * vm->loadedSprite->scaleFactor.x / 2.0f);
+                    (f32)strlen(buf) * fontWidth * vm->loadedSprite->scaleFactor.x / 2.0f);
     this->DrawTextInner(vm->loadedSprite->texture, x, vm->loadedSprite->startPixelInclusive.y,
                         vm->loadedSprite->width, vm->loadedSprite->height, fontWidth, vm->fontHeight,
                         textColor, shadowColor, buf, vm->loadedSprite->scaleFactor.x,
@@ -2568,13 +2875,17 @@ void AnmManager::DrawTextRight(AnmVm *vm, COLORREF textColor, COLORREF shadowCol
 }
 
 // FUNCTION: th08 0x466650
-#pragma var_order(buf, fontWidth, x)
+#pragma var_order(args, x, y, buf, fontWidth)
 void AnmManager::DrawTextCentered(AnmVm *vm, COLORREF textColor, COLORREF shadowColor, const char *fmt, ...)
 {
     char buf[64];
     i32 fontWidth;
     i32 x;
+    i32 y;
     va_list args;
+
+    /* ZUN declared an unused local here; it still takes a stack slot. */
+    (void)y;
 
     fontWidth = vm->fontWidth <= 0 ? 15 : vm->fontWidth;
     va_start(args, fmt);
@@ -2866,22 +3177,39 @@ void AnmManager::CaptureToTexture(i32 captureAnmIdx, i32 srcX, i32 srcY, i32 src
 }
 
 // FUNCTION: th08 0x467040
+#pragma var_order(dstSurface, srcSurface)
 void AnmManager::FUN_00467040(i32 dstAnmIdx, i32 dstEntry, i32 srcAnmIdx, i32 srcEntry,
                               RECT *dstRect, RECT *srcRect)
 {
-    AnmEntry *dst = &this->anmFiles[dstAnmIdx].textures[dstEntry];
-    AnmEntry *src = &this->anmFiles[srcAnmIdx].textures[srcEntry];
-    if (dst->texture == NULL || src->texture == NULL) return;
+    IDirect3DSurface8 *dstSurface;
+    IDirect3DSurface8 *srcSurface;
+
+    if (this->anmFiles[dstAnmIdx].textures[dstEntry].texture == NULL)
+    {
+        return;
+    }
+    if (this->anmFiles[srcAnmIdx].textures[srcEntry].texture == NULL)
+    {
+        return;
+    }
+
     this->FlushVertexBuffer();
-    IDirect3DSurface8 *dstSurface = NULL;
-    IDirect3DSurface8 *srcSurface = NULL;
-    if (dst->texture->GetSurfaceLevel(0, &dstSurface) != D3D_OK) return;
-    if (src->texture->GetSurfaceLevel(0, &srcSurface) != D3D_OK)
+
+    if (this->anmFiles[dstAnmIdx].textures[dstEntry].texture->GetSurfaceLevel(0, &dstSurface) != D3D_OK)
+    {
+        return;
+    }
+    if (this->anmFiles[srcAnmIdx].textures[srcEntry].texture->GetSurfaceLevel(0, &srcSurface) != D3D_OK)
     {
         dstSurface->Release();
         return;
     }
-    D3DXLoadSurfaceFromSurface(dstSurface, NULL, dstRect, srcSurface, NULL, srcRect, D3DX_FILTER_NONE, 0);
+    if (D3DXLoadSurfaceFromSurface(dstSurface, NULL, dstRect, srcSurface, NULL, srcRect, -1, 0) != D3D_OK)
+    {
+        dstSurface->Release();
+        srcSurface->Release();
+        return;
+    }
     dstSurface->Release();
     srcSurface->Release();
 }

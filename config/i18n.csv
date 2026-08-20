@@ -100,6 +100,7 @@ ERR_ANMMANAGER_NO_TEXTURE_STORAGE,"テクスチャ格納先が足りません\r\
 ERR_ANMMANAGER_ANIMATION_CORRUPTED,"アニメが読み込めません。データが失われてるか壊れています\r\n","Unable to load animation %s. Data is missing or corrupted\r\n"
 ERR_ANMMANAGER_ANIMATION_WRONG_VERSION,"アニメのバージョンが違います\r\n","Animation versions do not match\r\n"
 ERR_ANMMANAGER_EXTERN_TEXTURE_CORRUPTED,"テクスチャ %s が作成できません。データが失われてるか壊れています\r\n","Unable to create texture %s. Data is missing or corrupted\r\n"
+ERR_ANMMANAGER_EXTERN_TEXTURE_NOT_LOADED,"テクスチャ %s が読み込めません。データが失われてるか壊れています\r\n","Unable to load texture %s. Data is missing or corrupted\r\n"
 ERR_ANMMANAGER_TEXTURE_CORRUPTED,"テクスチャが読み込めません。データが失われてるか壊れています\r\n","The texture cannot be loaded. The data is either missing or corrupted.\r\n"
 ERR_GUI_FAILED_TO_LOAD_MSG,"error : メッセージファイル %s が読み込めませんでした\r\n","error: Could not load message file %s\r\n"
 ERR_CANNOT_BE_LOADED,"%sが読み込めないです。\r\n","%s cannot be read.\r\n"
