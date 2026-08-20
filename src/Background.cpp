@@ -195,24 +195,23 @@ ChainCallbackResult Background::OnUpdate(Background *background)
     {
         return CHAIN_CALLBACK_RESULT_CONTINUE;
     }
-    if ((*(u32 *)((u8 *)&g_GameManager + 0x3dbac) & 0x400) != 0)
+    if (g_GameManager.flags.unk10)
     {
         return CHAIN_CALLBACK_RESULT_CONTINUE;
     }
 
     if (g_GameManager.currentStage == 7)
     {
-        Effect *stageEffect = *(Effect **)((u8 *)background + 0xae8);
-        if (stageEffect == NULL)
+        if (*(Effect **)((u8 *)background + 0xae8) == NULL)
         {
             Float3 zero = Float3(0.0f, 0.0f, 0.0f);
-            stageEffect = g_EffectManager.SpawnSpecialEffect(64, &zero, 12, 1, 0xffffffff);
-            *(Effect **)((u8 *)background + 0xae8) = stageEffect;
-            background->anm0x7f0->SetAndExecuteScriptIdx(&stageEffect->vm, 11);
+            *(Effect **)((u8 *)background + 0xae8) =
+                g_EffectManager.SpawnSpecialEffect(64, &zero, 12, 1, 0xffffffff);
+            background->anm0x7f0->SetAndExecuteScriptIdx(&(*(Effect **)((u8 *)background + 0xae8))->vm, 11);
         }
         else if (background->scriptWaitTime == 1)
         {
-            background->anm0x7f0->SetAndExecuteScriptIdx(&stageEffect->vm, 11);
+            background->anm0x7f0->SetAndExecuteScriptIdx(&(*(Effect **)((u8 *)background + 0xae8))->vm, 11);
         }
     }
 
