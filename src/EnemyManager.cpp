@@ -300,38 +300,22 @@ EnemyUnkStruct4::EnemyUnkStruct4()
     this->unk0x204 = -1;
 }
 
+// FUNCTION: th08 0x40d3d0
+ZunBool ZunTimer::FUN_0040d3d0()
+{
+    return this->current != this->previous;
+}
+
 // FUNCTION: th08 0x40e350
-#pragma var_order(result)
 ZunBool ZunTimer::FUN_0040e350(i32 value)
 {
-    ZunBool result;
-
-    if (this->current != this->previous && this->current == value)
-    {
-        result = true;
-    }
-    else
-    {
-        result = false;
-    }
-    return result;
+    return this->current != this->previous && this->current == value;
 }
 
 // FUNCTION: th08 0x40ebc0
-#pragma var_order(result)
 ZunBool ZunTimer::FUN_0040ebc0(i32 value)
 {
-    ZunBool result;
-
-    if (this->current != this->previous && this->current % value == 0)
-    {
-        result = true;
-    }
-    else
-    {
-        result = false;
-    }
-    return result;
+    return this->current != this->previous && this->current % value == 0;
 }
 
 // FUNCTION: th08 0x40e040
@@ -3857,7 +3841,6 @@ i32 th08::Effect::FUN_00427250()
     return 1;
 }
 
-// FUNCTION: th08 0x40d3d0
 ZunBool FUN_0040d3d0(void *data)
 {
     return *((i32 *)data + 2) != *(i32 *)data;

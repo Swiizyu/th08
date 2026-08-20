@@ -25,55 +25,55 @@ namespace th08
 DIFFABLE_STATIC(i32, g_BackgroundTintActive);
 
 // FUNCTION: th08 0x40bc60
-#pragma var_order(result, blue, green, red, factor)
+#pragma var_order(color2, result)
 void __fastcall Player::FUN_0040bc60(D3DCOLOR color)
 {
-    i32 factor;
-    i32 red;
-    i32 green;
-    i32 blue;
     D3DCOLOR result;
-    i32 timer = ((ZunTimer *)((u8 *)this + 0xe2af4))->AsFrames();
-    i32 duration = *(i32 *)((u8 *)this + 0xe2ae4);
+    D3DCOLOR color2 = color;
 
-    red = (color >> 16) & 0xff;
-    green = (color >> 8) & 0xff;
-    blue = color & 0xff;
-    if (timer < 60)
+    if (*(ZunTimer *)((u8 *)this + 0xff4) < 60)
     {
-        factor = timer;
+        ((u8 *)&result)[2] =
+            0x80 - ((0x80 - ((u8 *)&color2)[2]) * (i32)*(ZunTimer *)((u8 *)this + 0xff4) / 60);
+        ((u8 *)&result)[1] =
+            0x80 - ((0x80 - ((u8 *)&color2)[1]) * (i32)*(ZunTimer *)((u8 *)this + 0xff4) / 60);
+        ((u8 *)&result)[0] =
+            0x80 - ((0x80 - ((u8 *)&color2)[0]) * (i32)*(ZunTimer *)((u8 *)this + 0xff4) / 60);
     }
-    else if (timer > duration - 60)
+    else if (*(ZunTimer *)((u8 *)this + 0xff4) >= *(i32 *)((u8 *)this + 0xfe4) - 60)
     {
-        factor = duration - timer;
+        ((u8 *)&result)[2] = 0x80 - ((0x80 - ((u8 *)&color2)[2]) *
+                                     (*(i32 *)((u8 *)this + 0xfe4) - (i32)*(ZunTimer *)((u8 *)this + 0xff4)) / 60);
+        ((u8 *)&result)[1] = 0x80 - ((0x80 - ((u8 *)&color2)[1]) *
+                                     (*(i32 *)((u8 *)this + 0xfe4) - (i32)*(ZunTimer *)((u8 *)this + 0xff4)) / 60);
+        ((u8 *)&result)[0] = 0x80 - ((0x80 - ((u8 *)&color2)[0]) *
+                                     (*(i32 *)((u8 *)this + 0xfe4) - (i32)*(ZunTimer *)((u8 *)this + 0xff4)) / 60);
     }
     else
     {
-        factor = 60;
+        result = color2;
     }
-    red = 128 - (128 - red) * factor / 60;
-    green = 128 - (128 - green) * factor / 60;
-    blue = 128 - (128 - blue) * factor / 60;
-    result = 0x80000000 | (red << 16) | (green << 8) | blue;
+    ((u8 *)&result)[3] = 0x80;
+    g_AnmManager->SetMixColorDefault();
     g_Background.FUN_00409160(result);
     g_BackgroundTintActive = 1;
 }
 
 // FUNCTION: th08 0x40be30
-#pragma var_order(i, entry, bomb)
-void __fastcall Player::FUN_0040be30(i32, i32, i32 arg2, i32 duration, i32)
+#pragma var_order(i, bomb, entry)
+void __fastcall Player::FUN_0040be30(i32 a0, const char *a1, i32 arg2, i32 duration, i32 a4)
 {
     u8 *bomb;
     u8 *entry;
-    i32 i;
+    u32 i;
 
     bomb = (u8 *)this + 0xfdc;
+    g_Spellcard.FUN_00415d60(a0, a1, a4);
     *(i32 *)(bomb + 8) = arg2;
-    ((ZunTimer *)((u8 *)this + 0xe2af4))->SetCurrent(duration);
+    *(ZunTimer *)((u8 *)this + 0xe2af4) = duration;
     this->playerState = 3;
     this->FUN_0040bf00();
-    entry = bomb + 0x4c;
-    for (i = 0; i < 0x80; i++, entry += 0x16f0)
+    for (i = 0, entry = bomb + 0x4c; i < 0x80; i++, entry += 0x16f0)
     {
         *(i32 *)entry = 0;
     }
@@ -86,7 +86,7 @@ static void UpdateBombPattern(Player *player, i32 effectId, D3DCOLOR color, i32 
     ZunTimer *timer = (ZunTimer *)((u8 *)player + 0xff4);
     if (timer->current == 0)
     {
-        player->FUN_0040be30(0, 200, duration, duration, 0);
+        player->FUN_0040be30(0, (const char *)200, duration, duration, 0);
         player->FUN_0040bc60(color);
         g_EffectManager.SpawnEffect(effectId, &player->position, 1, color);
     }
@@ -119,15 +119,267 @@ void Player::FUN_0040c910()
 }
 
 // FUNCTION: th08 0x40d430
+#pragma var_order(bomb, entry, t, v, bombGfx, effect, effect1, effect2, effect3, effect4)
 void Player::FUN_0040d430()
 {
-    UpdateBombPattern(this, 13, 0xff80c0ff, 250, 12);
+    u8 *bomb;
+    u8 *entry;
+    f32 t;
+
+    bomb = (u8 *)this + 0xfdc;
+    entry = bomb + 0x4c;
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
+    {
+        this->FUN_0040be30(1, "\x96\x82\x95\x84\x81\x75\x83\x41\x81\x5b\x83\x65\x83\x42\x83\x74\x83\x8b\x83\x54\x83\x4e\x83\x8a\x83\x74\x83\x40\x83\x43\x83\x58\x81\x76", 0xd2, 0xfa, 0);
+
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)13, 0);
+        *(Float3 *)(entry + 0x14) = *(Float3 *)((u8 *)this + 0x6b0);
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)6, 0);
+    }
+
+    if (*(ZunTimer *)(bomb + 0x18) < 60)
+    {
+        Float3 v(192.0f, 224.0f, 0.0f);
+
+        t = (f32)*(ZunTimer *)(bomb + 0x18) / 60.0f;
+        t = t * t;
+
+        *(Float3 *)((u8 *)this + 0x6b0) = (v - *(Float3 *)(entry + 0x14)) * t + *(Float3 *)(entry + 0x14);
+
+        *(f32 *)((u8 *)this + 0x414) += (-ZUN_PI) / 10.0f;
+
+        this->FUN_0044df00((Float2 *)((u8 *)this + 0x6b0), 32.0f, 0.0f, 0, 6);
+        this->FUN_0044e040((Float2 *)((u8 *)this + 0x6b0), 32.0f, 0.0f, 40, 0);
+        return;
+    }
+
+    *(f32 *)((u8 *)this + 0x414) = 0.0f;
+    *(f32 *)((u8 *)this + 0x6b0) = 192.0f;
+    *(f32 *)((u8 *)this + 0x6b4) = 224.0f;
+
+    if (*(ZunTimer *)(bomb + 0x18) >= 150)
+    {
+        *(u8 *)((u8 *)this + 0x5ff) = 0;
+    }
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(60))
+    {
+        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(64))
+    {
+        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffffd0d0);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(68))
+    {
+        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffffb0b0);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(72))
+    {
+        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff8080);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(76))
+    {
+        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff4040);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(90))
+    {
+        Effect *effect;
+        void *bombGfx;
+
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)15, 0);
+        effect = g_EffectManager.SpawnEffect(42, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
+        effect = g_EffectManager.SpawnEffect(43, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
+        effect = g_EffectManager.SpawnEffect(44, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
+        this->FUN_0044df00((Float2 *)((u8 *)this + 0x6b0), 1.0f, 5.0f, 110, 6);
+        bombGfx = this->FUN_0044e040((Float2 *)((u8 *)this + 0x6b0), 1.0f, 5.0f, 70, 110);
+        *(i32 *)((u8 *)bombGfx + 0x38) = 5;
+        ScreenEffect::RegisterChain((ScreenEffectType)1, 24, 8, 0, 0, 21);
+        ScreenEffect::RegisterChain((ScreenEffectType)3, 8, 1, 0x8fffffff, 0, 21);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(100))
+    {
+        Effect *effect1;
+
+        effect1 = g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(110))
+    {
+        Effect *effect2;
+
+        effect2 = g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffffd0d0);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(120))
+    {
+        Effect *effect3;
+
+        effect3 = g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff8080);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(130))
+    {
+        Effect *effect4;
+
+        effect4 = g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff0000);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(150))
+    {
+        ScreenEffect::RegisterChain((ScreenEffectType)3, 8, 1, 0x8fffffff, 0, 21);
+        ScreenEffect::RegisterChain((ScreenEffectType)1, 24, 8, 0, 0, 21);
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)0x19, 0);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0xd1))
+    {
+        *(i32 *)((u8 *)this + 0x6d4) = 1;
+        *(ZunTimer *)((u8 *)this + 0x6ec) = 0;
+    }
 }
 
 // FUNCTION: th08 0x40d970
+#pragma var_order(bomb, entry, t, v, bombGfx, effect, pos, effect1, effect2, effect3, effect4)
 void Player::FUN_0040d970()
 {
-    UpdateBombPattern(this, 13, 0xffffc080, 280, 12);
+    u8 *bomb;
+    u8 *entry;
+    f32 t;
+
+    bomb = (u8 *)this + 0xfdc;
+    entry = bomb + 0x4c;
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
+    {
+        this->FUN_0040be30(1, "\x96\x82\x91\x80\x81\x75\x83\x8a\x83\x5e\x81\x5b\x83\x93\x83\x43\x83\x69\x83\x6a\x83\x81\x83\x67\x83\x6c\x83\x58\x81\x76", 0xe6, 0x118, 1);
+
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)13, 0);
+        *(Float3 *)(entry + 0x14) = this->position;
+    }
+
+    if (*(ZunTimer *)(bomb + 0x18) < 60)
+    {
+        Float3 v(192.0f, 224.0f, 0.0f);
+
+        t = (f32)*(ZunTimer *)(bomb + 0x18) / 60.0f;
+        t = t * t;
+
+        *(Float3 *)((u8 *)this + 0x6b0) = (v - *(Float3 *)(entry + 0x14)) * t + *(Float3 *)(entry + 0x14);
+
+        *(f32 *)((u8 *)this + 0x414) += (-ZUN_PI) / 10.0f;
+
+        this->FUN_0044df00((Float2 *)((u8 *)this + 0x6b0), 32.0f, 0.0f, 0, 6);
+        this->FUN_0044e040((Float2 *)((u8 *)this + 0x6b0), 32.0f, 0.0f, 40, 0);
+        return;
+    }
+
+    *(f32 *)((u8 *)this + 0x414) = 0.0f;
+    *(f32 *)((u8 *)this + 0x6b0) = 192.0f;
+    *(f32 *)((u8 *)this + 0x6b4) = 224.0f;
+
+    if (*(ZunTimer *)(bomb + 0x18) >= 128)
+    {
+        *(u8 *)((u8 *)this + 0x5ff) = 0;
+    }
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(60))
+    {
+        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(64))
+    {
+        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffffd0d0);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(68))
+    {
+        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffffb0b0);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(72))
+    {
+        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff8080);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(76))
+    {
+        g_EffectManager.SpawnEffect(40, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff4040);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(120))
+    {
+        Effect *effect;
+        void *bombGfx;
+
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)15, 0);
+        effect = g_EffectManager.SpawnEffect(42, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
+        effect = g_EffectManager.SpawnEffect(43, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
+        effect = g_EffectManager.SpawnEffect(44, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
+
+        Float3 pos(64.0f, 96.0f, 0.0f);
+
+        effect = g_EffectManager.SpawnEffect(45, &pos, 1, 0xff0000f0);
+        pos.y = 352.0f;
+        effect = g_EffectManager.SpawnEffect(45, &pos, 1, 0xfff00000);
+        pos.x = 320.0f;
+        effect = g_EffectManager.SpawnEffect(45, &pos, 1, 0xff00f000);
+        pos.y = 96.0f;
+        effect = g_EffectManager.SpawnEffect(45, &pos, 1, 0xff00f0f0);
+
+        this->FUN_0044df00((Float2 *)((u8 *)this + 0x6b0), 1.0f, 5.0f, 110, 6);
+        bombGfx = this->FUN_0044e040((Float2 *)((u8 *)this + 0x6b0), 1.0f, 5.0f, 70, 110);
+        *(i32 *)((u8 *)bombGfx + 0x38) = 5;
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x82))
+    {
+        Effect *effect1;
+
+        effect1 = g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x8c))
+    {
+        Effect *effect2;
+
+        effect2 = g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffffd0d0);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x96))
+    {
+        Effect *effect3;
+
+        effect3 = g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff8080);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0xa0))
+    {
+        Effect *effect4;
+
+        effect4 = g_EffectManager.SpawnEffect(45, (Float3 *)((u8 *)this + 0x6b0), 1, 0xffff0000);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0xb4))
+    {
+        ScreenEffect::RegisterChain((ScreenEffectType)3, 8, 1, -1, 0, 21);
+        ScreenEffect::RegisterChain((ScreenEffectType)1, 24, 8, 0, 0, 21);
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)0x19, 0);
+        return;
+    }
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0xe5))
+    {
+        *(i32 *)((u8 *)this + 0x6d4) = 1;
+        *(ZunTimer *)((u8 *)this + 0x6ec) = 0;
+    }
 }
 
 // FUNCTION: th08 0x40e3b0
@@ -143,15 +395,263 @@ void Player::FUN_0040e780()
 }
 
 // FUNCTION: th08 0x40ee10
+#pragma var_order(bomb, entry, t, pos, pos2, effect, v2, v1, b, a)
 void Player::FUN_0040ee10()
 {
-    UpdateBombPattern(this, 4, 0xffc080ff, 420, 14);
+    u8 *bomb;
+    u8 *entry;
+    f32 t;
+
+    bomb = (u8 *)this + 0xfdc;
+    entry = bomb + 0x4c;
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
+    {
+        this->FUN_0040be30(1, "\x8d\x67\x95\x84\x81\x75\x95\x73\x96\xe9\x8f\xe9\x83\x8c\x83\x62\x83\x68\x81\x76", 0xf0, 0x122, 0);
+
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)13, 0);
+        *(Float3 *)(entry + 0x14) = *(Float3 *)((u8 *)this + 0x6bc);
+        *(Float3 *)(entry + 0x1704) = *(Float3 *)((u8 *)this + 0x9b0);
+        *(Float3 *)(entry + 0x2df4) = *(Float3 *)((u8 *)this + 0xca4);
+        *(Float3 *)(entry + 0x44e4) = *(Float3 *)((u8 *)this + 0xf98);
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)6, 0);
+
+        *(i32 *)(bomb + 0x14) = 0;
+        *(f32 *)((u8 *)this + 0x408) = 0.0f;
+        *(f32 *)((u8 *)this + 0x404) = 0.0f;
+    }
+
+    if (*(ZunTimer *)(bomb + 0x18) < 60)
+    {
+        t = (f32)*(ZunTimer *)(bomb + 0x18) / 60.0f;
+        t = t * t;
+
+        Float3 pos;
+
+        pos = this->position;
+        pos.x -= 16.0f;
+        *(Float3 *)((u8 *)this + 0x6bc) = (pos - *(Float3 *)(entry + 0x14)) * t + *(Float3 *)(entry + 0x14);
+        pos.x += 16.0f;
+        pos.y -= 16.0f;
+        *(Float3 *)((u8 *)this + 0x9b0) = (pos - *(Float3 *)(entry + 0x1704)) * t + *(Float3 *)(entry + 0x1704);
+        pos.y += 32.0f;
+        *(Float3 *)((u8 *)this + 0xca4) = (pos - *(Float3 *)(entry + 0x2df4)) * t + *(Float3 *)(entry + 0x2df4);
+        pos.x += 16.0f;
+        pos.y -= 16.0f;
+        *(Float3 *)((u8 *)this + 0xf98) = (pos - *(Float3 *)(entry + 0x44e4)) * t + *(Float3 *)(entry + 0x44e4);
+
+        return;
+    }
+    else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(60))
+    {
+        *(f32 *)((u8 *)this + 0x408) = 2.0f;
+        *(f32 *)((u8 *)this + 0x404) = 2.0f;
+        ((AnmVm *)((u8 *)this + 0x40c))->SetInterrupt(2);
+        ((AnmVm *)((u8 *)this + 0x700))->SetInterrupt(2);
+        ((AnmVm *)((u8 *)this + 0x9f4))->SetInterrupt(2);
+        ((AnmVm *)((u8 *)this + 0xce8))->SetInterrupt(2);
+    }
+
+    {
+        Float3 pos2;
+
+        pos2 = this->position;
+        pos2.x -= 16.0f;
+        *(Float3 *)((u8 *)this + 0x6bc) = pos2;
+        pos2.x += 16.0f;
+        pos2.y -= 16.0f;
+        *(Float3 *)((u8 *)this + 0x9b0) = pos2;
+        pos2.y += 32.0f;
+        *(Float3 *)((u8 *)this + 0xca4) = pos2;
+        pos2.x += 16.0f;
+        pos2.y -= 16.0f;
+        *(Float3 *)((u8 *)this + 0xf98) = pos2;
+    }
+
+    *(void **)(entry + 0x16ec) = this->FUN_0044df00((Float2 *)&this->position, 96.0f, 0.0f, 0, 6);
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040ebc0(10))
+    {
+        Effect *effect;
+
+        effect = g_EffectManager.SpawnSpecialEffect(53, &this->position, (*(i32 *)(bomb + 0x14) % 4) + 4, 1, -1);
+        *(i32 *)((u8 *)effect + 0x324) = 0x20;
+        *(f32 *)((u8 *)effect + 0x334) = 4.0f;
+
+        Float3 v1;
+        Float3 v2;
+
+        v1.x = 0.0f;
+        v1.y = 0.0f;
+        v1.z = 0.0f;
+        v2.x = 192.0f;
+        v2.y = g_Rng.GetRandomF32InRange(128.0f);
+        v2.z = 0.0f;
+        ((AnmVm *)effect)->FUN_0040ec30(30, 4, &v1, &v2);
+
+        Float2 a;
+        Float2 b;
+
+        a.x = 64.0f;
+        a.y = 0.0f;
+        b.x = 64.0f;
+        b.y = 0.0f;
+        ((AnmVm *)effect)->FUN_0040eda0(30, 1, &a, &b);
+        ((AnmVm *)effect)->FUN_0040ed50(30, 3, 0xff, 0);
+        ((AnmVm *)effect)->FUN_0040eca0(30, 0, -1, 0xffff0000);
+
+        *(i32 *)(bomb + 0x14) += 1;
+        g_SoundPlayer.PlaySoundPositionedByIdx((SoundIdx)0x11, this->position.x);
+        g_AnmManager->ExecuteScript((AnmVm *)effect);
+    }
+
+    if (*(ZunTimer *)((u8 *)this + 0xe2ac4) >= 5)
+    {
+        *(void **)(entry + 0x16ec) = this->FUN_0044de60((Float2 *)&this->position, 96.0f, 800.0f, 6, 0);
+        *(void **)(entry + 0x16ec) = this->FUN_0044de60((Float2 *)&this->position, 800.0f, 96.0f, 6, 0);
+    }
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0xef))
+    {
+        *(i32 *)((u8 *)this + 0x6d4) = 1;
+        *(ZunTimer *)((u8 *)this + 0x6ec) = 0;
+        *(i32 *)((u8 *)this + 0x9c8) = 1;
+        *(ZunTimer *)((u8 *)this + 0x9e0) = 0;
+        *(i32 *)((u8 *)this + 0xcbc) = 1;
+        *(ZunTimer *)((u8 *)this + 0xcd4) = 0;
+        *(i32 *)((u8 *)this + 0xfb0) = 1;
+        *(ZunTimer *)((u8 *)this + 0xfc8) = 0;
+    }
 }
 
 // FUNCTION: th08 0x40f570
+#pragma var_order(bomb, entry, t, pos, pos2, effect, v2, v1, b, a)
 void Player::FUN_0040f570()
 {
-    UpdateBombPattern(this, 5, 0xffff80c0, 420, 14);
+    u8 *bomb;
+    u8 *entry;
+    f32 t;
+
+    bomb = (u8 *)this + 0xfdc;
+    entry = bomb + 0x4c;
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
+    {
+        this->FUN_0040be30(1, "\x8d\x67\x96\x82\x81\x75\x83\x58\x83\x4a\x81\x5b\x83\x8c\x83\x62\x83\x67\x83\x66\x83\x72\x83\x8b\x81\x76", 0x118, 0x140, 1);
+
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)13, 0);
+        *(Float3 *)(entry + 0x14) = *(Float3 *)((u8 *)this + 0x6bc);
+        *(Float3 *)(entry + 0x1704) = *(Float3 *)((u8 *)this + 0x9b0);
+        *(Float3 *)(entry + 0x2df4) = *(Float3 *)((u8 *)this + 0xca4);
+        *(Float3 *)(entry + 0x44e4) = *(Float3 *)((u8 *)this + 0xf98);
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)6, 0);
+
+        *(i32 *)(bomb + 0x14) = 0;
+        *(f32 *)((u8 *)this + 0x408) = 0.0f;
+        *(f32 *)((u8 *)this + 0x404) = 0.0f;
+    }
+
+    if (*(ZunTimer *)(bomb + 0x18) < 60)
+    {
+        t = (f32)*(ZunTimer *)(bomb + 0x18) / 60.0f;
+        t = t * t;
+
+        Float3 pos;
+
+        pos = this->position;
+        pos.x -= 16.0f;
+        *(Float3 *)((u8 *)this + 0x6bc) = (pos - *(Float3 *)(entry + 0x14)) * t + *(Float3 *)(entry + 0x14);
+        pos.x += 16.0f;
+        pos.y -= 16.0f;
+        *(Float3 *)((u8 *)this + 0x9b0) = (pos - *(Float3 *)(entry + 0x1704)) * t + *(Float3 *)(entry + 0x1704);
+        pos.y += 32.0f;
+        *(Float3 *)((u8 *)this + 0xca4) = (pos - *(Float3 *)(entry + 0x2df4)) * t + *(Float3 *)(entry + 0x2df4);
+        pos.x += 16.0f;
+        pos.y -= 16.0f;
+        *(Float3 *)((u8 *)this + 0xf98) = (pos - *(Float3 *)(entry + 0x44e4)) * t + *(Float3 *)(entry + 0x44e4);
+
+        return;
+    }
+    else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(60))
+    {
+        *(f32 *)((u8 *)this + 0x408) = 3.0f;
+        *(f32 *)((u8 *)this + 0x404) = 3.0f;
+        ((AnmVm *)((u8 *)this + 0x40c))->SetInterrupt(2);
+        ((AnmVm *)((u8 *)this + 0x700))->SetInterrupt(2);
+        ((AnmVm *)((u8 *)this + 0x9f4))->SetInterrupt(2);
+        ((AnmVm *)((u8 *)this + 0xce8))->SetInterrupt(2);
+    }
+
+    {
+        Float3 pos2;
+
+        *(void **)(entry + 0x16ec) = this->FUN_0044df00((Float2 *)&this->position, 96.0f, 0.0f, 0, 6);
+
+        pos2 = this->position;
+        pos2.x -= 16.0f;
+        *(Float3 *)((u8 *)this + 0x6bc) = pos2;
+        pos2.x += 16.0f;
+        pos2.y -= 16.0f;
+        *(Float3 *)((u8 *)this + 0x9b0) = pos2;
+        pos2.y += 32.0f;
+        *(Float3 *)((u8 *)this + 0xca4) = pos2;
+        pos2.x += 16.0f;
+        pos2.y -= 16.0f;
+        *(Float3 *)((u8 *)this + 0xf98) = pos2;
+    }
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040ebc0(10))
+    {
+        Effect *effect;
+
+        effect = g_EffectManager.SpawnSpecialEffect(53, &this->position, (*(i32 *)(bomb + 0x14) % 4) + 4, 1, -1);
+        *(i32 *)((u8 *)effect + 0x324) = 0x20;
+        *(f32 *)((u8 *)effect + 0x334) = 4.0f;
+
+        Float3 v1;
+        Float3 v2;
+
+        v1.x = 0.0f;
+        v1.y = 0.0f;
+        v1.z = 0.0f;
+        v2.x = 192.0f;
+        v2.y = g_Rng.GetRandomF32InRange(128.0f);
+        v2.z = 0.0f;
+        ((AnmVm *)effect)->FUN_0040ec30(30, 4, &v1, &v2);
+
+        Float2 a;
+        Float2 b;
+
+        a.x = 64.0f;
+        a.y = 0.0f;
+        b.x = 128.0f;
+        b.y = 0.0f;
+        ((AnmVm *)effect)->FUN_0040eda0(30, 1, &a, &b);
+        ((AnmVm *)effect)->FUN_0040ed50(30, 3, 0xff, 0);
+        ((AnmVm *)effect)->FUN_0040eca0(30, 0, -1, 0xffff0000);
+
+        *(i32 *)(bomb + 0x14) += 1;
+        g_SoundPlayer.PlaySoundPositionedByIdx((SoundIdx)0x11, this->position.x);
+        g_AnmManager->ExecuteScript((AnmVm *)effect);
+    }
+
+    if (*(ZunTimer *)((u8 *)this + 0xe2ac4) >= 5)
+    {
+        *(void **)(entry + 0x16ec) = this->FUN_0044de60((Float2 *)&this->position, 96.0f, 800.0f, 6, 0);
+        *(void **)(entry + 0x16ec) = this->FUN_0044de60((Float2 *)&this->position, 800.0f, 96.0f, 6, 0);
+    }
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x117))
+    {
+        *(i32 *)((u8 *)this + 0x6d4) = 1;
+        *(ZunTimer *)((u8 *)this + 0x6ec) = 0;
+        *(i32 *)((u8 *)this + 0x9c8) = 1;
+        *(ZunTimer *)((u8 *)this + 0x9e0) = 0;
+        *(i32 *)((u8 *)this + 0xcbc) = 1;
+        *(ZunTimer *)((u8 *)this + 0xcd4) = 0;
+        *(i32 *)((u8 *)this + 0xfb0) = 1;
+        *(ZunTimer *)((u8 *)this + 0xfc8) = 0;
+    }
 }
 
 // FUNCTION: th08 0x40fcd0
@@ -238,8 +738,7 @@ void Player::FUN_0040c820()
     AnmVm *vm;
 
     this->FUN_0040bc60(0x80404040);
-    entry = (u8 *)this + 0x1028;
-    for (i = 0; i < 16; i++, entry += 0x16f0)
+    for (i = 0, entry = (u8 *)this + 0x1028; i < 16; i++, entry += 0x16f0)
     {
         if (*(i32 *)entry == 0)
         {
@@ -259,12 +758,11 @@ void Player::FUN_0040c820()
 void Player::FUN_0040d010()
 {
     u8 *entry;
-    i32 i;
+    u32 i;
     AnmVm *vm;
 
     this->FUN_0040bc60(0x802020d0);
-    entry = (u8 *)this + 0x1028;
-    for (i = 0; i < 128; i++, entry += 0x16f0)
+    for (i = 0, entry = (u8 *)this + 0x1028; i < 128; i++, entry += 0x16f0)
     {
         if (*(i32 *)entry == 0)
         {
