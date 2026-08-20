@@ -13,7 +13,7 @@ import tempfile
 WATCHLIST = os.path.join(os.path.dirname(__file__), "..", "config", "verbose_watch.txt")
 VERBOSE_OUT = "verbose_diff.txt"
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
-PER_FUNCTION_CAP = 8000
+PER_FUNCTION_CAP = 24000
 TOTAL_CAP = 46000
 
 

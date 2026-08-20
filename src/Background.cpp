@@ -41,7 +41,7 @@ f32 FUN_004031e0(f32 value)
 // FUNCTION: th08 0x40c7b0
 f32 FUN_0040c7b0(f32 value, f32 exponent)
 {
-    return pow(value, exponent);
+    return atan2(value, exponent);
 }
 
 // FUNCTION: th08 0x4073b0
