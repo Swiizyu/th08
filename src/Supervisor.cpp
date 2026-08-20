@@ -843,7 +843,7 @@ void Supervisor::StartupThread(Supervisor *s)
             FindClose(findFile);
         }
 
-        _time32(&currentTime);
+        time(&currentTime);
         currentLocalTime = localtime(&currentTime);
         strftime(fileNameBuffer, 128, "score_1.%y%m%d.bak", currentLocalTime);
 

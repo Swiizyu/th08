@@ -1146,8 +1146,8 @@ FUN_00478049,0x478049,library
 FUN_004780c5,0x4780c5,library
 FUN_004781cd,0x4781cd,library
 FUN_004782af,0x4782af,library
-D3DXMatrixLookAtLH,0x478395,library
-D3DXMatrixPerspectiveFovLH,0x4784dd,library
+_D3DXMatrixLookAtLH@16,0x478395,library
+_D3DXMatrixPerspectiveFovLH@16,0x4784dd,library
 FUN_00478571,0x478571,library
 FUN_0047860e,0x47860e,library
 FUN_00478742,0x478742,library
@@ -1216,6 +1216,7 @@ FUN_0047a668,0x47a668,library
 FUN_0047a73b,0x47a73b,library
 FUN_0047aa65,0x47aa65,library
 _DirectInput8Create@20,0x476ce0,library
+_D3DXVec3Normalize@8,0x476e9f,library
 _D3DXCreateTexture@32,0x47aa8d,library
 _D3DXLoadSurfaceFromFileInMemory@36,0x47aaf3,library
 _D3DXLoadSurfaceFromSurface@32,0x47abab,library
@@ -1772,7 +1773,7 @@ FUN_004a584f,0x4a584f,library
 _Strftime,0x4a58f3,library
 strftime,0x4a5925,library
 localtime,0x4a5940,library
-_time32,0x4a5ac0,library
+time,0x4a5ac0,library
 rename,0x4a5af9,library
 _chdir,0x4a5b27,library
 strchr,0x4a5be0,library
