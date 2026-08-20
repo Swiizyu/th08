@@ -20,4 +20,4 @@ void GuiDebugPrint(char *fmt, ...);
 }; // namespace utils
 }; // namespace th08
 
-char *ConvertToFullWidthDigits(i32 value, i32 digits);
+char *__fastcall ConvertToFullWidthDigits(i32 value, i32 digits);
