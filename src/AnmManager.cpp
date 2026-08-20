@@ -10,6 +10,8 @@
 
 namespace th08
 {
+f32 FUN_004031e0(f32 value);
+
 DIFFABLE_STATIC(AnmManager *, g_AnmManager);
 DIFFABLE_STATIC_ARRAY(VertexTex1DiffuseXyzrhw, 4, g_QuadVertices);
 DIFFABLE_STATIC_ARRAY(VertexTex1Xyzrhw, 4, g_UnknownQuadVertices);
@@ -1556,20 +1558,67 @@ ZunResult AnmManager::DrawNoRotationNoRound(AnmVm *vm)
     return this->DrawInner(vm, 0);
 }
 
+#pragma var_order(rot, world)
 // FUNCTION: th08 0x463d60
 void AnmManager::TransformVerticesWorld(AnmVm *vm)
 {
-    D3DXMATRIX scale;
-    D3DXMATRIX rotation;
-    D3DXMATRIX translation;
-    D3DXMatrixScaling(&scale, vm->scale.x, vm->scale.y, 1.0f);
-    D3DXMatrixRotationYawPitchRoll(&rotation, vm->rotation.y, vm->rotation.x, vm->rotation.z);
-    Float3 position = vm->pos + vm->pos2;
-    D3DXMatrixTranslation(&translation, position.x, position.y, position.z);
-    vm->matrix2 = scale * rotation * vm->matrix1 * translation;
-    vm->matrix3 = vm->matrix2;
-    vm->updateRotation = false;
-    vm->updateScale = false;
+    D3DXMATRIX world;
+    D3DXMATRIX rot;
+
+    if (vm->flag16 == 0 && (vm->updateScale || vm->updateRotation))
+    {
+        vm->matrix2 = vm->matrix1;
+        vm->matrix2.m[0][0] *= vm->scale.x;
+        vm->matrix2.m[1][1] *= vm->scale.y;
+        vm->updateScale = 0;
+        if (vm->rotation.x != 0.0)
+        {
+            D3DXMatrixRotationX(&rot, vm->rotation.x);
+            D3DXMatrixMultiply(&vm->matrix2, &vm->matrix2, &rot);
+        }
+        if (vm->rotation.y != 0.0)
+        {
+            D3DXMatrixRotationY(&rot, vm->rotation.y);
+            D3DXMatrixMultiply(&vm->matrix2, &vm->matrix2, &rot);
+        }
+        if (vm->rotation.z != 0.0)
+        {
+            D3DXMatrixRotationZ(&rot, vm->rotation.z);
+            D3DXMatrixMultiply(&vm->matrix2, &vm->matrix2, &rot);
+        }
+        vm->updateRotation = 0;
+    }
+
+    world = vm->matrix2;
+    if ((vm->anchor & 1) == 0)
+    {
+        world.m[3][0] = vm->pos.x;
+    }
+    else
+    {
+        world.m[3][0] = FUN_004031e0(vm->spriteSize.x * vm->scale.x / 2.0f) + vm->pos.x;
+    }
+
+    if ((vm->anchor & 2) == 0)
+    {
+        world.m[3][1] = vm->pos.y;
+    }
+    else
+    {
+        world.m[3][1] = FUN_004031e0(vm->spriteSize.y * vm->scale.y / 2.0f) + vm->pos.y;
+    }
+    world.m[3][2] = vm->pos.z;
+
+    D3DXVec3Project((D3DXVECTOR3 *)&g_QuadVertices[0].pos, (D3DXVECTOR3 *)&this->untexturedVector[0].pos,
+                    &g_Supervisor.viewport, &g_Supervisor.projectionMatrix, &g_Supervisor.viewMatrix, &world);
+    D3DXVec3Project((D3DXVECTOR3 *)&g_QuadVertices[1].pos, (D3DXVECTOR3 *)&this->untexturedVector[1].pos,
+                    &g_Supervisor.viewport, &g_Supervisor.projectionMatrix, &g_Supervisor.viewMatrix, &world);
+    D3DXVec3Project((D3DXVECTOR3 *)&g_QuadVertices[2].pos, (D3DXVECTOR3 *)&this->untexturedVector[2].pos,
+                    &g_Supervisor.viewport, &g_Supervisor.projectionMatrix, &g_Supervisor.viewMatrix, &world);
+    D3DXVec3Project((D3DXVECTOR3 *)&g_QuadVertices[3].pos, (D3DXVECTOR3 *)&this->untexturedVector[3].pos,
+                    &g_Supervisor.viewport, &g_Supervisor.projectionMatrix, &g_Supervisor.viewMatrix, &world);
+
+    this->unk0x1c24 = world;
 }
 
 // FUNCTION: th08 0x463cf0

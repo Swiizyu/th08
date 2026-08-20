@@ -783,8 +783,7 @@ struct AnmManager
     u32 flushesThisFrame;
     Float2 screenShakeOffset;
     AnmLoaded anmFiles[256];
-    Float3 unk0x1c24;
-    unknown_fields(0x1c30, 0x34);
+    D3DXMATRIX unk0x1c24;
     AnmVm unk0x1c64;
     unknown_fields(0x1f08, 0x130);
 
