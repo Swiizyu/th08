@@ -3487,8 +3487,6 @@ i32 TitleScreen::MoveCursorHorizontal(i32 menuLength)
     return 0;
 }
 
-#pragma var_order(spell, i, attemptsTotal, comment, comment1, comment2, catkA, catkB, catkC, catkD)
-// FUNCTION: th08 0x46d7f9
 void TitleScreen::FormatSpellCardInfo()
 {
     i32 spell;
