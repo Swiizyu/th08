@@ -545,7 +545,7 @@ struct AnmManager
     void SetRenderStateForVm(AnmVm *vm);
     ZunResult DrawInner(AnmVm *vm, i32 flags);
     ZunResult FUN_004639e0(AnmVm *vm);
-    ZunResult FUN_004640e0(AnmVm *vm);
+    ZunResult FUN_004640e0(AnmVm *vm, void (*callback)(AnmVm *, Float3 *));
     ZunResult FUN_00464070(AnmVm *vm);
     ZunResult AddSpriteToDrawBuffer(VertexTex1DiffuseXyzrhw *vertices);
     ZunResult DrawNoRotation(AnmVm *vm);
@@ -557,7 +557,7 @@ struct AnmManager
     ZunResult DrawNoRotationNoRound(AnmVm *vm);
     void TransformVerticesWorld(AnmVm *vm);
     ZunResult DrawWorld(AnmVm *vm);
-    ZunResult FUN_00464400(AnmVm *vm, i32 flags);
+    ZunResult FUN_00464400(AnmVm *vm, void (*callback)(AnmVm *, Float3 *));
     ZunResult FUN_00464470(AnmVm *vm);
     ZunResult FUN_004649a0(AnmVm *vm, VertexTex1DiffuseXyzrhw *vertices, i32 vertexCount);
     ZunResult FUN_00464b00(AnmVm *vm, VertexTex1DiffuseXyzrhw *vertices, i32 vertexCount);
