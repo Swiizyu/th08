@@ -2581,32 +2581,36 @@ static i32 __fastcall Sht0ad0(Player *p, u8 *d) { return p->FUN_00450ad0(d); }
 static i32 __fastcall Sht0c50(Player *p, u8 *d, Float3 *pos) { return p->FUN_00450c50(d, pos); }
 static i32 __fastcall Sht0ee0(Player *p, Effect *e, Float3 *pos) { return p->FUN_00450ee0(e, pos); }
 
+DIFFABLE_STATIC_ARRAY_ASSIGN(void *, 9, g_ShtFileFireCallbacks) = {NULL,     Sht0240, ShtFdd0, ShtFdd0, ShtFe20,
+                                                                   ShtFfa0, Sht0080, Sht01b0, Sht0110};
+DIFFABLE_STATIC_ARRAY_ASSIGN(void *, 6, g_ShtFileUpdateCallbacks) = {NULL, Sht0320, NULL, Sht0580, Sht05d0, Sht0840};
+DIFFABLE_STATIC_ARRAY_ASSIGN(void *, 2, g_ShtFileDrawCallbacks) = {NULL, Sht0ad0};
+DIFFABLE_STATIC_ARRAY_ASSIGN(void *, 3, g_ShtFileHitCallbacks) = {NULL, Sht0c50, Sht0ee0};
+
+#pragma var_order(i, entry)
 // FUNCTION: th08 0x44dd70
 ZunResult Player::LoadShtFile(PlayerRawShtFile **header, const char *path)
 {
-    static void *callback1[] = {NULL, Sht0240, ShtFdd0, ShtFdd0, ShtFe20, ShtFfa0, Sht0080, Sht01b0, Sht0110};
-    static void *callback2[] = {NULL, Sht0320, NULL, Sht0580, Sht05d0, Sht0840};
-    static void *callback3[] = {NULL, Sht0ad0};
-    static void *callback4[] = {NULL, Sht0c50, Sht0ee0};
-    i32 fileSize = 0;
-    *header = (PlayerRawShtFile *)FileSystem::OpenFile(path, &fileSize, false);
-    if (*header == NULL) return ZUN_ERROR;
-    u8 *data = (u8 *)*header;
-    i32 count = *(u16 *)(data + 2);
-    for (i32 i = 0; i < count; i++)
+    i32 i;
+    u8 *entry;
+
+    *header = (PlayerRawShtFile *)FileSystem::OpenFile(path, NULL, false);
+    if (*header == NULL)
     {
-        u8 **offset = (u8 **)(data + 0x38 + i * 8);
-        *offset += (u32)data;
-        for (u8 *entry = *offset; *(i16 *)entry >= 0; entry += 0x38)
+        return ZUN_ERROR;
+    }
+
+    for (i = 0; i < *(u16 *)((u8 *)*header + 2); i++)
+    {
+        *(u32 *)((u8 *)*header + 0x38 + i * 8) += (u32)*header;
+        entry = *(u8 **)((u8 *)*header + 0x38 + i * 8);
+        while (*(i16 *)entry >= 0)
         {
-            u32 index = *(u32 *)(entry + 0x28);
-            *(void **)(entry + 0x28) = index < ARRAY_SIZE(callback1) ? callback1[index] : NULL;
-            index = *(u32 *)(entry + 0x2c);
-            *(void **)(entry + 0x2c) = index < ARRAY_SIZE(callback2) ? callback2[index] : NULL;
-            index = *(u32 *)(entry + 0x30);
-            *(void **)(entry + 0x30) = index < ARRAY_SIZE(callback3) ? callback3[index] : NULL;
-            index = *(u32 *)(entry + 0x34);
-            *(void **)(entry + 0x34) = index < ARRAY_SIZE(callback4) ? callback4[index] : NULL;
+            *(void **)(entry + 0x28) = g_ShtFileFireCallbacks[*(u32 *)(entry + 0x28)];
+            *(void **)(entry + 0x2c) = g_ShtFileUpdateCallbacks[*(u32 *)(entry + 0x2c)];
+            *(void **)(entry + 0x30) = g_ShtFileDrawCallbacks[*(u32 *)(entry + 0x30)];
+            *(void **)(entry + 0x34) = g_ShtFileHitCallbacks[*(u32 *)(entry + 0x34)];
+            entry += 0x38;
         }
     }
     return ZUN_SUCCESS;
