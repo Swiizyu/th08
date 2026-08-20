@@ -418,7 +418,7 @@ i32 Effect::FUN_0040eb50()
     *(u8 *)((u8 *)this + 0x356) = 1;
     *(i32 *)((u8 *)this + 0x324) = 48;
     *(f32 *)((u8 *)this + 0x320) = 32.0f;
-    offset = -((this->timer.AsFrames() & 1) != 0) & 8;
+    offset = (this->timer.AsFrames() & 1) ? 8 : 0;
     *(f32 *)((u8 *)this + 0x314) = 64.0f + (f32)offset;
     *(i32 *)((u8 *)this + 0x318) = 0;
     return 1;

@@ -635,19 +635,21 @@ void Player::FUN_0040e780()
         ((ZunTimer *)((u8 *)this + 0xff4))->AsFrames() % 4 != 0)
     {
         void *e;
-        Float3 pos2;
+        {
+            Float3 pos2;
 
-        pos2 = this->position;
-        pos2.x = 192.0f;
-        pos2.y = pos2.y / 2.0f;
-        this->FUN_0044de60((Float2 *)&pos2, 384.0f, pos2.y + pos2.y, 6, 0);
-        pos2 = this->position;
-        pos2.y = pos2.y / 2.0f;
-        e = this->FUN_0044dfa0((Float2 *)&pos2, 128.0f, pos2.y + pos2.y, 0xc, 0);
-        *(u8 *)((u8 *)e + 0x3d) = 1;
-        pos2.x = 192.0f;
-        e = this->FUN_0044dfa0((Float2 *)&pos2, 384.0f, pos2.y + pos2.y, 7, 0);
-        *(u8 *)((u8 *)e + 0x3d) = 1;
+            pos2 = this->position;
+            pos2.x = 192.0f;
+            pos2.y = pos2.y / 2.0f;
+            this->FUN_0044de60((Float2 *)&pos2, 384.0f, pos2.y * 2, 6, 0);
+            pos2 = this->position;
+            pos2.y = pos2.y / 2.0f;
+            e = this->FUN_0044dfa0((Float2 *)&pos2, 128.0f, pos2.y * 2, 0xc, 0);
+            *(u8 *)((u8 *)e + 0x3d) = 1;
+            pos2.x = 192.0f;
+            e = this->FUN_0044dfa0((Float2 *)&pos2, 384.0f, pos2.y * 2, 7, 0);
+            *(u8 *)((u8 *)e + 0x3d) = 1;
+        }
     }
 
     g_AnmManager->ExecuteScriptArray((AnmVm *)(bomb + 0x204), 5);
@@ -1250,8 +1252,8 @@ void Player::FUN_0040e610()
             angle += ZUN_2PI;
         }
         vm->pos = this->position;
-        vm->pos.x += cosf(angle) * vm->loadedSprite->widthPx * vm->scale.y / 2.0f;
-        vm->pos.y += sinf(angle) * vm->loadedSprite->widthPx * vm->scale.y / 2.0f;
+        vm->pos.x += cosf(angle) * vm->loadedSprite->widthPx * vm->scale.x / 2.0f;
+        vm->pos.y += sinf(angle) * vm->loadedSprite->widthPx * vm->scale.x / 2.0f;
         vm->SetZRotation(angle);
         vm->pos.x += g_GameManager.arcadeRegionTopLeftPos.x;
         vm->pos.y += g_GameManager.arcadeRegionTopLeftPos.y;
