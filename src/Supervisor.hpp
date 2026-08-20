@@ -372,10 +372,11 @@ struct ZunTimer
         this->previous = -999;
     }
 
-    void Tick()
+    i32 Tick()
     {
         this->previous = this->current;
         g_Supervisor.TickTimer(&this->current, &this->subFrame);
+        return this->current;
     }
 
     void operator=(i32 value)

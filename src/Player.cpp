@@ -351,7 +351,6 @@ void Player::FUN_0040d430()
     }
     if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(90))
     {
-        void *bombGfx;
         Effect *effect;
 
         g_SoundPlayer.PlaySoundByIdx((SoundIdx)15, 0);
@@ -359,8 +358,12 @@ void Player::FUN_0040d430()
         effect = g_EffectManager.SpawnEffect(43, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
         effect = g_EffectManager.SpawnEffect(44, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
         this->FUN_0044df00((Float2 *)((u8 *)this + 0x6b0), 1.0f, 5.0f, 110, 6);
-        bombGfx = this->FUN_0044e040((Float2 *)((u8 *)this + 0x6b0), 1.0f, 5.0f, 70, 110);
-        *(i32 *)((u8 *)bombGfx + 0x38) = 5;
+        {
+            void *bombGfx;
+
+            bombGfx = this->FUN_0044e040((Float2 *)((u8 *)this + 0x6b0), 1.0f, 5.0f, 70, 110);
+            *(i32 *)((u8 *)bombGfx + 0x38) = 5;
+        }
         ScreenEffect::RegisterChain((ScreenEffectType)1, 24, 8, 0, 0, 21);
         ScreenEffect::RegisterChain((ScreenEffectType)3, 8, 1, 0x8fffffff, 0, 21);
         return;
@@ -478,7 +481,6 @@ void Player::FUN_0040d970()
     }
     if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(120))
     {
-        void *bombGfx;
         Effect *effect;
 
         g_SoundPlayer.PlaySoundByIdx((SoundIdx)15, 0);
@@ -497,8 +499,12 @@ void Player::FUN_0040d970()
         effect = g_EffectManager.SpawnEffect(45, &pos, 1, 0xff00f0f0);
 
         this->FUN_0044df00((Float2 *)((u8 *)this + 0x6b0), 1.0f, 5.0f, 110, 6);
-        bombGfx = this->FUN_0044e040((Float2 *)((u8 *)this + 0x6b0), 1.0f, 5.0f, 70, 110);
-        *(i32 *)((u8 *)bombGfx + 0x38) = 5;
+        {
+            void *bombGfx;
+
+            bombGfx = this->FUN_0044e040((Float2 *)((u8 *)this + 0x6b0), 1.0f, 5.0f, 70, 110);
+            *(i32 *)((u8 *)bombGfx + 0x38) = 5;
+        }
         return;
     }
     if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x82))
