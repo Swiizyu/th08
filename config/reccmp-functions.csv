@@ -1734,7 +1734,7 @@ _nh_malloc,0x4a423d,library
 malloc,0x4a4269,library
 free,0x4a427b,library
 FUN_004a42ce,0x4a42ce,library
-FUN_004a42fa,0x4a42fa,library
+_CIatan2,0x4a42fa,library
 FUN_004a431a,0x4a431a,library
 atol,0x4a4342,library
 operator delete(void *),0x4a43cf,library

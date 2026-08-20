@@ -160,10 +160,10 @@ void Player::FUN_0040c010()
     }
     else
     {
-        f32 dy;
-        f32 dx;
-        f32 t;
         Float3 target;
+        f32 t;
+        f32 dx;
+        f32 dy;
 
         if (*(ZunTimer *)(bomb + 0x18) == 40)
         {
@@ -188,8 +188,14 @@ void Player::FUN_0040c010()
             {
                 void *gfx3;
 
-                target = (*(f32 *)((u8 *)this + 0xe2aa4) > -100.0f) ? *(Float3 *)((u8 *)this + 0xe2aa4)
-                                                                    : this->position;
+                if (*(f32 *)((u8 *)this + 0xe2aa4) > -100.0f)
+                {
+                    target = *(Float3 *)((u8 *)this + 0xe2aa4);
+                }
+                else
+                {
+                    target = this->position;
+                }
 
                 dx = ((f32 *)target)[0] - *(f32 *)(entry + 0x14);
                 dy = ((f32 *)target)[1] - *(f32 *)(entry + 0x18);
@@ -488,20 +494,19 @@ void Player::FUN_0040d970()
         effect = g_EffectManager.SpawnEffect(43, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
         effect = g_EffectManager.SpawnEffect(44, (Float3 *)((u8 *)this + 0x6b0), 1, -1);
 
-        Float3 pos(64.0f, 96.0f, 0.0f);
-
-        effect = g_EffectManager.SpawnEffect(45, &pos, 1, 0xff0000f0);
-        pos.y = 352.0f;
-        effect = g_EffectManager.SpawnEffect(45, &pos, 1, 0xfff00000);
-        pos.x = 320.0f;
-        effect = g_EffectManager.SpawnEffect(45, &pos, 1, 0xff00f000);
-        pos.y = 96.0f;
-        effect = g_EffectManager.SpawnEffect(45, &pos, 1, 0xff00f0f0);
-
-        this->FUN_0044df00((Float2 *)((u8 *)this + 0x6b0), 1.0f, 5.0f, 110, 6);
         {
             void *bombGfx;
+            Float3 pos(64.0f, 96.0f, 0.0f);
 
+            effect = g_EffectManager.SpawnEffect(45, &pos, 1, 0xff0000f0);
+            pos.y = 352.0f;
+            effect = g_EffectManager.SpawnEffect(45, &pos, 1, 0xfff00000);
+            pos.x = 320.0f;
+            effect = g_EffectManager.SpawnEffect(45, &pos, 1, 0xff00f000);
+            pos.y = 96.0f;
+            effect = g_EffectManager.SpawnEffect(45, &pos, 1, 0xff00f0f0);
+
+            this->FUN_0044df00((Float2 *)((u8 *)this + 0x6b0), 1.0f, 5.0f, 110, 6);
             bombGfx = this->FUN_0044e040((Float2 *)((u8 *)this + 0x6b0), 1.0f, 5.0f, 70, 110);
             *(i32 *)((u8 *)bombGfx + 0x38) = 5;
         }
@@ -656,16 +661,20 @@ void Player::FUN_0040ee10()
         v2.z = 0.0f;
         ((AnmVm *)effect)->FUN_0040ec30(30, 4, &v1, &v2);
 
-        Float2 a;
-        Float2 b;
+        {
+            Float2 b;
+            {
+                Float2 a;
 
-        a.x = 64.0f;
-        a.y = 0.0f;
-        b.x = 64.0f;
-        b.y = 0.0f;
-        ((AnmVm *)effect)->FUN_0040eda0(30, 1, &a, &b);
-        ((AnmVm *)effect)->FUN_0040ed50(30, 3, 0xff, 0);
-        ((AnmVm *)effect)->FUN_0040eca0(30, 0, -1, 0xffff0000);
+                a.x = 64.0f;
+                a.y = 0.0f;
+                b.x = 64.0f;
+                b.y = 0.0f;
+                ((AnmVm *)effect)->FUN_0040eda0(30, 1, &a, &b);
+                ((AnmVm *)effect)->FUN_0040ed50(30, 3, 0xff, 0);
+                ((AnmVm *)effect)->FUN_0040eca0(30, 0, -1, 0xffff0000);
+            }
+        }
 
         *(i32 *)(bomb + 0x14) += 1;
         g_SoundPlayer.PlaySoundPositionedByIdx((SoundIdx)0x11, this->position.x);
@@ -786,16 +795,20 @@ void Player::FUN_0040f570()
         v2.z = 0.0f;
         ((AnmVm *)effect)->FUN_0040ec30(30, 4, &v1, &v2);
 
-        Float2 a;
-        Float2 b;
+        {
+            Float2 b;
+            {
+                Float2 a;
 
-        a.x = 64.0f;
-        a.y = 0.0f;
-        b.x = 128.0f;
-        b.y = 0.0f;
-        ((AnmVm *)effect)->FUN_0040eda0(30, 1, &a, &b);
-        ((AnmVm *)effect)->FUN_0040ed50(30, 3, 0xff, 0);
-        ((AnmVm *)effect)->FUN_0040eca0(30, 0, -1, 0xffff0000);
+                a.x = 64.0f;
+                a.y = 0.0f;
+                b.x = 128.0f;
+                b.y = 0.0f;
+                ((AnmVm *)effect)->FUN_0040eda0(30, 1, &a, &b);
+                ((AnmVm *)effect)->FUN_0040ed50(30, 3, 0xff, 0);
+                ((AnmVm *)effect)->FUN_0040eca0(30, 0, -1, 0xffff0000);
+            }
+        }
 
         *(i32 *)(bomb + 0x14) += 1;
         g_SoundPlayer.PlaySoundPositionedByIdx((SoundIdx)0x11, this->position.x);
