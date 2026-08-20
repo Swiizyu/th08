@@ -2,6 +2,7 @@ name,address,type
 th08::MidiTimer::`vftable',0x4b6550,vtable
 th08::MidiOutput::`vftable',0x4b6554,vtable
 th08::DummyMidiTimer::`vftable',0x4b677c,vtable
+g_DifficultyWeightList,0x4b7b14,global
 th08::g_TextureFormatD3D8Mapping,0x4b8480,global
 th08::g_TextureFormatBytesPerPixel,0x4b8498,global
 th08::g_TitleCharacterSpriteIndices,0x4b8cd8,global
@@ -44,6 +45,8 @@ th08::g_SpellcardNumbersPerStage,0x4c6c40,global
 th08::g_SpellcardCountPerStage,0x4c6c68,global
 th08::g_EclExInsn,0x4c6cb0,global
 th08::g_EffectTemplates,0x4c6d30,global
+th08::g_ClearStageBonuses,0x4c7158,global
+th08::g_StageBgmIndices,0x4c7240,global
 th08::g_StageAnmFiles,0x4c72f8,global
 th08::g_StageStdFiles,0x4c731c,global
 th08::g_StageSpellStdFiles,0x4c7340,global
@@ -71,10 +74,12 @@ th08::g_ShtFileDrawCallbacks,0x4c7f1c,global
 th08::g_ShtFileHitCallbacks,0x4c7f24,global
 th08::g_AlphabetList,0x4c7f48,global
 th08::g_CharacterList,0x4c7f4c,global
+th08::g_ResultStageNumbers,0x4c7f80,global
 th08::g_ResultsStageList,0x4c7fac,global
 th08::g_ResultsDifficultyList,0x4c7fd4,global
 th08::g_SpellcardsWeightList,0x4c7fe8,global
 th08::g_RightAlignedDifficultyList,0x4c7ffc,global
+th08::g_ResultsCharacterNames,0x4c8010,global
 th08::g_SoundBufferIdxVol,0x4c8040,global
 th08::g_SFXList,0x4c81b0,global
 th08::g_DemoReplayFiles,0x4c8240,global
@@ -86,6 +91,8 @@ th08::g_OptionsHelpText,0x4c8664,global
 th08::g_LastKeyChanged,0x4c868c,global
 th08::g_KeyConfgHelperText,0x4c8690,global
 th08::g_KeyConfigHelpText,0x4c8690,global
+th08::g_ReplayCharacterNames,0x4c86c0,global
+th08::g_ReplayDifficulties,0x4c86f0,global
 th08::g_PbgFileOpenModes,0x4c8704,global
 FLOAT_0.5_004c9fd0,0x4c9fd0,global
 FLOAT_3.0_004c9fe0,0x4c9fe0,global
@@ -100,7 +107,6 @@ th08::g_BackgroundDrawChainLowPrio,0x4ea630,global
 th08::g_BackgroundCalcChain,0x4ea650,global
 th08::g_Spellcard,0x4ea670,global
 th08::g_BackgroundTintActive,0x4ea49c,global
-th08::g_Spellcard,0x4eca80,global
 th08::g_SpellcardCalcChain,0x4eccac,global
 th08::g_EclManager,0x4eccb8,global
 th08::g_EffectManager,0x4ece60,global

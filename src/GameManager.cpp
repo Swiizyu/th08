@@ -435,14 +435,14 @@ ZunResult GameManager::DeletedCallback(GameManager *gameManager)
         g_Supervisor.curState != SupervisorState_SpellcardPracticeRestart &&
         g_Supervisor.curState != SupervisorState_GameManagerNextStageWeird)
     {
-        g_Supervisor.keepStageResources = TRUE;
+        g_Supervisor.unk168 = TRUE;
     }
     else
     {
-        g_Supervisor.keepStageResources = FALSE;
+        g_Supervisor.unk168 = FALSE;
     }
 
-    if (!g_GameManager.flags.isSpellPractice || g_Supervisor.keepStageResources)
+    if (!g_GameManager.flags.isSpellPractice || g_Supervisor.unk168)
     {
         g_Supervisor.StopAudio();
         if (g_Supervisor.cfg.musicMode == 2 && g_Supervisor.midiOutput != NULL)

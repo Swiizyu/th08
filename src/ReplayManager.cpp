@@ -33,7 +33,7 @@ th08::ChainCallbackResult FUN_00452490(th08::ReplayManager *mgr);
 th08::ChainCallbackResult FUN_004526c0(th08::ReplayManager *mgr);
 
 // FUNCTION: th08 0x453b80
-char *sprintf(char *dst, const char *fmt, ...)
+char *SprintfReturnEnd(char *dst, const char *fmt, ...)
 {
     va_list args;
     char *cur;
@@ -187,7 +187,7 @@ ChainCallbackResult ReplayManager::OnUpdateHighPrio(ReplayManager *mgr)
     {
         return CHAIN_CALLBACK_RESULT_CONTINUE;
     }
-    if (g_Supervisor.IsClearBackBufferOnRefreshEnabled())
+    if (g_Supervisor.IsSpeedhackDetected())
     {
         return CHAIN_CALLBACK_RESULT_CONTINUE;
     }
@@ -683,21 +683,21 @@ void ReplayManager::SaveReplay(const char *replayPath, const char *replayName)
     memset(userSectionText, 0, sizeof(userSectionText));
 
     textCursor = userSectionText;
-    textCursor = sprintf(textCursor, "\x83\x76\x83\x8c\x83\x43\x83\x84\x81\x5b\x96\xbc\t%s\r\n", replayName);
+    textCursor = SprintfReturnEnd(textCursor, "\x83\x76\x83\x8c\x83\x43\x83\x84\x81\x5b\x96\xbc\t%s\r\n", replayName);
 
     time((time_t *)&timeValue);
     timeInfo = localtime((time_t *)&timeValue);
     strftime(timeString, 20, "%Y/%m/%d %H:%M:%S", timeInfo);
-    textCursor = sprintf(textCursor, "\x83\x76\x83\x8c\x83\x43\x8e\x9e\x8d\x8f\t%s\r\n", timeString);
-    textCursor = sprintf(textCursor, "\x83\x4c\x83\x83\x83\x89\x96\xbc\t%s\r\n",
+    textCursor = SprintfReturnEnd(textCursor, "\x83\x76\x83\x8c\x83\x43\x8e\x9e\x8d\x8f\t%s\r\n", timeString);
+    textCursor = SprintfReturnEnd(textCursor, "\x83\x4c\x83\x83\x83\x89\x96\xbc\t%s\r\n",
                          ResultScreen::GetCharacterName(g_GameManager.shotType));
-    textCursor = sprintf(textCursor, "\x83\x58\x83\x52\x83\x41\t\t%d0\r\n", g_GameManager.globals->displayScore);
-    textCursor = sprintf(textCursor, "\x93\xef\x88\xd5\x93\x78\t\t%s\r\n",
+    textCursor = SprintfReturnEnd(textCursor, "\x83\x58\x83\x52\x83\x41\t\t%d0\r\n", g_GameManager.globals->displayScore);
+    textCursor = SprintfReturnEnd(textCursor, "\x93\xef\x88\xd5\x93\x78\t\t%s\r\n",
                          g_ReplayDifficultyNames[g_GameManager.difficulty]);
 
     if (replayDataCopy.spellcardNumber >= 0)
     {
-        textCursor = sprintf(textCursor, "\x83\x4a\x81\x5b\x83\x68\x96\xbc\tNo.%3d %s\r\n",
+        textCursor = SprintfReturnEnd(textCursor, "\x83\x4a\x81\x5b\x83\x68\x96\xbc\tNo.%3d %s\r\n",
                              replayDataCopy.spellcardNumber + 1, replayDataCopy.spellcardName);
     }
     else
@@ -710,17 +710,17 @@ void ReplayManager::SaveReplay(const char *replayPath, const char *replayName)
         {
             stageName = ResultScreen::GetStageName(g_GameManager.currentStage);
         }
-        textCursor = sprintf(textCursor, "\x8d\xc5\x8f\x49\x83\x58\x83\x65\x81\x5b\x83\x57\t%s\r\n", stageName);
+        textCursor = SprintfReturnEnd(textCursor, "\x8d\xc5\x8f\x49\x83\x58\x83\x65\x81\x5b\x83\x57\t%s\r\n", stageName);
     }
-    textCursor = sprintf(textCursor, "\x83\x7e\x83\x58\x89\xf1\x90\x94\t%d\r\n", g_GameManager.GetDeaths());
-    textCursor = sprintf(textCursor, "\x83\x7b\x83\x80\x89\xf1\x90\x94\t%d\r\n", g_GameManager.GetBombsUsed());
-    textCursor = sprintf(textCursor, "\x8f\x88\x97\x9d\x97\x8e\x82\xbf\x97\xa6\t%f%%\r\n", replayDataCopy.slowDownRate);
+    textCursor = SprintfReturnEnd(textCursor, "\x83\x7e\x83\x58\x89\xf1\x90\x94\t%d\r\n", g_GameManager.GetDeaths());
+    textCursor = SprintfReturnEnd(textCursor, "\x83\x7b\x83\x80\x89\xf1\x90\x94\t%d\r\n", g_GameManager.GetBombsUsed());
+    textCursor = SprintfReturnEnd(textCursor, "\x8f\x88\x97\x9d\x97\x8e\x82\xbf\x97\xa6\t%f%%\r\n", replayDataCopy.slowDownRate);
 
     *(i32 *)((u8 *)&g_GameManager + 0x3dab0) =
         (i32)((f32)g_GameManager.unk3DBA0 / (f32)g_GameManager.unk3DBA4 * 10000.0f);
-    textCursor = sprintf(textCursor, "\x90\x6c\x8a\xd4\x97\xa6\t\t%3.2f\x81\x93\r\n",
+    textCursor = SprintfReturnEnd(textCursor, "\x90\x6c\x8a\xd4\x97\xa6\t\t%3.2f\x81\x93\r\n",
                          (f32) * (i32 *)((u8 *)&g_GameManager + 0x3dab0) / 100.0f);
-    textCursor = sprintf(textCursor, "\x83\x51\x81\x5b\x83\x80\x82\xcc\x83\x6f\x81\x5b\x83\x57\x83\x87\x83\x93\t%d.%.2d%c\r\n",
+    textCursor = SprintfReturnEnd(textCursor, "\x83\x51\x81\x5b\x83\x80\x82\xcc\x83\x6f\x81\x5b\x83\x57\x83\x87\x83\x93\t%d.%.2d%c\r\n",
                          1, 0, 'd');
 
     strlenCursor = userSectionText;

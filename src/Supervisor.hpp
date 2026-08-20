@@ -181,11 +181,6 @@ struct Supervisor
         return this->flags.speedhackDetected;
     }
 
-    ZunBool IsClearBackBufferOnRefreshEnabled()
-    {
-        return this->flags.speedhackDetected;
-    }
-
     ZunBool IsSoftwareTexturing()
     {
         return this->cfg.opts.disableColorCompositing | this->cfg.opts.useSwTextureBlending;
@@ -292,8 +287,8 @@ struct Supervisor
     i32 curState;
     i32 wantedState2;
     ZunBool isInitialStageLoad;
-    ZunBool releaseResourcesOnRestart;
-    ZunBool keepStageResources;
+    ZunBool unk168; // Written by GameManager::DeletedCallback; read by the 0x438ff3 helper
+    ZunBool keepStageResources; // Set on spell practice restart; read by the 0x438ffd helper
     i32 unk170;
     i32 unk174; // Commonly set for screen transitions and decremented once per frame, but never actually used for
                 // anything
@@ -458,7 +453,7 @@ inline ZunBool IsInitialStageLoad()
 
 inline ZunBool ReleaseResourcesOnRestart()
 {
-    return g_Supervisor.releaseResourcesOnRestart;
+    return g_Supervisor.unk168;
 }
 
 ZunBool KeepStageResources();
