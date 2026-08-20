@@ -332,7 +332,7 @@ i32 Effect::FUN_0040e040()
     *(u8 *)((u8 *)this + 0x356) = 1;
     *(f32 *)((u8 *)this + 0x334) = 5.0f;
     *(i32 *)((u8 *)this + 0x330) = 0;
-    if (this->timer == 40)
+    if (this->timer < 40)
     {
         *(f32 *)((u8 *)this + 0x320) = 8.0f;
     }
@@ -359,7 +359,7 @@ i32 Effect::FUN_0040e120()
     *(i32 *)((u8 *)this + 0x334) = 0;
     *(f32 *)((u8 *)this + 0x32c) = 128.0f * factor;
     *(f32 *)((u8 *)this + 0x330) = ZUN_PI / 4.0f;
-    if (this->timer == 40)
+    if (this->timer < 40)
     {
         *(f32 *)((u8 *)this + 0x320) = 8.0f;
     }
@@ -384,7 +384,7 @@ i32 Effect::FUN_0040e200()
     *(u8 *)((u8 *)this + 0x356) = 1;
     *(f32 *)((u8 *)this + 0x32c) = 128.0f * factor;
     *(f32 *)((u8 *)this + 0x330) = -ZUN_PI / 4.0f;
-    if (this->timer == 40)
+    if (this->timer < 40)
     {
         *(f32 *)((u8 *)this + 0x320) = 8.0f;
     }
