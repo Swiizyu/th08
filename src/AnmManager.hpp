@@ -538,7 +538,7 @@ struct AnmManager
     AnmLoaded *GetAnm(i32 anmIdx);
     void SetCameraMode(u8 cameraMode);
     void SetupVertexBuffer();
-    void FUN_004623c0(AnmVm *vm);
+    void SetRenderStateForVm3D(AnmVm *vm);
 
     ZunBool ExecuteScript(AnmVm *vm);
     void ExecuteScriptArray(AnmVm *sprites, int count);
@@ -558,7 +558,7 @@ struct AnmManager
     void TransformVerticesWorld(AnmVm *vm);
     ZunResult DrawWorld(AnmVm *vm);
     ZunResult DrawWithCallback(AnmVm *vm, void (*callback)(AnmVm *, Float3 *));
-    ZunResult FUN_00464470(AnmVm *vm);
+    ZunResult Draw3D(AnmVm *vm);
     ZunResult FUN_004649a0(AnmVm *vm, VertexTex1DiffuseXyzrhw *vertices, i32 vertexCount);
     ZunResult FUN_00464b00(AnmVm *vm, VertexTex1DiffuseXyzrhw *vertices, i32 vertexCount);
     ZunResult FUN_00464c60(AnmVm *vm, VertexDiffuseXyzrhw *vertices, i32 vertexCount);

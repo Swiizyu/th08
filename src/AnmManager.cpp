@@ -24,7 +24,7 @@ AnmVmBase::AnmVmBase()
 }
 
 // FUNCTION: th08 0x4623c0
-void AnmManager::FUN_004623c0(AnmVm *vm)
+void AnmManager::SetRenderStateForVm3D(AnmVm *vm)
 {
     this->SetRenderStateForVm(vm);
     if (vm->loadedSprite != NULL && vm->anmFile != NULL)
@@ -1802,13 +1802,126 @@ ZunResult AnmManager::DrawWithCallback(AnmVm *vm, void (*callback)(AnmVm *, Floa
     return DrawInner(vm, 0);
 }
 
+#pragma var_order(texMatrix, rot, world)
 // FUNCTION: th08 0x464470
-ZunResult AnmManager::FUN_00464470(AnmVm *vm)
+ZunResult AnmManager::Draw3D(AnmVm *vm)
 {
-    if (vm == NULL || !vm->FUN_00428720() || !vm->flag1 || vm->color1.a == 0)
+    D3DMATRIX texMatrix;
+    D3DXMATRIX rot;
+    D3DXMATRIX world;
+
+    if (!vm->IsVisible())
+    {
         return ZUN_ERROR;
-    this->SetRenderStateForVm(vm);
-    return this->DrawInner(vm, 0);
+    }
+
+    if (!vm->flag1)
+    {
+        return ZUN_ERROR;
+    }
+
+    if (vm->color1.a == 0)
+    {
+        return ZUN_ERROR;
+    }
+
+    if (this->spritesToDraw != 0)
+    {
+        this->FlushVertexBuffer();
+    }
+
+    if (vm->flag16 == 0 && (vm->updateScale || vm->updateRotation))
+    {
+        vm->matrix2 = vm->matrix1;
+        vm->matrix2.m[0][0] *= vm->scale.x;
+        vm->matrix2.m[1][1] *= vm->scale.y;
+        vm->updateScale = 0;
+        if (vm->rotation.x != 0.0)
+        {
+            D3DXMatrixRotationX(&rot, vm->rotation.x);
+            D3DXMatrixMultiply(&vm->matrix2, &vm->matrix2, &rot);
+        }
+        if (vm->rotation.y != 0.0)
+        {
+            D3DXMatrixRotationY(&rot, vm->rotation.y);
+            D3DXMatrixMultiply(&vm->matrix2, &vm->matrix2, &rot);
+        }
+        if (vm->rotation.z != 0.0)
+        {
+            D3DXMatrixRotationZ(&rot, vm->rotation.z);
+            D3DXMatrixMultiply(&vm->matrix2, &vm->matrix2, &rot);
+        }
+        vm->updateRotation = 0;
+    }
+
+    world = vm->matrix2;
+    if ((vm->anchor & 1) == 0)
+    {
+        world.m[3][0] = vm->pos.x;
+    }
+    else
+    {
+        world.m[3][0] = FUN_004031e0(vm->spriteSize.x * vm->scale.x / 2.0f) + vm->pos.x;
+    }
+
+    if ((vm->anchor & 2) == 0)
+    {
+        world.m[3][1] = vm->pos.y;
+    }
+    else
+    {
+        world.m[3][1] = FUN_004031e0(vm->spriteSize.y * vm->scale.y / 2.0f) + vm->pos.y;
+    }
+    world.m[3][0] += this->screenShakeOffset.x;
+    world.m[3][1] += this->screenShakeOffset.y;
+
+    this->SetRenderStateForVm3D(vm);
+    world.m[3][2] = vm->pos.z;
+
+    g_Supervisor.d3dDevice->SetTransform(D3DTS_WORLD, &world);
+
+    if (this->currentSprite != vm->loadedSprite || vm->uvScrollPos.x > 0.0f || vm->uvScrollPos.x < 0.0f)
+    {
+        this->currentSprite = vm->loadedSprite;
+        texMatrix = vm->matrix3;
+        texMatrix.m[3][0] = vm->loadedSprite->uvStart.x + vm->uvScrollPos.x;
+        texMatrix.m[3][1] = vm->loadedSprite->uvStart.y + vm->uvScrollPos.y;
+        g_Supervisor.d3dDevice->SetTransform(D3DTS_TEXTURE0, &texMatrix);
+
+        if (this->currentTexture != vm->loadedSprite->texture)
+        {
+            this->currentTexture = vm->loadedSprite->texture;
+            g_Supervisor.d3dDevice->SetTexture(0, this->currentTexture);
+        }
+    }
+
+    if (this->currentVertexShader != 2)
+    {
+        if (!g_Supervisor.IsVertexBufferDisabled())
+        {
+            g_Supervisor.d3dDevice->SetVertexShader(D3DFVF_XYZ | D3DFVF_TEX1);
+            g_Supervisor.d3dDevice->SetStreamSource(0, this->quadVertexBuffer, sizeof(VertexDiffuseXyzrhw));
+        }
+        else
+        {
+            g_Supervisor.d3dDevice->SetVertexShader(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+        }
+        g_Supervisor.d3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_TFACTOR);
+        g_Supervisor.d3dDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_TFACTOR);
+        this->currentVertexShader = 2;
+    }
+
+    if (!g_Supervisor.IsVertexBufferDisabled())
+    {
+        g_Supervisor.d3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+    }
+    else
+    {
+        g_Supervisor.d3dDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, g_BackgroundQuadVertices,
+                                                sizeof(VertexTex1Xyzrhw));
+    }
+
+    return ZUN_SUCCESS;
 }
 
 // FUNCTION: th08 0x4649a0
