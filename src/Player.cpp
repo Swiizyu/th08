@@ -167,12 +167,12 @@ void Player::FUN_0040ee10()
     {
         this->FUN_0040be30(1, "紅符「不夜城レッド」", 0xf0, 0x122, 0);
 
-        g_SoundPlayer.PlaySoundByIdx(13, 0);
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)13, 0);
         *(Float3 *)(entry + 0x14) = *(Float3 *)((u8 *)this + 0x6bc);
         *(Float3 *)(entry + 0x1704) = *(Float3 *)((u8 *)this + 0x9b0);
         *(Float3 *)(entry + 0x2df4) = *(Float3 *)((u8 *)this + 0xca4);
         *(Float3 *)(entry + 0x44e4) = *(Float3 *)((u8 *)this + 0xf98);
-        g_SoundPlayer.PlaySoundByIdx(6, 0);
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)6, 0);
 
         *(i32 *)(bomb + 0x14) = 0;
         *(f32 *)((u8 *)this + 0x408) = 0.0f;
@@ -245,7 +245,7 @@ void Player::FUN_0040ee10()
             ((AnmVm *)effect)->FUN_0040eca0(30, 0, -1, 0xffff0000);
 
             *(i32 *)(bomb + 0x14) += 1;
-            g_SoundPlayer.PlaySoundPositionedByIdx(0x11, this->position.x);
+            g_SoundPlayer.PlaySoundPositionedByIdx((SoundIdx)0x11, this->position.x);
             g_AnmManager->ExecuteScript((AnmVm *)effect);
         }
 
