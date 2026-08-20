@@ -161,9 +161,9 @@ void Player::FUN_0040c010()
     else
     {
         f32 dy;
-        f32 dx;
+        f32 target;
         f32 t;
-        Float3 target;
+        Float3 dx;
 
         if (*(ZunTimer *)(bomb + 0x18) == 40)
         {
@@ -190,33 +190,33 @@ void Player::FUN_0040c010()
 
                 if (*(f32 *)((u8 *)this + 0xe2aa4) > -100.0f)
                 {
-                    target = *(Float3 *)((u8 *)this + 0xe2aa4);
+                    dx = *(Float3 *)((u8 *)this + 0xe2aa4);
                 }
                 else
                 {
-                    target = this->position;
+                    dx = this->position;
                 }
 
-                dx = ((f32 *)target)[0] - *(f32 *)(entry + 0x14);
-                dy = ((f32 *)target)[1] - *(f32 *)(entry + 0x18);
+                target = ((f32 *)dx)[0] - *(f32 *)(entry + 0x14);
+                dy = ((f32 *)dx)[1] - *(f32 *)(entry + 0x18);
 
-                t = sqrtf(dx * dx + dy * dy) / (*(f32 *)(entry + 8) / 8.0f);
+                t = sqrtf(target * target + dy * dy) / (*(f32 *)(entry + 8) / 8.0f);
                 if (t < 1.0f)
                 {
                     t = 1.0f;
                 }
 
-                dx = dx / t + *(f32 *)(entry + 0x1a0);
+                target = target / t + *(f32 *)(entry + 0x1a0);
                 dy = dy / t + *(f32 *)(entry + 0x1a4);
 
-                t = sqrtf(dx * dx + dy * dy);
+                t = sqrtf(target * target + dy * dy);
                 *(f32 *)(entry + 8) = (t > 10.0f) ? 10.0f : t;
                 if (*(f32 *)(entry + 8) < 1.0f)
                 {
                     *(f32 *)(entry + 8) = 1.0f;
                 }
 
-                *(f32 *)(entry + 0x1a0) = dx * *(f32 *)(entry + 8) / t;
+                *(f32 *)(entry + 0x1a0) = target * *(f32 *)(entry + 8) / t;
                 *(f32 *)(entry + 0x1a4) = dy * *(f32 *)(entry + 8) / t;
 
                 this->FUN_0044df00((Float2 *)(entry + 0x14), 128.0f, 0.0f, 0, 6);
@@ -640,26 +640,26 @@ void Player::FUN_0040ee10()
         *(Float3 *)((u8 *)this + 0xf98) = pos2;
     }
 
-    *(void **)(entry + 0x16ec) = this->FUN_0044df00((Float2 *)&this->position, 96.0f, 0.0f, 0, 6);
+        *(void **)(entry + 0x16ec) = this->FUN_0044df00((Float2 *)&this->position, 96.0f, 0.0f, 0, 6);
 
     if (((ZunTimer *)(bomb + 0x18))->FUN_0040ebc0(10))
     {
-        Effect *effect;
+        Effect *target;
 
-        effect = g_EffectManager.SpawnSpecialEffect(53, &this->position, (*(i32 *)(bomb + 0x14) % 4) + 4, 1, -1);
-        *(i32 *)((u8 *)effect + 0x324) = 0x20;
-        *(f32 *)((u8 *)effect + 0x334) = 4.0f;
+        target = g_EffectManager.SpawnSpecialEffect(53, &this->position, (*(i32 *)(bomb + 0x14) % 4) + 4, 1, -1);
+        *(i32 *)((u8 *)target + 0x324) = 0x20;
+        *(f32 *)((u8 *)target + 0x334) = 4.0f;
 
-        Float3 v2;
-        Float3 v1;
+        Float3 dx;
+        Float3 t;
 
-        v2.x = 192.0f;
-        v2.y = g_Rng.GetRandomF32InRange(128.0f);
-        v2.z = 0.0f;
-        v1.x = 0.0f;
-        v1.y = 0.0f;
-        v1.z = 0.0f;
-        ((AnmVm *)effect)->FUN_0040ec30(30, 4, &v1, &v2);
+        dx.x = 0.0f;
+        dx.y = 0.0f;
+        dx.z = 0.0f;
+        t.x = 192.0f;
+        t.y = g_Rng.GetRandomF32InRange(128.0f);
+        t.z = 0.0f;
+        ((AnmVm *)target)->FUN_0040ec30(30, 4, &dx, &t);
 
         {
             Float2 b;
@@ -670,15 +670,15 @@ void Player::FUN_0040ee10()
                 a.y = 0.0f;
                 b.x = 64.0f;
                 b.y = 0.0f;
-                ((AnmVm *)effect)->FUN_0040eda0(30, 1, &a, &b);
-                ((AnmVm *)effect)->FUN_0040ed50(30, 3, 0xff, 0);
-                ((AnmVm *)effect)->FUN_0040eca0(30, 0, -1, 0xffff0000);
+                ((AnmVm *)target)->FUN_0040eda0(30, 1, &a, &b);
+                ((AnmVm *)target)->FUN_0040ed50(30, 3, 0xff, 0);
+                ((AnmVm *)target)->FUN_0040eca0(30, 0, -1, 0xffff0000);
             }
         }
 
         *(i32 *)(bomb + 0x14) += 1;
         g_SoundPlayer.PlaySoundPositionedByIdx((SoundIdx)0x11, this->position.x);
-        g_AnmManager->ExecuteScript((AnmVm *)effect);
+        g_AnmManager->ExecuteScript((AnmVm *)target);
     }
 
     if (*(ZunTimer *)((u8 *)this + 0xe2ac4) >= 5)
@@ -778,22 +778,22 @@ void Player::FUN_0040f570()
 
     if (((ZunTimer *)(bomb + 0x18))->FUN_0040ebc0(10))
     {
-        Effect *effect;
+        Effect *target;
 
-        effect = g_EffectManager.SpawnSpecialEffect(53, &this->position, (*(i32 *)(bomb + 0x14) % 4) + 4, 1, -1);
-        *(i32 *)((u8 *)effect + 0x324) = 0x20;
-        *(f32 *)((u8 *)effect + 0x334) = 4.0f;
+        target = g_EffectManager.SpawnSpecialEffect(53, &this->position, (*(i32 *)(bomb + 0x14) % 4) + 4, 1, -1);
+        *(i32 *)((u8 *)target + 0x324) = 0x20;
+        *(f32 *)((u8 *)target + 0x334) = 4.0f;
 
-        Float3 v2;
-        Float3 v1;
+        Float3 dx;
+        Float3 t;
 
-        v2.x = 192.0f;
-        v2.y = g_Rng.GetRandomF32InRange(128.0f);
-        v2.z = 0.0f;
-        v1.x = 0.0f;
-        v1.y = 0.0f;
-        v1.z = 0.0f;
-        ((AnmVm *)effect)->FUN_0040ec30(30, 4, &v1, &v2);
+        dx.x = 0.0f;
+        dx.y = 0.0f;
+        dx.z = 0.0f;
+        t.x = 192.0f;
+        t.y = g_Rng.GetRandomF32InRange(128.0f);
+        t.z = 0.0f;
+        ((AnmVm *)target)->FUN_0040ec30(30, 4, &dx, &t);
 
         {
             Float2 b;
@@ -804,15 +804,15 @@ void Player::FUN_0040f570()
                 a.y = 0.0f;
                 b.x = 128.0f;
                 b.y = 0.0f;
-                ((AnmVm *)effect)->FUN_0040eda0(30, 1, &a, &b);
-                ((AnmVm *)effect)->FUN_0040ed50(30, 3, 0xff, 0);
-                ((AnmVm *)effect)->FUN_0040eca0(30, 0, -1, 0xffff0000);
+                ((AnmVm *)target)->FUN_0040eda0(30, 1, &a, &b);
+                ((AnmVm *)target)->FUN_0040ed50(30, 3, 0xff, 0);
+                ((AnmVm *)target)->FUN_0040eca0(30, 0, -1, 0xffff0000);
             }
         }
 
         *(i32 *)(bomb + 0x14) += 1;
         g_SoundPlayer.PlaySoundPositionedByIdx((SoundIdx)0x11, this->position.x);
-        g_AnmManager->ExecuteScript((AnmVm *)effect);
+        g_AnmManager->ExecuteScript((AnmVm *)target);
     }
 
     if (*(ZunTimer *)((u8 *)this + 0xe2ac4) >= 5)
@@ -835,9 +835,141 @@ void Player::FUN_0040f570()
 }
 
 // FUNCTION: th08 0x40fcd0
+#pragma var_order(i, bomb, entry, vm, angle)
 void Player::FUN_0040fcd0()
 {
-    UpdateBombPattern(this, 6, 0xff80ffff, 300, 10);
+    i32 i;
+    u8 *bomb;
+    u8 *entry;
+    AnmVm *vm;
+    f32 angle;
+
+    bomb = (u8 *)this + 0xfdc;
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
+    {
+        this->FUN_0040be30(0, "\x8c\xb6\x95\x84\x81u\x8eE\x90l\x83h\x81[\x83\x8b\x81v", 0xfa, 0x122, 0);
+
+        for (entry = bomb + 0x4c, i = 0; i < 0x60; i++, entry += 0x16f0)
+        {
+            *(i32 *)entry = 0;
+        }
+
+        *(f32 *)((u8 *)this + 0x408) = 0.5f;
+        *(f32 *)((u8 *)this + 0x404) = 0.5f;
+
+        *(void **)(bomb + 0x1724) = g_EffectManager.SpawnEffect(20, &this->position, 1, -1);
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)5, 0);
+    }
+
+    if (*(ZunTimer *)(bomb + 0x18) >= 0 && *(ZunTimer *)(bomb + 0x18) <= 0x3c)
+    {
+        *(Float3 *)(*(u8 **)(bomb + 0x1724) + 0x2a4) = this->position;
+    }
+
+    if (*(ZunTimer *)(bomb + 0x18) >= 0x14 && *(ZunTimer *)(bomb + 0x18) < 0x74)
+    {
+        for (entry = (u8 *)this + 0x1028, i = 0; i < 0x60; i++, entry += 0x16f0)
+        {
+            if (!((ZunTimer *)((u8 *)this + 0xff4))->FUN_0040e350((i % 0x30) * 2 + 0x14))
+            {
+                continue;
+            }
+
+            if (*(i32 *)entry != 0)
+            {
+                return;
+            }
+
+            *(i32 *)entry = 1;
+            vm = (AnmVm *)(entry + 0x1b8);
+            this->playerAnm->ExecuteAnmIdx(vm, 0x16);
+
+            angle = (f32)i * ZUN_PI * 2.0f / 96.0f - ZUN_PI;
+            *(f32 *)(entry + 0x10) = angle;
+            *(f32 *)(entry + 0xc) = g_Rng.GetRandomF32InRange(1.0f) + 0.5f;
+            *(f32 *)(entry + 8) = g_Rng.GetRandomF32InRange(0.1f) + 0.03f;
+            *(f32 *)(entry + 0x1ac) =
+                g_Rng.GetRandomU16InRange(1) != 0 ? ZUN_PI / 20.0f : -(ZUN_PI / 20.0f);
+
+            *(f32 *)(entry + 0x1a0) = sinf(*(f32 *)(entry + 0x10)) * 24.0f;
+            *(f32 *)(entry + 0x1a4) = cosf(*(f32 *)(entry + 0x10)) * 24.0f;
+            *(Float3 *)(entry + 0x14) = this->position + *(Float3 *)(entry + 0x1a0);
+
+            *(ZunTimer *)(entry + 0x16dc) = 0;
+            *(f32 *)(entry + 0x1a8) = 0.0f;
+
+            *(void **)(entry + 0x16ec) = this->FUN_0044df00((Float2 *)(entry + 0x14), 32.0f, 0.0f, 0x1f4, 6);
+            *(void **)(entry + 0x16e8) = this->FUN_0044e040((Float2 *)(entry + 0x14), 32.0f, 0.0f, 0x14, 0x1f4);
+        }
+
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)6, 0);
+        ScreenEffect::RegisterChain((ScreenEffectType)1, 120, 4, 1, 0, 21);
+    }
+
+    for (entry = bomb + 0x4c, i = 0; i < 0x60; i++, entry += 0x16f0)
+    {
+        if (*(i32 *)entry == 0)
+        {
+            continue;
+        }
+
+        if (((ZunTimer *)(entry + 0x16dc))->AsFrames() < 0x1e ||
+            ((ZunTimer *)(entry + 0x16dc))->AsFrames() >= 0x46)
+        {
+            if (((ZunTimer *)(entry + 0x16dc))->FUN_0040e350(0x46))
+            {
+                if (*(f32 *)((u8 *)this + 0xe2aa4) > -100.0f)
+                {
+                    *(f32 *)(entry + 0x10) = AddNormalizeAngle(
+                        FUN_0040c7b0(*(f32 *)((u8 *)this + 0xe2aa8) - *(f32 *)(entry + 0x18),
+                                     *(f32 *)((u8 *)this + 0xe2aa4) - *(f32 *)(entry + 0x14)),
+                        0.0f);
+                }
+                *(f32 *)(entry + 0xc) = 14.0f;
+            }
+
+            *(f32 *)(entry + 0xc) += *(f32 *)(entry + 8);
+            *(f32 *)(entry + 0x1a0) = sinf(*(f32 *)(entry + 0x10)) * *(f32 *)(entry + 0xc);
+            *(f32 *)(entry + 0x1a4) = cosf(*(f32 *)(entry + 0x10)) * *(f32 *)(entry + 0xc);
+        }
+        else
+        {
+            *(f32 *)(entry + 0x10) = AddNormalizeAngle(*(f32 *)(entry + 0x10), *(f32 *)(entry + 0x1ac));
+            *(f32 *)(entry + 0x1a0) = 0.0f;
+            *(f32 *)(entry + 0x1a4) = 0.0f;
+        }
+
+        if (*(i32 *)(entry + 0x16e8) != 0)
+        {
+            **(f32 **)(entry + 0x16e8) = *(f32 *)(entry + 0x14);
+            *(f32 *)(*(u8 **)(entry + 0x16e8) + 4) = *(f32 *)(entry + 0x18);
+            **(f32 **)(entry + 0x16ec) = *(f32 *)(entry + 0x14);
+            *(f32 *)(*(u8 **)(entry + 0x16ec) + 4) = *(f32 *)(entry + 0x18);
+
+            if (*(ZunTimer *)(entry + 0x16dc) >= 0x78)
+            {
+                *(u8 *)(*(u8 **)(entry + 0x16e8) + 0x3c) = 0;
+                *(u8 *)(*(u8 **)(entry + 0x16ec) + 0x3c) = 0;
+                *(void **)(entry + 0x16ec) = 0;
+                *(void **)(entry + 0x16e8) = 0;
+            }
+            else if (*(i32 *)(*(u8 **)(entry + 0x16e8) + 0x30) > 0)
+            {
+                this->playerAnm->ExecuteAnmIdx((AnmVm *)(entry + 0x1b8), 0x17);
+                g_EffectManager.SpawnEffect(0, (Float3 *)(bomb + i * 0x16f0 + 0x60), 1, 0xffff80ff);
+                *(u8 *)(*(u8 **)(entry + 0x16e8) + 0x3c) = 0;
+                *(u8 *)(*(u8 **)(entry + 0x16ec) + 0x3c) = 0;
+                *(void **)(entry + 0x16ec) = 0;
+                *(void **)(entry + 0x16e8) = 0;
+                g_SoundPlayer.PlaySoundPositionedByIdx((SoundIdx)0x2b, *(f32 *)(entry + 0x14));
+            }
+        }
+
+        *(Float3 *)(entry + 0x14) += *(Float3 *)(entry + 0x1a0);
+        g_AnmManager->ExecuteScript((AnmVm *)(entry + 0x1b8));
+        (*(ZunTimer *)(entry + 0x16dc))++;
+    }
 }
 
 // FUNCTION: th08 0x4103f0
