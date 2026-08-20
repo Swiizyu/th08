@@ -86,6 +86,8 @@ th08::g_DemoReplayFiles,0x4c8240,global
 th08::g_StageNames,0x4c8250,global
 th08::g_StageNamesSpellPractice,0x4c8274,global
 th08::g_FullWidthDigits,0x4c829c,global
+th08::g_LastWordHelpText,0x4c82c8,global
+th08::g_LastWordDifficultyNames,0x4c8628,global
 th08::g_StartMenuHelpText,0x4c8640,global
 th08::g_OptionsHelpText,0x4c8664,global
 th08::g_LastKeyChanged,0x4c868c,global
