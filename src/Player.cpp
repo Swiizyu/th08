@@ -160,10 +160,10 @@ void Player::FUN_0040c010()
     }
     else
     {
-        Float3 target;
-        f32 t;
-        f32 dx;
         f32 dy;
+        f32 dx;
+        f32 t;
+        Float3 target;
 
         if (*(ZunTimer *)(bomb + 0x18) == 40)
         {
@@ -650,15 +650,15 @@ void Player::FUN_0040ee10()
         *(i32 *)((u8 *)effect + 0x324) = 0x20;
         *(f32 *)((u8 *)effect + 0x334) = 4.0f;
 
-        Float3 v1;
         Float3 v2;
+        Float3 v1;
 
-        v1.x = 0.0f;
-        v1.y = 0.0f;
-        v1.z = 0.0f;
         v2.x = 192.0f;
         v2.y = g_Rng.GetRandomF32InRange(128.0f);
         v2.z = 0.0f;
+        v1.x = 0.0f;
+        v1.y = 0.0f;
+        v1.z = 0.0f;
         ((AnmVm *)effect)->FUN_0040ec30(30, 4, &v1, &v2);
 
         {
@@ -784,15 +784,15 @@ void Player::FUN_0040f570()
         *(i32 *)((u8 *)effect + 0x324) = 0x20;
         *(f32 *)((u8 *)effect + 0x334) = 4.0f;
 
-        Float3 v1;
         Float3 v2;
+        Float3 v1;
 
-        v1.x = 0.0f;
-        v1.y = 0.0f;
-        v1.z = 0.0f;
         v2.x = 192.0f;
         v2.y = g_Rng.GetRandomF32InRange(128.0f);
         v2.z = 0.0f;
+        v1.x = 0.0f;
+        v1.y = 0.0f;
+        v1.z = 0.0f;
         ((AnmVm *)effect)->FUN_0040ec30(30, 4, &v1, &v2);
 
         {
