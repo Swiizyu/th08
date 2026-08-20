@@ -11,18 +11,6 @@
 
 namespace th08
 {
-// FUNCTION: th08 0x4068e0
-void AnmVm::Initialize()
-{
-    memset(this, 0, sizeof(AnmVmBase));
-    this->scale.x = 1.0f;
-    this->scale.y = 1.0f;
-    this->color1.d3dColor = COLOR_WHITE;
-    D3DXMatrixIdentity(&this->matrix1);
-    this->flags = 7;
-    this->currentTimeInScript.Initialize();
-}
-
 f32 FUN_004031e0(f32 value);
 u8 MixColors(u8 color1, u8 color2);
 
