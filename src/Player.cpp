@@ -81,31 +81,6 @@ void __fastcall Player::FUN_0040be30(i32 a0, const char *a1, i32 arg2, i32 durat
     *(Float3 *)(bomb + 0xb784c) = this->position;
 }
 
-static void UpdateBombPattern(Player *player, i32 effectId, D3DCOLOR color, i32 duration, i32 interval)
-{
-    ZunTimer *timer = (ZunTimer *)((u8 *)player + 0xff4);
-    if (timer->current == 0)
-    {
-        player->FUN_0040be30(0, (const char *)200, duration, duration, 0);
-        player->FUN_0040bc60(color);
-        g_EffectManager.SpawnEffect(effectId, &player->position, 1, color);
-    }
-    if (interval > 0 && timer->current % interval == 0)
-    {
-        Float3 position = player->position;
-        position.x += g_Rng.GetRandomF32InRange(96.0f) - 48.0f;
-        position.y += g_Rng.GetRandomF32InRange(96.0f) - 48.0f;
-        g_EffectManager.SpawnEffect(effectId, &position, 1, color);
-        g_BulletManager.RemoveAllBullets(0);
-    }
-    timer->Tick();
-    if (timer->current >= duration)
-    {
-        player->FUN_0040bc60(0x80404040);
-        player->playerState = PLAYER_STATE_ALIVE;
-    }
-}
-
 // FUNCTION: th08 0x40c010
 #pragma var_order(i, bomb, entry, angle, v2, dy, dx, t, target, gfx3)
 void Player::FUN_0040c010()
@@ -2009,9 +1984,169 @@ void Player::FUN_00413140()
 }
 
 // FUNCTION: th08 0x413990
+#pragma var_order(i, bomb, entry)
 void Player::FUN_00413990()
 {
-    UpdateBombPattern(this, 15, 0xffffa0a0, 480, 9);
+    i32 i;
+    u8 *bomb;
+    u8 *entry;
+
+    bomb = (u8 *)this + 0xfdc;
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
+    {
+        this->FUN_0040be30(1, "\x8e\x80\x92\xb1\x81\x75\x89\xd8\xe3\xef\x82\xcc\x89\x69\x96\xb0\x81\x76", 0x12c, 0x15e, 1);
+
+        for (entry = bomb + 0x4c, i = 0; i < 0x80; i++, entry += 0x16f0)
+        {
+            *(i32 *)entry = 0;
+        }
+
+        for (entry = bomb + 0x4c, i = 0; i < 0x10; i++, entry += 0x16f0)
+        {
+            *(i32 *)entry = 1;
+            this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)(entry + 0x1b8), 0x12);
+            *(f32 *)(entry + 0x10) = (f32)i * ZUN_PI / 8.0f - ZUN_PI;
+            *(f32 *)(entry + 8) = ZUN_PI / 240.0f;
+            *(Float3 *)(entry + 0x20) = this->position;
+            *(Float3 *)(entry + 0x14) = *(Float3 *)(entry + 0x20);
+            *(void **)(entry + 0x16e8) = this->FUN_0044e040((Float2 *)(entry + 0x14), 24.0f, 0.0f, 0x32, 0x1f4);
+            *(void **)(entry + 0x16ec) = this->FUN_0044df00((Float2 *)(entry + 0x14), 24.0f, 0.0f, 0x1f4, 6);
+            *(i32 *)((*(u8 **)(entry + 0x16e8)) + 0x34) = 0x320;
+            *(f32 *)(entry + 0x1a0) = 0.0f;
+            *(f32 *)(entry + 0x1a4) = 2.0f;
+        }
+
+        for (i = 0; i < 0x10; i++, entry += 0x16f0)
+        {
+            *(i32 *)entry = 1;
+            this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)(entry + 0x1b8), 0x13);
+            *(f32 *)(entry + 0x10) = (f32)i * ZUN_PI / 8.0f - ZUN_PI;
+            *(f32 *)(entry + 8) = -(ZUN_PI / 240.0f);
+            *(Float3 *)(entry + 0x20) = this->position;
+            *(Float3 *)(entry + 0x14) = *(Float3 *)(entry + 0x20);
+            *(void **)(entry + 0x16e8) = this->FUN_0044e040((Float2 *)(entry + 0x14), 24.0f, 0.0f, 0x32, 0x1f4);
+            *(void **)(entry + 0x16ec) = this->FUN_0044df00((Float2 *)(entry + 0x14), 24.0f, 0.0f, 0x1f4, 6);
+            *(i32 *)((*(u8 **)(entry + 0x16e8)) + 0x34) = 0x320;
+            *(f32 *)(entry + 0x1a0) = 0.0f;
+            *(f32 *)(entry + 0x1a4) = 2.0f;
+        }
+
+        for (i = 0; i < 0x10; i++, entry += 0x16f0)
+        {
+            *(i32 *)entry = 1;
+            this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)(entry + 0x1b8), 0x12);
+            *(f32 *)(entry + 0x10) = (f32)i * ZUN_PI / 8.0f - ZUN_PI;
+            *(f32 *)(entry + 8) = ZUN_PI / 200.0f;
+            *(Float3 *)(entry + 0x20) = this->position;
+            *(Float3 *)(entry + 0x14) = *(Float3 *)(entry + 0x20);
+            *(void **)(entry + 0x16e8) = this->FUN_0044e040((Float2 *)(entry + 0x14), 24.0f, 0.0f, 0x32, 0x1f4);
+            *(void **)(entry + 0x16ec) = this->FUN_0044df00((Float2 *)(entry + 0x14), 24.0f, 0.0f, 0x1f4, 6);
+            *(i32 *)((*(u8 **)(entry + 0x16e8)) + 0x34) = 0x320;
+            *(f32 *)(entry + 0x1a0) = 0.0f;
+            *(f32 *)(entry + 0x1a4) = 1.5f;
+        }
+
+        for (i = 0; i < 0x10; i++, entry += 0x16f0)
+        {
+            *(i32 *)entry = 1;
+            this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)(entry + 0x1b8), 0x13);
+            *(f32 *)(entry + 0x10) = (f32)i * ZUN_PI / 8.0f - ZUN_PI;
+            *(f32 *)(entry + 8) = -(ZUN_PI / 200.0f);
+            *(Float3 *)(entry + 0x20) = this->position;
+            *(Float3 *)(entry + 0x14) = *(Float3 *)(entry + 0x20);
+            *(void **)(entry + 0x16e8) = this->FUN_0044e040((Float2 *)(entry + 0x14), 24.0f, 0.0f, 0x32, 0x1f4);
+            *(void **)(entry + 0x16ec) = this->FUN_0044df00((Float2 *)(entry + 0x14), 24.0f, 0.0f, 0x1f4, 6);
+            *(i32 *)((*(u8 **)(entry + 0x16e8)) + 0x34) = 0x320;
+            *(f32 *)(entry + 0x1a0) = 0.0f;
+            *(f32 *)(entry + 0x1a4) = 1.5f;
+        }
+
+        *(f32 *)((u8 *)this + 0x408) = 0.8f;
+        *(f32 *)((u8 *)this + 0x404) = 0.8f;
+        *(void **)(bomb + 0x1724) = g_EffectManager.SpawnEffect(0x14, &this->position, 1, -1);
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)5, 0);
+        ScreenEffect::RegisterChain((ScreenEffectType)1, 0x3c, 0x10, 0, 0, 21);
+    }
+
+    if (*(ZunTimer *)(bomb + 0x18) >= 0x3c && *(ZunTimer *)(bomb + 0x18) < 0xc8 &&
+        ((ZunTimer *)(bomb + 0x18))->FUN_0040ebc0(0x14))
+    {
+        i32 cnt;
+
+        {
+            f32 base = g_Rng.GetRandomF32SignedInRange(ZUN_PI);
+
+            cnt = 0;
+
+            for (entry = bomb + 0x4c, i = 0; i < 0x80; i++, entry += 0x16f0)
+            {
+                if (*(i32 *)entry != 0)
+                {
+                    continue;
+                }
+
+                *(i32 *)entry = 1;
+                this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)(entry + 0x1b8), 0x14);
+                *(f32 *)(entry + 0x10) = AddNormalizeAngle((f32)i * ZUN_PI / 8.0f, base);
+                *(Float3 *)(entry + 0x20) = this->position;
+                *(Float3 *)(entry + 0x14) = *(Float3 *)(entry + 0x20);
+                *(void **)(entry + 0x16e8) = this->FUN_0044e040((Float2 *)(entry + 0x14), 64.0f, 0.0f, 0x64, 0x1f4);
+                *(i32 *)((*(u8 **)(entry + 0x16e8)) + 0x34) = 0x4b0;
+                *(void **)(entry + 0x16ec) = this->FUN_0044df00((Float2 *)(entry + 0x14), 64.0f, 0.0f, 0x1f4, 6);
+                *(f32 *)(entry + 0x1a0) = 0.0f;
+                *(f32 *)(entry + 0x1a4) = 8.0f;
+
+                cnt++;
+                if (cnt >= 0x10)
+                {
+                    break;
+                }
+            }
+
+            g_SoundPlayer.PlaySoundPositionedByIdx((SoundIdx)0xf, *(f32 *)(entry + 0x14));
+            ScreenEffect::RegisterChain((ScreenEffectType)1, 0x1e, 0x8, 0, 0, 21);
+            ScreenEffect::RegisterChain((ScreenEffectType)3, 0x8, 0x1, 0xe0f0f0f0, 0, 21);
+        }
+    }
+
+    for (entry = bomb + 0x4c, i = 0; i < 0x80; i++, entry += 0x16f0)
+    {
+        if (*(i32 *)entry == 0)
+        {
+            continue;
+        }
+
+        *(Float3 *)(entry + 0x2c) = *(Float3 *)(entry + 0x14);
+        *(f32 *)(entry + 0x1a0) += *(f32 *)(entry + 0x1a4);
+        *(f32 *)(entry + 0x10) = AddNormalizeAngle(*(f32 *)(entry + 0x10), *(f32 *)(entry + 8));
+        ((Float3 *)(entry + 0x14))->FromAngleMagnitude(*(f32 *)(entry + 0x10), *(f32 *)(entry + 0x1a0));
+        *(Float3 *)(entry + 0x14) += *(Float3 *)(entry + 0x20);
+        *(Float3 *)(entry + 0x2c) = *(Float3 *)(entry + 0x14) - *(Float3 *)(entry + 0x2c);
+
+        if (*(f32 *)(entry + 0x1a0) >= 500.0f)
+        {
+            *(i32 *)entry = 0;
+            *(u8 *)(*(u8 **)(entry + 0x16e8) + 0x3c) = 0;
+            *(u8 *)(*(u8 **)(entry + 0x16ec) + 0x3c) = 0;
+            continue;
+        }
+
+        if (*(i32 *)(entry + 0x16e8) != 0)
+        {
+            **(f32 **)(entry + 0x16e8) = *(f32 *)(entry + 0x14);
+            *(f32 *)(*(u8 **)(entry + 0x16e8) + 4) = *(f32 *)(entry + 0x18);
+            **(f32 **)(entry + 0x16ec) = *(f32 *)(entry + 0x14);
+            *(f32 *)(*(u8 **)(entry + 0x16ec) + 4) = *(f32 *)(entry + 0x18);
+        }
+
+        if (g_AnmManager->ExecuteScript((AnmVm *)(entry + 0x1b8)) != 0)
+        {
+            *(i32 *)entry = 0;
+            *(u8 *)(*(u8 **)(entry + 0x16e8) + 0x3c) = 0;
+            *(u8 *)(*(u8 **)(entry + 0x16ec) + 0x3c) = 0;
+        }
+    }
 }
 
 // FUNCTION: th08 0x40bf00
@@ -2246,23 +2381,27 @@ void Player::FUN_004113a0()
 
 // FUNCTION: th08 0x413890
 #pragma var_order(i, entry)
+#pragma var_order(i, entry)
 void Player::FUN_00413890()
 {
-    u8 *entry = (u8 *)this + 0x1028;
+    i32 i;
+    u8 *entry;
+
     this->FUN_0040bc60(0x80404040);
-    for (i32 i = 0; i < 96; i++, entry += 0x16f0)
+
+    for (entry = (u8 *)this + 0x1028, i = 0; i < 0x60; i++, entry += 0x16f0)
     {
         if (*(i32 *)entry == 0)
         {
             continue;
         }
-        AnmVm *vm = (AnmVm *)(entry + 0x1b8);
-        vm->SetZRotation(atan2f(*(f32 *)(entry + 0x30), *(f32 *)(entry + 0x2c)));
-        vm->pos = *(Float3 *)(entry + 0x14);
-        vm->pos.x += g_GameManager.arcadeRegionTopLeftPos.x;
-        vm->pos.y += g_GameManager.arcadeRegionTopLeftPos.y;
-        vm->pos.z = 0.0f;
-        g_AnmManager->Draw2D(vm);
+
+        ((AnmVm *)(entry + 0x1b8))->SetZRotation(FUN_0040c7b0(*(f32 *)(entry + 0x30), *(f32 *)(entry + 0x2c)));
+        ((AnmVm *)(entry + 0x1b8))->pos2 = *(Float3 *)(entry + 0x14);
+        ((AnmVm *)(entry + 0x1b8))->pos2.x += g_GameManager.arcadeRegionTopLeftPos.x;
+        ((AnmVm *)(entry + 0x1b8))->pos2.y += g_GameManager.arcadeRegionTopLeftPos.y;
+        ((AnmVm *)(entry + 0x1b8))->pos2.z = 0.0f;
+        g_AnmManager->Draw2D((AnmVm *)(entry + 0x1b8));
     }
 }
 
