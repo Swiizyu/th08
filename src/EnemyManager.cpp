@@ -1315,30 +1315,72 @@ void __fastcall Enemy::FUN_00423e20(void *)
 }
 
 // FUNCTION: th08 0x4241e0
+#pragma var_order(i, zonePrev, bullet, zoneCur, delta)
 void __fastcall Enemy::FUN_004241e0(void *)
 {
-    for (i32 i = 0; i < MAX_BULLETS; i++)
+    Bullet *bullet;
+    Float3 delta;
+    i32 zoneCur;
+    i32 zonePrev;
+    i32 i;
+
+    bullet = (Bullet *)0xf6f710;
+    for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
-        Bullet *bullet = &g_BulletManager.bullets[i];
-        if (bullet->state == 0) continue;
-        if (bullet->reimuBarrierCooldownFrames > 0)
+        if (bullet->state == 0)
         {
-            bullet->reimuBarrierCooldownFrames--;
             continue;
         }
-        Float3 next = bullet->position + bullet->velocity;
-        bool outside = next.x < 0.0f || next.x > 384.0f || next.y < 0.0f || next.y > 448.0f;
-        if (!outside) continue;
-        bullet->reimuBarrierCooldownFrames = 2;
-        f32 x = bullet->position.x - 192.0f;
-        f32 y = bullet->position.y - 224.0f;
-        bullet->position.x = 192.0f - y;
-        bullet->position.y = 224.0f + x;
-        bullet->angle = AddNormalizeAngle(bullet->angle + ZUN_PI / 2.0f, 0.0f);
-        f32 sine, cosine;
-        fsincos(&sine, &cosine, bullet->angle);
-        bullet->velocity.x = cosine * bullet->speed;
-        bullet->velocity.y = sine * bullet->speed;
+        if (*(i32 *)((u8 *)bullet + 0xdc4) != 0)
+        {
+            *(i32 *)((u8 *)bullet + 0xdc4) = *(i32 *)((u8 *)bullet + 0xdc4) - 1;
+            continue;
+        }
+        delta = bullet->position - bullet->velocity;
+        if (bullet->position.x > 56.23548889160156f && bullet->position.x < 327.7645263671875f &&
+            bullet->position.y > 88.23548889160156f && bullet->position.y < 359.7645263671875f)
+        {
+            zoneCur = 0;
+        }
+        else if (bullet->position.x > -96.0f && bullet->position.x < 416.0f && bullet->position.y > 0.0f &&
+                 bullet->position.y < 448.0f)
+        {
+            zoneCur = 1;
+        }
+        else
+        {
+            zoneCur = 2;
+        }
+        if (delta.x > 56.23548889160156f && delta.x < 327.7645263671875f && delta.y > 88.23548889160156f &&
+            delta.y < 359.7645263671875f)
+        {
+            zonePrev = 0;
+        }
+        else if (delta.x > -96.0f && delta.x < 416.0f && delta.y > 0.0f && delta.y < 448.0f)
+        {
+            zonePrev = 1;
+        }
+        else
+        {
+            zonePrev = 2;
+        }
+        if (zoneCur == zonePrev)
+        {
+            continue;
+        }
+        *(i32 *)((u8 *)bullet + 0xdc4) = 2;
+        bullet->velocity *= -1.0f;
+        if (zoneCur == 0 || zonePrev == 0)
+        {
+            bullet->position.x = (bullet->position.x - 192.0f) * 224.0f / 135.76451110839844f + 192.0f;
+            bullet->position.y = (bullet->position.y - 224.0f) * 224.0f / 135.76451110839844f + 224.0f;
+        }
+        else
+        {
+            bullet->position.x = (bullet->position.x - 192.0f) * 135.76451110839844f / 224.0f + 192.0f;
+            bullet->position.y = (bullet->position.y - 224.0f) * 135.76451110839844f / 224.0f + 224.0f;
+        }
+        bullet->angle = AddNormalizeAngle(bullet->angle, ZUN_PI);
     }
 }
 
