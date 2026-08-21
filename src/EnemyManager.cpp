@@ -155,9 +155,9 @@ EnemyFloat3Holder::EnemyFloat3Holder()
 // FUNCTION: th08 0x423d70
 Float3 *Float3::operator*=(f32 scalar)
 {
-    this->x *= scalar;
-    this->y *= scalar;
-    this->z *= scalar;
+    this->x = scalar * this->x;
+    this->y = scalar * this->y;
+    this->z = scalar * this->z;
     return this;
 }
 
