@@ -440,7 +440,7 @@ void Item::CollectPointSmall()
 {
     i32 maximumValue;
     i32 value;
-    ZunBool isAbovePoc;
+    u8 isAbovePoc;
 
     maximumValue = g_GameManager.globals->pointItemValue;
     isAbovePoc = this->currentPosition.y < *(f32 *)((u8 *)g_Player.player1ShtFile + 0x1c);
