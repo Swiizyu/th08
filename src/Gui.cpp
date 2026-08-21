@@ -21,6 +21,8 @@ u32 GuiKeepStageResources();
 u32 GuiReleaseResourcesOnRestart();
 }
 
+namespace th08
+{
 
 // FUNCTION: th08 0x439856
 u32 GameManager::FUN_00439856(i32 bit, i32 entryIdx, i32 valueIdx)
