@@ -129,17 +129,7 @@ ZunBool GameManager::IsSoloYoukai()
 // FUNCTION: th08 0x418130
 ZunBool GameManager::IsSpellNumberEqualTo(i32 spellNumber)
 {
-    ZunBool result;
-
-    if (this->flags.isSpellPractice)
-    {
-        result = !(this->currentSpellCardNumber - spellNumber);
-    }
-    else
-    {
-        result = FALSE;
-    }
-    return result;
+    return this->flags.isSpellPractice && !(this->currentSpellCardNumber - spellNumber);
 }
 
 // FUNCTION: th08 0x418180

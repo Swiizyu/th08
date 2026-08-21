@@ -4,6 +4,8 @@
 #include "ZunResult.hpp"
 #include "diffbuild.hpp"
 #include "inttypes.hpp"
+#include "Supervisor.hpp"
+#include "AnmManager.hpp"
 
 namespace th08
 {
@@ -54,7 +56,24 @@ struct Spellcard
     ZunBool FUN_0042dff0();
 
     SpellcardFlags flags;
-    unknown_fields(0x4, 0x2620);
+    unknown_fields(0x4, 0x104);
+    ZunTimer timer0x108;
+    ZunTimer timer0x114;
+    AnmVm vm0x120;
+    AnmVm vm0x3c4;
+    AnmVm vm0x668;
+    AnmVm vm0x90c;
+    AnmVm vm0xbb0;
+    AnmVm vm0xe54;
+    AnmVm vm0x10f8;
+    AnmVm vm0x139c;
+    AnmVm vm0x1640;
+    AnmVm vm0x18e4;
+    AnmVm vm0x1b88;
+    AnmVm vm0x1e2c;
+    AnmVm vm0x20d0;
+    AnmVm vm0x2374;
+    unknown_fields(0x2618, 0xc);
     AnmLoaded *playerHumanFaceAnm;
     AnmLoaded *playerYoukaiFaceAnm;
     AnmLoaded *enemyFaceAnm;
