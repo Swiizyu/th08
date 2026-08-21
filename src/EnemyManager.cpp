@@ -838,7 +838,7 @@ i32 Effect::FUN_004270c0()
 {
     f32 angle;
 
-    if ((f64)this->custom.x >= -990.0)
+    if ((f64)this->custom.x > -990.0)
     {
         angle = AddNormalizeAngle(this->custom.x, 0.0f);
     }
@@ -1378,29 +1378,35 @@ void Enemy::FUN_004244f0(void *)
 }
 
 // FUNCTION: th08 0x424e50
-void Enemy::FUN_00424e50(void *)
+#pragma var_order(i, bullet, chain, delta)
+void __fastcall Enemy::FUN_00424e50(void *)
 {
-    for (i32 i = 0; i < MAX_BULLETS; i++)
+    Bullet *bullet;
+    u8 *chain;
+    Float3 delta;
+    i32 i;
+
+    bullet = (Bullet *)0xf6f710;
+    for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
-        Bullet *bullet = &g_BulletManager.bullets[i];
         if (bullet->state == 0 || (bullet->flags & 0x100000) == 0)
         {
             continue;
         }
-        Enemy *enemy = this;
-        while (*(Enemy **)((u8 *)enemy + 8) != NULL)
+        chain = *(u8 **)((u8 *)this + 8);
+        while (chain != NULL)
         {
-            enemy = *(Enemy **)((u8 *)enemy + 8);
-            u8 *context = *(u8 **)((u8 *)enemy + 0x2ca0);
-            if (*(i32 *)(context + 0x60) == 0)
+            if (*(i32 *)(*(u8 **)(chain + 0x2ca0) + 0x60) == 0)
             {
-                Float3 delta = bullet->position - enemy->position0x2d34;
-                if (delta.x * delta.x + delta.y * delta.y + delta.z * delta.z <= 4096.0f)
+                delta = *(Float3 *)((u8 *)bullet + 0xd44) - *(Float3 *)(*(u8 **)(chain + 0x2ca0) + 0x2d34);
+                if (delta.FUN_0040b500() >= 64.0f)
                 {
-                    *(i32 *)(context + 0x60) = 60;
-                    *(i32 *)(context + 0x34) = *(i32 *)((u8 *)*(void **)((u8 *)this + 0x2ca0) + 0x34);
+                    *(i32 *)(*(u8 **)(chain + 0x2ca0) + 0x60) = 60;
+                    *(i32 *)(*(u8 **)(chain + 0x2ca0) + 0x34) =
+                        *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x34);
                 }
             }
+            chain = *(u8 **)(chain + 8);
         }
     }
 }
