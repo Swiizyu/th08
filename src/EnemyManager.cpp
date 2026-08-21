@@ -1524,6 +1524,68 @@ void __fastcall Enemy::FUN_00424c40(void *)
     }
 }
 
+// FUNCTION: th08 0x424a20
+#pragma var_order(i, bullet, chain, chain2)
+void __fastcall EclExIns::ReisenFreezeBullets(void *)
+{
+    Bullet *bullet;
+    i32 i;
+    u8 *chain;
+    u8 *chain2;
+
+    bullet = (Bullet *)0xf6f710;
+    for (i = 0; i < MAX_BULLETS; i++, bullet++)
+    {
+        if (bullet->state == 0 || (bullet->flags & *(u32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x18)) == 0)
+        {
+            continue;
+        }
+        if (*(i16 *)((u8 *)bullet + 0x1fc) == 1)
+        {
+            *(i16 *)((u8 *)bullet + 0x1fc) = 0;
+            *(u32 *)((u8 *)bullet + 0x1f8) = (*(u32 *)((u8 *)bullet + 0x1f8) & ~0x30) | 0x10;
+            g_BulletManager.bonusAnm->SetSprite((AnmVm *)bullet, *(i16 *)((u8 *)bullet + 0x214) + 16);
+            *(i8 *)((u8 *)bullet + 0x10b4) = 1;
+            ((Float3 *)((u8 *)bullet + 0xd50))
+                ->FromAngleMagnitude(*(f32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x38),
+                                     *(f32 *)((u8 *)&g_Supervisor + 0x188) *
+                                         *(f32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x3c));
+        }
+        else
+        {
+            *(i16 *)((u8 *)bullet + 0x1fc) = 1;
+            *(u32 *)((u8 *)bullet + 0x1f8) &= ~0x30;
+            g_BulletManager.bonusAnm->SetSprite((AnmVm *)bullet, *(i16 *)((u8 *)bullet + 0x214) - 16);
+            *(i8 *)((u8 *)bullet + 0x10b4) = 0;
+            ((Float3 *)((u8 *)bullet + 0xd50))
+                ->FromAngleMagnitude(*(f32 *)((u8 *)bullet + 0xd74),
+                                     *(f32 *)((u8 *)&g_Supervisor + 0x188) * *(f32 *)((u8 *)bullet + 0xd68));
+        }
+    }
+    if (*(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x1c) == 0)
+    {
+        chain = (u8 *)this;
+        while (*(u8 **)(chain + 8) != NULL)
+        {
+            chain = *(u8 **)(chain + 8);
+            *(u32 *)(chain + 0x3328) |= 0x80;
+        }
+        g_EclEffectVm0.SetInterrupt(2);
+        g_EclEffectVm1.SetInterrupt(2);
+    }
+    else
+    {
+        chain2 = (u8 *)this;
+        while (*(u8 **)(chain2 + 8) != NULL)
+        {
+            chain2 = *(u8 **)(chain2 + 8);
+            *(u32 *)(chain2 + 0x3328) &= ~0x80;
+        }
+        g_EclEffectVm0.SetInterrupt(1);
+        g_EclEffectVm1.SetInterrupt(1);
+    }
+}
+
 // FUNCTION: th08 0x424e00
 void __fastcall EclExIns::FUN_00424e00(void *)
 {
