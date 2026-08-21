@@ -1825,9 +1825,19 @@ ZunResult EffectManager::AddedCallback(EffectManager *effectManager)
 {
     effectManager->ResetEffects();
     effectManager->effectAnm = g_AnmManager->GetAnm(6);
+    *(i32 *)0x4e4b64 = 0;
+    g_EffectManagerState = 2;
     if (!IsDisableResourceReload())
     {
-        effectManager->effectAnm2 = g_AnmManager->PreloadAnm(9, g_EffectAnms[g_GameManager.currentStage]);
+        if (!g_GameManager.IsSpellPractice() || *(i16 *)((u8 *)&g_GameManager + 0xdbb0) < 0xd8)
+        {
+            effectManager->effectAnm2 = g_AnmManager->PreloadAnm(9, g_EffectAnms[g_GameManager.currentStage]);
+        }
+        else
+        {
+            effectManager->effectAnm2 = g_AnmManager->PreloadAnm(
+                9, *(const char **)(0x4c7144 + *(i16 *)((u8 *)&g_GameManager + 0xdbb0) * 4));
+        }
         if (effectManager->effectAnm2 == NULL)
         {
             return ZUN_ERROR;
@@ -1858,15 +1868,15 @@ ZunResult EffectManager::RegisterChain()
     effectManager = &g_EffectManager;
     effectManager->ResetEffects();
     g_EffectManagerCalcChain.SetCallback((ChainCallback)EffectManagerUpdateCallback);
-    g_EffectManagerCalcChain.addedCallback = (ChainLifetimeCallback)EffectManager::AddedCallback;
-    g_EffectManagerCalcChain.deletedCallback = (ChainLifetimeCallback)EffectManager::DeletedCallback;
-    g_EffectManagerCalcChain.arg = effectManager;
+    *(ChainLifetimeCallback *)0x577ec4 = (ChainLifetimeCallback)EffectManager::AddedCallback;
+    *(ChainLifetimeCallback *)0x577ec8 = (ChainLifetimeCallback)EffectManager::DeletedCallback;
+    *(EffectManager **)0x577ed8 = effectManager;
     if (g_Chain.AddToCalcChain(&g_EffectManagerCalcChain, 13) != ZUN_SUCCESS)
     {
         return ZUN_ERROR;
     }
     g_EffectManagerDrawChain.SetCallback((ChainCallback)EffectManagerDrawCallback);
-    g_EffectManagerDrawChain.arg = effectManager;
+    *(EffectManager **)0x577ef8 = effectManager;
     g_Chain.AddToDrawChain(&g_EffectManagerDrawChain, 12);
     return ZUN_SUCCESS;
 }

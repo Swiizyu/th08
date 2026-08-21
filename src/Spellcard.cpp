@@ -8,6 +8,7 @@
 #include <new>
 
 u32 FUN_004338c0();
+u32 IsDisableResourceReload();
 
 namespace th08
 {
@@ -107,19 +108,23 @@ ChainCallbackResult Spellcard::OnDraw(Spellcard *spellcard)
 }
 
 // FUNCTION: th08 0x417f60
+#pragma var_order(spellcard)
 ZunResult Spellcard::RegisterChain()
 {
-    if (g_Spellcard.Init() != ZUN_SUCCESS) return ZUN_ERROR;
-    g_SpellcardCalcChain = g_Chain.CreateElem((ChainCallback)Spellcard::OnUpdate);
-    g_SpellcardDrawChain = g_Chain.CreateElem((ChainCallback)Spellcard::OnDraw);
-    if (g_SpellcardCalcChain == NULL || g_SpellcardDrawChain == NULL) return ZUN_ERROR;
-    g_SpellcardCalcChain->deletedCallback = (ChainLifetimeCallback)Spellcard::DeletedCallback;
-    g_SpellcardCalcChain->arg = &g_Spellcard;
-    g_SpellcardDrawChain->arg = &g_Spellcard;
-    *(ChainElem **)((u8 *)&g_Spellcard + 0x263c) = g_SpellcardCalcChain;
-    *(ChainElem **)((u8 *)&g_Spellcard + 0x2640) = g_SpellcardDrawChain;
-    g_Chain.AddToCalcChain(g_SpellcardCalcChain, 12);
-    g_Chain.AddToDrawChain(g_SpellcardDrawChain, 15);
+    Spellcard *spellcard;
+
+    spellcard = &g_Spellcard;
+    if (spellcard->Init() != ZUN_SUCCESS)
+    {
+        return ZUN_ERROR;
+    }
+    *(ChainElem **)((u8 *)spellcard + 0x263c) = g_Chain.CreateElem((ChainCallback)Spellcard::OnUpdate);
+    *(ChainElem **)((u8 *)spellcard + 0x2640) = g_Chain.CreateElem((ChainCallback)Spellcard::OnDraw);
+    (*(ChainElem **)((u8 *)spellcard + 0x263c))->deletedCallback = (ChainLifetimeCallback)Spellcard::DeletedCallback;
+    (*(ChainElem **)((u8 *)spellcard + 0x263c))->arg = spellcard;
+    (*(ChainElem **)((u8 *)spellcard + 0x2640))->arg = spellcard;
+    g_Chain.AddToCalcChain(*(ChainElem **)((u8 *)spellcard + 0x263c), 12);
+    g_Chain.AddToDrawChain(*(ChainElem **)((u8 *)spellcard + 0x2640), 15);
     return ZUN_SUCCESS;
 }
 
@@ -131,7 +136,7 @@ Spellcard::Spellcard()
 // FUNCTION: th08 0x418050
 ZunResult Spellcard::DeletedCallback(Spellcard *spellcard)
 {
-    if (!KeepStageResources())
+    if (!IsDisableResourceReload())
     {
         g_AnmManager->ReleaseAnm(18);
         g_AnmManager->ReleaseAnm(19);
@@ -142,10 +147,9 @@ ZunResult Spellcard::DeletedCallback(Spellcard *spellcard)
         g_AnmManager->ReleaseAnm(16);
         g_AnmManager->ReleaseAnm(17);
     }
-    ChainElem *calcChain = *(ChainElem **)((u8 *)spellcard + 0x263c);
-    if (calcChain != NULL)
+    if (*(ChainElem **)((u8 *)spellcard + 0x263c) != NULL)
     {
-        calcChain->deletedCallback = NULL;
+        (*(ChainElem **)((u8 *)spellcard + 0x263c))->deletedCallback = NULL;
     }
     g_Chain.Cut(*(ChainElem **)((u8 *)spellcard + 0x2640));
     *(ChainElem **)((u8 *)spellcard + 0x2640) = NULL;
@@ -222,11 +226,12 @@ i32 ZunTimer::operator%(i32 value)
 }
 
 // FUNCTION: th08 0x415d10
-void Spellcard::FUN_00415d10(const char *, void *)
+void Spellcard::FUN_00415d10(const char *name, void *)
 {
     *(u32 *)this |= 0x400;
     *(u32 *)this &= ~1;
     *(u32 *)this &= ~0x10;
+    this->FUN_00415f00(-1, name, 1);
 }
 
 // FUNCTION: th08 0x415d60

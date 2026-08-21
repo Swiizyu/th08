@@ -3079,23 +3079,12 @@ i32 Player::CalcItemBoxCollision(Float3 *position, Float3 *hitbox)
     }
     minPosition = *position - *hitbox / 2.0f;
     maxPosition = *position + *hitbox / 2.0f;
-    if (*(f32 *)((u8 *)this + 0x3bc) >= maxPosition.x)
+    if (*(f32 *)((u8 *)this + 0x3bc) > maxPosition.x || *(f32 *)((u8 *)this + 0x3c8) >= minPosition.x ||
+        *(f32 *)((u8 *)this + 0x3c0) > maxPosition.y)
     {
         return 0;
     }
-    if (*(f32 *)((u8 *)this + 0x3c8) <= minPosition.x)
-    {
-        return 0;
-    }
-    if (*(f32 *)((u8 *)this + 0x3c0) >= maxPosition.y)
-    {
-        return 0;
-    }
-    if (*(f32 *)((u8 *)this + 0x3cc) <= minPosition.y)
-    {
-        return 0;
-    }
-    return 1;
+    return *(f32 *)((u8 *)this + 0x3cc) < minPosition.y;
 }
 
 // FUNCTION: th08 0x449ff0
