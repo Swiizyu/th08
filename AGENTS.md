@@ -27,6 +27,7 @@
 | ⛩️ **Канако** (integration owner) | `arena/01a01c02-th08` | `Player.cpp`, `EnemyManager.cpp`, `BulletManager.cpp`, `AnmManager.cpp`, `Supervisor`, `Background`, `main.cpp`, `ItemManager`, `ScreenEffect`, `Ecl*/Effect*`, CSV-интеграция | активна |
 | 🌸 **Санаэ** | `arena/01a01ccf-th08` | `Gui`, `GameManager`, `TitleScreen`, `ResultScreen` (+ кусок Background-обёрток) | активна |
 | 🐸 **Сувако** | `arena/01a01cd1-th08` | `Ending`, `AsciiManager`, `MusicRoom`, `RetryMenu` | активна |
+| ⛩️ **Рейму** | `arena/01a0246d-th08` | `ReplayManager`, `BulletManager`, `ItemManager`, `GameWindow`/`main.cpp`(WinMain), `CSoundManager`/`SoundPlayer` | активна (зонировалась 21.08 ~13:10Z в PR #2) |
 | 📰 **Ая** | репо `Swiizyu/th10` (своя ветка) | th10-аналог проекта; читает наш PR #2, её посты — в th10 PR #2, Канако ретранслирует | активна |
 
 - Ветка `arena/01a01b5a-th08` — пустая (base 176477b), не трогать.
@@ -123,6 +124,14 @@ gh api repos/Swiizyu/th08/commits/$(git rev-parse HEAD)/comments --jq 'last(.[].
 14. Переименование library-ряда в настоящее имя (`_CIfmod`) делает его СРАВНИВАЕМЫМ: сам хелпер
     попадёт в remaining (наш CRT-ASM не байт-идентичен). Прими решение: держать (call-сайты 100%,
     тело потом перепишем naked-asm) или вернуть FUN_-имя.
+22. **ОрИгинал рисует `<OFFSET5>` / raw imm, у нас `th08::g_X+N (OFFSET)` или иначе-резолвлено** →
+    cosmetic data-ref. Лечение: `DIFFABLE_STATIC(type, g_ИмяHEX)` в подходящем .cpp + ряд
+    `th08::g_ИмяHEX,0x<точныйVA>,global` в reccmp-globals.csv (прецеденты: g_GameManagerUnknown4e3d28,
+    g_EclUnknown4ea28c). Наш VA нерелевантен (NORMAL-билд = обычные переменные), матч по ИМЕНИ.
+23. **CSV-ряд с чужим именем на нашем теле:** если нашу fn зовут иначе, чем CSV-ряд на том же VA,
+    ВСЕ call-сайты несут 1-строчный diff. Охота: verbose показывает `call FUN_...` vs `call имя`;
+    переименуй ряд в НАШЕ имя когда тела совпадают (прецеденты: FUN_00423d70→Float3::operator*=,
+    'fabs'→FUN_004031e0). Осторожно: ряд станет СРАВНИВАЕМ — тело нашей fn должно реально совпадать.
 
 **Код, который выглядит невинно, но стоил нам коммита:**
 
@@ -130,6 +139,22 @@ gh api repos/Swiizyu/th08/commits/$(git rev-parse HEAD)/comments --jq 'last(.[].
     C2059/C2143 на CI. После любых массовых sed/скриптов — собирай в уме или проверяй `git diff`.
 16. Голый `Float3 x;` где-то ЕСТЬ вызов, где-то нет — это нормально (см. #1), но «везде copy-init»
     — НЕправда (собственная over-fix, откачена).
+17. **member-array ctor: массив vs N отдельных полей.** Если orig зовёт `AnmVm::AnmVm` N раз подряд с
+    `add ecx,OFF` — это N ОТДЕЛЬНЫХ полей, а не `T arr[N]` (массив = `vector constructor iterator`
+    с push ctor/count/stride). Spellcard: 14 штук AnmVm = 14 полей. Симптом: ctor ~13% при «верной» layout.
+18. **Локали-призраки:** наши `u8 *enemy = ctx; f32 angle = field;` для перечитываемых значений —
+    ZUN часто перечитывает напрямую; лишний именованный локал сдвигает ВЕСЬ фрейм (-1 слот всем).
+    Симптом: ~55-90% при визуально-верном коде; лечение — инлайнить выражения в местах использования
+    (424730/424820/424910 → 100).
+19. **FPU-маски после `fcomp` (таблица ответов):** `test ah,0x41; jne L` ⇔ a<=b прыжок; `je` ⇔ a>b;
+    `test ah,5; jp` ⇔ a>=b (и unordered); `jnp` ⇔ a<b. Идиома `return a<b;` = `jp→mov eax,1; xor eax`.
+    Идиома or-цепи return0: серия `je/jnp→ret0`; финал `return cond;` — jp/kopiruy exact.
+20. **u8/u16/i16/i32 ширины полей в структурах:** movzx WORD = u16/i16-логика (movsx = знаковое!),
+    `and 0xffffffcf | 0x10` = бит-сет вместо `= 1` (424c40: blendMode — полубайтовое хранение!).
+    НЕ «семантизируй» — копируй бит-операции из дизасма дословно.
+21. **Сырые базы массивов:** ZUN инициализирует ptr-walk литералом `mov [ebp-8], 0xf6f710`
+    (g_BulletManager.bullets[0] абсолютный) — наша `&g_BulletManager.bullets[0]` даёт symbol-ref,
+    по тексту diff'а НЕ совпадает. Пиши `(Bullet *)0xf6f710` явно (424e50/424c40/424a20/4241e0).
 
 ## 6. Ритуалы восстановления
 
