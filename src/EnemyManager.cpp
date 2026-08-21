@@ -1483,39 +1483,43 @@ void __fastcall Enemy::FUN_00424a20(void *)
 // FUNCTION: th08 0x424c40
 void __fastcall Enemy::FUN_00424c40(void *)
 {
-    u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
-    u32 mask = *(u32 *)(context + 0x18);
-    for (i32 i = 0; i < MAX_BULLETS; i++)
+    Bullet *bullet;
+    i32 i;
+
+    bullet = (Bullet *)0xf6f710;
+    for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
-        Bullet *bullet = &g_BulletManager.bullets[i];
-        if (bullet->state == 0 || (bullet->flags & mask) == 0)
+        if (bullet->state == 0 || (bullet->flags & *(u32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x18)) == 0)
         {
             continue;
         }
-        AnmVm *vm = &bullet->sprites.spriteBullet;
-        if (vm->type == 1)
+        if (*(i16 *)((u8 *)bullet + 0x1fc) == 1)
         {
-            vm->type = 0;
-            vm->blendMode = 1;
-            vm->color1.a = 0;
-            if (vm->anmFile != NULL) vm->anmFile->SetSprite(vm, vm->activeSpriteIndex + 16);
-            *(u8 *)((u8 *)bullet + 0x10b4) = 1;
-            bullet->velocity.FromAngleMagnitude(bullet->angle,
-                                                *(f32 *)(context + 0x3c) * g_Supervisor.framerateMultiplier);
+            *(i16 *)((u8 *)bullet + 0x1fc) = 0;
+            *(u32 *)((u8 *)bullet + 0x1f8) = (*(u32 *)((u8 *)bullet + 0x1f8) & ~0x30) | 0x10;
+            *(i8 *)((u8 *)bullet + 0x1f3) = 0;
+            g_BulletManager.bonusAnm->SetSprite((AnmVm *)bullet, *(i16 *)((u8 *)bullet + 0x214) + 16);
+            *(i8 *)((u8 *)bullet + 0x10b4) = 1;
+            ((Float3 *)((u8 *)bullet + 0xd50))
+                ->FromAngleMagnitude(*(f32 *)((u8 *)bullet + 0xd74),
+                                     *(f32 *)((u8 *)&g_Supervisor + 0x188) *
+                                         *(f32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x3c));
         }
-        else if (vm->type == 0)
+        else if (*(i16 *)((u8 *)bullet + 0x1fc) == 0)
         {
-            vm->type = 2;
-            vm->FUN_0040ed50(15, 0, 0, 255);
+            *(i16 *)((u8 *)bullet + 0x1fc) = 2;
+            *(i8 *)((u8 *)bullet + 0x1f3) = 0;
+            ((AnmVm *)bullet)->FUN_0040ed50(15, 0, 0, 255);
         }
         else
         {
-            vm->type = 1;
-            vm->blendMode = 0;
-            if (vm->anmFile != NULL) vm->anmFile->SetSprite(vm, vm->activeSpriteIndex - 16);
-            *(u8 *)((u8 *)bullet + 0x10b4) = 0;
-            bullet->velocity.FromAngleMagnitude(bullet->angle,
-                                                bullet->speed * g_Supervisor.framerateMultiplier);
+            *(i16 *)((u8 *)bullet + 0x1fc) = 1;
+            *(u32 *)((u8 *)bullet + 0x1f8) &= ~0x30;
+            g_BulletManager.bonusAnm->SetSprite((AnmVm *)bullet, *(i16 *)((u8 *)bullet + 0x214) - 16);
+            *(i8 *)((u8 *)bullet + 0x10b4) = 0;
+            ((Float3 *)((u8 *)bullet + 0xd50))
+                ->FromAngleMagnitude(*(f32 *)((u8 *)bullet + 0xd74),
+                                     *(f32 *)((u8 *)&g_Supervisor + 0x188) * *(f32 *)((u8 *)bullet + 0xd68));
         }
     }
 }
