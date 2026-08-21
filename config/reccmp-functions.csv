@@ -1216,6 +1216,7 @@ FUN_0047a668,0x47a668,library
 FUN_0047a73b,0x47a73b,library
 FUN_0047aa65,0x47aa65,library
 _DirectInput8Create@20,0x476ce0,library
+_DirectSoundCreate8@12,0x476ce6,library
 _Direct3DCreate8@4,0x476cec,library
 _D3DXVec3Normalize@8,0x476e9f,library
 _D3DXCreateTexture@32,0x47aa8d,library

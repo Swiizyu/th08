@@ -126,22 +126,6 @@ ZunResult Spellcard::RegisterChain()
 // FUNCTION: th08 0x4143e0
 Spellcard::Spellcard()
 {
-    new ((u8 *)this + 0x108) ZunTimer();
-    new ((u8 *)this + 0x114) ZunTimer();
-    new ((u8 *)this + 0x120) AnmVm();
-    new ((u8 *)this + 0x3c4) AnmVm();
-    new ((u8 *)this + 0x668) AnmVm();
-    new ((u8 *)this + 0x90c) AnmVm();
-    new ((u8 *)this + 0xbb0) AnmVm();
-    new ((u8 *)this + 0xe54) AnmVm();
-    new ((u8 *)this + 0x10f8) AnmVm();
-    new ((u8 *)this + 0x139c) AnmVm();
-    new ((u8 *)this + 0x1640) AnmVm();
-    new ((u8 *)this + 0x18e4) AnmVm();
-    new ((u8 *)this + 0x1b88) AnmVm();
-    new ((u8 *)this + 0x1e2c) AnmVm();
-    new ((u8 *)this + 0x20d0) AnmVm();
-    new ((u8 *)this + 0x2374) AnmVm();
 }
 
 // FUNCTION: th08 0x418050
