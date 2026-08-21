@@ -1702,9 +1702,182 @@ void Player::FUN_00411b10()
 }
 
 // FUNCTION: th08 0x4123d0
+#pragma var_order(i, j, bomb, entry, f)
 void Player::FUN_004123d0()
 {
-    UpdateBombPattern(this, 11, 0xffffc0c0, 360, 12);
+    i32 i;
+    i32 j;
+    u8 *bomb;
+    u8 *entry;
+    f32 f;
+
+    bomb = (u8 *)this + 0xfdc;
+    j = 0;
+    i = 0;
+    entry = bomb + 0x4c;
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
+    {
+        this->FUN_0040be30(0, "\x90\x6c\x8b\x53\x81\x75\x96\xa2\x97\x88\x89\x69\x8d\x85\x8e\x61\x81\x76", 0xfa, 0x12c, 0);
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)0xd, 0);
+        *(f32 *)((u8 *)this + 0x408) = 0.0f;
+        *(f32 *)((u8 *)this + 0x404) = 0.0f;
+        this->playerAnm->SetAndExecuteScriptIdx((AnmVm *)((u8 *)this + 0x10), 0);
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)6, 0);
+        *(Float3 *)(entry + 0x14) = this->position;
+        *(Float3 *)(entry + 0x1a0) = *(Float3 *)(entry + 0x14);
+        *(f32 *)(entry + 0x1a4) = 416.0f;
+    }
+
+    if (*(ZunTimer *)(bomb + 0x18) < 0x28)
+    {
+        f = (f32)*(ZunTimer *)(bomb + 0x18) / 40.0f;
+        f = 1.0f - f;
+        f = f * f;
+        f = 1.0f - f;
+        this->position = (*(Float3 *)(entry + 0x1a0) - *(Float3 *)(entry + 0x14)) * f + *(Float3 *)(entry + 0x14);
+    }
+    else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x28))
+    {
+        g_EffectManager.SpawnEffect(0x28, &this->position, 1, 0xffff8080);
+    }
+    else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x46))
+    {
+        Float3 pos2;
+
+        this->position.y = 32.0f;
+        pos2 = this->position;
+        pos2.y = 224.0f;
+        ScreenEffect::RegisterChain((ScreenEffectType)3, 8, 1, 0xefffffff, 0, 21);
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)0x2a, 0);
+        *(void **)(entry + 0x16ec) = this->FUN_0044de60((Float2 *)&pos2, 96.0f, 448.0f, 6, 0x3c);
+        *(void **)(entry + 0x16e8) = this->FUN_0044dfa0((Float2 *)&pos2, 96.0f, 448.0f, 0x1f4, 0);
+        *(void **)(entry + 0x16e8) = this->FUN_0044dfa0((Float2 *)&pos2, 96.0f, 448.0f, 0x64, 0x3c);
+        *(i32 *)(*(u8 **)(entry + 0x16e8) + 0x38) = 5;
+        g_EffectManager.SpawnEffect(0x30, &pos2, 1, 0xffff8080);
+    }
+    else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x50))
+    {
+        Float3 pos3;
+
+        pos3 = this->position;
+        pos3.y = 224.0f;
+        pos3.x = pos3.x - 32.0f;
+        this->FUN_0044de60((Float2 *)&pos3, 96.0f, 448.0f, 6, 0x3c);
+        *(void **)(entry + 0x16e8) = this->FUN_0044dfa0((Float2 *)&pos3, 96.0f, 448.0f, 0x64, 0x28);
+        *(i32 *)(*(u8 **)(entry + 0x16e8) + 0x38) = 2;
+        g_EffectManager.SpawnEffect(0x30, &pos3, 1, 0xffff8080);
+        pos3.x = pos3.x + 64.0f;
+        this->FUN_0044de60((Float2 *)&pos3, 96.0f, 448.0f, 6, 0x3c);
+        *(void **)(entry + 0x16e8) = this->FUN_0044dfa0((Float2 *)&pos3, 96.0f, 448.0f, 0x64, 0x28);
+        *(i32 *)(*(u8 **)(entry + 0x16e8) + 0x38) = 3;
+        g_EffectManager.SpawnEffect(0x30, &pos3, 1, 0xffff8080);
+        ScreenEffect::RegisterChain((ScreenEffectType)3, 8, 1, 0xcfffffff, 0, 21);
+    }
+    else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x5a))
+    {
+        Float3 pos4;
+
+        pos4 = this->position;
+        pos4.y = 224.0f;
+        pos4.x = pos4.x - 64.0f;
+        this->FUN_0044de60((Float2 *)&pos4, 96.0f, 448.0f, 6, 0x3c);
+        *(void **)(entry + 0x16e8) = this->FUN_0044dfa0((Float2 *)&pos4, 96.0f, 448.0f, 0x64, 0x28);
+        *(i32 *)(*(u8 **)(entry + 0x16e8) + 0x38) = 2;
+        g_EffectManager.SpawnEffect(0x30, &pos4, 1, 0xffff8080);
+        pos4.x = pos4.x + 128.0f;
+        this->FUN_0044de60((Float2 *)&pos4, 96.0f, 448.0f, 6, 0x3c);
+        *(void **)(entry + 0x16e8) = this->FUN_0044dfa0((Float2 *)&pos4, 96.0f, 448.0f, 0x64, 0x28);
+        *(i32 *)(*(u8 **)(entry + 0x16e8) + 0x38) = 3;
+        g_EffectManager.SpawnEffect(0x30, &pos4, 1, 0xffff8080);
+        ScreenEffect::RegisterChain((ScreenEffectType)3, 8, 1, 0xafffffff, 0, 21);
+    }
+    else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x64))
+    {
+        Float3 pos5;
+
+        pos5 = this->position;
+        pos5.y = 224.0f;
+        pos5.x = pos5.x - 96.0f;
+        this->FUN_0044de60((Float2 *)&pos5, 96.0f, 448.0f, 6, 0x3c);
+        *(void **)(entry + 0x16e8) = this->FUN_0044dfa0((Float2 *)&pos5, 96.0f, 448.0f, 0x50, 0x28);
+        *(i32 *)(*(u8 **)(entry + 0x16e8) + 0x38) = 2;
+        g_EffectManager.SpawnEffect(0x30, &pos5, 1, 0xffff8080);
+        pos5.x = pos5.x + 192.0f;
+        this->FUN_0044de60((Float2 *)&pos5, 96.0f, 448.0f, 6, 0x3c);
+        *(void **)(entry + 0x16e8) = this->FUN_0044dfa0((Float2 *)&pos5, 96.0f, 448.0f, 0x50, 0x28);
+        *(i32 *)(*(u8 **)(entry + 0x16e8) + 0x38) = 3;
+        g_EffectManager.SpawnEffect(0x30, &pos5, 1, 0xffff8080);
+        ScreenEffect::RegisterChain((ScreenEffectType)3, 8, 1, 0x8fffffff, 0, 21);
+    }
+    else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x6e))
+    {
+        Float3 pos6;
+
+        pos6 = this->position;
+        pos6.y = 224.0f;
+        pos6.x = pos6.x - 128.0f;
+        this->FUN_0044de60((Float2 *)&pos6, 96.0f, 448.0f, 6, 0x3c);
+        *(void **)(entry + 0x16e8) = this->FUN_0044dfa0((Float2 *)&pos6, 96.0f, 448.0f, 0x3c, 0x28);
+        *(i32 *)(*(u8 **)(entry + 0x16e8) + 0x38) = 2;
+        g_EffectManager.SpawnEffect(0x30, &pos6, 1, 0xffff8080);
+        pos6.x = pos6.x + 256.0f;
+        this->FUN_0044de60((Float2 *)&pos6, 96.0f, 448.0f, 6, 0x3c);
+        *(void **)(entry + 0x16e8) = this->FUN_0044dfa0((Float2 *)&pos6, 96.0f, 448.0f, 0x3c, 0x28);
+        *(i32 *)(*(u8 **)(entry + 0x16e8) + 0x38) = 3;
+        g_EffectManager.SpawnEffect(0x30, &pos6, 1, 0xffff8080);
+        ScreenEffect::RegisterChain((ScreenEffectType)3, 8, 1, 0x6fffffff, 0, 21);
+    }
+    else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x78))
+    {
+        Float3 pos7;
+
+        pos7 = this->position;
+        pos7.y = 224.0f;
+        pos7.x = pos7.x - 160.0f;
+        this->FUN_0044de60((Float2 *)&pos7, 96.0f, 448.0f, 6, 0x3c);
+        *(void **)(entry + 0x16e8) = this->FUN_0044dfa0((Float2 *)&pos7, 96.0f, 448.0f, 0x32, 0x28);
+        *(i32 *)(*(u8 **)(entry + 0x16e8) + 0x38) = 2;
+        g_EffectManager.SpawnEffect(0x30, &pos7, 1, 0xffff8080);
+        pos7.x = pos7.x + 320.0f;
+        this->FUN_0044de60((Float2 *)&pos7, 96.0f, 448.0f, 6, 0x3c);
+        *(void **)(entry + 0x16e8) = this->FUN_0044dfa0((Float2 *)&pos7, 96.0f, 448.0f, 0x32, 0x28);
+        *(i32 *)(*(u8 **)(entry + 0x16e8) + 0x38) = 3;
+        g_EffectManager.SpawnEffect(0x30, &pos7, 1, 0xffff8080);
+        ScreenEffect::RegisterChain((ScreenEffectType)3, 8, 1, 0x5fffffff, 0, 21);
+    }
+    else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x82))
+    {
+        Float3 pos8;
+
+        pos8 = this->position;
+        pos8.y = 224.0f;
+        pos8.x = pos8.x - 192.0f;
+        this->FUN_0044de60((Float2 *)&pos8, 96.0f, 448.0f, 6, 0x3c);
+        *(void **)(entry + 0x16e8) = this->FUN_0044dfa0((Float2 *)&pos8, 96.0f, 448.0f, 0x28, 0x28);
+        *(i32 *)(*(u8 **)(entry + 0x16e8) + 0x38) = 2;
+        g_EffectManager.SpawnEffect(0x30, &pos8, 1, 0xffff8080);
+        pos8.x = pos8.x + 384.0f;
+        this->FUN_0044de60((Float2 *)&pos8, 96.0f, 448.0f, 6, 0x3c);
+        *(void **)(entry + 0x16e8) = this->FUN_0044dfa0((Float2 *)&pos8, 96.0f, 448.0f, 0x28, 0x28);
+        *(i32 *)(*(u8 **)(entry + 0x16e8) + 0x38) = 3;
+        g_EffectManager.SpawnEffect(0x30, &pos8, 1, 0xffff8080);
+        ScreenEffect::RegisterChain((ScreenEffectType)3, 8, 1, 0x5fffffff, 0, 21);
+        *(Float3 *)(entry + 0x1a0) = this->position;
+    }
+    else if (*(ZunTimer *)(bomb + 0x18) >= 0x96 && *(ZunTimer *)(bomb + 0x18) < 0xb4)
+    {
+        f = ((f32)*(ZunTimer *)(bomb + 0x18) - 150.0f) / 30.0f;
+        f = 1.0f - f;
+        f = f * f;
+        f = 1.0f - f;
+        this->position = (*(Float3 *)(entry + 0x14) - *(Float3 *)(entry + 0x1a0)) * f + *(Float3 *)(entry + 0x1a0);
+    }
+    else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0xb4))
+    {
+        *(f32 *)((u8 *)this + 0x408) = 1.0f;
+        *(f32 *)((u8 *)this + 0x404) = 1.0f;
+    }
 }
 
 // FUNCTION: th08 0x413140
