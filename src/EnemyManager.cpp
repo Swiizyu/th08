@@ -29,6 +29,7 @@ DIFFABLE_STATIC(EffectManager, g_EffectManager);
 DIFFABLE_STATIC(i32, g_EffectManagerState);
 void FUN_004235a0();
 
+DIFFABLE_EXTERN(i32, g_GameManagerUnknown4e3d28);
 DIFFABLE_STATIC(AnmVm, g_EclEffectVm0);
 DIFFABLE_STATIC(AnmVm, g_EclEffectVm1);
 DIFFABLE_STATIC_ARRAY_ASSIGN(const char *, 9, g_StageEnemyAnms) = {
@@ -1405,20 +1406,27 @@ void Enemy::FUN_00424e50(void *)
 }
 
 // FUNCTION: th08 0x4250d0
-void Enemy::FUN_004250d0(void *)
+#pragma var_order(i, bullet, state)
+void __fastcall EclExIns::FUN_004250d0(void *)
 {
-    u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
-    for (i32 i = 0; i < MAX_BULLETS; i++)
+    i32 i;
+    Bullet *bullet;
+    Float3 state;
+
+    bullet = &g_BulletManager.bullets[0];
+    for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
-        Bullet *bullet = &g_BulletManager.bullets[i];
-        if (bullet->state == 0 || (bullet->flags & 0x100000) == 0)
+        if (bullet->state == 0)
         {
             continue;
         }
-        *(f32 *)(context + 0x38) = bullet->angle;
-        g_EnemyManager.FUN_0042a680((i16)*(i32 *)(context + 0x60), &bullet->position, 800, -2, 10,
-                                    context + 0x18);
-        bullet->flags &= ~0x100000;
+        if ((bullet->flags & 0x100000) != 0)
+        {
+            *(f32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x38) = bullet->angle;
+            g_EnemyManager.SpawnEnemy2(*(i16 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x60), &bullet->position, 800,
+                                       -2, 10, *(u8 **)((u8 *)this + 0x2ca0) + 0x18);
+            bullet->flags &= ~0x100000;
+        }
     }
 }
 
@@ -1627,7 +1635,7 @@ void __fastcall EclExIns::FUN_00425290(void *instruction)
         }
     }
     *(f32 *)((u8 *)&g_Supervisor + 0x188) = 1.0f / *(i32 *)((u8 *)instruction + 0x10);
-    if (*(f32 *)((u8 *)&g_Supervisor + 0x188) >= 1.0f)
+    if (*(f32 *)((u8 *)&g_Supervisor + 0x188) < 1.0f)
     {
         *(u32 *)((u8 *)&g_Supervisor + 0x1a4) |= 0x20;
     }
@@ -1675,7 +1683,7 @@ void EclExIns::FUN_0042deb0()
 // FUNCTION: th08 0x423390
 void __fastcall EclExIns::MystiaNightBlindness(void *)
 {
-    *(i32 *)((u8 *)&g_AsciiManager + 93960) = *(i32 *)((u8 *)this->enemyData + 0x18);
+    g_GameManagerUnknown4e3d28 = *(i32 *)((u8 *)this->enemyData + 0x18);
     *(i32 *)((u8 *)&g_AsciiManager + 93956) = *(i32 *)((u8 *)this->enemyData + 0x38);
 }
 
