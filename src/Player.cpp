@@ -1552,7 +1552,6 @@ void Player::FUN_00410fe0()
 }
 
 // FUNCTION: th08 0x411b10
-#pragma var_order(i, j, bomb, entry, f)
 void Player::FUN_00411b10()
 {
     i32 i;
