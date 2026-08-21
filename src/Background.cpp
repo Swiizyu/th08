@@ -15,6 +15,12 @@ namespace th08
 u32 IsDisableResourceReload();
 u8 __fastcall MixColors(u8 color1, u8 color2);
 
+// FUNCTION: th08 0x40b900
+u32 IsDisableResourceReload()
+{
+    return g_Supervisor.keepStageResources;
+}
+
 DIFFABLE_STATIC(Background, g_Background);
 DIFFABLE_STATIC(ChainElem, g_BackgroundCalcChain);
 DIFFABLE_STATIC(ChainElem, g_BackgroundDrawChainHighPrio);

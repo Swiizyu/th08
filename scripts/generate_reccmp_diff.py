@@ -55,7 +55,85 @@ def dump_verbose(entries):
             written += len(text)
 
 
+
+
+def probe_recomp_bytes():
+    import struct
+    exe = os.path.join(os.path.dirname(__file__), "..", "recompiled", "th08.exe")
+    probes = [
+        ("FormatSpellCardInfo recomp VA 0x452ce4", 0x452CE4, 0x940),
+    ]
+    if not os.path.exists(exe):
+        print("probe: exe not found"); return
+    with open(exe, "rb") as f:
+        data = f.read()
+    pe = struct.unpack_from("<I", data, 0x3C)[0]
+    image_base = struct.unpack_from("<I", data, pe + 24 + 28)[0]
+    nsec = struct.unpack_from("<H", data, pe + 6)[0]
+    opt = struct.unpack_from("<H", data, pe + 20)[0]
+    sec0 = pe + 24 + opt
+    for label, va, nbytes in probes:
+        rva = va - image_base
+        for i in range(nsec):
+            off = sec0 + i * 40
+            vsize, vaddr, rawsize, rawptr = struct.unpack_from("<IIII", data, off + 8)
+            if vaddr <= rva < vaddr + max(vsize, rawsize):
+                fo = rawptr + (rva - vaddr)
+                print("probe %s bytes=%s" % (label, data[fo:fo + nbytes].hex()))
+                break
+        else:
+            print("probe %s NOT MAPPED" % label)
+
+
+
+def probe_recomp_symbols():
+    import csv as csvmod
+    import subprocess as spmod
+    out = spmod.run(["reccmp-roadmap", "--target", "th08", "--csv", "roadmap_probe.csv"],
+                    capture_output=True, text=True, timeout=600)
+    if out.returncode != 0:
+        print("roadmap probe failed:", out.stderr[-1500:]); return
+    rows = []
+    with open("roadmap_probe.csv") as f:
+        for row in csvmod.DictReader(f):
+            if row.get("row_type") not in ("dat", "poi", "vta", "str", "flo", "off", "lab", "imp"):
+                continue
+            name = row.get("name") or ""
+            orig = row.get("orig_addr") or ""
+            rec = row.get("recomp_addr") or ""
+            if not orig or not rec or not name:
+                continue
+            try:
+                o = int(orig, 16) if orig.startswith("0x") else int(orig)
+                r = int(rec, 16) if rec.startswith("0x") else int(rec)
+            except ValueError:
+                continue
+            sz = row.get("size") or "0"
+            sz = int(sz, 16) if isinstance(sz, str) and sz.startswith("0x") else int(sz)
+            rows.append((o, r, sz, name))
+    rows = [t for t in rows if t[3].startswith("th08::")]
+    rows.sort()
+    prev_o = prev_r = None
+    for o, r, size, name in rows:
+        gap_note = ""
+        if prev_o is not None:
+            go, gr = o - prev_o, r - prev_r
+            if go != gr:
+                gap_note = "   <== GAPDIFF orig+%d recomp+%d (missing %d bytes)" % (go, gr, go - gr)
+        print("sym %-46s orig=0x%08x rec=0x%08x sz=%#x%s" % (name, o, r, size, gap_note))
+        prev_o, prev_r = o, r
+
 def main():
+    try:
+        probe_recomp_symbols()
+    except Exception as e:
+        print("symbol probe error:", e)
+
+    try:
+        probe_recomp_bytes()
+    except Exception as e:
+        print("probe error:", e)
+
     report_filename = tempfile.mktemp()
 
     subprocess.run(

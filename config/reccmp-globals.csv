@@ -18,7 +18,7 @@ GUID_SysKeyboard,0x4bd620,global
 IID_IDirectInput8A,0x4bd6c0,global
 IID_IShellLinkA,0x4bd6d0,global
 CLSID_ShellLink,0x4bd6e0,global
-IPersistFile,0x4bd6f0,global
+IID_IPersistFile,0x4bd6f0,global
 GUID_NULL,0x4bd700,global
 th08::g_SpellcardNumbersEasy,0x4c6120,global
 th08::g_SpellcardNumbersNormal,0x4c61c8,global
@@ -47,6 +47,8 @@ th08::g_EclExInsn,0x4c6cb0,global
 th08::g_EffectTemplates,0x4c6d30,global
 th08::g_ClearStageBonuses,0x4c7158,global
 th08::g_StageBgmIndices,0x4c7240,global
+th08::g_AmPmStrings,0x4c72bc,global
+th08::g_LoadingAnms,0x4c72c4,global
 th08::g_StageAnmFiles,0x4c72f8,global
 th08::g_StageStdFiles,0x4c731c,global
 th08::g_StageSpellStdFiles,0x4c7340,global
@@ -55,6 +57,8 @@ th08::g_StageEclFiles,0x4c73cc,global
 th08::g_StageSpellEclFiles,0x4c73f0,global
 th08::g_EffectAnms,0x4c7480,global
 th08::g_BulletTypeInfos,0x4b4ad8,global
+th08::g_SpellcardTimeColors,0x4c72ac,global
+th08::g_MsgFiles,0x4c74c0,global
 g_TimeRequirementParams,0x4c77f0,global
 g_RankParams,0x4c7880,global
 th08::g_ControllerMapping,0x4c78c8,global
@@ -86,10 +90,11 @@ th08::g_DemoReplayFiles,0x4c8240,global
 th08::g_StageNames,0x4c8250,global
 th08::g_StageNamesSpellPractice,0x4c8274,global
 th08::g_FullWidthDigits,0x4c829c,global
+th08::g_LastWordHelpText,0x4c82c8,global
+th08::g_LastWordDifficultyNames,0x4c8628,global
 th08::g_StartMenuHelpText,0x4c8640,global
 th08::g_OptionsHelpText,0x4c8664,global
 th08::g_LastKeyChanged,0x4c868c,global
-th08::g_KeyConfgHelperText,0x4c8690,global
 th08::g_KeyConfigHelpText,0x4c8690,global
 th08::g_ReplayCharacterNames,0x4c86c0,global
 th08::g_ReplayDifficulties,0x4c86f0,global

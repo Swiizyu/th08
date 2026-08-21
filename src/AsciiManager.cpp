@@ -14,6 +14,18 @@
 
 namespace th08
 {
+// FUNCTION: th08 0x421b60
+i32 GameManager::GetTimeOrbs()
+{
+    return this->globals->currentTimeOrbs;
+}
+
+// FUNCTION: th08 0x421b80
+i32 GameManager::GetLastSpellTimeOrbThreshold()
+{
+    return this->globals->lastSpellTimeOrbThreshold;
+}
+
 
 DIFFABLE_STATIC(ChainElem, g_AsciiManagerDrawChainLowPrio);
 DIFFABLE_STATIC(AsciiManager, g_AsciiManager);
@@ -1601,16 +1613,12 @@ i32 RetryMenu::OnUpdate()
 
             g_Supervisor.unk174 = 8;
 
-            IncrementIfBelow(&g_GameManager.plst.playData[g_GameManager.difficulty].attemptsTotal, 999999);
-            IncrementIfBelow(&g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].attemptsTotal, 999999);
-            IncrementIfBelow(
-                &g_GameManager.plst.playData[g_GameManager.difficulty].attemptsPerCharacter[g_GameManager.shotType],
-                999999);
-            IncrementIfBelow(
-                &g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].attemptsPerCharacter[g_GameManager.shotType],
-                999999);
-            IncrementIfBelow(&g_GameManager.plst.playData[g_GameManager.difficulty].continues, 999999);
-            IncrementIfBelow(&g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].continues, 999999);
+            ((PlstPlayCounts *)&(g_GameManager.plst.playData[g_GameManager.difficulty].attemptsTotal))->IncrementTotalAttempts(999999);
+            ((PlstPlayCounts *)&(g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].attemptsTotal))->IncrementTotalAttempts(999999);
+            ((PlstPlayCounts *)&(g_GameManager.plst.playData[g_GameManager.difficulty].attemptsPerCharacter[g_GameManager.shotType]))->IncrementTotalAttempts(999999);
+            ((PlstPlayCounts *)&(g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].attemptsPerCharacter[g_GameManager.shotType]))->IncrementTotalAttempts(999999);
+            ((PlstPlayCounts *)&(g_GameManager.plst.playData[g_GameManager.difficulty].continues))->IncrementTotalAttempts(999999);
+            ((PlstPlayCounts *)&(g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].continues))->IncrementTotalAttempts(999999);
 
             g_SoundPlayer.Unpause();
 
