@@ -1410,10 +1410,10 @@ void Gui::DrawStageElements()
     if (this->impl->loadingPortraitSprite.activeSpriteIndex >= 0)
     {
         g_AnmManager->DrawNoRotation(&this->impl->loadingPortraitSprite);
-        g_AnmManager->DrawWorld(&this->impl->arcadeZoneSprite);
+        g_AnmManager->FUN_00464070(&this->impl->arcadeZoneSprite);
         for (i = 0; i < 8; i++)
         {
-            g_AnmManager->DrawWorld(&this->impl->arcadeZoneMotionBlurSprites[i]);
+            g_AnmManager->FUN_00464070(&this->impl->arcadeZoneMotionBlurSprites[i]);
         }
         if (this->impl->unk_3a1c.activeSpriteIndex >= 0)
         {
@@ -1425,7 +1425,7 @@ void Gui::DrawStageElements()
     {
         for (i = 0; (i32)i < ARRAY_SIZE_SIGNED(this->impl->stageTransitionSprites); i++)
         {
-            g_AnmManager->DrawWorld(&this->impl->stageTransitionSprites[i]);
+            g_AnmManager->FUN_00464070(&this->impl->stageTransitionSprites[i]);
             g_AnmManager->ClearSprite();
         }
     }

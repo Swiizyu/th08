@@ -3353,8 +3353,7 @@ ChainCallbackResult TitleScreen::DrawSpellCardSelect()
 
     for (i = 0; i < TITLE_SPELL_CARD_SPELLCARDS_PER_PAGE; i++)
     {
-        if ((i + this->currentPageSpellCardSelect * TITLE_SPELL_CARD_SPELLCARDS_PER_PAGE) >=
-            this->currentNumberOfSpellCards)
+        if ((i + this->currentPageSpellCardSelect * TITLE_SPELL_CARD_SPELLCARDS_PER_PAGE) >= this->unk0xc298)
         {
             break;
         }
