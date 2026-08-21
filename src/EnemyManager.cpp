@@ -436,23 +436,49 @@ i32 Effect::FUN_00410bb0()
 }
 
 // FUNCTION: th08 0x4114e0
-#pragma var_order(factor)
+#pragma var_order(factor, i, obj, angle, dir, speed)
 i32 Effect::FUN_004114e0()
 {
     f32 factor;
+    i32 i;
+    void *obj;
+    f32 angle;
+    Float3 dir;
+    f32 speed;
 
-    *(u8 *)((u8 *)this + 0x356) = 1;
-    if (this->timer <= 40)
+    if (this->timer < 40)
     {
-        factor = 1.0f - (f32)this->timer.AsFrames() / 40.0f;
-        *(f32 *)((u8 *)this + 0x320) = ZUN_PI - g_Rng.GetRandomF32() * (2.0f * ZUN_PI) / 40.0f;
-        *(f32 *)((u8 *)this + 0x314) = 64.0f - 64.0f * factor * factor;
+        factor = 1.0f - (f32)this->timer / 40.0f;
+        *(f32 *)((u8 *)this + 0x320) = 88.0f - (f32)this->timer * 5.0f / 40.0f;
+        *(f32 *)((u8 *)this + 0x314) = 192.0f - 96.0f * factor * factor;
         (*(i32 *)((u8 *)this + 0x324))--;
+        *(u8 *)((u8 *)this + 0x356) = 1;
+        return 1;
     }
-    else
+    else if (this->timer == 40)
     {
-        this->active = 0;
+        ScreenEffect::RegisterChain(SCREEN_EFFECT_PULSE, 8, 1, 0x8ff08080, 0, 21);
+        angle = *(f32 *)((u8 *)this + 0x318) + ZUN_PI / 4.0f;
+        speed = *(f32 *)((u8 *)this + 0x314) * 0.70710678f;
+        g_AnmManager->FUN_00464b00((AnmVm *)this, *(VertexTex1DiffuseXyzrhw **)((u8 *)this + 0x358),
+                                   *(i32 *)((u8 *)this + 0x324) * 2 + 2);
+        for (i = 0; i < 4; i++)
+        {
+            if (angle >= ZUN_PI)
+            {
+                angle -= ZUN_2PI;
+            }
+            dir.FromAngleMagnitude(angle, speed);
+            dir += *(Float3 *)((u8 *)this + 0x2e0);
+            obj = g_Player.FUN_0044dfa0((Float2 *)&dir, speed * 32.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 60, 70);
+            *(i32 *)((u8 *)obj + 0x38) = 4;
+            *(f32 *)((u8 *)obj + 0x20) = AddNormalizeAngle(angle, ZUN_PI / 2.0f);
+            angle = *(f32 *)((u8 *)obj + 0x20);
+            obj = g_Player.FUN_0044de60((Float2 *)&dir, speed * 4.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 6, 100);
+            *(f32 *)((u8 *)obj + 0x20) = angle;
+        }
     }
+    *(u8 *)((u8 *)this + 0x356) = 1;
     return 1;
 }
 
