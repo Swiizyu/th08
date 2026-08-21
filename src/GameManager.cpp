@@ -572,17 +572,7 @@ ZunBool GameManager::IsPhantasmUnlocked()
 // FUNCTION: th08 0x43c322
 ZunBool GameManager::IsReplayPractice()
 {
-    ZunBool result;
-
-    if (this->flags.isReplay && g_ReplayManager->replayData->isPractice)
-    {
-        result = TRUE;
-    }
-    else
-    {
-        result = FALSE;
-    }
-    return result;
+    return this->flags.isReplay && g_ReplayManager->replayData->isPractice != 0;
 }
 
 void GameManager::CutChain()
