@@ -8,10 +8,11 @@
 #include <new>
 
 u32 FUN_004338c0();
-u32 IsDisableResourceReload();
 
 namespace th08
 {
+
+u32 IsDisableResourceReload();
 // clang-format off
 // TODO: stop clang-format from fucking with whitespace formatting
 
