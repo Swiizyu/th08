@@ -2343,10 +2343,11 @@ void Player::FUN_00410ac0()
 #pragma var_order(vm, entry)
 void Player::FUN_004113a0()
 {
+    AnmVm *vm;
     u8 *entry = (u8 *)this + 0x1028;
-    AnmVm *vm = (AnmVm *)(entry + 0x1b8);
 
     this->FUN_0040bc60(0x802020d0);
+    vm = (AnmVm *)(entry + 0x1b8);
     vm->pos = *(Float3 *)(entry + 0x14) + vm->pos2;
     vm->pos.x += g_GameManager.arcadeRegionTopLeftPos.x;
     vm->pos.y += g_GameManager.arcadeRegionTopLeftPos.y;

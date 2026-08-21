@@ -574,7 +574,7 @@ i32 Effect::FUN_00413070()
 {
     f32 factor;
 
-    if (this->timer == 30)
+    if (this->timer < 30)
     {
         *(f32 *)((u8 *)this + 0x314) = 192.0f;
         *(i32 *)((u8 *)this + 0x324) = 48;
