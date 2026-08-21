@@ -12,8 +12,7 @@ f32 __stdcall FUN_00408fc0(f32 value0, f32 value1, f32 tangent0, f32 tangent1, f
 
 namespace th08
 {
-namespace th08 { u32 GuiKeepStageResources(); }
-using th08::GuiKeepStageResources;
+u32 GuiKeepStageResources();
 u8 __fastcall MixColors(u8 color1, u8 color2);
 
 DIFFABLE_STATIC(Background, g_Background);

@@ -20,8 +20,7 @@ u32 FUN_004338c0();
 namespace th08
 {
 
-namespace th08 { u32 GuiKeepStageResources(); }
-using th08::GuiKeepStageResources;
+u32 GuiKeepStageResources();
 
 DIFFABLE_STATIC(EnemyManager, g_EnemyManager);
 DIFFABLE_STATIC(EclManager, g_EclManager);
