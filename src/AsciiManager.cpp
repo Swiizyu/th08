@@ -14,6 +14,18 @@
 
 namespace th08
 {
+// FUNCTION: th08 0x421b60
+i32 GameManager::GetTimeOrbs()
+{
+    return this->globals->currentTimeOrbs;
+}
+
+// FUNCTION: th08 0x421b80
+i32 GameManager::GetLastSpellTimeOrbThreshold()
+{
+    return this->globals->lastSpellTimeOrbThreshold;
+}
+
 
 DIFFABLE_STATIC(ChainElem, g_AsciiManagerDrawChainLowPrio);
 DIFFABLE_STATIC(AsciiManager, g_AsciiManager);
