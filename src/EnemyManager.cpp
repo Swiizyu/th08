@@ -1385,39 +1385,73 @@ void __fastcall Enemy::FUN_004241e0(void *)
 }
 
 // FUNCTION: th08 0x4244f0
+#pragma var_order(cnt, myTimer, best, diff, target, chain)
 void Enemy::FUN_004244f0(void *)
 {
-    u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
-    i32 group = *(i32 *)(context + 0x60);
-    i32 count = 0;
-    Enemy *first = NULL;
-    Enemy *enemy = this;
-    while (*(Enemy **)((u8 *)enemy + 8) != NULL)
+    u8 *chain;
+    f32 target;
+    f32 diff;
+    u8 *best;
+    i32 myTimer;
+    i32 cnt;
+
+    myTimer = *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x60);
+    chain = *(u8 **)((u8 *)this + 0x2da4);
+    if (chain == NULL)
     {
-        enemy = *(Enemy **)((u8 *)enemy + 8);
-        u8 *enemyContext = *(u8 **)((u8 *)enemy + 0x2ca0);
-        if (*(i32 *)(enemyContext + 0x60) != group)
+        return;
+    }
+    cnt = 0;
+    while (*(u32 *)(chain + 8) != 0)
+    {
+        chain = *(u8 **)(chain + 8);
+        if (*(i32 *)(*(u8 **)(chain + 0x2ca0) + 0x60) == myTimer)
         {
-            continue;
+            *(i32 *)(*(u8 **)(chain + 0x2ca0) + 0x5c) = cnt;
+            if (cnt == 0)
+            {
+                best = chain;
+            }
+            cnt++;
         }
-        *(i32 *)(enemyContext + 0x5c) = count;
-        if (first == NULL) first = enemy;
-        count++;
     }
-    *(i32 *)(context + 0x2c) = 0;
-    if (*(i32 *)(context + 0x30) != count)
+    *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x2c) = 0;
+    if (*(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x30) != cnt)
     {
-        if (*(i32 *)(context + 0x30) != 0) *(i32 *)(context + 0x2c) = 1;
-        *(i32 *)(context + 0x30) = count;
+        if (*(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x30) != 0)
+        {
+            *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x2c) = 1;
+        }
+        *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x30) = cnt;
     }
-    i32 ordinal = *(i32 *)(context + 0x5c);
-    (*(i32 *)(context + 0x34))++;
-    if (first != NULL && ordinal != 0 && count != 0)
+    myTimer = *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x5c);
+    *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x34) = *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x34) + 1;
+    if (myTimer == 0)
     {
-        f32 offset = (f32)ordinal * ZUN_2PI / count;
-        *(f32 *)((u8 *)this + 0x2d9c) = AddNormalizeAngle(*(f32 *)((u8 *)first + 0x2d9c), offset);
+        return;
     }
+    target = AddNormalizeAngle(*(f32 *)(best + 0x2d9c), myTimer * ZUN_2PI / cnt);
+    if (*(i32 *)(*(u8 **)(best + 0x2ca0) + 0x34) != *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x34))
+    {
+        target = AddNormalizeAngle(target, *(f32 *)((u8 *)this + 0x2da0));
+    }
+    diff = AddNormalizeAngle(*(f32 *)((u8 *)this + 0x2d9c), *(f32 *)((u8 *)this + 0x2da0));
+    diff = target - diff;
+    if (FUN_004031e0(diff) > ZUN_PI)
+    {
+        if (diff > 0.0f)
+        {
+            diff = diff + -ZUN_2PI;
+        }
+        else
+        {
+            diff = diff + ZUN_2PI;
+        }
+    }
+    diff = diff * 0.02f;
+    *(f32 *)((u8 *)this + 0x2d9c) = AddNormalizeAngle(*(f32 *)((u8 *)this + 0x2d9c), diff);
 }
+
 
 // FUNCTION: th08 0x424e50
 #pragma var_order(i, bullet, chain, delta)
@@ -1441,7 +1475,7 @@ void __fastcall Enemy::FUN_00424e50(void *)
             if (*(i32 *)(*(u8 **)(chain + 0x2ca0) + 0x60) == 0)
             {
                 delta = *(Float3 *)((u8 *)bullet + 0xd44) - *(Float3 *)(*(u8 **)(chain + 0x2ca0) + 0x2d34);
-                if (delta.FUN_0040b500() >= 64.0f)
+                if (delta.FUN_0040b500() >= 4096.0f)
                 {
                     *(i32 *)(*(u8 **)(chain + 0x2ca0) + 0x60) = 60;
                     *(i32 *)(*(u8 **)(chain + 0x2ca0) + 0x34) =
