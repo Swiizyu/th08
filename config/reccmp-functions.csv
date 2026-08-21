@@ -1738,7 +1738,7 @@ free,0x4a427b,library
 FUN_004a42ce,0x4a42ce,library
 _CIatan2,0x4a42fa,library
 _CIfmod,0x4a431a,library
-atol,0x4a4342,library
+atol,0x4a43ca,library
 operator delete(void *),0x4a43cf,library
 operator new(unsigned int),0x4a43d4,library
 JumpToContinuation,0x4a43e2,library
