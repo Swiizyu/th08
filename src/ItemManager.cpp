@@ -145,7 +145,7 @@ void ItemManager::UpdatePointItemExtendThreshold()
 {
     if (g_GameManager.difficulty < 4)
     {
-        if (g_GameManager.globals->pointItemExtendsSoFar < 6)
+        if ((u32)g_GameManager.globals->pointItemExtendsSoFar < 6)
         {
             g_GameManager.globals->nextPointItemExtendThreshold =
                 g_PointItemExtendThresholds[g_GameManager.globals->pointItemExtendsSoFar];
@@ -158,7 +158,7 @@ void ItemManager::UpdatePointItemExtendThreshold()
     }
     else
     {
-        if (g_GameManager.globals->pointItemExtendsSoFar < 3)
+        if ((u32)g_GameManager.globals->pointItemExtendsSoFar < 3)
         {
             g_GameManager.globals->nextPointItemExtendThreshold =
                 g_ExPointItemExtendThresholds[g_GameManager.globals->pointItemExtendsSoFar];
