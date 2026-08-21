@@ -8,10 +8,18 @@
 #include "ScreenEffect.hpp"
 #include "ZunMath.hpp"
 
+f32 __stdcall FUN_00408fc0(f32 value0, f32 value1, f32 tangent0, f32 tangent1, f32 time);
+
 namespace th08
 {
 u32 IsDisableResourceReload();
 u8 __fastcall MixColors(u8 color1, u8 color2);
+
+// FUNCTION: th08 0x40b900
+u32 IsDisableResourceReload()
+{
+    return g_Supervisor.keepStageResources;
+}
 
 DIFFABLE_STATIC(Background, g_Background);
 DIFFABLE_STATIC(ChainElem, g_BackgroundCalcChain);
@@ -39,7 +47,7 @@ f32 FUN_004031e0(f32 value)
 // FUNCTION: th08 0x40c7b0
 f32 FUN_0040c7b0(f32 value, f32 exponent)
 {
-    return pow(value, exponent);
+    return atan2(value, exponent);
 }
 
 // FUNCTION: th08 0x4073b0
@@ -74,19 +82,18 @@ void Background::FUN_00409160(u32 color)
 void __fastcall Background::FUN_00408d60(i32 index, Float3 *out, Float3 *initial, Float3 *final,
                                           Float3 *control1, Float3 *control2)
 {
-    i32 *duration = (i32 *)((u8 *)this + 0x63e0 + index * 4);
-    ZunTimer *timer = (ZunTimer *)((u8 *)this + 0x63f4 + index * sizeof(ZunTimer));
     f32 t;
-    if (timer->AsFrames() < *duration)
+    if (*(ZunTimer *)((u8 *)this + 0x63f4 + index * sizeof(ZunTimer)) < *(i32 *)((u8 *)this + 0x63e0 + index * 4))
     {
-        timer->Tick();
-        t = (f32)timer->AsFrames() / *duration;
+        (*(ZunTimer *)((u8 *)this + 0x63f4 + index * sizeof(ZunTimer)))++;
+        t = (f32)*(ZunTimer *)((u8 *)this + 0x63f4 + index * sizeof(ZunTimer)) /
+            *(i32 *)((u8 *)this + 0x63e0 + index * 4);
     }
     else
     {
-        timer->SetCurrent(*duration);
+        *(ZunTimer *)((u8 *)this + 0x63f4 + index * sizeof(ZunTimer)) = *(i32 *)((u8 *)this + 0x63e0 + index * 4);
         t = 1.0f;
-        *duration = 0;
+        *(i32 *)((u8 *)this + 0x63e0 + index * 4) = 0;
     }
     switch (*(i32 *)((u8 *)this + 0x6430 + index * 4))
     {
@@ -96,19 +103,18 @@ void __fastcall Background::FUN_00408d60(i32 index, Float3 *out, Float3 *initial
     case 4: t *= t; break;
     case 5: t = t * t * t; break;
     case 6: t = t * t * t * t; break;
-    case 7:
+    }
+    if (*(i32 *)((u8 *)this + 0x6430 + index * 4) == 7)
     {
-        f32 u = 1.0f - t;
-        out->x = u * u * u * initial->x + 3.0f * u * u * t * control1->x +
-                 3.0f * u * t * t * control2->x + t * t * t * final->x;
-        out->y = u * u * u * initial->y + 3.0f * u * u * t * control1->y +
-                 3.0f * u * t * t * control2->y + t * t * t * final->y;
-        out->z = u * u * u * initial->z + 3.0f * u * u * t * control1->z +
-                 3.0f * u * t * t * control2->z + t * t * t * final->z;
-        return;
+        out->x = FUN_00408fc0(initial->x, final->x, control1->x, control2->x, t);
+        out->y = FUN_00408fc0(initial->y, final->y, control1->y, control2->y, t);
+        out->z = FUN_00408fc0(initial->z, final->z, control1->z, control2->z, t);
     }
+    else
+    {
+        *out = *final - *initial;
+        *out = *out * t + *initial;
     }
-    *out = *initial + (*final - *initial) * t;
 }
 
 // FUNCTION: th08 0x409080
@@ -195,24 +201,23 @@ ChainCallbackResult Background::OnUpdate(Background *background)
     {
         return CHAIN_CALLBACK_RESULT_CONTINUE;
     }
-    if ((*(u32 *)((u8 *)&g_GameManager + 0x3dbac) & 0x400) != 0)
+    if (g_GameManager.flags.unk10)
     {
         return CHAIN_CALLBACK_RESULT_CONTINUE;
     }
 
     if (g_GameManager.currentStage == 7)
     {
-        Effect *stageEffect = *(Effect **)((u8 *)background + 0xae8);
-        if (stageEffect == NULL)
+        if (*(Effect **)((u8 *)background + 0xae8) == NULL)
         {
             Float3 zero = Float3(0.0f, 0.0f, 0.0f);
-            stageEffect = g_EffectManager.SpawnSpecialEffect(64, &zero, 12, 1, 0xffffffff);
-            *(Effect **)((u8 *)background + 0xae8) = stageEffect;
-            background->anm0x7f0->SetAndExecuteScriptIdx(&stageEffect->vm, 11);
+            *(Effect **)((u8 *)background + 0xae8) =
+                g_EffectManager.SpawnSpecialEffect(64, &zero, 12, 1, 0xffffffff);
+            background->anm0x7f0->SetAndExecuteScriptIdx(&(*(Effect **)((u8 *)background + 0xae8))->vm, 11);
         }
         else if (background->scriptWaitTime == 1)
         {
-            background->anm0x7f0->SetAndExecuteScriptIdx(&stageEffect->vm, 11);
+            background->anm0x7f0->SetAndExecuteScriptIdx(&(*(Effect **)((u8 *)background + 0xae8))->vm, 11);
         }
     }
 

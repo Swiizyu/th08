@@ -77,6 +77,7 @@ DIFFABLE_EXTERN(Spellcard, g_Spellcard);
 DIFFABLE_EXTERN_ARRAY(i32 *, 6, g_SpellcardNumbersPerDifficulty);
 DIFFABLE_EXTERN_ARRAY(i32, 6, g_SpellcardCountsPerDifficulty);
 DIFFABLE_EXTERN_ARRAY(i32, 43, g_LastSpellNumbers);
+DIFFABLE_EXTERN_ARRAY(i32, 49, g_SpellcardNumbersNormal);
 DIFFABLE_EXTERN(i32, g_LastSpellCount);
 DIFFABLE_EXTERN_ARRAY(i32 *, 10, g_SpellcardNumbersPerStage)
 DIFFABLE_EXTERN_ARRAY(i32, 10, g_SpellcardCountPerStage)

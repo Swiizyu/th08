@@ -42,10 +42,12 @@ struct EclExIns
     void __fastcall FUN_00425020(void *instruction);
     void __fastcall FUN_00425040(void *instruction);
     void __fastcall FUN_00425070(void *instruction);
+    void __fastcall FUN_004250d0(void *instruction);
     void __fastcall FUN_004251b0(void *instruction);
     void __fastcall FUN_00425290(void *instruction);
     void __fastcall FUN_00425390(void *instruction);
     void __fastcall MystiaNightBlindness(void *unused);
+    void __fastcall ReisenFreezeBullets(void *unused);
     void FUN_0042deb0();
 
     u8 data[0x2ca0];
@@ -55,8 +57,8 @@ struct EclExIns
 struct EclTimelineHeader
 {
     u32 magic;
-    i16 timelineCount;
     i16 subCount;
+    i16 timelineCount;
     EclTimeline *timelines[16];
 };
 
