@@ -1916,15 +1916,12 @@ ChainCallbackResult TitleScreen::OnUpdatePracticeStageSelect()
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
-#pragma var_order(menuLength1, vmIdx1, i1, horizontalCursorMovement, oldCursorPos, menuLength2, vmIdx2, i2, oldScreen)
+#pragma var_order(menuLength, vmIdx, i, horizontalCursorMovement, oldCursorPos, oldScreen)
 ChainCallbackResult TitleScreen::OnUpdateSpellStageSelect()
 {
-    i32 menuLength1;
-    i32 menuLength2;
-    i32 vmIdx1;
-    i32 vmIdx2;
-    i32 i1;
-    i32 i2;
+    i32 menuLength;
+    i32 vmIdx;
+    i32 i;
     i32 oldCursorPos;
     i32 horizontalCursorMovement;
     TitleCurrentScreen oldScreen;
@@ -1949,13 +1946,13 @@ ChainCallbackResult TitleScreen::OnUpdateSpellStageSelect()
 
             this->cursor = g_GameManager.shotType;
 
-            menuLength1 = g_GameManager.IsExtraUnlockedWithAllTeams() ? 12 : 4;
+            menuLength = g_GameManager.IsExtraUnlockedWithAllTeams() ? 12 : 4;
             while (!g_GameManager.IsSpellPracticeUnlockedForCharacter(this->cursor))
             {
                 this->cursor++;
-                if (this->cursor >= menuLength1)
+                if (this->cursor >= menuLength)
                 {
-                    this->cursor -= menuLength1;
+                    this->cursor -= menuLength;
                 }
             }
 
@@ -1968,22 +1965,22 @@ ChainCallbackResult TitleScreen::OnUpdateSpellStageSelect()
 
             this->cursor = g_GameManager.currentStage;
 
-            for (vmIdx1 = TITLE_SPRITE_CHARACTER_START; vmIdx1 <= TITLE_SPRITE_CHARACTER_END; vmIdx1++)
+            for (vmIdx = TITLE_SPRITE_CHARACTER_START; vmIdx <= TITLE_SPRITE_CHARACTER_END; vmIdx++)
             {
-                this->vms[vmIdx1].flag1 = FALSE;
-                this->vms[vmIdx1].SetInterrupt(8);
-                for (i1 = 1; i1 < ARRAY_SIZE(g_TitleCharacterSpriteIndices[0]) - 1; i1++)
+                this->vms[vmIdx].flag1 = FALSE;
+                this->vms[vmIdx].SetInterrupt(8);
+                for (i = 1; i < ARRAY_SIZE(g_TitleCharacterSpriteIndices[0]) - 1; i++)
                 {
-                    if (g_TitleCharacterSpriteIndices[g_GameManager.shotType][i1] == vmIdx1)
+                    if (g_TitleCharacterSpriteIndices[g_GameManager.shotType][i] == vmIdx)
                     {
-                        this->vms[vmIdx1].flag1 = TRUE;
-                        this->vms[vmIdx1].SetInterrupt(9);
+                        this->vms[vmIdx].flag1 = TRUE;
+                        this->vms[vmIdx].SetInterrupt(9);
                     }
                 }
-                if (g_TitleCharacterSpriteIndices[g_GameManager.shotType][i1] == vmIdx1)
+                if (g_TitleCharacterSpriteIndices[g_GameManager.shotType][i] == vmIdx)
                 {
-                    this->vms[vmIdx1].flag1 = TRUE;
-                    this->vms[vmIdx1].SetInterrupt(23);
+                    this->vms[vmIdx].flag1 = TRUE;
+                    this->vms[vmIdx].SetInterrupt(23);
                 }
             }
 
@@ -2046,42 +2043,42 @@ ChainCallbackResult TitleScreen::OnUpdateSpellStageSelect()
         oldCursorPos = this->cursor;
         this->cursor = g_GameManager.shotType;
 
-        menuLength2 = g_GameManager.IsExtraUnlockedWithAllTeams() ? 12 : 4;
+        menuLength = g_GameManager.IsExtraUnlockedWithAllTeams() ? 12 : 4;
 
-        horizontalCursorMovement = this->MoveCursorHorizontal(menuLength2);
+        horizontalCursorMovement = this->MoveCursorHorizontal(menuLength);
         if (horizontalCursorMovement != 0)
         {
             while (!g_GameManager.IsSpellPracticeUnlockedForCharacter(this->cursor))
             {
                 this->cursor += horizontalCursorMovement;
-                if (this->cursor >= menuLength2)
+                if (this->cursor >= menuLength)
                 {
-                    this->cursor -= menuLength2;
+                    this->cursor -= menuLength;
                 }
                 if (this->cursor < 0)
                 {
-                    this->cursor += menuLength2;
+                    this->cursor += menuLength;
                 }
             }
 
             g_GameManager.shotType = this->cursor;
 
-            for (vmIdx2 = TITLE_SPRITE_CHARACTER_START; vmIdx2 <= TITLE_SPRITE_CHARACTER_END; vmIdx2++)
+            for (vmIdx = TITLE_SPRITE_CHARACTER_START; vmIdx <= TITLE_SPRITE_CHARACTER_END; vmIdx++)
             {
-                this->vms[vmIdx2].flag1 = FALSE;
-                this->vms[vmIdx2].SetInterrupt(8);
-                for (i2 = 1; i2 < ARRAY_SIZE(g_TitleCharacterSpriteIndices[0]) - 1; i2++)
+                this->vms[vmIdx].flag1 = FALSE;
+                this->vms[vmIdx].SetInterrupt(8);
+                for (i = 1; i < ARRAY_SIZE(g_TitleCharacterSpriteIndices[0]) - 1; i++)
                 {
-                    if (g_TitleCharacterSpriteIndices[this->cursor][i2] == vmIdx2)
+                    if (g_TitleCharacterSpriteIndices[this->cursor][i] == vmIdx)
                     {
-                        this->vms[vmIdx2].flag1 = TRUE;
-                        this->vms[vmIdx2].SetInterrupt(9);
+                        this->vms[vmIdx].flag1 = TRUE;
+                        this->vms[vmIdx].SetInterrupt(9);
                     }
                 }
-                if (g_TitleCharacterSpriteIndices[this->cursor][i2] == vmIdx2)
+                if (g_TitleCharacterSpriteIndices[this->cursor][i] == vmIdx)
                 {
-                    this->vms[vmIdx2].flag1 = TRUE;
-                    this->vms[vmIdx2].SetInterrupt(23);
+                    this->vms[vmIdx].flag1 = TRUE;
+                    this->vms[vmIdx].SetInterrupt(23);
                 }
             }
 
@@ -2536,11 +2533,11 @@ ChainCallbackResult TitleScreen::DrawReplayMenu()
         g_AsciiManager.SetIsSelected(i == this->selectedReplay);
         if (i == this->selectedReplay)
         {
-            g_AsciiManager.SetColor(COLOR_WHITE);
+            g_AsciiManager.color.d3dColor = COLOR_WHITE;
         }
         else
         {
-            g_AsciiManager.SetColor(0xff808080);
+            g_AsciiManager.color.d3dColor = 0xff808080;
         }
 
         if (this->replays[i].spellcardNumber < 0)
@@ -2561,7 +2558,7 @@ ChainCallbackResult TitleScreen::DrawReplayMenu()
 
     if ((this->currentScreenState == 2 || this->currentScreenState == 3) && this->currentReplay)
     {
-        g_AsciiManager.SetColor(COLOR_WHITE);
+        g_AsciiManager.color.d3dColor = COLOR_WHITE;
         g_AsciiManager.SetIsSelected(FALSE);
 
         vm = &this->vms[78];
@@ -2588,22 +2585,22 @@ ChainCallbackResult TitleScreen::DrawReplayMenu()
 
                     if (i2 == this->selectedReplayStage)
                     {
-                        g_AsciiManager.SetColor(0xffffffff);
+                        g_AsciiManager.color.d3dColor = 0xffffffff;
                     }
                     else
                     {
-                        g_AsciiManager.SetColor(0xff808080);
+                        g_AsciiManager.color.d3dColor = 0xff808080;
                     }
                 }
                 else
                 {
                     if (i2 == this->selectedReplayStage)
                     {
-                        g_AsciiManager.SetColor(0x60ffffff);
+                        g_AsciiManager.color.d3dColor = 0x60ffffff;
                     }
                     else
                     {
-                        g_AsciiManager.SetColor(0x60808080);
+                        g_AsciiManager.color.d3dColor = 0x60808080;
                     }
                 }
 
@@ -2637,7 +2634,7 @@ ChainCallbackResult TitleScreen::DrawReplayMenu()
         }
     }
 
-    g_AsciiManager.SetColor(COLOR_WHITE);
+    g_AsciiManager.color.d3dColor = COLOR_WHITE;
     g_AsciiManager.SetIsSelected(FALSE);
 
     return CHAIN_CALLBACK_RESULT_CONTINUE;
@@ -2651,7 +2648,7 @@ ChainCallbackResult TitleScreen::DrawPracticeStageSelect()
     i32 i;
     AnmVm *vm;
 
-    g_AsciiManager.SetColor(COLOR_WHITE);
+    g_AsciiManager.color.d3dColor = COLOR_WHITE;
     g_AsciiManager.SetIsSelected(FALSE);
 
     vm = &this->vms[141];
@@ -2680,15 +2677,15 @@ ChainCallbackResult TitleScreen::DrawPracticeStageSelect()
 
         if (i == this->cursor)
         {
-            g_AsciiManager.SetColor(COLOR_WHITE);
+            g_AsciiManager.color.d3dColor = COLOR_WHITE;
         }
         else if (IS_STAGE_CLEARED(clearInfo, i))
         {
-            g_AsciiManager.SetColor(0xffa0a0a0);
+            g_AsciiManager.color.d3dColor = 0xffa0a0a0;
         }
         else
         {
-            g_AsciiManager.SetColor(0xff404040);
+            g_AsciiManager.color.d3dColor = 0xff404040;
         }
 
         g_AsciiManager.AddFormatText(
@@ -2698,7 +2695,7 @@ ChainCallbackResult TitleScreen::DrawPracticeStageSelect()
         position.y += 16.0f;
     }
 
-    g_AsciiManager.SetColor(COLOR_WHITE);
+    g_AsciiManager.color.d3dColor = COLOR_WHITE;
     g_AsciiManager.SetIsSelected(FALSE);
 
     return CHAIN_CALLBACK_RESULT_CONTINUE;
@@ -2740,7 +2737,7 @@ ChainCallbackResult TitleScreen::DrawSpellStageSelect()
     totalAttemptedLastWordPerShot = 0;
     totalAttemptedLastWord = 0;
 
-    g_AsciiManager.SetColor(COLOR_WHITE);
+    g_AsciiManager.color.d3dColor = COLOR_WHITE;
     g_AsciiManager.SetIsSelected(FALSE);
 
     vm = &this->vms[141];
@@ -2758,11 +2755,11 @@ ChainCallbackResult TitleScreen::DrawSpellStageSelect()
         g_AsciiManager.SetIsSelected(i == this->cursor);
         if (i == this->cursor)
         {
-            g_AsciiManager.SetColor(COLOR_WHITE);
+            g_AsciiManager.color.d3dColor = COLOR_WHITE;
         }
         else
         {
-            g_AsciiManager.SetColor(0xffa0a0a0);
+            g_AsciiManager.color.d3dColor = 0xffa0a0a0;
         }
 
         capturesPerStageSpellPracticePerShot = 0;
@@ -2837,7 +2834,7 @@ ChainCallbackResult TitleScreen::DrawSpellStageSelect()
     position.y += 5.0f;
 
     g_AsciiManager.SetIsSelected(FALSE);
-    g_AsciiManager.SetColor(0xffd06060);
+    g_AsciiManager.color.d3dColor = 0xffd06060;
 
     g_AsciiManager.AddFormatText(&position, "%sTotal",
                                  (totalCapturesSpellPracticePerShot >= SPELLCARD_COUNT_SPELLCARDS
@@ -2854,7 +2851,7 @@ ChainCallbackResult TitleScreen::DrawSpellStageSelect()
     position.x -= 182.0f;
 
     g_AsciiManager.SetScale(1.0f, 1.0f);
-    g_AsciiManager.SetColor(COLOR_WHITE);
+    g_AsciiManager.color.d3dColor = COLOR_WHITE;
     g_AsciiManager.SetIsSelected(FALSE);
 
     this->spellCardNameVms[1].pos.x = 400.0f;
@@ -3002,7 +2999,7 @@ ChainCallbackResult TitleScreen::DrawSpellCardSelect()
     u16 clearInfo;
     Float3 position;
 
-    g_AsciiManager.SetColor(COLOR_WHITE);
+    g_AsciiManager.color.d3dColor = COLOR_WHITE;
     g_AsciiManager.SetIsSelected(FALSE);
 
     position = Float3(16.0f, 78.0f, 0.0f);
@@ -3071,7 +3068,7 @@ ChainCallbackResult TitleScreen::DrawSpellCardSelect()
     g_AnmManager->DrawNoRotation(&this->spellCardInfoVms[5]);
     g_AnmManager->DrawNoRotation(&this->spellCardInfoVms[6]);
 
-    g_AsciiManager.SetColor(COLOR_WHITE);
+    g_AsciiManager.color.d3dColor = COLOR_WHITE;
     g_AsciiManager.SetIsSelected(FALSE);
 
     return CHAIN_CALLBACK_RESULT_CONTINUE;

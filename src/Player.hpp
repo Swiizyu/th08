@@ -115,7 +115,7 @@ struct Player
     ZunBool IsHuman();
     ZunBool IsYoukai();
     void __fastcall FUN_0040bc60(D3DCOLOR color);
-    void __fastcall FUN_0040be30(i32 arg0, i32 arg1, i32 arg2, i32 duration, i32 arg4);
+    void __fastcall FUN_0040be30(i32 arg0, const char *arg1, i32 arg2, i32 duration, i32 arg4);
     void FUN_0040bf00();
     void FUN_0040c010();
     void FUN_0040c910();
@@ -246,5 +246,7 @@ struct Player
 C_ASSERT(sizeof(Player) == 0xe2b30);
 
 DIFFABLE_EXTERN(Player, g_Player);
+DIFFABLE_EXTERN_ARRAY(u8 *, 8, g_PlayerObjPtrs);
+DIFFABLE_EXTERN_ARRAY(void *, 7, g_DreamSealFuncTable);
 
 } /* namespace th08 */

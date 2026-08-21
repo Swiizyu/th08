@@ -686,3 +686,5 @@ def main(args: Namespace) -> int:
 
 if __name__ == "__main__":
     sys.exit(main(parse_arguments()))
+
+# cache-poison workaround: bump hashFiles key to force toolchain reinstall (2026-08-21)

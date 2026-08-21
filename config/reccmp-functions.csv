@@ -148,7 +148,7 @@ FUN_0040d100,0x40d100,function
 FUN_0040d310,0x40d310,function
 th08::Rng::GetRandomF32InRange,0x40d390,function
 th08::ZunTimer::operator int,0x40d3b0,function
-FUN_0040d3d0,0x40d3d0,function
+th08::ZunTimer::FUN_0040d3d0,0x40d3d0,function
 th08::ZunTimer::operator==,0x40d3f0,function
 th08::ZunTimer::operator%,0x40d410,function
 FUN_0040d430,0x40d430,function
@@ -208,7 +208,7 @@ th08::BulletManager::bulletmanager_fun_00415c60,0x415c60,function
 th08::Enemy::enemy_fun_00415c80,0x415c80,function
 th08::Background::background_fun_00415ce0,0x415ce0,function
 th08::Spellcard::CutInEnemyNoPortrait,0x415d10,function
-th08::Spellcard::CutInPlayer,0x415d60,function
+th08::Spellcard::FUN_00415d60,0x415d60,function
 th08::Spellcard::CutInEnemy,0x415f00,function
 th08::Spellcard::spellcard_fun_00416130,0x416130,function
 th08::Spellcard::spellcard_fun_00416160,0x416160,function
@@ -324,7 +324,7 @@ FUN_004253e0,0x4253e0,function
 th08::EffectManager::ResetEffects,0x425410,function
 th08::EffectManager::SpawnEffect,0x425430,function
 th08::EffectManager::SpawnEffectAngle,0x425650,function
-th08::EffectManager::FUN_00425870,0x425870,function
+th08::EffectManager::SpawnSpecialEffect,0x425870,function
 FUN_004259e0,0x4259e0,function
 FUN_00425b70,0x425b70,function
 FUN_00425d70,0x425d70,function
@@ -837,11 +837,11 @@ th08::ReplayManager::DeletedCallback,0x453080,function
 th08::ReplayManager::ReplayManager,0x453160,function
 FUN_004531a0,0x4531a0,function
 th08::ReplayManager::SaveReplay,0x4531f0,function
-sprintf,0x453b80,function
+SprintfReturnEnd,0x453b80,function
 th08::Rng::SetSeed,0x453be0,function
 th08::Rng::ResetGenerationCount,0x453c00,function
 th08::Rng::GetSeed,0x453c20,function
-th08::Supervisor::IsClearBackBufferOnRefreshEnabled,0x453c40,function
+th08::Supervisor::IsSpeedhackDetected,0x453c40,function
 th08::GameManager::SetClockTime,0x453c60,function
 th08::GameManager::GetDeaths,0x453c80,function
 th08::GameManager::GetBombsUsed,0x453ca0,function
@@ -849,7 +849,7 @@ FUN_00453cc0,0x453cc0,function
 th08::ResultScreen::GetStageName,0x453cd1,function
 th08::ResultScreen::GetCharacterName,0x453cfa,function
 th08::ResultScreen::WriteScore,0x453d0d,function
-sprintf,0x454269,function
+FUN_00454269,0x454269,function
 th08::ResultScreen::LogScoreDataToFile,0x454298,function
 th08::ResultScreen::LinkScoreEx,0x454c59,function
 th08::ResultScreen::FreeScore,0x454c87,function
@@ -967,7 +967,7 @@ th08::AnmManager::FUN_004639e0,0x4639e0,function
 th08::AnmManager::DrawWorld,0x463cf0,function
 th08::AnmManager::TransformVerticesWorld,0x463d60,function
 th08::AnmManager::FUN_00464070,0x464070,function
-th08::AnmManager::TransformVerticesWorld,0x4640e0,function
+th08::AnmManager::TransformVerticesWorldWithCallback,0x4640e0,function
 th08::AnmManager::DrawWithCallback,0x464400,function
 th08::AnmManager::Draw3D,0x464470,function
 th08::AnmManager::FUN_004649a0,0x4649a0,function
@@ -1124,25 +1124,30 @@ th08::D3DXVec3Hermite,0x476ea5,library
 th08::D3DXVec3CatmullRom,0x476f53,library
 FUN_00477024,0x477024,library
 FUN_00477081,0x477081,library
+_D3DXVec3Project@24,0x477178,library
 FUN_0047717e,0x47717e,library
 FUN_0047726e,0x47726e,library
 FUN_0047733f,0x47733f,library
 FUN_00477432,0x477432,library
 FUN_004774a9,0x4774a9,library
 FUN_00477548,0x477548,library
+_D3DXMatrixMultiply@12,0x477612,library
 FUN_00477618,0x477618,library
 FUN_00477854,0x477854,library
 FUN_004778c1,0x4778c1,library
 FUN_00477afd,0x477afd,library
 FUN_00477ee6,0x477ee6,library
+_D3DXMatrixRotationX@8,0x477f42,library
 FUN_00477f48,0x477f48,library
+_D3DXMatrixRotationY@8,0x477fc2,library
 FUN_00477fc8,0x477fc8,library
+_D3DXMatrixRotationZ@8,0x478043,library
 FUN_00478049,0x478049,library
 FUN_004780c5,0x4780c5,library
 FUN_004781cd,0x4781cd,library
 FUN_004782af,0x4782af,library
-D3DXMatrixLookAtLH,0x478395,library
-D3DXMatrixPerspectiveFovLH,0x4784dd,library
+_D3DXMatrixLookAtLH@16,0x478395,library
+_D3DXMatrixPerspectiveFovLH@20,0x4784dd,library
 FUN_00478571,0x478571,library
 FUN_0047860e,0x47860e,library
 FUN_00478742,0x478742,library
@@ -1210,13 +1215,17 @@ FUN_0047a586,0x47a586,library
 FUN_0047a668,0x47a668,library
 FUN_0047a73b,0x47a73b,library
 FUN_0047aa65,0x47aa65,library
-D3DXCreateTexture,0x47aa8d,library
-D3DXLoadSurfaceFromFileInMemory,0x47aaf3,library
-D3DXLoadSurfaceFromSurface,0x47abab,library
+_DirectInput8Create@20,0x476ce0,library
+_DirectSoundCreate8@12,0x476ce6,library
+_Direct3DCreate8@4,0x476cec,library
+_D3DXVec3Normalize@8,0x476e9f,library
+_D3DXCreateTexture@32,0x47aa8d,library
+_D3DXLoadSurfaceFromFileInMemory@36,0x47aaf3,library
+_D3DXLoadSurfaceFromSurface@32,0x47abab,library
 FUN_0047ad51,0x47ad51,library
 FUN_0047add7,0x47add7,library
 FUN_0047b0bb,0x47b0bb,library
-D3DXCreateTextureFromFileInMemoryEx,0x47b72e,library
+_D3DXCreateTextureFromFileInMemoryEx@60,0x47b72e,library
 FUN_0047b76e,0x47b76e,library
 FUN_0047b7ca,0x47b7ca,library
 FUN_0047b7ef,0x47b7ef,library
@@ -1727,11 +1736,11 @@ _nh_malloc,0x4a423d,library
 malloc,0x4a4269,library
 free,0x4a427b,library
 FUN_004a42ce,0x4a42ce,library
-FUN_004a42fa,0x4a42fa,library
-FUN_004a431a,0x4a431a,library
+_CIatan2,0x4a42fa,library
+_CIfmod,0x4a431a,library
 atol,0x4a4342,library
-operator delete,0x4a43cf,library
-operator new,0x4a43d4,library
+operator delete(void *),0x4a43cf,library
+operator new(unsigned int),0x4a43d4,library
 JumpToContinuation,0x4a43e2,library
 CallMemberFunction1,0x4a4412,library
 UnwindNestedFrames,0x4a4419,library
@@ -1766,7 +1775,7 @@ FUN_004a584f,0x4a584f,library
 _Strftime,0x4a58f3,library
 strftime,0x4a5925,library
 localtime,0x4a5940,library
-_time32,0x4a5ac0,library
+time,0x4a5ac0,library
 rename,0x4a5af9,library
 _chdir,0x4a5b27,library
 strchr,0x4a5be0,library
@@ -1774,9 +1783,9 @@ sscanf,0x4a5c9e,library
 strncmp,0x4a5ce0,library
 strcpy,0x4a5d20,library
 FUN_004a5d30,0x4a5d30,library
-FUN_004a5e20,0x4a5e20,library
+_CIacos,0x4a5e20,library
 FUN_004a5e3d,0x4a5e3d,library
-FUN_004a5f30,0x4a5f30,library
+_CIatan,0x4a5f30,library
 FUN_004a5f88,0x4a5f88,library
 rand,0x4a600a,library
 purecall,0x4a602c,library

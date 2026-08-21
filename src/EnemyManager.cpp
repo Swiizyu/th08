@@ -27,6 +27,9 @@ DIFFABLE_STATIC(EclManager, g_EclManager);
 DIFFABLE_STATIC(i32, g_EnemyManagerUnknown);
 DIFFABLE_STATIC(EffectManager, g_EffectManager);
 DIFFABLE_STATIC(i32, g_EffectManagerState);
+void FUN_004235a0();
+
+DIFFABLE_EXTERN(i32, g_GameManagerUnknown4e3d28);
 DIFFABLE_STATIC(AnmVm, g_EclEffectVm0);
 DIFFABLE_STATIC(AnmVm, g_EclEffectVm1);
 DIFFABLE_STATIC_ARRAY_ASSIGN(const char *, 9, g_StageEnemyAnms) = {
@@ -300,38 +303,22 @@ EnemyUnkStruct4::EnemyUnkStruct4()
     this->unk0x204 = -1;
 }
 
+// FUNCTION: th08 0x40d3d0
+ZunBool ZunTimer::FUN_0040d3d0()
+{
+    return this->current != this->previous;
+}
+
 // FUNCTION: th08 0x40e350
-#pragma var_order(result)
 ZunBool ZunTimer::FUN_0040e350(i32 value)
 {
-    ZunBool result;
-
-    if (this->current != this->previous && this->current == value)
-    {
-        result = true;
-    }
-    else
-    {
-        result = false;
-    }
-    return result;
+    return this->current != this->previous && this->current == value;
 }
 
 // FUNCTION: th08 0x40ebc0
-#pragma var_order(result)
 ZunBool ZunTimer::FUN_0040ebc0(i32 value)
 {
-    ZunBool result;
-
-    if (this->current != this->previous && this->current % value == 0)
-    {
-        result = true;
-    }
-    else
-    {
-        result = false;
-    }
-    return result;
+    return this->current != this->previous && this->current % value == 0;
 }
 
 // FUNCTION: th08 0x40e040
@@ -348,7 +335,7 @@ i32 Effect::FUN_0040e040()
     *(u8 *)((u8 *)this + 0x356) = 1;
     *(f32 *)((u8 *)this + 0x334) = 5.0f;
     *(i32 *)((u8 *)this + 0x330) = 0;
-    if (this->timer == 40)
+    if (this->timer < 40)
     {
         *(f32 *)((u8 *)this + 0x320) = 8.0f;
     }
@@ -375,7 +362,7 @@ i32 Effect::FUN_0040e120()
     *(i32 *)((u8 *)this + 0x334) = 0;
     *(f32 *)((u8 *)this + 0x32c) = 128.0f * factor;
     *(f32 *)((u8 *)this + 0x330) = ZUN_PI / 4.0f;
-    if (this->timer == 40)
+    if (this->timer < 40)
     {
         *(f32 *)((u8 *)this + 0x320) = 8.0f;
     }
@@ -400,7 +387,7 @@ i32 Effect::FUN_0040e200()
     *(u8 *)((u8 *)this + 0x356) = 1;
     *(f32 *)((u8 *)this + 0x32c) = 128.0f * factor;
     *(f32 *)((u8 *)this + 0x330) = -ZUN_PI / 4.0f;
-    if (this->timer == 40)
+    if (this->timer < 40)
     {
         *(f32 *)((u8 *)this + 0x320) = 8.0f;
     }
@@ -429,13 +416,10 @@ i32 Effect::FUN_0040e2d0()
 // FUNCTION: th08 0x40eb50
 i32 Effect::FUN_0040eb50()
 {
-    i32 offset;
-
     *(u8 *)((u8 *)this + 0x356) = 1;
     *(i32 *)((u8 *)this + 0x324) = 48;
     *(f32 *)((u8 *)this + 0x320) = 32.0f;
-    offset = -((this->timer.AsFrames() & 1) != 0) & 8;
-    *(f32 *)((u8 *)this + 0x314) = 64.0f + (f32)offset;
+    *(f32 *)((u8 *)this + 0x314) = 64.0f + (f32)((this->timer.AsFrames() & 1) ? 8 : 0);
     *(i32 *)((u8 *)this + 0x318) = 0;
     return 1;
 }
@@ -1114,11 +1098,11 @@ void __fastcall EclExIns::FUN_00423db0(void *)
 void __fastcall EclExIns::FUN_00424170(void *)
 {
     Effect *effect;
-    Float3 *position = (Float3 *)((u8 *)this + 0x2d34);
 
-    effect = g_EffectManager.SpawnSpecialEffect(58, position, 9, 1, -1);
-    effect = g_EffectManager.SpawnSpecialEffect(58, position, 10, 1, -1);
+    effect = g_EffectManager.SpawnSpecialEffect(58, (Float3 *)((u8 *)this + 0x2d34), 9, 1, -1);
+    effect = g_EffectManager.SpawnSpecialEffect(58, (Float3 *)((u8 *)this + 0x2d34), 10, 1, -1);
     g_EffectManager.effectAnm->SetAndExecuteScriptIdx(&effect->vm, 101);
+    *(void (**)())0x4ea28c = FUN_004235a0;
 }
 
 // FUNCTION: th08 0x424130
@@ -1132,7 +1116,7 @@ void __fastcall EclExIns::FUN_00424130(void *)
 // FUNCTION: th08 0x4246e0
 void __fastcall EclExIns::FUN_004246e0(void *)
 {
-    ScreenEffect::RegisterChain(SCREEN_EFFECT_FULL_FADE_OUT, 30, 5, 0x40ffffff, 0, 21);
+    ScreenEffect::RegisterChain(SCREEN_EFFECT_PULSE, 30, 5, 0x40ffffff, 0, 21);
     ScreenEffect::RegisterChain(SCREEN_EFFECT_UNK7, 4, 120, 190, 60, 21);
 }
 
@@ -1422,20 +1406,27 @@ void Enemy::FUN_00424e50(void *)
 }
 
 // FUNCTION: th08 0x4250d0
-void Enemy::FUN_004250d0(void *)
+#pragma var_order(i, bullet, state)
+void __fastcall EclExIns::FUN_004250d0(void *)
 {
-    u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
-    for (i32 i = 0; i < MAX_BULLETS; i++)
+    i32 i;
+    Bullet *bullet;
+    Float3 state;
+
+    bullet = &g_BulletManager.bullets[0];
+    for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
-        Bullet *bullet = &g_BulletManager.bullets[i];
-        if (bullet->state == 0 || (bullet->flags & 0x100000) == 0)
+        if (bullet->state == 0)
         {
             continue;
         }
-        *(f32 *)(context + 0x38) = bullet->angle;
-        g_EnemyManager.FUN_0042a680((i16)*(i32 *)(context + 0x60), &bullet->position, 800, -2, 10,
-                                    context + 0x18);
-        bullet->flags &= ~0x100000;
+        if ((bullet->flags & 0x100000) != 0)
+        {
+            *(f32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x38) = bullet->angle;
+            g_EnemyManager.SpawnEnemy2(*(i16 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x60), &bullet->position, 800,
+                                       -2, 10, *(u8 **)((u8 *)this + 0x2ca0) + 0x18);
+            bullet->flags &= ~0x100000;
+        }
     }
 }
 
@@ -1538,7 +1529,7 @@ void __fastcall EclExIns::FUN_00424e20(void *)
 // FUNCTION: th08 0x424f60
 void __fastcall EclExIns::FUN_00424f60(void *)
 {
-    ScreenEffect::RegisterChain(SCREEN_EFFECT_FULL_FADE_OUT, 180, 1, -1, 0, 21);
+    ScreenEffect::RegisterChain(SCREEN_EFFECT_PULSE, 180, 1, -1, 0, 21);
 }
 
 // FUNCTION: th08 0x424f90
@@ -1580,7 +1571,7 @@ void __fastcall EclExIns::FUN_00425040(void *)
 void __fastcall EclExIns::FUN_00425070(void *instruction)
 {
     *(i8 *)((u8 *)&g_GameManager + 0x2c) = *(i8 *)((u8 *)instruction + 0x10);
-    if (*(i8 *)((u8 *)&g_GameManager + 0x2c) != 0)
+    if (*(i8 *)((u8 *)&g_GameManager + 0x2c))
     {
         g_EclEffectVm0.SetInterrupt(2);
         g_EclEffectVm1.SetInterrupt(2);
@@ -1614,7 +1605,7 @@ void __fastcall EclExIns::FUN_004251b0(void *instruction)
         if (bullet->sprites.spriteBullet.activeSpriteIndex >= 96 &&
             bullet->sprites.spriteBullet.activeSpriteIndex <= 111)
         {
-            bullet->sprites.spriteBullet.anmFile->SetSprite(&bullet->sprites.spriteBullet, 111);
+            g_BulletManager.bonusAnm->SetSprite(&bullet->sprites.spriteBullet, 111);
         }
     }
 }
@@ -1639,12 +1630,12 @@ void __fastcall EclExIns::FUN_00425290(void *instruction)
         if (bullet->sprites.spriteBullet.activeSpriteIndex >= 96 &&
             bullet->sprites.spriteBullet.activeSpriteIndex <= 111)
         {
-            bullet->sprites.spriteBullet.anmFile->SetSprite(&bullet->sprites.spriteBullet,
-                                                            bullet->sprites.spriteBullet.baseSpriteIndex);
+            g_BulletManager.bonusAnm->SetSprite(&bullet->sprites.spriteBullet,
+                                                bullet->sprites.spriteBullet.baseSpriteIndex);
         }
     }
     *(f32 *)((u8 *)&g_Supervisor + 0x188) = 1.0f / *(i32 *)((u8 *)instruction + 0x10);
-    if (*(f32 *)((u8 *)&g_Supervisor + 0x188) >= 1.0f)
+    if (*(f32 *)((u8 *)&g_Supervisor + 0x188) < 1.0f)
     {
         *(u32 *)((u8 *)&g_Supervisor + 0x1a4) |= 0x20;
     }
@@ -1692,7 +1683,7 @@ void EclExIns::FUN_0042deb0()
 // FUNCTION: th08 0x423390
 void __fastcall EclExIns::MystiaNightBlindness(void *)
 {
-    *(i32 *)((u8 *)&g_AsciiManager + 93960) = *(i32 *)((u8 *)this->enemyData + 0x18);
+    g_GameManagerUnknown4e3d28 = *(i32 *)((u8 *)this->enemyData + 0x18);
     *(i32 *)((u8 *)&g_AsciiManager + 93956) = *(i32 *)((u8 *)this->enemyData + 0x38);
 }
 
@@ -2462,7 +2453,7 @@ Enemy *__fastcall Enemy::FUN_0041f110(void *instruction)
     i32 arg4 = (mask & 0x10) ? this->FUN_0041f420(*(i32 *)(ins + 0x1c)) : *(i32 *)(ins + 0x1c);
     i32 field = (mask & 0x20) ? this->FUN_0041f420(*(i32 *)(ins + 0x20)) : *(i32 *)(ins + 0x20);
     u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
-    return g_EnemyManager.FUN_0042a680(*(i16 *)(ins + 0xc), &position, health, (i8)arg4, field, context + 0x18);
+    return g_EnemyManager.SpawnEnemy2(*(i16 *)(ins + 0xc), &position, health, (i8)arg4, field, context + 0x18);
 }
 
 // FUNCTION: th08 0x41f280
@@ -2481,7 +2472,7 @@ Enemy *__fastcall Enemy::FUN_0041f280(void *instruction)
     i32 arg4 = (mask & 0x10) ? this->FUN_0041f420(*(i32 *)(ins + 0x1c)) : *(i32 *)(ins + 0x1c);
     i32 field = (mask & 0x20) ? this->FUN_0041f420(*(i32 *)(ins + 0x20)) : *(i32 *)(ins + 0x20);
     u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
-    return g_EnemyManager.FUN_0042a680(*(i16 *)(ins + 0xc), &position, health, (i8)arg4, field, context + 0x18);
+    return g_EnemyManager.SpawnEnemy2(*(i16 *)(ins + 0xc), &position, health, (i8)arg4, field, context + 0x18);
 }
 
 // FUNCTION: th08 0x41f420
@@ -2636,13 +2627,12 @@ void __fastcall Enemy::FUN_00421180(void *instruction, f32 interpolation)
 }
 
 // FUNCTION: th08 0x421280
-void __fastcall Enemy::FUN_00421280(void *instruction)
+void __fastcall StartEnemySpell(Enemy *enemy, void *instruction)
 {
-    const char *name = (const char *)instruction + 0x14;
-    g_Spellcard.FUN_00415d10(name, this);
-    g_Spellcard.flags.isActive = 1;
-    *(Enemy **)((u8 *)&g_Spellcard + 4) = this;
-    g_GameManager.currentSpellCardNumber = *(u16 *)((u8 *)instruction + 0xe);
+    g_Spellcard.StartSpell(*(u16 *)((u8 *)instruction + 0xe), (const char *)instruction + 0x14,
+                           *(i16 *)((u8 *)instruction + 0xc), *(i32 *)((u8 *)instruction + 0x10), enemy,
+                           (const char *)instruction + 0x44, (const char *)instruction + 0x74,
+                           (const char *)instruction + 0xb4);
 }
 
 // FUNCTION: th08 0x421300
@@ -3399,7 +3389,7 @@ void EclTimeline::FUN_0042a8a0()
             if (opcode >= 1 && opcode <= 5)
             {
                 Float3 position(*(f32 *)(args + 4), *(f32 *)(args + 8), 0.0f);
-                Enemy *enemy = g_EnemyManager.FUN_0042a4e0(*(i16 *)args, &position,
+                Enemy *enemy = g_EnemyManager.SpawnEnemy1(*(i16 *)args, &position,
                     *(i32 *)(args + 0xc), (i8)*(i32 *)(args + 0x10), *(i32 *)(args + 0x14), opcode == 1);
                 if (enemy != NULL && opcode == 3)
                 {
@@ -3419,7 +3409,7 @@ void EclTimeline::FUN_0042a8a0()
 }
 
 // FUNCTION: th08 0x42a4e0
-Enemy *EnemyManager::FUN_0042a4e0(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08, i32 flag)
+Enemy *EnemyManager::SpawnEnemy1(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08, i32 flag)
 {
     Enemy *enemy = NULL;
     i32 index;
@@ -3452,10 +3442,10 @@ Enemy *EnemyManager::FUN_0042a4e0(i16 timeline, Float3 *position, i32 health, i8
 }
 
 // FUNCTION: th08 0x42a680
-Enemy *EnemyManager::FUN_0042a680(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08,
+Enemy *EnemyManager::SpawnEnemy2(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08,
                                    void *eclData)
 {
-    Enemy *enemy = this->FUN_0042a4e0(timeline, position, health, arg4, field2e08, 0);
+    Enemy *enemy = this->SpawnEnemy1(timeline, position, health, arg4, field2e08, 0);
     if (enemy != NULL && eclData != NULL)
     {
         memcpy((u8 *)enemy + 0x810, eclData, 0x78);
@@ -3857,7 +3847,6 @@ i32 th08::Effect::FUN_00427250()
     return 1;
 }
 
-// FUNCTION: th08 0x40d3d0
 ZunBool FUN_0040d3d0(void *data)
 {
     return *((i32 *)data + 2) != *(i32 *)data;
