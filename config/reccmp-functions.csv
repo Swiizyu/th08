@@ -23,7 +23,7 @@ th08::AsciiManager::CreatePlayerPointPopup,0x403330,function
 th08::AsciiManager::CreateTimePopup,0x403460,function
 th08::AsciiManager::CreateFamiliarPopup,0x403600,function
 th08::PauseMenu::OnUpdate,0x4037b0,function
-th08::Float3::Float3,0x404720,function
+th08::Float3::Float3(float, float, float),0x404720,function
 th08::PauseMenu::OnDraw,0x404750,function
 th08::RetryMenu::OnUpdate,0x404890,function
 th08::Spellcard::FUN_00405260,0x405260,function
@@ -104,7 +104,7 @@ th08::Background::LoadStageData,0x409ce0,function
 th08::Background::FUN_00409f40,0x409f40,function
 th08::Background::RenderObjects,0x40a1b0,function
 sqrtf,0x40b440,function
-th08::Float3::Float3,0x40b460,function
+th08::Float3::Float3(void),0x40b460,function
 th08::Float3::operator/=,0x40b470,function
 D3DXVec3Length,0x40b4c0,function
 D3DXVec3LengthSq,0x40b500,function
