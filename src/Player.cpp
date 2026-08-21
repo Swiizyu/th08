@@ -2377,10 +2377,10 @@ void Player::FUN_00413890()
         }
 
         ((AnmVm *)(entry + 0x1b8))->SetZRotation(FUN_0040c7b0(*(f32 *)(entry + 0x30), *(f32 *)(entry + 0x2c)));
-        ((AnmVm *)(entry + 0x1b8))->pos2 = *(Float3 *)(entry + 0x14);
-        ((AnmVm *)(entry + 0x1b8))->pos2.x += g_GameManager.arcadeRegionTopLeftPos.x;
-        ((AnmVm *)(entry + 0x1b8))->pos2.y += g_GameManager.arcadeRegionTopLeftPos.y;
-        ((AnmVm *)(entry + 0x1b8))->pos2.z = 0.0f;
+        *(Float3 *)(entry + 0x3c0) = *(Float3 *)(entry + 0x14);
+        *(f32 *)(entry + 0x3c0) += g_GameManager.arcadeRegionTopLeftPos.x;
+        *(f32 *)(entry + 0x3c4) += g_GameManager.arcadeRegionTopLeftPos.y;
+        *(f32 *)(entry + 0x3c8) = 0.0f;
         g_AnmManager->Draw2D((AnmVm *)(entry + 0x1b8));
     }
 }
