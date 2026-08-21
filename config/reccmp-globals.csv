@@ -18,7 +18,7 @@ GUID_SysKeyboard,0x4bd620,global
 IID_IDirectInput8A,0x4bd6c0,global
 IID_IShellLinkA,0x4bd6d0,global
 CLSID_ShellLink,0x4bd6e0,global
-IPersistFile,0x4bd6f0,global
+IID_IPersistFile,0x4bd6f0,global
 GUID_NULL,0x4bd700,global
 th08::g_SpellcardNumbersEasy,0x4c6120,global
 th08::g_SpellcardNumbersNormal,0x4c61c8,global
