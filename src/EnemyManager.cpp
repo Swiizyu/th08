@@ -27,6 +27,8 @@ DIFFABLE_STATIC(EclManager, g_EclManager);
 DIFFABLE_STATIC(i32, g_EnemyManagerUnknown);
 DIFFABLE_STATIC(EffectManager, g_EffectManager);
 DIFFABLE_STATIC(i32, g_EffectManagerState);
+void FUN_004235a0();
+
 DIFFABLE_STATIC(AnmVm, g_EclEffectVm0);
 DIFFABLE_STATIC(AnmVm, g_EclEffectVm1);
 DIFFABLE_STATIC_ARRAY_ASSIGN(const char *, 9, g_StageEnemyAnms) = {
@@ -1095,11 +1097,11 @@ void __fastcall EclExIns::FUN_00423db0(void *)
 void __fastcall EclExIns::FUN_00424170(void *)
 {
     Effect *effect;
-    Float3 *position = (Float3 *)((u8 *)this + 0x2d34);
 
-    effect = g_EffectManager.SpawnSpecialEffect(58, position, 9, 1, -1);
-    effect = g_EffectManager.SpawnSpecialEffect(58, position, 10, 1, -1);
+    effect = g_EffectManager.SpawnSpecialEffect(58, (Float3 *)((u8 *)this + 0x2d34), 9, 1, -1);
+    effect = g_EffectManager.SpawnSpecialEffect(58, (Float3 *)((u8 *)this + 0x2d34), 10, 1, -1);
     g_EffectManager.effectAnm->SetAndExecuteScriptIdx(&effect->vm, 101);
+    *(void (**)())0x4ea28c = FUN_004235a0;
 }
 
 // FUNCTION: th08 0x424130
@@ -1113,7 +1115,7 @@ void __fastcall EclExIns::FUN_00424130(void *)
 // FUNCTION: th08 0x4246e0
 void __fastcall EclExIns::FUN_004246e0(void *)
 {
-    ScreenEffect::RegisterChain(SCREEN_EFFECT_FULL_FADE_OUT, 30, 5, 0x40ffffff, 0, 21);
+    ScreenEffect::RegisterChain(SCREEN_EFFECT_PULSE, 30, 5, 0x40ffffff, 0, 21);
     ScreenEffect::RegisterChain(SCREEN_EFFECT_UNK7, 4, 120, 190, 60, 21);
 }
 
@@ -1519,7 +1521,7 @@ void __fastcall EclExIns::FUN_00424e20(void *)
 // FUNCTION: th08 0x424f60
 void __fastcall EclExIns::FUN_00424f60(void *)
 {
-    ScreenEffect::RegisterChain(SCREEN_EFFECT_FULL_FADE_OUT, 180, 1, -1, 0, 21);
+    ScreenEffect::RegisterChain(SCREEN_EFFECT_PULSE, 180, 1, -1, 0, 21);
 }
 
 // FUNCTION: th08 0x424f90
@@ -1561,7 +1563,7 @@ void __fastcall EclExIns::FUN_00425040(void *)
 void __fastcall EclExIns::FUN_00425070(void *instruction)
 {
     *(i8 *)((u8 *)&g_GameManager + 0x2c) = *(i8 *)((u8 *)instruction + 0x10);
-    if (*(i8 *)((u8 *)&g_GameManager + 0x2c) != 0)
+    if (*(i8 *)((u8 *)&g_GameManager + 0x2c))
     {
         g_EclEffectVm0.SetInterrupt(2);
         g_EclEffectVm1.SetInterrupt(2);

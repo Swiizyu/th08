@@ -111,6 +111,9 @@ th08::g_BackgroundTintActive,0x4ea49c,global
 th08::g_SpellcardCalcChain,0x4eccac,global
 th08::g_EclManager,0x4eccb8,global
 th08::g_EffectManager,0x4ece60,global
+th08::g_EffectManagerState,0x4e4b60,global
+th08::g_EclEffectVm0,0x4e4b68,global
+th08::g_EclEffectVm1,0x4e4e0c,global
 th08::g_EffectManagerCalcChain,0x577ebc,global
 th08::g_EffectManagerDrawChain,0x577edc,global
 th08::g_EnemyManagerDrawChainHighPrio,0x577f00,global
