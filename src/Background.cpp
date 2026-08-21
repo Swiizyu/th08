@@ -840,7 +840,7 @@ ZunResult Background::DeletedCallback(Background *background)
         g_ZunMemory.Free(*(void **)background);
         *(void **)background = NULL;
     }
-    if (!GuiKeepStageResources() && background->stdData != NULL)
+    if (!IsDisableResourceReload() && background->stdData != NULL)
     {
         g_ZunMemory.Free(background->stdData);
         background->stdData = NULL;
