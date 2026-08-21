@@ -171,6 +171,7 @@ ChainCallbackResult ReplayManager::OnUpdateLowPrio(ReplayManager *mgr)
 }
 
 // FUNCTION: th08 0x452310
+#pragma var_order(stage, input)
 ChainCallbackResult ReplayManager::OnUpdateHighPrio(ReplayManager *mgr)
 {
     i32 stage;
