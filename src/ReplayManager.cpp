@@ -171,6 +171,7 @@ ChainCallbackResult ReplayManager::OnUpdateLowPrio(ReplayManager *mgr)
 }
 
 // FUNCTION: th08 0x452310
+#pragma var_order(stage, input)
 ChainCallbackResult ReplayManager::OnUpdateHighPrio(ReplayManager *mgr)
 {
     i32 stage;
@@ -441,13 +442,14 @@ ZunResult ReplayManager::AddedCallback(ReplayManager *mgr)
 }
 
 // FUNCTION: th08 0x452d60
+#pragma var_order(stageReplay, i, fileSize, fpsReplayData, lastBookmark)
 ZunResult ReplayManager::AddedCallbackDemo(ReplayManager *mgr)
 {
+    StageReplayData *stageReplay;
     i32 i;
+    i32 fileSize;
     u8 *fpsReplayData;
     StageReplayData *lastBookmark;
-    i32 fileSize;
-    StageReplayData *stageReplay;
 
     mgr->frameId = 0;
 
