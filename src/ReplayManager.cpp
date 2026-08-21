@@ -442,13 +442,14 @@ ZunResult ReplayManager::AddedCallback(ReplayManager *mgr)
 }
 
 // FUNCTION: th08 0x452d60
+#pragma var_order(stageReplay, fileSize, lastBookmark, fpsReplayData, i)
 ZunResult ReplayManager::AddedCallbackDemo(ReplayManager *mgr)
 {
-    i32 i;
-    u8 *fpsReplayData;
-    StageReplayData *lastBookmark;
-    i32 fileSize;
     StageReplayData *stageReplay;
+    i32 fileSize;
+    StageReplayData *lastBookmark;
+    u8 *fpsReplayData;
+    i32 i;
 
     mgr->frameId = 0;
 
