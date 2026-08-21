@@ -12,7 +12,8 @@ f32 __stdcall FUN_00408fc0(f32 value0, f32 value1, f32 tangent0, f32 tangent1, f
 
 namespace th08
 {
-u32 IsDisableResourceReload();
+namespace th08 { u32 GuiKeepStageResources(); }
+using th08::GuiKeepStageResources;
 u8 __fastcall MixColors(u8 color1, u8 color2);
 
 DIFFABLE_STATIC(Background, g_Background);
@@ -729,7 +730,7 @@ ZunResult Background::AddedCallback(Background *background)
     *(i32 *)((u8 *)background + 0xb24) = 0;
     *(i32 *)((u8 *)background + 0xb10) = 0;
 
-    if (!IsDisableResourceReload())
+    if (!GuiKeepStageResources())
     {
         background->anm0x7f0 = g_AnmManager->PreloadAnm(4, g_StageAnmFiles[g_GameManager.currentStage]);
         if (background->anm0x7f0 == NULL)
@@ -791,12 +792,12 @@ ZunResult Background::RegisterChain(i32 stage)
     StdRawHeader *savedStdData;
 
     background = &g_Background;
-    if (IsDisableResourceReload())
+    if (GuiKeepStageResources())
     {
         savedStdData = background->stdData;
     }
     memset(background, 0, sizeof(Background));
-    if (IsDisableResourceReload())
+    if (GuiKeepStageResources())
     {
         background->stdData = savedStdData;
     }
@@ -825,7 +826,7 @@ ZunResult Background::RegisterChain(i32 stage)
 // FUNCTION: th08 0x409c20
 ZunResult Background::DeletedCallback(Background *background)
 {
-    if (!IsDisableResourceReload())
+    if (!GuiKeepStageResources())
     {
         g_AnmManager->ReleaseAnm(4);
     }
@@ -834,7 +835,7 @@ ZunResult Background::DeletedCallback(Background *background)
         g_ZunMemory.Free(*(void **)background);
         *(void **)background = NULL;
     }
-    if (!IsDisableResourceReload() && background->stdData != NULL)
+    if (!GuiKeepStageResources() && background->stdData != NULL)
     {
         g_ZunMemory.Free(background->stdData);
         background->stdData = NULL;
@@ -859,7 +860,7 @@ ZunResult Background::LoadStageData(const char *path)
     i32 i;
     i32 vmIdx;
 
-    if (!IsDisableResourceReload())
+    if (!GuiKeepStageResources())
     {
         this->stdData = (StdRawHeader *)FileSystem::OpenFile(path, NULL, FALSE);
         if (this->stdData == NULL)
@@ -874,7 +875,7 @@ ZunResult Background::LoadStageData(const char *path)
     this->objectInstances = (StdRawInstance *)(this->stdData->quadsOffset + (i32)this->stdData);
     this->beginningOfScript = (StdRawInstr *)(this->stdData->scriptOffset + (i32)this->stdData);
     this->objects = (StdRawObject **)(this->stdData + 1);
-    if (!IsDisableResourceReload())
+    if (!GuiKeepStageResources())
     {
         for (i = 0; i < this->objectsCount; i++)
         {
