@@ -865,9 +865,7 @@ void Player::FUN_0040ee10()
     }
 
     {
-        Float3 pos2;
-
-        pos2 = this->position;
+        Float3 pos2 = this->position;
         pos2.x -= 32.0f;
         *(Float3 *)((u8 *)this + 0x6bc) = pos2;
         pos2.x += 32.0f;
@@ -1282,7 +1280,7 @@ void Player::FUN_004103f0()
             *(f32 *)(entry + 0x1a8) = 0.0f;
 
             *(void **)(entry + 0x16ec) = this->FUN_0044df00((Float2 *)(entry + 0x14), 32.0f, 0.0f, 0x1f4, 6);
-            *(void **)(entry + 0x16e8) = this->FUN_0044e040((Float2 *)(entry + 0x14), 32.0f, 0.0f, 0x14, 0x1f4);
+            *(void **)(entry + 0x16e8) = this->FUN_0044e040((Float2 *)(entry + 0x14), 32.0f, 0.0f, 0x1e, 0x1f4);
         }
 
         g_SoundPlayer.PlaySoundByIdx((SoundIdx)6, 0);
@@ -1442,7 +1440,7 @@ void Player::FUN_00410c40()
             *(i32 *)((u8 *)e7 + 0x38) = 5;
 
             {
-                Float3 v4(1.9634954f, 1.0f, 4.0f);
+                Float3 v4(1.9634955f, 1.0f, 4.0f);
                 e6 = g_EffectManager.SpawnSpecialEffect2(0x24, &this->position, &v4, 7, 1, -1);
                 g_EffectManager.effectAnm->SetAndExecuteScriptIdx((AnmVm *)e6, 0x5b);
                 *(Float3 *)(bomb + 0x4530) = this->position;
@@ -1540,7 +1538,7 @@ void Player::FUN_00410fe0()
             *(i32 *)((u8 *)e7 + 0x38) = 5;
 
             {
-                Float3 v4(1.9634954f, 1.0f, 4.0f);
+                Float3 v4(1.9634955f, 1.0f, 4.0f);
                 e6 = g_EffectManager.SpawnSpecialEffect2(0x25, (Float3 *)(bomb + 0x60), &v4, 7, 1, -1);
                 g_EffectManager.effectAnm->SetAndExecuteScriptIdx((AnmVm *)e6, 0x5f);
                 *(Float3 *)(bomb + 0x4530) = this->position;
@@ -1593,10 +1591,9 @@ void Player::FUN_00411b10()
     }
     else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x46))
     {
-        Float3 pos2;
-
         this->position.y = 32.0f;
-        pos2 = this->position;
+
+        Float3 pos2 = this->position;
         pos2.y = 224.0f;
         ScreenEffect::RegisterChain((ScreenEffectType)3, 8, 1, 0xefffffff, 0, 21);
         g_SoundPlayer.PlaySoundByIdx((SoundIdx)0x2a, 0);
@@ -1608,9 +1605,7 @@ void Player::FUN_00411b10()
     }
     else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x50))
     {
-        Float3 pos3;
-
-        pos3 = this->position;
+        Float3 pos3 = this->position;
         pos3.y = 224.0f;
         pos3.x = pos3.x - 32.0f;
         this->FUN_0044de60((Float2 *)&pos3, 96.0f, 448.0f, 6, 0x3c);
@@ -1626,9 +1621,7 @@ void Player::FUN_00411b10()
     }
     else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x5a))
     {
-        Float3 pos4;
-
-        pos4 = this->position;
+        Float3 pos4 = this->position;
         pos4.y = 224.0f;
         pos4.x = pos4.x - 64.0f;
         this->FUN_0044de60((Float2 *)&pos4, 96.0f, 448.0f, 6, 0x3c);
@@ -1644,9 +1637,7 @@ void Player::FUN_00411b10()
     }
     else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x64))
     {
-        Float3 pos5;
-
-        pos5 = this->position;
+        Float3 pos5 = this->position;
         pos5.y = 224.0f;
         pos5.x = pos5.x - 96.0f;
         this->FUN_0044de60((Float2 *)&pos5, 96.0f, 448.0f, 6, 0x3c);
@@ -1718,10 +1709,9 @@ void Player::FUN_004123d0()
     }
     else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x46))
     {
-        Float3 pos2;
-
         this->position.y = 32.0f;
-        pos2 = this->position;
+
+        Float3 pos2 = this->position;
         pos2.y = 224.0f;
         ScreenEffect::RegisterChain((ScreenEffectType)3, 8, 1, 0xefffffff, 0, 21);
         g_SoundPlayer.PlaySoundByIdx((SoundIdx)0x2a, 0);
@@ -1733,9 +1723,7 @@ void Player::FUN_004123d0()
     }
     else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x50))
     {
-        Float3 pos3;
-
-        pos3 = this->position;
+        Float3 pos3 = this->position;
         pos3.y = 224.0f;
         pos3.x = pos3.x - 32.0f;
         this->FUN_0044de60((Float2 *)&pos3, 96.0f, 448.0f, 6, 0x3c);
@@ -1751,9 +1739,7 @@ void Player::FUN_004123d0()
     }
     else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x5a))
     {
-        Float3 pos4;
-
-        pos4 = this->position;
+        Float3 pos4 = this->position;
         pos4.y = 224.0f;
         pos4.x = pos4.x - 64.0f;
         this->FUN_0044de60((Float2 *)&pos4, 96.0f, 448.0f, 6, 0x3c);
@@ -1769,9 +1755,7 @@ void Player::FUN_004123d0()
     }
     else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x64))
     {
-        Float3 pos5;
-
-        pos5 = this->position;
+        Float3 pos5 = this->position;
         pos5.y = 224.0f;
         pos5.x = pos5.x - 96.0f;
         this->FUN_0044de60((Float2 *)&pos5, 96.0f, 448.0f, 6, 0x3c);
@@ -1787,9 +1771,7 @@ void Player::FUN_004123d0()
     }
     else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x6e))
     {
-        Float3 pos6;
-
-        pos6 = this->position;
+        Float3 pos6 = this->position;
         pos6.y = 224.0f;
         pos6.x = pos6.x - 128.0f;
         this->FUN_0044de60((Float2 *)&pos6, 96.0f, 448.0f, 6, 0x3c);
@@ -1805,9 +1787,7 @@ void Player::FUN_004123d0()
     }
     else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x78))
     {
-        Float3 pos7;
-
-        pos7 = this->position;
+        Float3 pos7 = this->position;
         pos7.y = 224.0f;
         pos7.x = pos7.x - 160.0f;
         this->FUN_0044de60((Float2 *)&pos7, 96.0f, 448.0f, 6, 0x3c);
