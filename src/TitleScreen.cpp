@@ -7,6 +7,7 @@
 #include "SoundPlayer.hpp"
 #include "Spellcard.hpp"
 #include "TitleScreen.hpp"
+#include "ResultScreen.hpp"
 #include "ZunMath.hpp"
 #include "i18n.hpp"
 
@@ -153,6 +154,75 @@ DIFFABLE_STATIC_ASSIGN(const char *, g_FullWidthDigits[]) = {
     TH_TITLE_FULLWIDTH_DIGIT_0, TH_TITLE_FULLWIDTH_DIGIT_1, TH_TITLE_FULLWIDTH_DIGIT_2, TH_TITLE_FULLWIDTH_DIGIT_3,
     TH_TITLE_FULLWIDTH_DIGIT_4, TH_TITLE_FULLWIDTH_DIGIT_5, TH_TITLE_FULLWIDTH_DIGIT_6, TH_TITLE_FULLWIDTH_DIGIT_7,
     TH_TITLE_FULLWIDTH_DIGIT_8, TH_TITLE_FULLWIDTH_DIGIT_9,
+};
+
+// FUNCTION-adjacent data for th08 0x4c82c8 / 0x4c8628
+// Last Word unlock condition help text (two lines per spell), used by FormatSpellCardInfo.
+// FUNCTION-adjacent data for th08 0x4c82c8 / 0x4c8628
+#define LW_STR_00 " "
+#define LW_STR_01 "\x92\xa7\x90\xed\x89\xc2\x94\x5c\x8f\xf0\x8c\x8f\x81\x46\x82\xb1\x82\xea\x88\xc8\x8a\x4f\x82\xcc\x83\x89\x83\x58\x83\x67\x83\x8f\x81\x5b\x83\x68\x82\xf0\x91\x53\x82\xc4\x88\xea\x93\x78\x8c\xa9\x82\xe9\x81\x42"
+#define LW_STR_02 "\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x83\x52\x83\x93\x83\x65\x83\x42\x83\x6a\x83\x85\x81\x5b\x89\xc2\x81\x41\x8e\x67\x97\x70\x83\x4c\x83\x83\x83\x89\x95\x73\x96\xe2\x81\x42"
+#define LW_STR_03 "\x92\xa7\x90\xed\x89\xc2\x94\x5c\x8f\xf0\x8c\x8f\x81\x46\x91\xd2\x8f\xaa\x81\x69\x83\x8b\x83\x69\x83\x65\x83\x42\x83\x62\x83\x4e\x81\x6a\x82\xf0\x83\x4e\x83\x8a\x83\x41\x82\xb7\x82\xe9\x81\x42"
+#define LW_STR_04 "\x92\xa7\x90\xed\x89\xc2\x94\x5c\x8f\xf0\x8c\x8f\x81\x46\x83\x58\x83\x79\x83\x8b\x83\x4a\x81\x5b\x83\x68\x83\x82\x81\x5b\x83\x68\x82\xc5\x83\x89\x83\x58\x83\x67\x83\x58\x83\x79\x83\x8b\x82\xf0\x33\x30\x96\x87\x88\xc8\x8f\xe3\x8e\xe6\x93\xbe\x82\xb7\x82\xe9\x81\x42"
+#define LW_STR_05 "\x92\xa7\x90\xed\x89\xc2\x94\x5c\x8f\xf0\x8c\x8f\x81\x46\x96\x5d\x8c\x8e\x81\x69\x83\x47\x83\x4c\x83\x58\x83\x67\x83\x89\x81\x6a\x82\xf0\x82\x52\x83\x4c\x83\x83\x83\x89\x88\xc8\x8f\xe3\x83\x4e\x83\x8a\x83\x41\x82\xb7\x82\xe9\x81\x42"
+#define LW_STR_06 "\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40"
+#define LW_STR_07 "\x92\xa7\x90\xed\x89\xc2\x94\x5c\x8f\xf0\x8c\x8f\x81\x46\x92\xca\x8f\xed\x83\x82\x81\x5b\x83\x68\x46\x69\x6e\x61\x6c\x42\x82\xf0\x82\x55\x83\x4c\x83\x83\x83\x89\x88\xc8\x8f\xe3\x83\x4e\x83\x8a\x83\x41\x82\xb7\x82\xe9\x81\x42"
+#define LW_STR_08 "\x92\xa7\x90\xed\x89\xc2\x94\x5c\x8f\xf0\x8c\x8f\x81\x46\x83\x58\x83\x79\x83\x8b\x83\x4a\x81\x5b\x83\x68\x83\x82\x81\x5b\x83\x68\x82\xc5\x83\x58\x83\x79\x83\x8b\x83\x4a\x81\x5b\x83\x68\x82\xf0\x31\x32\x30\x96\x87\x88\xc8\x8f\xe3\x8e\xe6\x93\xbe\x82\xb7\x82\xe9"
+#define LW_STR_09 "\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x8d\xc5\x8f\x49\x96\xca\x82\xcd\x46\x69\x6e\x61\x6c\x42\x82\xcc\x82\xdd\x81\x42"
+#define LW_STR_10 "\x92\xa7\x90\xed\x89\xc2\x94\x5c\x8f\xf0\x8c\x8f\x81\x46\x97\xec\x96\xb2\x81\x69\x92\x50\x93\xc6\x8e\x67\x97\x70\x81\x6a\x82\xc5\x8f\xe3\x82\xc2\x8b\x7c\x92\xa3\x81\x69\x83\x6e\x81\x5b\x83\x68\x81\x6a\x88\xc8\x8f\xe3\x82\xf0\x83\x4e\x83\x8a\x83\x41\x81\x42"
+#define LW_STR_11 "\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x83\x58\x83\x79\x83\x8b\x83\x4a\x81\x5b\x83\x68\x82\xf0\x91\x53\x82\xc4\x8e\xe6\x93\xbe\x81\x42"
+#define LW_STR_12 "\x92\xa7\x90\xed\x89\xc2\x94\x5c\x8f\xf0\x8c\x8f\x81\x46\x96\x82\x97\x9d\x8d\xb9\x81\x69\x92\x50\x93\xc6\x8e\x67\x97\x70\x81\x6a\x82\xc5\x8e\x4f\x93\xfa\x8c\x8e\x81\x69\x83\x6d\x81\x5b\x83\x7d\x83\x8b\x81\x6a\x82\xcc"
+#define LW_STR_13 "\x92\xa7\x90\xed\x89\xc2\x94\x5c\x8f\xf0\x8c\x8f\x81\x46\x4e\x6f\x2e\x25\x2e\x33\x64\x2c\x25\x2e\x33\x64\x2c\x25\x2e\x33\x64\x2c\x25\x2e\x33\x64\x82\xf0\x88\xea\x93\x78\x82\xc5\x82\xe0\x8c\xa9\x82\xe9\x81\x42"
+#define LW_STR_14 "\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x8e\xe6\x93\xbe\x82\xcc\x95\x4b\x97\x76\x82\xcd\x82\xc8\x82\xa2\x81\x42"
+#define LW_STR_15 "\x92\xa7\x90\xed\x89\xc2\x94\x5c\x8f\xf0\x8c\x8f\x81\x46\x4e\x6f\x2e\x25\x2e\x33\x64\x2c\x25\x2e\x33\x64\x2c\x25\x2e\x33\x64\x82\xf0\x88\xea\x93\x78\x82\xc5\x82\xe0\x8c\xa9\x82\xe9\x81\x42"
+#define LW_STR_16 "\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x82\xa9\x82\xc2\x81\x41\x4e\x6f\x2e\x25\x2e\x33\x64\x82\xf0\x88\xea\x93\x78\x82\xc5\x82\xe0\x8c\xa9\x82\xe9\x81\x42"
+#define LW_STR_17 "\x92\xa7\x90\xed\x89\xc2\x94\x5c\x8f\xf0\x8c\x8f\x81\x46\x4e\x6f\x2e\x25\x2e\x33\x64\x2c\x25\x2e\x33\x64\x82\xf0\x8e\xe6\x93\xbe\x82\xb5"
+#define LW_STR_18 "\x92\xa7\x90\xed\x89\xc2\x94\x5c\x8f\xf0\x8c\x8f\x81\x46\x83\x58\x83\x79\x83\x8b\x83\x4a\x81\x5b\x83\x68\x83\x82\x81\x5b\x83\x68\x82\xc5\x83\x89\x83\x58\x83\x67\x83\x58\x83\x79\x83\x8b\x82\xf0\x31\x35\x96\x87\x88\xc8\x8f\xe3\x8e\xe6\x93\xbe\x82\xb7\x82\xe9\x81\x42"
+#define LW_STR_19 "\x92\xa7\x90\xed\x89\xc2\x94\x5c\x8f\xf0\x8c\x8f\x81\x46\x4e\x6f\x2e\x25\x2e\x33\x64\x82\xf0\x8e\xe6\x93\xbe\x82\xb7\x82\xe9\x81\x42"
+#define LW_STR_20 "\x92\xa7\x90\xed\x89\xc2\x94\x5c\x8f\xf0\x8c\x8f\x81\x46\x92\xca\x8f\xed\x83\x82\x81\x5b\x83\x68\x46\x69\x6e\x61\x6c\x42\x82\xf0\x82\x53\x83\x4c\x83\x83\x83\x89\x88\xc8\x8f\xe3\x83\x4e\x83\x8a\x83\x41\x82\xb7\x82\xe9\x81\x42"
+#define LW_STR_21 "\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x91\x53\x83\x4c\x83\x83\x83\x89\x8d\x87\x8c\x76\x81\x42"
+#define LW_STR_22 "\x92\xa7\x90\xed\x89\xc2\x94\x5c\x8f\xf0\x8c\x8f\x81\x46\x83\x58\x83\x79\x83\x8b\x83\x4a\x81\x5b\x83\x68\x83\x82\x81\x5b\x83\x68\x82\xc5\x83\x58\x83\x79\x83\x8b\x83\x4a\x81\x5b\x83\x68\x82\xf0\x35\x30\x96\x87\x88\xc8\x8f\xe3\x8e\xe6\x93\xbe\x82\xb7\x82\xe9\x81\x42"
+#define LW_STR_23 "\x92\xa7\x90\xed\x89\xc2\x94\x5c\x8f\xf0\x8c\x8f\x81\x46\x92\xca\x8f\xed\x83\x82\x81\x5b\x83\x68\x46\x69\x6e\x61\x6c\x42\x82\xf0\x82\x52\x83\x4c\x83\x83\x83\x89\x88\xc8\x8f\xe3\x83\x4e\x83\x8a\x83\x41\x82\xb7\x82\xe9\x81\x42"
+#define LW_STR_24 "\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x93\xef\x88\xd5\x93\x78\x95\x73\x96\xe2\x81\x42"
+#define LW_STR_25 "\x92\xa7\x90\xed\x89\xc2\x94\x5c\x8f\xf0\x8c\x8f\x81\x46\x92\xca\x8f\xed\x83\x82\x81\x5b\x83\x68\x46\x69\x6e\x61\x6c\x42\x82\xf0\x82\x51\x83\x4c\x83\x83\x83\x89\x88\xc8\x8f\xe3\x83\x4e\x83\x8a\x83\x41\x82\xb7\x82\xe9\x81\x42"
+#define LW_STR_26 "\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x81\x40\x83\x4e\x83\x8a\x83\x41\x82\xb7\x82\xe9\x81\x42"
+#define LW_STR_27 "\x92\xa7\x90\xed\x89\xc2\x94\x5c\x8f\xf0\x8c\x8f\x81\x46\x96\x5d\x8c\x8e\x81\x69\x83\x47\x83\x4c\x83\x58\x83\x67\x83\x89\x81\x6a\x82\xf0\x83\x58\x83\x79\x83\x8b\x83\x4a\x81\x5b\x83\x68\x82\x56\x96\x87\x88\xc8\x8f\xe3\x8e\xe6\x93\xbe\x82\xb5\x82\xc4"
+
+struct LastWordHelpEntry
+{
+    const char *line1;
+    i32 nums1[5];
+    const char *line2;
+    i32 nums2[5];
+};
+
+DIFFABLE_STATIC_ASSIGN(LastWordHelpEntry, g_LastWordHelpText[]) = {
+    { LW_STR_27, { 0, 0, 0, 0, 0 }, LW_STR_26, { 0, 0, 0, 0, 0 } },
+    { LW_STR_25, { 0, 0, 0, 0, 0 }, LW_STR_24, { 0, 0, 0, 0, 0 } },
+    { LW_STR_23, { 0, 0, 0, 0, 0 }, LW_STR_24, { 0, 0, 0, 0, 0 } },
+    { LW_STR_22, { 0, 0, 0, 0, 0 }, LW_STR_21, { 0, 0, 0, 0, 0 } },
+    { LW_STR_20, { 0, 0, 0, 0, 0 }, LW_STR_24, { 0, 0, 0, 0, 0 } },
+    { LW_STR_19, { 137, 0, 0, 0, 0 }, LW_STR_00, { 0, 0, 0, 0, 0 } },
+    { LW_STR_18, { 0, 0, 0, 0, 0 }, LW_STR_21, { 0, 0, 0, 0, 0 } },
+    { LW_STR_17, { 145, 195, 0, 0, 0 }, LW_STR_16, { 204, 0, 0, 0, 0 } },
+    { LW_STR_15, { 208, 209, 210, 0, 0 }, LW_STR_14, { 0, 0, 0, 0, 0 } },
+    { LW_STR_13, { 205, 206, 207, 211, 0 }, LW_STR_14, { 0, 0, 0, 0, 0 } },
+    { LW_STR_12, { 0, 0, 0, 0, 0 }, LW_STR_11, { 0, 0, 0, 0, 0 } },
+    { LW_STR_10, { 0, 0, 0, 0, 0 }, LW_STR_09, { 0, 0, 0, 0, 0 } },
+    { LW_STR_08, { 0, 0, 0, 0, 0 }, LW_STR_21, { 0, 0, 0, 0, 0 } },
+    { LW_STR_07, { 0, 0, 0, 0, 0 }, LW_STR_06, { 0, 0, 0, 0, 0 } },
+    { LW_STR_05, { 0, 0, 0, 0, 0 }, LW_STR_00, { 0, 0, 0, 0, 0 } },
+    { LW_STR_04, { 0, 0, 0, 0, 0 }, LW_STR_21, { 0, 0, 0, 0, 0 } },
+    { LW_STR_03, { 0, 0, 0, 0, 0 }, LW_STR_02, { 0, 0, 0, 0, 0 } },
+    { LW_STR_01, { 0, 0, 0, 0, 0 }, LW_STR_14, { 0, 0, 0, 0, 0 } },
+};
+DIFFABLE_STATIC_ASSIGN(const char *, g_LastWordDifficultyNames[]) = {
+    "\x8f\x89\x8c\x8e\x81\x69\x83\x43\x81\x5b\x83\x57\x81\x5b\x81\x6a",
+    "\x8e\x4f\x93\xfa\x8c\x8e\x81\x69\x83\x6d\x81\x5b\x83\x7d\x83\x8b\x81\x6a",
+    "\x8f\xe3\x82\xc2\x8b\x7c\x92\xa3\x81\x69\x83\x6e\x81\x5b\x83\x68\x81\x6a",
+    "\x91\xd2\x8f\xaa\x81\x69\x83\x8b\x83\x69\x83\x65\x83\x42\x83\x62\x83\x4e\x81\x6a",
+    "\x96\x5d\x8c\x8e\x81\x69\x83\x47\x83\x4c\x83\x58\x83\x67\x83\x89\x81\x6a",
+    "\x8b\xc9\x88\xd3\x81\x69\x83\x89\x83\x58\x83\x67\x83\x8f\x81\x5b\x83\x68\x81\x6a",
 };
 
 DIFFABLE_STATIC_ASSIGN(const char *, g_StartMenuHelpText[]) = {
@@ -1916,15 +1986,12 @@ ChainCallbackResult TitleScreen::OnUpdatePracticeStageSelect()
     return CHAIN_CALLBACK_RESULT_CONTINUE;
 }
 
-#pragma var_order(menuLength1, vmIdx1, i1, horizontalCursorMovement, oldCursorPos, menuLength2, vmIdx2, i2, oldScreen)
+#pragma var_order(menuLength, vmIdx, i, horizontalCursorMovement, oldCursorPos, oldScreen)
 ChainCallbackResult TitleScreen::OnUpdateSpellStageSelect()
 {
-    i32 menuLength1;
-    i32 menuLength2;
-    i32 vmIdx1;
-    i32 vmIdx2;
-    i32 i1;
-    i32 i2;
+    i32 menuLength;
+    i32 vmIdx;
+    i32 i;
     i32 oldCursorPos;
     i32 horizontalCursorMovement;
     TitleCurrentScreen oldScreen;
@@ -1949,13 +2016,13 @@ ChainCallbackResult TitleScreen::OnUpdateSpellStageSelect()
 
             this->cursor = g_GameManager.shotType;
 
-            menuLength1 = g_GameManager.IsExtraUnlockedWithAllTeams() ? 12 : 4;
+            menuLength = g_GameManager.IsExtraUnlockedWithAllTeams() ? 12 : 4;
             while (!g_GameManager.IsSpellPracticeUnlockedForCharacter(this->cursor))
             {
                 this->cursor++;
-                if (this->cursor >= menuLength1)
+                if (this->cursor >= menuLength)
                 {
-                    this->cursor -= menuLength1;
+                    this->cursor -= menuLength;
                 }
             }
 
@@ -1968,22 +2035,22 @@ ChainCallbackResult TitleScreen::OnUpdateSpellStageSelect()
 
             this->cursor = g_GameManager.currentStage;
 
-            for (vmIdx1 = TITLE_SPRITE_CHARACTER_START; vmIdx1 <= TITLE_SPRITE_CHARACTER_END; vmIdx1++)
+            for (vmIdx = TITLE_SPRITE_CHARACTER_START; vmIdx <= TITLE_SPRITE_CHARACTER_END; vmIdx++)
             {
-                this->vms[vmIdx1].flag1 = FALSE;
-                this->vms[vmIdx1].SetInterrupt(8);
-                for (i1 = 1; i1 < ARRAY_SIZE(g_TitleCharacterSpriteIndices[0]) - 1; i1++)
+                this->vms[vmIdx].flag1 = FALSE;
+                this->vms[vmIdx].SetInterrupt(8);
+                for (i = 1; i < ARRAY_SIZE(g_TitleCharacterSpriteIndices[0]) - 1; i++)
                 {
-                    if (g_TitleCharacterSpriteIndices[g_GameManager.shotType][i1] == vmIdx1)
+                    if (g_TitleCharacterSpriteIndices[g_GameManager.shotType][i] == vmIdx)
                     {
-                        this->vms[vmIdx1].flag1 = TRUE;
-                        this->vms[vmIdx1].SetInterrupt(9);
+                        this->vms[vmIdx].flag1 = TRUE;
+                        this->vms[vmIdx].SetInterrupt(9);
                     }
                 }
-                if (g_TitleCharacterSpriteIndices[g_GameManager.shotType][i1] == vmIdx1)
+                if (g_TitleCharacterSpriteIndices[g_GameManager.shotType][i] == vmIdx)
                 {
-                    this->vms[vmIdx1].flag1 = TRUE;
-                    this->vms[vmIdx1].SetInterrupt(23);
+                    this->vms[vmIdx].flag1 = TRUE;
+                    this->vms[vmIdx].SetInterrupt(23);
                 }
             }
 
@@ -2046,42 +2113,42 @@ ChainCallbackResult TitleScreen::OnUpdateSpellStageSelect()
         oldCursorPos = this->cursor;
         this->cursor = g_GameManager.shotType;
 
-        menuLength2 = g_GameManager.IsExtraUnlockedWithAllTeams() ? 12 : 4;
+        menuLength = g_GameManager.IsExtraUnlockedWithAllTeams() ? 12 : 4;
 
-        horizontalCursorMovement = this->MoveCursorHorizontal(menuLength2);
+        horizontalCursorMovement = this->MoveCursorHorizontal(menuLength);
         if (horizontalCursorMovement != 0)
         {
             while (!g_GameManager.IsSpellPracticeUnlockedForCharacter(this->cursor))
             {
                 this->cursor += horizontalCursorMovement;
-                if (this->cursor >= menuLength2)
+                if (this->cursor >= menuLength)
                 {
-                    this->cursor -= menuLength2;
+                    this->cursor -= menuLength;
                 }
                 if (this->cursor < 0)
                 {
-                    this->cursor += menuLength2;
+                    this->cursor += menuLength;
                 }
             }
 
             g_GameManager.shotType = this->cursor;
 
-            for (vmIdx2 = TITLE_SPRITE_CHARACTER_START; vmIdx2 <= TITLE_SPRITE_CHARACTER_END; vmIdx2++)
+            for (vmIdx = TITLE_SPRITE_CHARACTER_START; vmIdx <= TITLE_SPRITE_CHARACTER_END; vmIdx++)
             {
-                this->vms[vmIdx2].flag1 = FALSE;
-                this->vms[vmIdx2].SetInterrupt(8);
-                for (i2 = 1; i2 < ARRAY_SIZE(g_TitleCharacterSpriteIndices[0]) - 1; i2++)
+                this->vms[vmIdx].flag1 = FALSE;
+                this->vms[vmIdx].SetInterrupt(8);
+                for (i = 1; i < ARRAY_SIZE(g_TitleCharacterSpriteIndices[0]) - 1; i++)
                 {
-                    if (g_TitleCharacterSpriteIndices[this->cursor][i2] == vmIdx2)
+                    if (g_TitleCharacterSpriteIndices[this->cursor][i] == vmIdx)
                     {
-                        this->vms[vmIdx2].flag1 = TRUE;
-                        this->vms[vmIdx2].SetInterrupt(9);
+                        this->vms[vmIdx].flag1 = TRUE;
+                        this->vms[vmIdx].SetInterrupt(9);
                     }
                 }
-                if (g_TitleCharacterSpriteIndices[this->cursor][i2] == vmIdx2)
+                if (g_TitleCharacterSpriteIndices[this->cursor][i] == vmIdx)
                 {
-                    this->vms[vmIdx2].flag1 = TRUE;
-                    this->vms[vmIdx2].SetInterrupt(23);
+                    this->vms[vmIdx].flag1 = TRUE;
+                    this->vms[vmIdx].SetInterrupt(23);
                 }
             }
 
@@ -2265,7 +2332,7 @@ ChainCallbackResult TitleScreen::OnUpdateSpellCardSelect()
             }
 
             this->FormatSpellCardInfo();
-            this->unk0xc29c = 0;
+            this->currentNumberOfSpellCards = 0;
         }
 
         if (this->stateTimer2 == 8)
@@ -2390,7 +2457,7 @@ ChainCallbackResult TitleScreen::OnUpdateSpellCardSelect()
                 this->spellCardInfoVms[i2].color1.a = 0;
             }
 
-            this->unk0xc29c = 21;
+            this->currentNumberOfSpellCards = 21;
         }
 
         this->FormatSpellCardInfo();
@@ -2494,22 +2561,286 @@ ChainCallbackResult TitleScreen::OnUpdateSpellCardSelect()
 
 /* This function checks the conditions needed to unlock certain Last Word spell cards. */
 // FUNCTION: th08 0x46cbbb
+#pragma var_order(i, captures, stagesCleared2, stagesCleared3, i2, lastWordCaptures15, stagesCleared4, i3, \
+                  normalCapturesShot6, i4, stagesCleared6, i5, extraStagesCleared, i6, lastWordCaptures30, \
+                  spellCd, spellCe, spellCf, spellD2, spellD1, spellD0, spellD3, spellD4, spellD5, catk6, \
+                  spellD6, spellD7, spellD8, spellD9, spellDa, spellDb, spellDc, spellDd, \
+                  condD1, condD3a, condD3b, condD3c, condD4a, condD4b, condD4c, \
+                  condD5a, condD5b, condD5c, condD5d, condD6, \
+                  condDda, condDdb, condDdc, condDdd, condDde, condDdf, condDdg, condDdh, condDdi, condDdj, \
+                  condDdk, condDdl, condDdm, condDdn, condDdo, condDdp)
 void TitleScreen::UnlockLastWordSpellCards()
 {
-    i32 captures = 0;
-    for (i32 i = 0; i < SPELLCARD_COUNT_SPELLCARDS; i++)
-    {
-        if (g_GameManager.catkData[i].inGameHistory.captures[SHOT_ALL] != 0 ||
-            g_GameManager.catkData[i].spellPracticeHistory.captures[SHOT_ALL] != 0)
-            captures++;
+    i32 i;
+    i32 captures;
+    i32 stagesCleared2;
+    i32 stagesCleared3;
+    i32 i2;
+    i32 lastWordCaptures15;
+    i32 stagesCleared4;
+    i32 i3;
+    i32 normalCapturesShot6;
+    i32 i4;
+    i32 stagesCleared6;
+    i32 i5;
+    i32 extraStagesCleared;
+    i32 i6;
+    i32 lastWordCaptures30;
+    i32 spellCd;
+    i32 spellCe;
+    i32 spellCf;
+    i32 spellD2;
+    i32 spellD1;
+    i32 spellD0;
+    i32 spellD3;
+    i32 spellD4;
+    i32 spellD5;
+    Catk *catk6;
+    i32 spellD6;
+    i32 spellD7;
+    i32 spellD8;
+    i32 spellD9;
+    i32 spellDa;
+    i32 spellDb;
+    i32 spellDc;
+    i32 spellDd;
+    ZunBool condD1;
+    ZunBool condD3a;
+    ZunBool condD3b;
+    ZunBool condD3c;
+    ZunBool condD4a;
+    ZunBool condD4b;
+    ZunBool condD4c;
+    ZunBool condD5a;
+    ZunBool condD5b;
+    ZunBool condD5c;
+    ZunBool condD5d;
+    ZunBool condD6;
+    ZunBool condDda;
+    ZunBool condDdb;
+    ZunBool condDdc;
+    ZunBool condDdd;
+    ZunBool condDde;
+    ZunBool condDdf;
+    ZunBool condDdg;
+    ZunBool condDdh;
+    ZunBool condDdi;
+    ZunBool condDdj;
+    ZunBool condDdk;
+    ZunBool condDdl;
+    ZunBool condDdm;
+    ZunBool condDdn;
+    ZunBool condDdo;
+    ZunBool condDdp;
+
+#define SPELL_GT_12(arr, idx) (0 < g_GameManager.catkData[idx].arr[SHOT_ALL])
+#define SPELL_NE_12(arr, idx) (g_GameManager.catkData[idx].arr[SHOT_ALL] != 0)
+#define UNLOCK_SPELL(var, num)                                                                                  \
+    {                                                                                                           \
+        var = (num);                                                                                            \
+        g_GameManager.flsp.unlockedLastWordSpellCards[var - SPELLCARD_LAST_WORD_START] = var;                   \
     }
-    for (i32 i = 0; i < SPELLCARD_COUNT_LAST_WORD_SPELLCARDS; i++)
+
+    captures = 0;
+    for (i = 0; i < SPELLCARD_COUNT_SPELLCARDS; i++)
     {
-        i32 spell = g_SpellcardNumbersPerStage[9][i];
-        Catk *catk = &g_GameManager.catkData[spell];
-        if (catk->inGameHistory.attempts[SHOT_ALL] != 0 ||
-            catk->spellPracticeHistory.attempts[SHOT_ALL] != 0 || captures >= (i + 1) * 10)
-            g_GameManager.flsp.unlockedLastWordSpellCards[i] = TRUE;
+        if (0 < g_GameManager.catkData[i].spellPracticeHistory.captures[SHOT_ALL])
+        {
+            captures++;
+        }
+    }
+
+    stagesCleared2 = 0;
+    for (i = 0; i < SHOT_ALL; i++)
+    {
+        if (IS_STAGE_CLEARED(g_GameManager.clrdData[i].difficultiesClearedWithoutRetries[0], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i].difficultiesClearedWithoutRetries[1], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i].difficultiesClearedWithoutRetries[2], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i].difficultiesClearedWithoutRetries[3], 14))
+        {
+            stagesCleared2++;
+        }
+    }
+    if (stagesCleared2 >= 2)
+    {
+        UNLOCK_SPELL(spellCd, 0xcd)
+    }
+
+    stagesCleared3 = 0;
+    for (i = 0; i < SHOT_ALL; i++)
+    {
+        if (IS_STAGE_CLEARED(g_GameManager.clrdData[i].difficultiesClearedWithoutRetries[0], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i].difficultiesClearedWithoutRetries[1], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i].difficultiesClearedWithoutRetries[2], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i].difficultiesClearedWithoutRetries[3], 14))
+        {
+            stagesCleared3++;
+        }
+    }
+    if (stagesCleared3 >= 3)
+    {
+        UNLOCK_SPELL(spellCe, 0xce)
+    }
+
+    if (captures >= 50)
+    {
+        UNLOCK_SPELL(spellCf, 0xcf)
+    }
+
+    lastWordCaptures15 = 0;
+    for (i2 = 0; i2 < g_LastSpellCount; i2++)
+    {
+        if (0 < g_GameManager.catkData[g_LastSpellNumbers[i2]].spellPracticeHistory.captures[SHOT_ALL])
+        {
+            lastWordCaptures15++;
+        }
+    }
+    if (lastWordCaptures15 >= 15)
+    {
+        UNLOCK_SPELL(spellD2, 0xd2)
+    }
+
+    condD1 = (SPELL_GT_12(inGameHistory.captures, 137) || SPELL_GT_12(spellPracticeHistory.captures, 137));
+    if (condD1)
+    {
+        UNLOCK_SPELL(spellD1, 0xd1)
+    }
+
+    stagesCleared4 = 0;
+    for (i3 = 0; i3 < SHOT_ALL; i3++)
+    {
+        if (IS_STAGE_CLEARED(g_GameManager.clrdData[i3].difficultiesClearedWithoutRetries[0], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i3].difficultiesClearedWithoutRetries[1], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i3].difficultiesClearedWithoutRetries[2], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i3].difficultiesClearedWithoutRetries[3], 14))
+        {
+            stagesCleared4++;
+        }
+    }
+    if (stagesCleared4 >= 4)
+    {
+        UNLOCK_SPELL(spellD0, 0xd0)
+    }
+
+    condD3a = (SPELL_GT_12(inGameHistory.captures, 195) || SPELL_GT_12(spellPracticeHistory.captures, 195));
+    condD3b = (SPELL_GT_12(inGameHistory.attempts, 204) || SPELL_NE_12(spellPracticeHistory.attempts, 204));
+    condD3c = (SPELL_GT_12(inGameHistory.captures, 145) || SPELL_GT_12(spellPracticeHistory.captures, 145));
+    if (condD3a && condD3b && condD3c)
+    {
+        UNLOCK_SPELL(spellD3, 0xd3)
+    }
+
+    condD4a = (SPELL_GT_12(inGameHistory.attempts, 208) || SPELL_NE_12(spellPracticeHistory.attempts, 208));
+    condD4b = (SPELL_GT_12(inGameHistory.attempts, 209) || SPELL_NE_12(spellPracticeHistory.attempts, 209));
+    condD4c = (SPELL_GT_12(inGameHistory.attempts, 210) || SPELL_NE_12(spellPracticeHistory.attempts, 210));
+    if (condD4a && condD4b && condD4c)
+    {
+        UNLOCK_SPELL(spellD4, 0xd4)
+    }
+
+    condD5a = (SPELL_GT_12(inGameHistory.attempts, 205) || SPELL_NE_12(spellPracticeHistory.attempts, 205));
+    condD5b = (SPELL_GT_12(inGameHistory.attempts, 206) || SPELL_NE_12(spellPracticeHistory.attempts, 206));
+    condD5c = (SPELL_GT_12(inGameHistory.attempts, 207) || SPELL_NE_12(spellPracticeHistory.attempts, 207));
+    condD5d = (SPELL_GT_12(inGameHistory.attempts, 211) || SPELL_NE_12(spellPracticeHistory.attempts, 211));
+    if (condD5a && condD5b && condD5c && condD5d)
+    {
+        UNLOCK_SPELL(spellD5, 0xd5)
+    }
+
+    normalCapturesShot6 = 0;
+    normalCapturesShot6 = 0;
+    for (i4 = 0; i4 < g_SpellcardCountsPerDifficulty[1]; i4++)
+    {
+        catk6 = &g_GameManager.catkData[g_SpellcardNumbersNormal[i4]];
+        condD6 = (0 < catk6->inGameHistory.captures[6] || 0 < catk6->spellPracticeHistory.captures[6]);
+        if (condD6)
+        {
+            normalCapturesShot6++;
+        }
+    }
+    if (normalCapturesShot6 == g_SpellcardCountsPerDifficulty[1])
+    {
+        UNLOCK_SPELL(spellD6, 0xd6)
+    }
+
+    if (IS_STAGE_CLEARED(g_GameManager.clrdData[4].difficultiesClearedWithoutRetries[2], 14) ||
+        IS_STAGE_CLEARED(g_GameManager.clrdData[4].difficultiesClearedWithoutRetries[3], 14))
+    {
+        UNLOCK_SPELL(spellD7, 0xd7)
+    }
+
+    if (captures >= 120)
+    {
+        UNLOCK_SPELL(spellD8, 0xd8)
+    }
+
+    stagesCleared6 = 0;
+    for (i5 = 0; i5 < SHOT_ALL; i5++)
+    {
+        if (IS_STAGE_CLEARED(g_GameManager.clrdData[i5].difficultiesClearedWithoutRetries[0], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i5].difficultiesClearedWithoutRetries[1], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i5].difficultiesClearedWithoutRetries[2], 14) ||
+            IS_STAGE_CLEARED(g_GameManager.clrdData[i5].difficultiesClearedWithoutRetries[3], 14))
+        {
+            stagesCleared6++;
+        }
+    }
+    if (stagesCleared6 >= 6)
+    {
+        UNLOCK_SPELL(spellD9, 0xd9)
+    }
+
+    extraStagesCleared = 0;
+    for (i6 = 0; i6 < SHOT_ALL; i6++)
+    {
+        if (IS_STAGE_CLEARED(g_GameManager.clrdData[i6].difficultiesClearedWithoutRetries[4], EXTRASTAGE))
+        {
+            extraStagesCleared++;
+        }
+    }
+    if (extraStagesCleared >= 3)
+    {
+        UNLOCK_SPELL(spellDa, 0xda)
+    }
+
+    lastWordCaptures30 = 0;
+    for (i = 0; i < g_LastSpellCount; i++)
+    {
+        if (0 < g_GameManager.catkData[g_LastSpellNumbers[i]].spellPracticeHistory.captures[SHOT_ALL])
+        {
+            lastWordCaptures30++;
+        }
+    }
+    if (lastWordCaptures30 >= 30)
+    {
+        UNLOCK_SPELL(spellDb, 0xdb)
+    }
+
+    if (IS_STAGE_CLEARED(g_GameManager.clrdData[SHOT_ALL].difficultiesClearedWithRetries[3], 14))
+    {
+        UNLOCK_SPELL(spellDc, 0xdc)
+    }
+
+    condDda = (SPELL_GT_12(inGameHistory.attempts, 205) || SPELL_NE_12(spellPracticeHistory.attempts, 205));
+    condDdb = (SPELL_GT_12(inGameHistory.attempts, 206) || SPELL_NE_12(spellPracticeHistory.attempts, 206));
+    condDdc = (SPELL_GT_12(inGameHistory.attempts, 207) || SPELL_NE_12(spellPracticeHistory.attempts, 207));
+    condDdd = (SPELL_GT_12(inGameHistory.attempts, 208) || SPELL_NE_12(spellPracticeHistory.attempts, 208));
+    condDde = (SPELL_GT_12(inGameHistory.attempts, 209) || SPELL_NE_12(spellPracticeHistory.attempts, 209));
+    condDdf = (SPELL_GT_12(inGameHistory.attempts, 210) || SPELL_NE_12(spellPracticeHistory.attempts, 210));
+    condDdg = (SPELL_GT_12(inGameHistory.attempts, 211) || SPELL_NE_12(spellPracticeHistory.attempts, 211));
+    condDdh = (SPELL_GT_12(inGameHistory.attempts, 212) || SPELL_NE_12(spellPracticeHistory.attempts, 212));
+    condDdi = (SPELL_GT_12(inGameHistory.attempts, 213) || SPELL_NE_12(spellPracticeHistory.attempts, 213));
+    condDdj = (SPELL_GT_12(inGameHistory.attempts, 214) || SPELL_NE_12(spellPracticeHistory.attempts, 214));
+    condDdk = (SPELL_GT_12(inGameHistory.attempts, 215) || SPELL_NE_12(spellPracticeHistory.attempts, 215));
+    condDdl = (SPELL_GT_12(inGameHistory.attempts, 216) || SPELL_NE_12(spellPracticeHistory.attempts, 216));
+    condDdm = (SPELL_GT_12(inGameHistory.attempts, 217) || SPELL_NE_12(spellPracticeHistory.attempts, 217));
+    condDdn = (SPELL_GT_12(inGameHistory.attempts, 218) || SPELL_NE_12(spellPracticeHistory.attempts, 218));
+    condDdo = (SPELL_GT_12(inGameHistory.attempts, 219) || SPELL_NE_12(spellPracticeHistory.attempts, 219));
+    condDdp = (SPELL_GT_12(inGameHistory.attempts, 220) || SPELL_NE_12(spellPracticeHistory.attempts, 220));
+    if (condDda && condDdb && condDdc && condDdd && condDde && condDdf && condDdg && condDdh && condDdi && condDdj &&
+        condDdk && condDdl && condDdm && condDdn && condDdo && condDdp)
+    {
+        UNLOCK_SPELL(spellDd, 0xdd)
     }
 }
 
@@ -2536,11 +2867,11 @@ ChainCallbackResult TitleScreen::DrawReplayMenu()
         g_AsciiManager.SetIsSelected(i == this->selectedReplay);
         if (i == this->selectedReplay)
         {
-            g_AsciiManager.SetColor(COLOR_WHITE);
+            g_AsciiManager.color.d3dColor = COLOR_WHITE;
         }
         else
         {
-            g_AsciiManager.SetColor(0xff808080);
+            g_AsciiManager.color.d3dColor = 0xff808080;
         }
 
         if (this->replays[i].spellcardNumber < 0)
@@ -2561,7 +2892,7 @@ ChainCallbackResult TitleScreen::DrawReplayMenu()
 
     if ((this->currentScreenState == 2 || this->currentScreenState == 3) && this->currentReplay)
     {
-        g_AsciiManager.SetColor(COLOR_WHITE);
+        g_AsciiManager.color.d3dColor = COLOR_WHITE;
         g_AsciiManager.SetIsSelected(FALSE);
 
         vm = &this->vms[78];
@@ -2588,22 +2919,22 @@ ChainCallbackResult TitleScreen::DrawReplayMenu()
 
                     if (i2 == this->selectedReplayStage)
                     {
-                        g_AsciiManager.SetColor(0xffffffff);
+                        g_AsciiManager.color.d3dColor = 0xffffffff;
                     }
                     else
                     {
-                        g_AsciiManager.SetColor(0xff808080);
+                        g_AsciiManager.color.d3dColor = 0xff808080;
                     }
                 }
                 else
                 {
                     if (i2 == this->selectedReplayStage)
                     {
-                        g_AsciiManager.SetColor(0x60ffffff);
+                        g_AsciiManager.color.d3dColor = 0x60ffffff;
                     }
                     else
                     {
-                        g_AsciiManager.SetColor(0x60808080);
+                        g_AsciiManager.color.d3dColor = 0x60808080;
                     }
                 }
 
@@ -2637,7 +2968,7 @@ ChainCallbackResult TitleScreen::DrawReplayMenu()
         }
     }
 
-    g_AsciiManager.SetColor(COLOR_WHITE);
+    g_AsciiManager.color.d3dColor = COLOR_WHITE;
     g_AsciiManager.SetIsSelected(FALSE);
 
     return CHAIN_CALLBACK_RESULT_CONTINUE;
@@ -2651,7 +2982,7 @@ ChainCallbackResult TitleScreen::DrawPracticeStageSelect()
     i32 i;
     AnmVm *vm;
 
-    g_AsciiManager.SetColor(COLOR_WHITE);
+    g_AsciiManager.color.d3dColor = COLOR_WHITE;
     g_AsciiManager.SetIsSelected(FALSE);
 
     vm = &this->vms[141];
@@ -2680,15 +3011,15 @@ ChainCallbackResult TitleScreen::DrawPracticeStageSelect()
 
         if (i == this->cursor)
         {
-            g_AsciiManager.SetColor(COLOR_WHITE);
+            g_AsciiManager.color.d3dColor = COLOR_WHITE;
         }
         else if (IS_STAGE_CLEARED(clearInfo, i))
         {
-            g_AsciiManager.SetColor(0xffa0a0a0);
+            g_AsciiManager.color.d3dColor = 0xffa0a0a0;
         }
         else
         {
-            g_AsciiManager.SetColor(0xff404040);
+            g_AsciiManager.color.d3dColor = 0xff404040;
         }
 
         g_AsciiManager.AddFormatText(
@@ -2698,7 +3029,7 @@ ChainCallbackResult TitleScreen::DrawPracticeStageSelect()
         position.y += 16.0f;
     }
 
-    g_AsciiManager.SetColor(COLOR_WHITE);
+    g_AsciiManager.color.d3dColor = COLOR_WHITE;
     g_AsciiManager.SetIsSelected(FALSE);
 
     return CHAIN_CALLBACK_RESULT_CONTINUE;
@@ -2740,7 +3071,7 @@ ChainCallbackResult TitleScreen::DrawSpellStageSelect()
     totalAttemptedLastWordPerShot = 0;
     totalAttemptedLastWord = 0;
 
-    g_AsciiManager.SetColor(COLOR_WHITE);
+    g_AsciiManager.color.d3dColor = COLOR_WHITE;
     g_AsciiManager.SetIsSelected(FALSE);
 
     vm = &this->vms[141];
@@ -2758,11 +3089,11 @@ ChainCallbackResult TitleScreen::DrawSpellStageSelect()
         g_AsciiManager.SetIsSelected(i == this->cursor);
         if (i == this->cursor)
         {
-            g_AsciiManager.SetColor(COLOR_WHITE);
+            g_AsciiManager.color.d3dColor = COLOR_WHITE;
         }
         else
         {
-            g_AsciiManager.SetColor(0xffa0a0a0);
+            g_AsciiManager.color.d3dColor = 0xffa0a0a0;
         }
 
         capturesPerStageSpellPracticePerShot = 0;
@@ -2837,7 +3168,7 @@ ChainCallbackResult TitleScreen::DrawSpellStageSelect()
     position.y += 5.0f;
 
     g_AsciiManager.SetIsSelected(FALSE);
-    g_AsciiManager.SetColor(0xffd06060);
+    g_AsciiManager.color.d3dColor = 0xffd06060;
 
     g_AsciiManager.AddFormatText(&position, "%sTotal",
                                  (totalCapturesSpellPracticePerShot >= SPELLCARD_COUNT_SPELLCARDS
@@ -2854,7 +3185,7 @@ ChainCallbackResult TitleScreen::DrawSpellStageSelect()
     position.x -= 182.0f;
 
     g_AsciiManager.SetScale(1.0f, 1.0f);
-    g_AsciiManager.SetColor(COLOR_WHITE);
+    g_AsciiManager.color.d3dColor = COLOR_WHITE;
     g_AsciiManager.SetIsSelected(FALSE);
 
     this->spellCardNameVms[1].pos.x = 400.0f;
@@ -3002,7 +3333,7 @@ ChainCallbackResult TitleScreen::DrawSpellCardSelect()
     u16 clearInfo;
     Float3 position;
 
-    g_AsciiManager.SetColor(COLOR_WHITE);
+    g_AsciiManager.color.d3dColor = COLOR_WHITE;
     g_AsciiManager.SetIsSelected(FALSE);
 
     position = Float3(16.0f, 78.0f, 0.0f);
@@ -3022,8 +3353,7 @@ ChainCallbackResult TitleScreen::DrawSpellCardSelect()
 
     for (i = 0; i < TITLE_SPELL_CARD_SPELLCARDS_PER_PAGE; i++)
     {
-        if ((i + this->currentPageSpellCardSelect * TITLE_SPELL_CARD_SPELLCARDS_PER_PAGE) >=
-            this->currentNumberOfSpellCards)
+        if ((i + this->currentPageSpellCardSelect * TITLE_SPELL_CARD_SPELLCARDS_PER_PAGE) >= this->unk0xc298)
         {
             break;
         }
@@ -3071,7 +3401,7 @@ ChainCallbackResult TitleScreen::DrawSpellCardSelect()
     g_AnmManager->DrawNoRotation(&this->spellCardInfoVms[5]);
     g_AnmManager->DrawNoRotation(&this->spellCardInfoVms[6]);
 
-    g_AsciiManager.SetColor(COLOR_WHITE);
+    g_AsciiManager.color.d3dColor = COLOR_WHITE;
     g_AsciiManager.SetIsSelected(FALSE);
 
     return CHAIN_CALLBACK_RESULT_CONTINUE;
@@ -3156,31 +3486,217 @@ i32 TitleScreen::MoveCursorHorizontal(i32 menuLength)
     return 0;
 }
 
+#pragma var_order(spell, i, attemptsTotal, comment, comment1, comment2, catkA, catkB, catkC, catkD,                      \
+                  nameStr, mark, ownerName, condA, condB, condC, condText1, condD, condText2)
 // FUNCTION: th08 0x46d7f9
 void TitleScreen::FormatSpellCardInfo()
 {
-    if (this->currentNumberOfSpellCards <= 0 || this->cursor < 0 ||
-        this->cursor >= this->currentNumberOfSpellCards) return;
-    i32 spell = g_SpellcardNumbersPerStage[g_GameManager.currentStage][this->cursor];
-    if (spell < 0 || spell >= SPELLCARD_COUNT_SPELLCARDS) return;
-    Catk *catk = &g_GameManager.catkData[spell];
-    for (i32 i = 0; i < 7; i++) this->spellCardInfoVms[i].color1.a = 0xff;
-    if (!g_GameManager.HasSpellCardBeenEncountered(spell, SHOT_ALL))
+    i32 spell;
+    i32 i;
+    i32 attemptsTotal;
+    char comment[128];
+    char comment1[128];
+    char comment2[4];
+    Catk *catkA;
+    Catk *catkB;
+    Catk *catkC;
+    Catk *catkD;
+    const char *nameStr;
+    const char *mark;
+    const char *ownerName;
+    ZunBool condA;
+    ZunBool condB;
+    ZunBool condC;
+    const char *condText1;
+    ZunBool condD;
+    const char *condText2;
+
+    if (this->currentScreenState == TitleCurrentScreenState_Ready && this->currentNumberOfSpellCards == 0)
     {
-        g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[0], COLOR_TEXT_WHITE, 0, "????????????????");
         return;
     }
-    g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[0], COLOR_TEXT_WHITE, 0, "%s", catk->spellName);
-    g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[1], COLOR_TEXT_WHITE, 0, "%s", catk->spellOwnerName);
-    g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[2], COLOR_TEXT_WHITE, 0, "%s", catk->spellCommentLine1);
-    g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[3], COLOR_TEXT_WHITE, 0, "%s", catk->spellCommentLine2);
-    g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[4], COLOR_TEXT_WHITE, 0, "Attempts %u",
-                               catk->spellPracticeHistory.attempts[g_GameManager.character]);
-    g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[5], COLOR_TEXT_WHITE, 0, "Captures %u",
-                               catk->spellPracticeHistory.captures[g_GameManager.character]);
-    g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[6], COLOR_TEXT_WHITE, 0, "Max bonus %d",
-                               catk->spellPracticeHistory.maxBonus[g_GameManager.character]);
+
+    spell = g_SpellcardNumbersPerStage[g_GameManager.currentStage][this->cursor];
+
+    attemptsTotal = g_GameManager.catkData[spell].spellPracticeHistory.attempts[SHOT_ALL] +
+                    g_GameManager.catkData[spell].inGameHistory.attempts[SHOT_ALL];
+
+    /* No. line: fullwidth spell number + name (or ?? if never attempted) */
+    if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 11)
+    {
+        nameStr = attemptsTotal == 0 ? "\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48"
+                                     : g_GameManager.catkData[spell].spellName;
+        g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[0], COLOR_TEXT_WHITE, 0,
+                                   "\x82\x6d\x82\x8f\x81\x44%s\x81\x40\x81\x40%s",
+                                   ConvertToFullWidthDigits(spell + 1, 3), nameStr);
+    }
+
+    /* Owner line: owner name + difficulty + "Last" mark for last spells */
+    if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 9)
+    {
+        mark = Spellcard::IsLastSpell(spell) != 0 ? "Last" : " ";
+        ownerName = attemptsTotal == 0 ? "\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48"
+                                       : g_GameManager.catkData[spell].spellOwnerName;
+        g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[1], COLOR_TEXT_WHITE, 0,
+                                   "\x8e\x67\x97\x70\x8e\xd2  %s\x81\x40\x81\x40%s %s", ownerName,
+                                   g_LastWordDifficultyNames[Spellcard::GetDifficultyFromSpellCard(spell)], mark);
+    }
+
+    /* Catches/attempts header with current character name */
+    if (this->currentScreenState == TitleCurrentScreenState_Init)
+    {
+        g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[2], COLOR_TEXT_WHITE, 0,
+                                   "\x8e\xe6\x93\xbe\x90\x94/\x92\xa7\x90\xed\x90\x94[\x8d\xc5\x8d\x82\x93\x5f]"
+                                   "\x81\x40%s\x81\x40\x91\x53\x8e\xe5\x90\x6c\x8c\xf6\x8d\x87\x8c\x76",
+                                   ResultScreen::GetCharacterName(g_GameManager.character));
+    }
+
+    /* Statistics line */
+    if (Spellcard::GetDifficultyFromSpellCard(spell) <= 4)
+    {
+        catkA = &g_GameManager.catkData[spell];
+        condA = catkA->inGameHistory.attempts[SHOT_ALL] > 0 || catkA->spellPracticeHistory.attempts[SHOT_ALL] != 0;
+        if (condA)
+        {
+            if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 7)
+            {
+                g_AnmManager->DrawTextLeft(
+                    &this->spellCardInfoVms[3], COLOR_TEXT_WHITE, 0,
+                    "\x81\x40\x81\x40%3d/%3d(%3d/%3d)[%.8d]\x81\x40\x81\x40%3d/%3d(%3d/%3d)[%.8d]",
+                    catkA->spellPracticeHistory.captures[g_GameManager.character],
+                    catkA->spellPracticeHistory.attempts[g_GameManager.character],
+                    catkA->inGameHistory.captures[g_GameManager.character],
+                    catkA->inGameHistory.attempts[g_GameManager.character],
+                    catkA->spellPracticeHistory.maxBonus[g_GameManager.character],
+                    catkA->spellPracticeHistory.captures[SHOT_ALL],
+                    catkA->spellPracticeHistory.attempts[SHOT_ALL],
+                    catkA->inGameHistory.captures[SHOT_ALL],
+                    catkA->inGameHistory.attempts[SHOT_ALL],
+                    catkA->spellPracticeHistory.maxBonus[SHOT_ALL]);
+            }
+        }
+        else
+        {
+            if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 7)
+            {
+                g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[3], COLOR_TEXT_WHITE, 0,
+                                           "\x81\x40\x81\x40---/---(---/---)[--------]\x81\x40\x81\x40"
+                                           "---/---(---/---)[--------]");
+            }
+        }
+    }
+    else
+    {
+        /* Last Word spell: no in-game history */
+        catkB = &g_GameManager.catkData[spell];
+        condB = catkB->inGameHistory.attempts[SHOT_ALL] > 0 || catkB->spellPracticeHistory.attempts[SHOT_ALL] != 0;
+        if (condB)
+        {
+            if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 7)
+            {
+                g_AnmManager->DrawTextLeft(
+                    &this->spellCardInfoVms[3], COLOR_TEXT_WHITE, 0,
+                    "\x81\x40\x81\x40%3d/%3d(---/---)[%.8d]\x81\x40\x81\x40%3d/%3d(---/---)[%.8d]",
+                    catkB->spellPracticeHistory.captures[g_GameManager.character],
+                    catkB->spellPracticeHistory.attempts[g_GameManager.character],
+                    catkB->spellPracticeHistory.maxBonus[g_GameManager.character],
+                    catkB->spellPracticeHistory.captures[SHOT_ALL],
+                    catkB->spellPracticeHistory.attempts[SHOT_ALL],
+                    catkB->spellPracticeHistory.maxBonus[SHOT_ALL]);
+            }
+        }
+        else
+        {
+            if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 7)
+            {
+                g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[3], COLOR_TEXT_WHITE, 0,
+                                           "\x81\x40\x81\x40---/---(---/---)[--------]\x81\x40\x81\x40"
+                                           "---/---(---/---)[--------]");
+            }
+        }
+    }
+
+    if (this->currentScreenState == TitleCurrentScreenState_Init)
+    {
+        g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[4], COLOR_TEXT_WHITE, 0,
+                                   "\x83\x4a\x81\x5b\x83\x68\x82\xcc\x95\xe2\x8d\x80");
+    }
+
+    /* Comment line 1: unlock condition for locked last words, else the spell comment */
+    if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 5)
+    {
+        catkC = &g_GameManager.catkData[spell];
+        condC = catkC->inGameHistory.attempts[SHOT_ALL] > 0 || catkC->spellPracticeHistory.attempts[SHOT_ALL] != 0;
+        if (condC)
+        {
+            goto comment1;
+        }
+        if (spell >= 204 && spell <= 221 && !g_GameManager.IsLastWordSpellCardAttempted(spell))
+        {
+            g_AnmManager->DrawTextLeft(
+                &this->spellCardInfoVms[5], COLOR_TEXT_WHITE, 0, g_LastWordHelpText[spell - 204].line1,
+                g_LastWordHelpText[spell - 204].nums1[0] + 1, g_LastWordHelpText[spell - 204].nums1[1] + 1,
+                g_LastWordHelpText[spell - 204].nums1[2] + 1, g_LastWordHelpText[spell - 204].nums1[3] + 1,
+                g_LastWordHelpText[spell - 204].nums1[4] + 1);
+        }
+        else
+        {
+        comment1:
+            memset(comment1, 0, 0x80);
+            strncpy(comment1, catkC->spellCommentLine1, 0x40);
+            condText1 = catkC->spellPracticeHistory.captures[SHOT_ALL] == 0
+                            ? "\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48"
+                            : comment1;
+            g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[5], COLOR_TEXT_WHITE, 0, condText1);
+        }
+    }
+
+    /* Comment line 2 */
+    if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 3)
+    {
+        catkD = &g_GameManager.catkData[spell];
+        condD = catkD->inGameHistory.attempts[SHOT_ALL] > 0 || catkD->spellPracticeHistory.attempts[SHOT_ALL] != 0;
+        if (condD)
+        {
+            goto comment2;
+        }
+        if (spell >= 204 && spell <= 221 && !g_GameManager.IsLastWordSpellCardAttempted(spell))
+        {
+            g_AnmManager->DrawTextLeft(
+                &this->spellCardInfoVms[6], COLOR_TEXT_WHITE, 0, g_LastWordHelpText[spell - 204].line2,
+                g_LastWordHelpText[spell - 204].nums2[0] + 1, g_LastWordHelpText[spell - 204].nums2[1] + 1,
+                g_LastWordHelpText[spell - 204].nums2[2] + 1, g_LastWordHelpText[spell - 204].nums2[3] + 1,
+                g_LastWordHelpText[spell - 204].nums2[4] + 1);
+        }
+        else
+        {
+        comment2:
+            memset(comment2, 0, 0x80);
+            strncpy(comment2, catkD->spellCommentLine2, 0x40);
+            condText2 = catkD->spellPracticeHistory.captures[SHOT_ALL] == 0
+                            ? "\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48\x81\x48"
+                            : comment2;
+            g_AnmManager->DrawTextLeft(&this->spellCardInfoVms[6], COLOR_TEXT_WHITE, 0, condText2);
+        }
+    }
+
+    this->spellCardInfoVms[5].pos.x = 96.0f;
+    this->spellCardInfoVms[6].pos.x = 96.0f;
+
+    if (this->currentScreenState == TitleCurrentScreenState_Init || this->currentNumberOfSpellCards == 3)
+    {
+        for (i = 0; i < 7; i++)
+        {
+            this->spellCardInfoVms[i].color1.a = 0xff;
+        }
+    }
+
+    if (this->currentNumberOfSpellCards != 0)
+    {
+        this->currentNumberOfSpellCards--;
+    }
 }
+
 
 // This function is 100% matching except for stack nonsense cause by AnmLoaded::InitializeAndSetSprite.
 #pragma var_order(i, firstFile, replayCount, fileSize, replayData, path, findData, fileSize2)
@@ -3534,20 +4050,23 @@ ChainCallbackResult TitleScreen::DrawCompletionStatusText()
             g_GameManager.IsStageClearedWithRetries(STAGE6A, this->cursor, g_Supervisor.cfg.defaultDifficulty))
         {
             showVm = TRUE;
-            this->titleAnm->InitializeAndSetSprite(&this->spellCardNameVms[0], 146);
+            AnmLoaded *anm = this->titleAnm;
+            anm->InitializeAndSetSprite(&this->spellCardNameVms[0], 146);
         }
         else if (g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, g_Supervisor.cfg.defaultDifficulty))
         {
             showVm = TRUE;
-            this->titleAnm->InitializeAndSetSprite(&this->spellCardNameVms[0], 148);
+            AnmLoaded *anm = this->titleAnm;
+            anm->InitializeAndSetSprite(&this->spellCardNameVms[0], 148);
         }
         else if (g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, EASY) ||
                  g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, NORMAL) ||
                  g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, HARD) ||
-                 g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, LUNATIC) && this->cursor > 3)
+                 g_GameManager.IsStageClearedWithoutRetries(STAGE6B, this->cursor, LUNATIC) || this->cursor > 3)
         {
             showVm = TRUE;
-            this->titleAnm->InitializeAndSetSprite(&this->spellCardNameVms[0], 147);
+            AnmLoaded *anm = this->titleAnm;
+            anm->InitializeAndSetSprite(&this->spellCardNameVms[0], 147);
         }
         else if (g_GameManager.IsStageClearedWithRetries(STAGE6A, this->cursor, EASY) ||
                  g_GameManager.IsStageClearedWithRetries(STAGE6A, this->cursor, NORMAL) ||
@@ -3555,7 +4074,8 @@ ChainCallbackResult TitleScreen::DrawCompletionStatusText()
                  g_GameManager.IsStageClearedWithRetries(STAGE6A, this->cursor, LUNATIC))
         {
             showVm = TRUE;
-            this->titleAnm->InitializeAndSetSprite(&this->spellCardNameVms[0], 145);
+            AnmLoaded *anm = this->titleAnm;
+            anm->InitializeAndSetSprite(&this->spellCardNameVms[0], 145);
         }
     }
 

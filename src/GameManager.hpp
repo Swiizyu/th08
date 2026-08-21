@@ -73,15 +73,9 @@ struct GameManager
 
     void AddTimeOrbs(i32 amount);
 
-    i32 GetTimeOrbs()
-    {
-        return this->globals->currentTimeOrbs;
-    }
+    i32 GetTimeOrbs();
 
-    i32 GetLastSpellTimeOrbThreshold()
-    {
-        return this->globals->lastSpellTimeOrbThreshold;
-    }
+    i32 GetLastSpellTimeOrbThreshold();
 
     i32 GetLives()
     {

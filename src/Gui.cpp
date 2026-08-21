@@ -17,6 +17,12 @@
 
 namespace th08
 {
+u32 GuiKeepStageResources();
+u32 GuiReleaseResourcesOnRestart();
+}
+
+namespace th08
+{
 
 // FUNCTION: th08 0x439856
 u32 GameManager::FUN_00439856(i32 bit, i32 entryIdx, i32 valueIdx)
@@ -1410,10 +1416,10 @@ void Gui::DrawStageElements()
     if (this->impl->loadingPortraitSprite.activeSpriteIndex >= 0)
     {
         g_AnmManager->DrawNoRotation(&this->impl->loadingPortraitSprite);
-        g_AnmManager->DrawWorld(&this->impl->arcadeZoneSprite);
+        g_AnmManager->FUN_00464070(&this->impl->arcadeZoneSprite);
         for (i = 0; i < 8; i++)
         {
-            g_AnmManager->DrawWorld(&this->impl->arcadeZoneMotionBlurSprites[i]);
+            g_AnmManager->FUN_00464070(&this->impl->arcadeZoneMotionBlurSprites[i]);
         }
         if (this->impl->unk_3a1c.activeSpriteIndex >= 0)
         {
@@ -1425,7 +1431,7 @@ void Gui::DrawStageElements()
     {
         for (i = 0; (i32)i < ARRAY_SIZE_SIGNED(this->impl->stageTransitionSprites); i++)
         {
-            g_AnmManager->DrawWorld(&this->impl->stageTransitionSprites[i]);
+            g_AnmManager->FUN_00464070(&this->impl->stageTransitionSprites[i]);
             g_AnmManager->ClearSprite();
         }
     }
@@ -1530,12 +1536,12 @@ ZunResult Gui::AddedCallback(Gui *gui)
 
 ZunResult Gui::DeletedCallback(Gui *gui)
 {
-    if (!KeepStageResources())
+    if (!th08::GuiKeepStageResources())
     {
         g_AnmManager->ReleaseAnm(13);
     }
     gui->FreeMsgFile();
-    if (ReleaseResourcesOnRestart())
+    if (th08::GuiReleaseResourcesOnRestart())
     {
         g_AnmManager->ReleaseAnm(10);
         g_AnmManager->ReleaseAnm(12);
@@ -1975,7 +1981,7 @@ ZunResult Gui::ActualAddedCallback()
     {
         return ZUN_ERROR;
     }
-    if (!KeepStageResources())
+    if (!th08::GuiKeepStageResources())
     {
         if (!g_GameManager.flags.isSpellPractice || g_GameManager.currentSpellCardNumber < 205)
         {
@@ -2013,7 +2019,7 @@ ZunResult Gui::ActualAddedCallback()
     }
     else
     {
-        if (!KeepStageResources() ||
+        if (!th08::GuiKeepStageResources() ||
             GameManager::ShouldPauseMusicInSpellPractice(g_GameManager.currentSpellCardNumber) != 0)
         {
             this->stageTextAnm->ExecuteAnmIdxArray(this->impl->stageTextSprites, 3, 1);
@@ -2102,18 +2108,13 @@ u32 FUN_00438fe9()
 }
 
 // FUNCTION: th08 0x438ff3
-u32 FUN_00438ff3()
+u32 th08::GuiReleaseResourcesOnRestart()
 {
     return *(u32 *)((u8 *)&th08::g_Supervisor + 360);
 }
 
-namespace th08
-{
-u32 IsDisableResourceReload();
-}
-
 // FUNCTION: th08 0x438ffd
-u32 th08::IsDisableResourceReload()
+u32 th08::GuiKeepStageResources()
 {
     return *(u32 *)((u8 *)&th08::g_Supervisor + 364);
 }
