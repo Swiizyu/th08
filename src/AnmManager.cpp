@@ -278,7 +278,7 @@ ZunResult AnmManager::TransformVerticesWorldWithCallback(AnmVm *vm, void (*callb
 }
 
 // FUNCTION: th08 0x464070
-ZunResult AnmManager::FUN_00464070(AnmVm *vm, ...)
+ZunResult AnmManager::FUN_00464070(AnmVm *vm)
 {
     if (!vm->IsVisible())
     {

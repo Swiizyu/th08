@@ -400,7 +400,7 @@ void Player::FUN_0040c910()
         }
     }
 
-    for (entry = bomb + 0x16f4c, i = 0x10; i < 0x80; i++, entry += 0x16f0)
+    for (entry = bomb + 0x16f4c, i = 0x10; (u32)i < 0x80; i++, entry += 0x16f0)
     {
         if (*(i32 *)entry == 0)
         {

@@ -413,13 +413,10 @@ i32 Effect::FUN_0040e2d0()
 // FUNCTION: th08 0x40eb50
 i32 Effect::FUN_0040eb50()
 {
-    i32 offset;
-
     *(u8 *)((u8 *)this + 0x356) = 1;
     *(i32 *)((u8 *)this + 0x324) = 48;
     *(f32 *)((u8 *)this + 0x320) = 32.0f;
-    offset = (this->timer.AsFrames() & 1) ? 8 : 0;
-    *(f32 *)((u8 *)this + 0x314) = 64.0f + (f32)offset;
+    *(f32 *)((u8 *)this + 0x314) = 64.0f + (f32)((this->timer.AsFrames() & 1) ? 8 : 0);
     *(i32 *)((u8 *)this + 0x318) = 0;
     return 1;
 }
