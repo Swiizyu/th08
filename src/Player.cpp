@@ -1384,9 +1384,98 @@ void Player::FUN_004103f0()
 }
 
 // FUNCTION: th08 0x410c40
+#pragma var_order(bomb, entry, angle)
 void Player::FUN_00410c40()
 {
-    UpdateBombPattern(this, 8, 0xff80c0ff, 260, 8);
+    u8 *bomb;
+    u8 *entry;
+    f32 angle;
+
+    bomb = (u8 *)this + 0xfdc;
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040d3d0() && *(ZunTimer *)(bomb + 0x18) == 0)
+    {
+        void *e;
+
+        this->FUN_0040be30(1, "\x8b\xab\x95\x84\x81\x75\x8e\x6c\x8f\x64\x8c\x8b\x8a\x45\x81\x76", 0x96, 0xc8, 0);
+        angle = -ZUN_PI;
+        entry = bomb + 0x4c;
+        g_SoundPlayer.PlaySoundByIdx((SoundIdx)0xd, 0);
+        *(Float3 *)(entry + 0x14) = this->position;
+        this->FUN_0044df00((Float2 *)&this->position, 100.0f, 1.0f, 0x28, 6);
+        e = this->FUN_0044e040((Float2 *)&this->position, 100.0f, 1.0f, 0x46, 0x28);
+        *(i32 *)((u8 *)e + 0x38) = 5;
+
+        {
+            Float3 v(0.78539819f, 1.0f, 4.0f);
+            g_EffectManager.SpawnSpecialEffect2(0x24, (Float3 *)(entry + 0x14), &v, 4, 1, -1);
+        }
+    }
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(10))
+    {
+        void *e2;
+
+        this->FUN_0044df00((Float2 *)&this->position, 100.0f, 1.0f, 0x28, 6);
+
+        {
+            void *e3;
+
+            e3 = this->FUN_0044e040((Float2 *)&this->position, 100.0f, 1.0f, 0x46, 0x28);
+            *(i32 *)((u8 *)e3 + 0x38) = 5;
+
+            {
+                Float3 v2(1.1780972f, 1.0f, 4.0f);
+                e2 = g_EffectManager.SpawnSpecialEffect2(0x24, &this->position, &v2, 5, 1, -1);
+                g_EffectManager.effectAnm->SetAndExecuteScriptIdx((AnmVm *)e2, 0x59);
+                *(Float3 *)(bomb + 0x1750) = this->position;
+            }
+        }
+    }
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x14))
+    {
+        void *e4;
+
+        this->FUN_0044df00((Float2 *)&this->position, 100.0f, 1.0f, 0x28, 6);
+
+        {
+            void *e5;
+
+            e5 = this->FUN_0044e040((Float2 *)&this->position, 100.0f, 1.0f, 0x46, 0x28);
+            *(i32 *)((u8 *)e5 + 0x38) = 5;
+
+            {
+                Float3 v3(1.5707964f, 1.0f, 4.0f);
+                e4 = g_EffectManager.SpawnSpecialEffect2(0x24, &this->position, &v3, 6, 1, -1);
+                g_EffectManager.effectAnm->SetAndExecuteScriptIdx((AnmVm *)e4, 0x5a);
+                *(Float3 *)(bomb + 0x2e40) = this->position;
+            }
+        }
+    }
+
+    if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x1e))
+    {
+        void *e6;
+
+        this->FUN_0044df00((Float2 *)&this->position, 100.0f, 1.0f, 0x28, 6);
+
+        {
+            void *e7;
+
+            e7 = this->FUN_0044e040((Float2 *)&this->position, 100.0f, 1.0f, 0x46, 0x28);
+            *(i32 *)((u8 *)e7 + 0x38) = 5;
+
+            {
+                Float3 v4(1.9634954f, 1.0f, 4.0f);
+                e6 = g_EffectManager.SpawnSpecialEffect2(0x24, &this->position, &v4, 7, 1, -1);
+                g_EffectManager.effectAnm->SetAndExecuteScriptIdx((AnmVm *)e6, 0x5b);
+                *(Float3 *)(bomb + 0x4530) = this->position;
+            }
+        }
+    }
+
+    g_AnmManager->ExecuteScriptArray((AnmVm *)(bomb + 0x204), 2);
 }
 
 // FUNCTION: th08 0x410fe0
