@@ -57,6 +57,7 @@ th08::g_StageEclFiles,0x4c73cc,global
 th08::g_StageSpellEclFiles,0x4c73f0,global
 th08::g_EffectAnms,0x4c7480,global
 th08::g_BulletTypeInfos,0x4b4ad8,global
+th08::g_SpellcardTimeColors,0x4c72ac,global
 th08::g_MsgFiles,0x4c74c0,global
 g_TimeRequirementParams,0x4c77f0,global
 g_RankParams,0x4c7880,global
