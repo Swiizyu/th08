@@ -1,109 +1,183 @@
-# AGENTS.md — multi-agent coordination for th08 decompilation
+# AGENTS.md — методичка по th08-декомпиляции (для всех агентов, новых и старых)
 
-Goal: byte-exact decompilation of `th08.exe` v1.00d (Touhou 8, Imperishable Night).
-Metric: number of functions at **100.00%** in the reccmp compare table (see §4).
-Never claim a function is done until the compare comment says `100.00%`.
+> **TL;DR для нового агента:** это репо `Swiizyu/th08`, побайтная декомпиляция `th08.exe` v1.00d.
+> Цель раунда: как можно больше функций на **100.00%** в reccmp-вердикте CI.
+> Работай только на СВОЕЙ auto-ветке `arena/<id>-th08`. Пуш → CI (Build ~2 мин → Compare ~5-10 мин)
+> → читай вердикт из commit-комментария. Никогда не заявляй 100% без CI-вердикта.
+> Координация и чат — в комментариях **PR #2** этого репо. Вопросы задавай там, по-русски, тепло.
 
-## 1. Agents and branches
+## 1. Проект и метрика
 
-| Agent | Arena chat | Branch (auto) | Owns |
-|-------|-----------|---------------|------|
-| Agent 1 (integration owner) | chat 1 | `arena/01a01c02-th08` | `src/AnmManager.*`, `src/Supervisor.*`, `src/Player.*`, `src/Background.*`, math in shared headers, integration of PRs |
-| Agent 2 | chat 2 | `arena/XXXXXXXX-th08` (auto-assigned) | `src/Gui.*`, `src/MusicRoom.*`, `src/ResultScreen.*`, `src/TitleScreen.*`, `src/Ending.*`, `src/GameManager.*`, `src/AsciiManager.*` |
+- Оригинал: `th08.exe` v1.00d (Touhou 8 — Imperishable Night), SHA256 начинается с `330fbdbf…`. Он
+  НЕ в гите (gitignored); как достать после вайпа — §6.
+- Инструмент сравнения: **reccmp** (пайплайн `.github/workflows/ci.yml` собирает бинарь MSVC 7.0 на
+  windows-latest, `compare.yml` прогоняет reccmp и постит вердикт комментарием на head-SHA).
+- Метрика: верхняя строка вердикта `functions compared: N | 100% matches: M | remaining: K`.
+  Максимум N плавает (≈1363-1370) — зависит от того, сколько рядов CSV сейчас парируется.
+  Цель: M → N. «Общий прогресс» (взвешенный по байтам) живёт в `PROGRESS.md`.
+- Правило §0: **100% объявляем только когда CI-комментарий это напечатал.** Не раньше.
 
-Shared files → **append-only, keep rows sorted by address** to avoid merge conflicts:
-`config/reccmp-functions.csv`, `config/reccmp-globals.csv`, `config/globals.csv`,
-`config/reccmp-floats.csv`, `config/verbose_watch.txt`.
-Shared base headers (`src/*.hpp` types used by both slices): ask in the sync
-channel before editing (§3).
+## 2. Репозитории, ветки, кто есть кто (САМОЕ АКТУАЛЬНОЕ)
 
-## 2. Hard rules (both agents)
+**Главный актуальный репо th08: `Swiizyu/th08`, ветка `arena/01a01c02-th08`** — интеграционная,
+её счётчик reccmp и есть «официальный прогресс». Остальные ветки — рабочие зоны тиммейтов.
 
-1. Work ONLY on your own auto-branch. Never merge to `main`, never force-push.
-2. Never push changes under `.github/workflows/` (bot token is denied there anyway).
-3. Never commit `*.exe` (gitignored). The original binary must stay out of git.
-4. Commits must be clean: run `git diff --check`. No `MATCHED`/100% claims without
-   a compare comment proving `100.00%`.
-5. Agent 2 integrates via PRs **into `arena/01a01c02-th08`** (base = that branch,
-   NOT main). Agent 1 reviews and merges.
-6. Keep `// FUNCTION: th08 0x<addr>` marker comments above every reconstructed
-   function; they are the address source for reccmp pairing.
+| Агент | Ветка th08 | Зона | Статус |
+|---|---|---|---|
+| ⛩️ **Канако** (integration owner) | `arena/01a01c02-th08` | `Player.cpp`, `EnemyManager.cpp`, `BulletManager.cpp`, `AnmManager.cpp`, `Supervisor`, `Background`, `main.cpp`, `ItemManager`, `ScreenEffect`, `Ecl*/Effect*`, CSV-интеграция | активна |
+| 🌸 **Санаэ** | `arena/01a01ccf-th08` | `Gui`, `GameManager`, `TitleScreen`, `ResultScreen` (+ кусок Background-обёрток) | активна |
+| 🐸 **Сувако** | `arena/01a01cd1-th08` | `Ending`, `AsciiManager`, `MusicRoom`, `RetryMenu` | активна |
+| 📰 **Ая** | репо `Swiizyu/th10` (своя ветка) | th10-аналог проекта; читает наш PR #2, её посты — в th10 PR #2, Канако ретранслирует | активна |
 
-## 3. Sync channel (two-way)
+- Ветка `arena/01a01b5a-th08` — пустая (base 176477b), не трогать.
+- Новым агентам: ваша auto-ветка выдаётся Arena; **не работайте на чужих ветках**, не мержите в main,
+  не force-push. PRы тиммейтов — в `arena/01a01c02-th08` (base = она, не main).
+- Shared CSV/config — append-only, ряды по адресам, чтобы не было merge-конфликтов.
 
-Issues are disabled on the repo. Use **comments on PR #2**:
+## 3. Verify loop (истина — только здесь)
 
-- Read at the START of every turn:
-  `gh api repos/Swiizyu/th08/issues/2/comments --jq '.[-6:][] | .user.login + ": " + .body'`
-- Post: `gh pr comment 2 -R Swiizyu/th08 --body "CLAIM: src/Gui.cpp OnUpdateOptions"`
-- Message types: `CLAIM: <scope>` (before starting), `DONE: <scope> (commit sha, score)`,
-  `BLOCKED: <what/why>`, `NOTE: <discovery worth sharing>`.
-- If `gh pr comment` ever fails for an agent, fall back to committing `SYNC-<branch>.md`
-  notes on your own branch and say so in your final user message.
-
-## 4. Verify loop (the only source of truth)
-
-1. `git commit` → `git push origin <your-branch>`.
-2. Push triggers **Build binary** (~1.5 min), then **Compare reimplementation** (~1 min).
-3. The compare posts a table as a **commit comment on your head sha**:
-   `gh api repos/Swiizyu/th08/commits/$(git rev-parse HEAD)/comments --jq 'last(.[]).body'`
-4. Rows missing from the table = recomp function name ≠ CSV name for that address
-   (reccmp pairs by demangled base name). Add/adjust a row in
-   `config/reccmp-functions.csv` (append-only) OR rename your function to the CSV name.
-5. Functions whose original references raw addresses of globals need rows in
-   `config/reccmp-globals.csv` + `config/globals.csv`, otherwise the two sides print
-   `<OFFSET_N>` vs a name and never match.
-
-## 5. Sandbox/bootstrap notes (Agent 2)
-
-- The sandbox wipes everything not committed between turns. Commit often.
-- `resources/th08.exe` is gitignored and may vanish; re-fetch:
+```bash
+git add -A && git commit -m "..." && git push origin arena/<id>-th08
+# через ~7-12 минут:
+gh api repos/Swiizyu/th08/commits/$(git rev-parse HEAD)/comments --jq 'last(.[].body)' | head -8
+```
+- Вердикт постится **на head-SHA вашего пуша**. Строка `functions compared …` — счёт.
+- Таблица ниже — ТОЛЬКО imperfect-ряды (`name | xx.xx%`). Функция исчезла из таблицы = стала 100%.
+- **Build-FAIL логи постятся комментариями на MERGE-SHA PR, не на head!** Как читать:
+  ```bash
+  gh api repos/Swiizyu/th08/pulls/2 --jq .merge_commit_sha
+  gh api repos/Swiizyu/th08/commits/<merge_sha>/comments --jq 'last(.[].body)'
   ```
-  SHA=$(curl -s "https://api.github.com/repos/1warriorscats1-sys/-/git/trees/HEAD" | \
-        python3 -c "import json,sys; print([t['sha'] for t in json.load(sys.stdin)['tree'] if t['path']=='th08.exe'][0])")
-  curl -s "https://api.github.com/repos/1warriorscats1-sys/-/git/blobs/$SHA" | \
-        python3 -c "import json,sys,base64; open('resources/th08.exe','wb').write(base64.b64decode(json.load(sys.stdin)['content']))"
+- Инфра-падежи CI (кэши, CDN) у нас бывали: симптом «падает даже откат дерева» — сначала смотри
+  merge-sha-комменты, не «чиня» код. Ночной инцидент 21.08: реальная причина была в синтаксисе
+  (осиротевшие хвосты после PROBE-скриптов), а не в кэше.
+
+## 4. Инструментарий (чем и как копать)
+
+- **Дизасм оригинала:** `python3 scripts/disasm.py 0x424730 0xf0` (VA hex-строкой!, второй аргумент —
+  размер, тоже hex). Изнутри — objdump по `resources/th08.exe`.
+- **Verbose-диффы (4 слота за пуш):** пишем адреса в `config/verbose_watch.txt` (одна строка = один
+  адрес). В вердикте появятся секции `## verbose: 0xADDR` — построчный diff: `-` = оригинал,
+  `+` = наша сборка. Ротируй слоты каждый пуш: вернул вердикт → исправил → 4 новых.
+- **Локальный MSС-билдов НЕТ** (вся верификация — только CI). Локально можно всё остальное:
+  дизасм, грепы, анализ CSV, подготовка фиксов.
+- **Артефакты CI (готовый наш .exe) из песочницы НЕ скачиваются** (Azure blob закрыт) — планируй
+  работу через verbose-выгрузки.
+- **Полезный однострочник** — join fail-таблицы с CSV и сортировка по размеру/проценту (охота на
+  «лёгкие» цели): сохранён у Канако в `/tmp`… но лучше сам: парсишь таблицу вердикта,
+  адреса — из `config/reccmp-functions.csv`, размер = следующий адрес минус текущий.
+- Файлы зонтика: `config/reccmp-functions.csv` (имя,VA,function|library), `reccmp-globals.csv`
+  (имя,VA,global — имена для нормализации адресов в диффах), `globals.csv` (Ghidra-side `_g_*`,
+  источник def-файла размещения), `reccmp-floats.csv`, `reccmp-strings.csv`.
+
+## 5. КАТАЛОГ ЛОВУШЕК (главное богатство; симптом → причина → лекарство)
+
+**MSVC 7.0 /Od /Oi /Ob0 /Gr — решается исходником:**
+
+1. **Одиночный ±8-байтовый сдвиг всех jmp в каскаде else-if** → лишний/недостающий вызов
+   `call Float3::Float3(void)` (8 байт `lea ecx`+`call`). Правило архетипов:
+   - `Float3 pos;` + отдельным оператором присваивание → ВЫЗОВ ctor ЕСТЬ.
+   - `Float3 pos = member;` (copy-init) → вызова НЕТ, три inline-mov.
+   Оригинал колеблется по месту (стиль Зюна непостоянен) — смотри verbose и подбирай архетип точечно.
+2. **Почти вся функция совпадает, но 1 инструкция отличается и это call/push с именем** →
+   cosmetic name mismatch. Три подвида:
+   a) orig рисует СЫРОЙ адрес (`ds:0x4e4b60`), наш — `th08::g_EffectManagerState (DATA)` →
+      добавь ряд в `config/reccmp-globals.csv` (имя зеркалим из `globals.csv`).
+   b) orig зовёт import-thunk сырым адресом 0x476cec → добавь ряд
+      `_Direct3DCreate8@4,0x476cec,library` (паттерн stdcall-декорации `_Name@N`).
+   c) orig `call FUN_004a431a`, наш `call _CIfmod` → переименуй library-ряд в правильное CRT-имя.
+      (CRT-хелперы `_CIfmod/_CIacos/_CIatan` берут аргументы в FPU-регистрах — это норма /Oi.)
+3. **`movsx` vs `movzx` vs dword-load** → у поля не тот знак/размер в нашем struct (i16 vs u16 vs i32).
+   `movsx word [x]` = i16, `movzx` = u16.
+4. **cmp byte [mem],0 вместо movsx+test** → в исходнике `if (byte)` (truthy), у нас `!= 0`.
+   Убери явное сравнение.
+5. **Чтение слова не с того оффсета ([edx+4] vs [edx+6])** → соседние i16-поля у нас перепутаны
+   местами; поменяй порядок полей в struct (EclTimelineHeader case).
+6. **Значение-членство ловушка:** оригинал грузит `mov ecx, ds:0x160f404` — это ПОСЛЕДНИЙ член
+   глобального BulletManager (`+0x6ba574`), а не поле буллета. Если оффсет вне нашей структуры — ищи,
+   чей конец совпадает.
+7. **Enum-константа на 1 отличается** (`mov ecx,3` vs `mov ecx,4`) → проверь значения enum в
+   заголовке по дизасму, не по «смыслу» (SCREEN_EFFECT_PULSE=3, FULL_FADE_OUT=4).
+8. **Вариативные член-функции** под /Gr = cdecl с this НА СТЕКЕ (не этcall!). Если прототип
+   `(AnmVm*, ...)` ломает раскладку arg — возможно, в оригинале это обычный thicall без `...`
+   (урок FUN_00464070).
+9. **Frame `sub esp,8; mov [ebp-8],edx; mov [ebp-4],ecx`** — идиома `__fastcall(Type *unused)`,
+   оба регистра спилятся всегда, даже неиспользуемые.
+10. **Local layout:** `#pragma var_order(...)` (см. `scripts/pragma_var_order.cpp`) — имена →
+    бакеты сверху-вниз от ebp-4 в порядке обхода declaration-order; компайлерные темпы (sret,
+    ternary, this-spill) лежат НИЖЕ именованных локалов.
+
+**reccmp/CSV — решается конфигом, и тут ОСТОРОЖНО:**
+
+11. **НЕЛЬЗЯ добавлять alias-ряды на ICF-folded VА** (два имени на один адрес, типа
+    `D3DXMATRIX::D3DXMATRIX,0x40b460`). Проверено 21.08: одна такая строчка роняет ~37
+    НЕСВЯЗАННЫХ 100%-функций (неоднозначность name→VA резолва их call-target'ов). −20 урок
+    усвоен; вердикт каждого пуша сверяй с ожиданием и откатывай мгновенно.
+12. **АМБИГУИТИ лечится сигнатурами, а не алиасами:** было
+    `th08::Float3::Float3`×2 разных VA → warning «Ambiguous match» и миспаринг call-сайтов.
+    Лечение: `th08::Float3::Float3(void),0x40b460` +
+    `th08::Float3::Float3(float, float, float),0x404720` (прецедент синтаксиса:
+    `operator new(unsigned int)` в том же CSV).
+13. Каждый CSV-фикс — отдельным пушем, если он «массового» свойства; читай дельту счётчика.
+    Ожидание/факт расходятся → `git revert` быстрее, чем разбор.
+14. Переименование library-ряда в настоящее имя (`_CIfmod`) делает его СРАВНИВАЕМЫМ: сам хелпер
+    попадёт в remaining (наш CRT-ASM не байт-идентичен). Прими решение: держать (call-сайты 100%,
+    тело потом перепишем naked-asm) или вернуть FUN_-имя.
+
+**Код, который выглядит невинно, но стоил нам коммита:**
+
+15. PROBE-скрипты, обрезающие тела до `{}`, оставляют осиротевшие `else if (...)` хвосты —
+    C2059/C2143 на CI. После любых массовых sed/скриптов — собирай в уме или проверяй `git diff`.
+16. Голый `Float3 x;` где-то ЕСТЬ вызов, где-то нет — это нормально (см. #1), но «везде copy-init»
+    — НЕправда (собственная over-fix, откачена).
+
+## 6. Ритуалы восстановления
+
+- **Вайп песочницы** (случается в любой момент): `.git` приезжает заново на base 176477b, но
+  dangling-tip остаётся. Ритуал: `git fsck --lost-found` → найти dangling commit tip →
+  `git update-ref refs/heads/<ветка> <tip>` → `git reset --mixed <tip>` → сверка с remote.
+- **Оригинальный exe после вайпа:**
+  ```bash
+  gh api repos/1warriorscats1-sys/-/git/blobs/4a757d5b015efd9cc0b181161f33aece4f16bddb \
+    --jq .content | base64 -d > resources/th08.exe
   ```
-  Verify: sha256 must be `330fbdbf58a710829d65277b4f312cfbb38d5448b3df523e79350b879213d924`.
-  Do NOT delete the burner repo `1warriorscats1-sys/-` (CI downloads the exe from it).
-- Only github.com/api.github.com/PyPI are reachable from the sandbox.
-- No MSVC locally: the only compiler is CI (MSVC 2002). Disassemble locally, compile in CI.
-- Disasm: `python3 scripts/disasm.py 0xADDR --end 0xEND` (or
-  `objdump -d -Mintel --start-address=0xA --stop-address=0xB resources/th08.exe`).
+  (burner-репо НЕ удалять ни при каких обстоятельствах.)
+- **Токен GitHub умирает** (`GH_TOKEN no longer valid`, push: could not read Username): локально
+  работаем дальше (анализ не требует сети), периодически ретраим; если долго — просить юзера
+  переподключить GitHub в Arena. Само не всегда воскресает.
 
-## 6. MSVC 2002 codegen facts (verified, saves hours)
+## 7. Координация (PR #2 = общий чат)
 
-- Everything is `__fastcall` by default (`/Gr`): do NOT write explicit `__fastcall`;
-  2-arg calls → ecx, edx. Methods: ecx=this, spills go **below** named locals.
-- Per-TU flags in `scripts/configure.py`: AsciiManager/Ending/EnemyManager/... = `/Od`
-  (debug_codegen); Gui/MusicRoom = `/Os`; GameManager/Supervisor = `/Os /Ob1`;
-  ResultScreen `/Os /Oi-`; TitleScreen `/Os /Oi- /Ob1`. `/Od` TUs keep dead stores
-  and use `push ecx` for a single spill.
-- `/Od`: `return ZUN_ERROR(-1)` compiles to `or eax,0xffffffff; jmp <epilogue>`.
-  Separate `return`s ⇒ separate `or eax,-1` blocks (helps count `if`s).
-- `#pragma var_order(a, b, ...)`: FIRST listed local at `[ebp-4]`, subsequent ones at
-  progressively lower addresses (arrays/matrices: base = lowest). Use it to pin stack order.
-- Float compares: `fcomp` + `test ah,0x5;jnp` (taken iff ST0<op), `test ah,0x41;jne` = `z<=B`.
-- `FSINCOS`: ST0=cos, ST1=sin (first `fstp` = cos). Prefer the project's `sincos()` helper.
-- `Float3` has a folded `operator float*()`: `(f32 *)obj` then `[eax+n*4]` indexing.
-  Class-returning methods: ecx=this, hidden ret-ptr = FIRST stack arg.
-- **Nested-scope (non-function-level) locals are laid out by NAME HASH, NOT declaration
-  order** (two compare cycles of evidence: decl-order swaps changed nothing; renames moved
-  slots predictably). C1XX keeps a fresh 16-bucket hash table (`hash & 15`) per block
-  scope; the pragma plugin only rewrites the FIRST scope it sees (normally the function
-  body) — deeper blocks go through vanilla insertion. Bucket walk ascending → offsets
-  descending contiguously (first-walked = highest address, closest to ebp). Child scopes
-  start below the parent's lowest var; sibling scopes later in source start lower still.
-  Practical fix: RENAME the locals so bucket order == original layout (renames don't
-  change the binary). Known bucket chains (walk order): `dy < target < t < dx`,
-  `v1 < v2 < effect`. Single-letter/simple names collide into predictable pairs; collect
-  more chains from compare diffs.
-- Compiler temps (sret buffers for `Float3 operator+`, ternary results, the ecx `this`
-  spill) land at the BOTTOM of the frame, below named locals — a lone temp at
-  `[ebp-0x28]`-style slots under all pragma'd vars usually means an anonymous ternary
-  (`cond ? A : B` stored straight into a struct field) or the hidden sret pointer,
-  not a missing named local.
-- SJIS spell-name literals: write EVERY byte as `\xXX`. `"\x8eE"` parses as hex `0x8ee`
-  (greedy escape) and fails with C2022 — `"\x8e\x45"` is the correct form.
-- Globals normalize by demangled name; `BSS`/`!BSS` sizes in `config/globals.csv` must
-  match the original layout or every reference mismatches.
+- Читать в начале хода: `gh api repos/Swiizyu/th08/issues/2/comments --jq 'last(.[] | .body)'`.
+- Писать: `CLAIM:` (беру область), `DONE:` (sha + счёт вердикта), `NOTE:` (находка-идиома),
+  `BLOCKED:`. По-русски, коротко и тепло.
+- Ая (th10): её апдейты в `Swiizyu/th10` PR #2 — последний: mapping/CSV groundwork
+  (`faf2a7c`, GameManager/ReplayManager/ScoreManager ряды), реализаций пока нет. Канако
+  ретранслирует важное в наш PR #2.
+- Зоны пересекаются минимально; shared-заголовки (`Global.hpp`, `AnmManager.hpp`…) — спросить в
+  чате перед правкой.
+
+## 8. Сознательно припарковано (НЕ тратить время без новой идеи)
+
+- **D3DX static-lib пак** (0x476xxx-0x479xxx, ~40 фн): orig собран Release+frameless, наш utils.cpp
+  /Od — байт-совпадение недостижимо в текущих флагах. Анализ есть (FUN_00477ee6 = inlined
+  D3DXMatrixTranslation и т.п.).
+- **AnmManager::FUN_004639e0 (99.55)**, **TransformVerticesWorldWithCallback (99.56)** — единственная
+  строка: ICF-folded пустой ctor, orig рисует Float3::Float3(void), наш — D3DXMATRIX::D3DXMATRIX.
+  байты идентичны, имя — нет; alias-фикс запрещён (лв.11). Ищем способ сделать наш pdb-primary
+  правильным (порядок COMDAT) — пока открыто.
+- **ItemManager::OnDraw (99.07)** — orig использует placement-ctor-on-member идиому с возвратом
+  eax=this — нужен аккуратный source-repro.
+- **Enemy::Enemy (98.96)** — push folded ctor name Tex1 vs Diffuse — та же ICF-семья.
+- CRT-ASM хелперы (`_CIfmod` и компания, ~30 fн из 0x4axxxx пула) — тела асмовые; план: naked-asm
+  репро при нужде.
+
+## 9. Дорожная карта (обновляется Канако)
+
+1. Counselor-cycle: вердикт → 4 слота verbose → фиксы → пуш. Основной двигатель +4..+10 за цикл.
+2. «Золотая жила» простых ECL-хендлеров EnemyManager.cpp: окно 0x424130-0x4253e0 (и выше к
+   0x426xxx) — десятки функций 32-256 байт, декодятся с дизасма за 10-20 минут.
+3. После 1000 — те же приёмы докручивают хвост; D3DX-пак отдельным решением (флаги TU или
+   asm-вставки).
+
+*— ⛩️ Канако, 2026-08-21. Методичка живая: каждая новая ловушка — сразу строка в §5.*
