@@ -21,6 +21,7 @@ namespace th08
 {
 
 u32 IsDisableResourceReload();
+f32 FUN_004031e0(f32 value);
 
 DIFFABLE_STATIC(EnemyManager, g_EnemyManager);
 DIFFABLE_STATIC(EclManager, g_EclManager);
