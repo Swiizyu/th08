@@ -444,7 +444,6 @@ i32 Effect::FUN_004114e0()
     i32 i;
     void *obj;
     f32 angle;
-    Float3 dir;
     f32 speed;
 
     if (this->timer < 40)
@@ -454,59 +453,91 @@ i32 Effect::FUN_004114e0()
         *(f32 *)((u8 *)this + 0x314) = 192.0f - 96.0f * factor * factor;
         (*(i32 *)((u8 *)this + 0x324))--;
         *(u8 *)((u8 *)this + 0x356) = 1;
-        return 1;
     }
-    else if (this->timer == 40)
+    else
     {
-        ScreenEffect::RegisterChain(SCREEN_EFFECT_PULSE, 8, 1, 0x8ff08080, 0, 21);
-        angle = *(f32 *)((u8 *)this + 0x318) + ZUN_PI / 4.0f;
-        speed = *(f32 *)((u8 *)this + 0x314) * 0.70710678f;
-        g_AnmManager->FUN_00464b00((AnmVm *)this, *(VertexTex1DiffuseXyzrhw **)((u8 *)this + 0x358),
-                                   *(i32 *)((u8 *)this + 0x324) * 2 + 2);
-        for (i = 0; i < 4; i++)
+        if (this->timer == 40)
         {
-            if (angle >= ZUN_PI)
+            ScreenEffect::RegisterChain(SCREEN_EFFECT_PULSE, 8, 1, 0x8ff08080, 0, 21);
+            angle = *(f32 *)((u8 *)this + 0x318) + ZUN_PI / 4.0f;
+            speed = *(f32 *)((u8 *)this + 0x314) * 0.7071067f;
+            Float3 dir;
+
+            g_AnmManager->FUN_00464b00((AnmVm *)this, *(VertexTex1DiffuseXyzrhw **)((u8 *)this + 0x358),
+                                       *(i32 *)((u8 *)this + 0x324) * 2 + 2);
+            for (i = 0; i < 4; i++)
             {
-                angle -= ZUN_2PI;
+                if (angle >= ZUN_PI)
+                {
+                    angle -= ZUN_2PI;
+                }
+                dir.FromAngleMagnitude(angle, speed);
+                dir += *(Float3 *)((u8 *)this + 0x2e0);
+                obj = g_Player.FUN_0044dfa0((Float2 *)&dir, speed * 32.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 60, 70);
+                *(i32 *)((u8 *)obj + 0x38) = 4;
+                *(f32 *)((u8 *)obj + 0x20) = AddNormalizeAngle(angle, ZUN_PI / 2.0f);
+                angle = *(f32 *)((u8 *)obj + 0x20);
+                obj = g_Player.FUN_0044de60((Float2 *)&dir, speed * 4.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 6, 100);
+                *(f32 *)((u8 *)obj + 0x20) = angle;
             }
-            dir.FromAngleMagnitude(angle, speed);
-            dir += *(Float3 *)((u8 *)this + 0x2e0);
-            obj = g_Player.FUN_0044dfa0((Float2 *)&dir, speed * 32.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 60, 70);
-            *(i32 *)((u8 *)obj + 0x38) = 4;
-            *(f32 *)((u8 *)obj + 0x20) = AddNormalizeAngle(angle, ZUN_PI / 2.0f);
-            angle = *(f32 *)((u8 *)obj + 0x20);
-            obj = g_Player.FUN_0044de60((Float2 *)&dir, speed * 4.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 6, 100);
-            *(f32 *)((u8 *)obj + 0x20) = angle;
         }
+        *(u8 *)((u8 *)this + 0x356) = 1;
     }
-    *(u8 *)((u8 *)this + 0x356) = 1;
     return 1;
 }
 
 // FUNCTION: th08 0x4117b0
-#pragma var_order(factor, angle)
+#pragma var_order(factor, radius, i, obj, angle, dir, speed)
 i32 Effect::FUN_004117b0()
 {
-    f32 angle;
     f32 factor;
+    f32 radius;
+    i32 i;
+    void *obj;
+    f32 angle;
+    f32 speed;
 
-    angle = *(f32 *)((u8 *)this + 0x318) +
-            ((*(i32 *)((u8 *)this + 0x328) & 1) ? 0.039269908f : -0.039269908f);
-    *(f32 *)((u8 *)this + 0x318) = sin(angle) * 1.5707964f;
+    *(f32 *)((u8 *)this + 0x318) = AddNormalizeAngle(*(f32 *)((u8 *)this + 0x318),
+        (*(i32 *)((u8 *)this + 0x328) & 1) ? 0.03926991f : -0.03926991f);
     *(u8 *)((u8 *)this + 0x356) = 1;
-    if (this->timer <= 50)
+    if (this->timer < 50)
     {
-        factor = 1.0f - (f32)this->timer.AsFrames() / 50.0f;
-        angle = ((f32)(*(i32 *)((u8 *)this + 0x328) - 4) * 0.4f) + 1.0f;
-        *(f32 *)((u8 *)this + 0x320) = ZUN_PI - g_Rng.GetRandomF32() * (2.0f * ZUN_PI) / 50.0f;
-        *(f32 *)((u8 *)this + 0x314) = 64.0f +
-                                              (f32)(*(i32 *)((u8 *)this + 0x328) - 4) * 0.4f -
-                                              angle * factor * factor;
+        factor = 1.0f - (f32)this->timer / 50.0f;
+        radius = (f32)(*(i32 *)((u8 *)this + 0x328) - 4) * 32.0f + 96.0f;
+        *(f32 *)((u8 *)this + 0x320) = 88.0f - (f32)this->timer * 5.0f / 50.0f;
+        *(f32 *)((u8 *)this + 0x314) = (f32)(*(i32 *)((u8 *)this + 0x328) - 4) * 32.0f + 192.0f -
+                                      radius * factor * factor;
         (*(i32 *)((u8 *)this + 0x324))--;
     }
     else
     {
-        this->active = 0;
+        if (this->timer == 50)
+        {
+            ScreenEffect::RegisterChain(SCREEN_EFFECT_SHAKE, 16, 8, 0, 0, 21);
+            ScreenEffect::RegisterChain(SCREEN_EFFECT_PULSE, 8, 1, 0x8f6060f0, 0, 21);
+            angle = *(f32 *)((u8 *)this + 0x318) + ZUN_PI / 4.0f;
+            speed = *(f32 *)((u8 *)this + 0x314) * 0.7071067f;
+            Float3 dir;
+
+            g_AnmManager->FUN_00464b00((AnmVm *)this, *(VertexTex1DiffuseXyzrhw **)((u8 *)this + 0x358),
+                                       *(i32 *)((u8 *)this + 0x324) * 2 + 2);
+            for (i = 0; i < 4; i++)
+            {
+                if (angle >= ZUN_PI)
+                {
+                    angle -= ZUN_2PI;
+                }
+                dir.FromAngleMagnitude(angle, speed);
+                dir += *(Float3 *)((u8 *)this + 0x2e0);
+                obj = g_Player.FUN_0044dfa0((Float2 *)&dir, speed * 32.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 60, 100);
+                *(i32 *)((u8 *)obj + 0x38) = 2;
+                *(f32 *)((u8 *)obj + 0x20) = AddNormalizeAngle(angle, ZUN_PI / 2.0f);
+                angle = *(f32 *)((u8 *)obj + 0x20);
+                obj = g_Player.FUN_0044de60((Float2 *)&dir, speed * 4.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 6, 150);
+                *(f32 *)((u8 *)obj + 0x20) = angle;
+            }
+        }
+        *(u8 *)((u8 *)this + 0x356) = 1;
     }
     return 1;
 }
