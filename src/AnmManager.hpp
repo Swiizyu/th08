@@ -550,7 +550,7 @@ struct AnmManager
     ZunResult DrawInner(AnmVm *vm, i32 flags);
     ZunResult FUN_004639e0(AnmVm *vm);
     ZunResult TransformVerticesWorldWithCallback(AnmVm *vm, void (*callback)(AnmVm *, Float3 *));
-    ZunResult FUN_00464070(AnmVm *vm);
+    ZunResult FUN_00464070(AnmVm *vm, ...);
     ZunResult AddSpriteToDrawBuffer(VertexTex1DiffuseXyzrhw *vertices);
     ZunResult DrawNoRotation(AnmVm *vm);
     void TranslateRotation(VertexTex1DiffuseXyzrhw *vertex, float x, float y, float sine, float cosine, float xOffset,
