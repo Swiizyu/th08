@@ -2453,7 +2453,7 @@ Enemy *__fastcall Enemy::FUN_0041f110(void *instruction)
     i32 arg4 = (mask & 0x10) ? this->FUN_0041f420(*(i32 *)(ins + 0x1c)) : *(i32 *)(ins + 0x1c);
     i32 field = (mask & 0x20) ? this->FUN_0041f420(*(i32 *)(ins + 0x20)) : *(i32 *)(ins + 0x20);
     u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
-    return g_EnemyManager.FUN_0042a680(*(i16 *)(ins + 0xc), &position, health, (i8)arg4, field, context + 0x18);
+    return g_EnemyManager.SpawnEnemy2(*(i16 *)(ins + 0xc), &position, health, (i8)arg4, field, context + 0x18);
 }
 
 // FUNCTION: th08 0x41f280
@@ -2472,7 +2472,7 @@ Enemy *__fastcall Enemy::FUN_0041f280(void *instruction)
     i32 arg4 = (mask & 0x10) ? this->FUN_0041f420(*(i32 *)(ins + 0x1c)) : *(i32 *)(ins + 0x1c);
     i32 field = (mask & 0x20) ? this->FUN_0041f420(*(i32 *)(ins + 0x20)) : *(i32 *)(ins + 0x20);
     u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
-    return g_EnemyManager.FUN_0042a680(*(i16 *)(ins + 0xc), &position, health, (i8)arg4, field, context + 0x18);
+    return g_EnemyManager.SpawnEnemy2(*(i16 *)(ins + 0xc), &position, health, (i8)arg4, field, context + 0x18);
 }
 
 // FUNCTION: th08 0x41f420
@@ -3389,7 +3389,7 @@ void EclTimeline::FUN_0042a8a0()
             if (opcode >= 1 && opcode <= 5)
             {
                 Float3 position(*(f32 *)(args + 4), *(f32 *)(args + 8), 0.0f);
-                Enemy *enemy = g_EnemyManager.FUN_0042a4e0(*(i16 *)args, &position,
+                Enemy *enemy = g_EnemyManager.SpawnEnemy1(*(i16 *)args, &position,
                     *(i32 *)(args + 0xc), (i8)*(i32 *)(args + 0x10), *(i32 *)(args + 0x14), opcode == 1);
                 if (enemy != NULL && opcode == 3)
                 {
@@ -3409,7 +3409,7 @@ void EclTimeline::FUN_0042a8a0()
 }
 
 // FUNCTION: th08 0x42a4e0
-Enemy *EnemyManager::FUN_0042a4e0(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08, i32 flag)
+Enemy *EnemyManager::SpawnEnemy1(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08, i32 flag)
 {
     Enemy *enemy = NULL;
     i32 index;
@@ -3442,10 +3442,10 @@ Enemy *EnemyManager::FUN_0042a4e0(i16 timeline, Float3 *position, i32 health, i8
 }
 
 // FUNCTION: th08 0x42a680
-Enemy *EnemyManager::FUN_0042a680(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08,
+Enemy *EnemyManager::SpawnEnemy2(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08,
                                    void *eclData)
 {
-    Enemy *enemy = this->FUN_0042a4e0(timeline, position, health, arg4, field2e08, 0);
+    Enemy *enemy = this->SpawnEnemy1(timeline, position, health, arg4, field2e08, 0);
     if (enemy != NULL && eclData != NULL)
     {
         memcpy((u8 *)enemy + 0x810, eclData, 0x78);

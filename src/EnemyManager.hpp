@@ -190,8 +190,8 @@ struct EnemyManager
     static void CutChain();
 
     i32 DespawnAllEnemies(i32 param_1, i32 param_2);
-    Enemy *FUN_0042a4e0(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08, i32 flag);
-    Enemy *FUN_0042a680(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08, void *eclData);
+    Enemy *SpawnEnemy1(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08, i32 flag);
+    Enemy *SpawnEnemy2(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08, void *eclData);
     void FUN_0042c3b0();
 
     Enemy enemyTemplate;
