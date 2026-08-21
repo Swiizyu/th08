@@ -865,7 +865,9 @@ void Player::FUN_0040ee10()
     }
 
     {
-        Float3 pos2 = this->position;
+        Float3 pos2;
+
+        pos2 = this->position;
         pos2.x -= 32.0f;
         *(Float3 *)((u8 *)this + 0x6bc) = pos2;
         pos2.x += 32.0f;
@@ -1803,9 +1805,8 @@ void Player::FUN_004123d0()
     }
     else if (((ZunTimer *)(bomb + 0x18))->FUN_0040e350(0x82))
     {
-        Float3 pos8;
+        Float3 pos8 = this->position;
 
-        pos8 = this->position;
         pos8.y = 224.0f;
         pos8.x = pos8.x - 192.0f;
         this->FUN_0044de60((Float2 *)&pos8, 96.0f, 448.0f, 6, 0x3c);

@@ -55,8 +55,8 @@ struct EclExIns
 struct EclTimelineHeader
 {
     u32 magic;
-    i16 timelineCount;
     i16 subCount;
+    i16 timelineCount;
     EclTimeline *timelines[16];
 };
 

@@ -105,11 +105,13 @@ th08::Background::FUN_00409f40,0x409f40,function
 th08::Background::RenderObjects,0x40a1b0,function
 sqrtf,0x40b440,function
 th08::Float3::Float3,0x40b460,function
+D3DXMATRIX::D3DXMATRIX,0x40b460,function
 th08::Float3::operator/=,0x40b470,function
 D3DXVec3Length,0x40b4c0,function
 D3DXVec3LengthSq,0x40b500,function
 D3DXVec3Dot,0x40b540,function
 th08::VertexDiffuseXyzrhw::VertexDiffuseXyzrhw,0x40b580,function
+th08::VertexTex1DiffuseXyzrhw::VertexTex1DiffuseXyzrhw,0x40b580,function
 th08::Background::SetCamera1,0x40b5a0,function
 th08::Background::SetCamera2,0x40b6d0,function
 D3DXVec3Cross,0x40b7f0,function
@@ -1216,6 +1218,7 @@ FUN_0047a668,0x47a668,library
 FUN_0047a73b,0x47a73b,library
 FUN_0047aa65,0x47aa65,library
 _DirectInput8Create@20,0x476ce0,library
+_Direct3DCreate8@4,0x476cec,library
 _D3DXVec3Normalize@8,0x476e9f,library
 _D3DXCreateTexture@32,0x47aa8d,library
 _D3DXLoadSurfaceFromFileInMemory@36,0x47aaf3,library

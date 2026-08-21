@@ -95,7 +95,6 @@ struct Enemy
     void __fastcall FUN_00420f40(void *instruction);
     void __fastcall FUN_00421120(void *instruction, f32 interpolation);
     void __fastcall FUN_00421180(void *instruction, f32 interpolation);
-    void __fastcall FUN_00421280(void *instruction);
     void __fastcall FUN_00421300(void *instruction);
     void __fastcall FUN_004213f0(void *instruction);
     void *__fastcall FUN_004215f0(void *instruction);

@@ -2617,13 +2617,12 @@ void __fastcall Enemy::FUN_00421180(void *instruction, f32 interpolation)
 }
 
 // FUNCTION: th08 0x421280
-void __fastcall Enemy::FUN_00421280(void *instruction)
+void __fastcall StartEnemySpell(Enemy *enemy, void *instruction)
 {
-    const char *name = (const char *)instruction + 0x14;
-    g_Spellcard.FUN_00415d10(name, this);
-    g_Spellcard.flags.isActive = 1;
-    *(Enemy **)((u8 *)&g_Spellcard + 4) = this;
-    g_GameManager.currentSpellCardNumber = *(u16 *)((u8 *)instruction + 0xe);
+    g_Spellcard.StartSpell(*(u16 *)((u8 *)instruction + 0xe), (const char *)instruction + 0x14,
+                           *(i16 *)((u8 *)instruction + 0xc), *(i32 *)((u8 *)instruction + 0x10), enemy,
+                           (const char *)instruction + 0x44, (const char *)instruction + 0x74,
+                           (const char *)instruction + 0xb4);
 }
 
 // FUNCTION: th08 0x421300
