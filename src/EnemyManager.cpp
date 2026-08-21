@@ -20,7 +20,7 @@ u32 FUN_004338c0();
 namespace th08
 {
 
-u32 GuiKeepStageResources();
+u32 IsDisableResourceReload();
 
 DIFFABLE_STATIC(EnemyManager, g_EnemyManager);
 DIFFABLE_STATIC(EclManager, g_EclManager);
@@ -1818,7 +1818,7 @@ ZunResult EffectManager::AddedCallback(EffectManager *effectManager)
 {
     effectManager->ResetEffects();
     effectManager->effectAnm = g_AnmManager->GetAnm(6);
-    if (!GuiKeepStageResources())
+    if (!IsDisableResourceReload())
     {
         effectManager->effectAnm2 = g_AnmManager->PreloadAnm(9, g_EffectAnms[g_GameManager.currentStage]);
         if (effectManager->effectAnm2 == NULL)
@@ -1880,7 +1880,7 @@ ZunResult EffectManager::DeletedCallback(EffectManager *effectManager)
             effect->resource = NULL;
         }
     }
-    if (!GuiKeepStageResources())
+    if (!IsDisableResourceReload())
     {
         g_AnmManager->ReleaseAnm(9);
     }
@@ -3674,7 +3674,7 @@ ZunResult EnemyManager::AddedCallback(EnemyManager *enemyManager)
         *(AnmLoaded **)((u8 *)enemyManager + 0x9dceec) = g_AnmManager->GetAnm(7);
     }
 
-    if (!GuiKeepStageResources())
+    if (!IsDisableResourceReload())
     {
         *(AnmLoaded **)((u8 *)enemyManager + 0x9dcef0) =
             g_AnmManager->PreloadAnm(8, g_StageEnemyAnms[g_GameManager.currentStage]);
@@ -3688,7 +3688,7 @@ ZunResult EnemyManager::AddedCallback(EnemyManager *enemyManager)
         *(AnmLoaded **)((u8 *)enemyManager + 0x9dcef0) = g_AnmManager->GetAnm(8);
     }
 
-    if (!GuiKeepStageResources())
+    if (!IsDisableResourceReload())
     {
         memset(&g_EclManager, 0, sizeof(g_EclManager));
         if (!g_GameManager.IsSpellPractice())
@@ -3734,7 +3734,7 @@ ZunResult EnemyManager::DeletedCallback(EnemyManager *enemyManager)
     {
         enemy->FUN_0042bc90();
     }
-    if (!GuiKeepStageResources())
+    if (!IsDisableResourceReload())
     {
         g_AnmManager->ReleaseAnm(8);
     }
@@ -3742,7 +3742,7 @@ ZunResult EnemyManager::DeletedCallback(EnemyManager *enemyManager)
     {
         g_AnmManager->ReleaseAnm(7);
     }
-    if (!GuiKeepStageResources())
+    if (!IsDisableResourceReload())
     {
         g_EclManager.FUN_00418420();
     }
