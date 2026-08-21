@@ -2084,27 +2084,44 @@ void Player::FUN_0040fcb0()
 }
 
 // FUNCTION: th08 0x412300
-#pragma var_order(color, rect, bomb)
+#pragma var_order(bomb, rect, color)
 void Player::FUN_00412300()
 {
-    u8 *bomb = (u8 *)this + 0xfdc;
+    u8 *bomb;
     ZunRect rect;
     D3DCOLOR color;
-    ZunTimer *timer = (ZunTimer *)(bomb + 0x18);
+
+    bomb = (u8 *)this + 0xfdc;
 
     this->FUN_0040bc60(0x80404040);
-    if (*timer >= 70)
+
+    if (*(ZunTimer *)(bomb + 0x18) >= 0x46)
     {
         this->FUN_0040bc60(0x80000030);
         rect.left = 32.0f;
         rect.top = 16.0f;
         rect.right = 416.0f;
         rect.bottom = 464.0f;
-        color = 0x00ffffff;
-        if (*timer < 100)
+        ((u8 *)&color)[2] = 0xff;
+        ((u8 *)&color)[1] = 0xff;
+        ((u8 *)&color)[0] = 0xff;
+
+        if (*(ZunTimer *)(bomb + 0x18) < 100)
         {
-            color |= 0xff000000;
+            ((u8 *)&color)[3] = 0xff;
         }
+        else if (*(ZunTimer *)(bomb + 0x18) < 160)
+        {
+            ((u8 *)&color)[3] = 255 - (((ZunTimer *)(bomb + 0x18))->AsFrames() - 100) * 255 / 60;
+        }
+        else
+        {
+            return;
+        }
+
+        ScreenEffect::DrawSquare(&rect, color);
+    }
+}
         else if (*timer < 160)
         {
             color |= (255 - (timer->AsFrames() - 100) * 255 / 60) << 24;
@@ -2118,27 +2135,44 @@ void Player::FUN_00412300()
 }
 
 // FUNCTION: th08 0x412fa0
-#pragma var_order(color, rect, bomb)
+#pragma var_order(bomb, color, rect)
 void Player::FUN_00412fa0()
 {
-    u8 *bomb = (u8 *)this + 0xfdc;
-    ZunRect rect;
+    u8 *bomb;
     D3DCOLOR color;
-    ZunTimer *timer = (ZunTimer *)(bomb + 0x18);
+    ZunRect rect;
+
+    bomb = (u8 *)this + 0xfdc;
 
     this->FUN_0040bc60(0x80404040);
-    if (*timer >= 70)
+
+    if (*(ZunTimer *)(bomb + 0x18) >= 0x46)
     {
         this->FUN_0040bc60(0x80000030);
         rect.left = 32.0f;
         rect.top = 16.0f;
         rect.right = 416.0f;
         rect.bottom = 464.0f;
-        color = 0x00ff0000;
-        if (*timer < 100)
+        ((u8 *)&color)[2] = 0xff;
+        ((u8 *)&color)[1] = 0;
+        ((u8 *)&color)[0] = 0;
+
+        if (*(ZunTimer *)(bomb + 0x18) < 100)
         {
-            color |= 0xff000000;
+            ((u8 *)&color)[3] = 0xff;
         }
+        else if (*(ZunTimer *)(bomb + 0x18) < 160)
+        {
+            ((u8 *)&color)[3] = 255 - (((ZunTimer *)(bomb + 0x18))->AsFrames() - 100) * 255 / 60;
+        }
+        else
+        {
+            return;
+        }
+
+        ScreenEffect::DrawSquare(&rect, color);
+    }
+}
         else if (*timer < 160)
         {
             color |= (255 - (timer->AsFrames() - 100) * 255 / 60) << 24;
