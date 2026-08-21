@@ -108,7 +108,6 @@ struct Enemy
     void __fastcall FUN_00423e20(void *instruction);
     void __fastcall FUN_004241e0(void *instruction);
     void __fastcall FUN_00421e50(void *instruction);
-    void __fastcall FUN_00424a20(void *instruction);
     void __fastcall FUN_00424c40(void *instruction);
     ZunBool FUN_0041f000();
     void FUN_0041f040(i32 x, i32 y, i32 z);

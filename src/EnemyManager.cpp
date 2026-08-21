@@ -449,8 +449,8 @@ i32 Effect::FUN_004114e0()
     if (this->timer < 40)
     {
         factor = 1.0f - (f32)this->timer / 40.0f;
-        *(f32 *)((u8 *)this + 0x320) = 88.0f - (f32)this->timer * 5.0f / 40.0f;
-        *(f32 *)((u8 *)this + 0x314) = 192.0f - 96.0f * factor * factor;
+        *(f32 *)((u8 *)this + 0x320) = 88.0f - (f32)this->timer * 80.0f / 40.0f;
+        *(f32 *)((u8 *)this + 0x314) = 192.0f - 384.0f * factor * factor;
         (*(i32 *)((u8 *)this + 0x324))--;
         *(u8 *)((u8 *)this + 0x356) = 1;
     }
@@ -473,7 +473,7 @@ i32 Effect::FUN_004114e0()
                 }
                 dir.FromAngleMagnitude(angle, speed);
                 dir += *(Float3 *)((u8 *)this + 0x2e0);
-                obj = g_Player.FUN_0044dfa0((Float2 *)&dir, speed * 32.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 60, 70);
+                obj = g_Player.FUN_0044dfa0((Float2 *)&dir, speed * 8.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 60, 70);
                 *(i32 *)((u8 *)obj + 0x38) = 4;
                 *(f32 *)((u8 *)obj + 0x20) = AddNormalizeAngle(angle, ZUN_PI / 2.0f);
                 angle = *(f32 *)((u8 *)obj + 0x20);
@@ -503,8 +503,8 @@ i32 Effect::FUN_004117b0()
     if (this->timer < 50)
     {
         factor = 1.0f - (f32)this->timer / 50.0f;
-        radius = (f32)(*(i32 *)((u8 *)this + 0x328) - 4) * 32.0f + 96.0f;
-        *(f32 *)((u8 *)this + 0x320) = 88.0f - (f32)this->timer * 5.0f / 50.0f;
+        radius = (f32)(*(i32 *)((u8 *)this + 0x328) - 4) * 32.0f + 384.0f;
+        *(f32 *)((u8 *)this + 0x320) = 88.0f - (f32)this->timer * 80.0f / 50.0f;
         *(f32 *)((u8 *)this + 0x314) = (f32)(*(i32 *)((u8 *)this + 0x328) - 4) * 32.0f + 192.0f -
                                       radius * factor * factor;
         (*(i32 *)((u8 *)this + 0x324))--;
@@ -529,7 +529,7 @@ i32 Effect::FUN_004117b0()
                 }
                 dir.FromAngleMagnitude(angle, speed);
                 dir += *(Float3 *)((u8 *)this + 0x2e0);
-                obj = g_Player.FUN_0044dfa0((Float2 *)&dir, speed * 32.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 60, 100);
+                obj = g_Player.FUN_0044dfa0((Float2 *)&dir, speed * 8.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 60, 100);
                 *(i32 *)((u8 *)obj + 0x38) = 2;
                 *(f32 *)((u8 *)obj + 0x20) = AddNormalizeAngle(angle, ZUN_PI / 2.0f);
                 angle = *(f32 *)((u8 *)obj + 0x20);
@@ -1564,50 +1564,6 @@ void __fastcall EclExIns::FUN_004250d0(void *)
             bullet->flags &= ~0x100000;
         }
     }
-}
-
-// FUNCTION: th08 0x424a20
-void __fastcall Enemy::FUN_00424a20(void *)
-{
-    u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
-    u32 mask = *(u32 *)(context + 0x18);
-    for (i32 i = 0; i < MAX_BULLETS; i++)
-    {
-        Bullet *bullet = &g_BulletManager.bullets[i];
-        if (bullet->state == 0 || (bullet->flags & mask) == 0)
-        {
-            continue;
-        }
-        AnmVm *vm = &bullet->sprites.spriteBullet;
-        if (vm->type == 1)
-        {
-            vm->type = 0;
-            vm->blendMode = 1;
-            if (vm->anmFile != NULL) vm->anmFile->SetSprite(vm, vm->activeSpriteIndex + 16);
-            *(u8 *)((u8 *)bullet + 0x10b4) = 1;
-            bullet->velocity.FromAngleMagnitude(*(f32 *)(context + 0x38),
-                                                *(f32 *)(context + 0x3c) * g_Supervisor.framerateMultiplier);
-        }
-        else
-        {
-            vm->type = 1;
-            vm->blendMode = 0;
-            if (vm->anmFile != NULL) vm->anmFile->SetSprite(vm, vm->activeSpriteIndex - 16);
-            *(u8 *)((u8 *)bullet + 0x10b4) = 0;
-            bullet->velocity.FromAngleMagnitude(bullet->angle,
-                                                bullet->speed * g_Supervisor.framerateMultiplier);
-        }
-    }
-    Enemy *enemy = this;
-    i32 enabled = *(i32 *)(context + 0x1c) == 0;
-    while (*(Enemy **)((u8 *)enemy + 8) != NULL)
-    {
-        enemy = *(Enemy **)((u8 *)enemy + 8);
-        if (enabled) *(u32 *)((u8 *)enemy + 0x3328) |= 0x80;
-        else *(u32 *)((u8 *)enemy + 0x3328) &= ~0x80;
-    }
-    g_EclEffectVm0.SetInterrupt(enabled ? 2 : 1);
-    g_EclEffectVm1.SetInterrupt(enabled ? 2 : 1);
 }
 
 // FUNCTION: th08 0x424c40
