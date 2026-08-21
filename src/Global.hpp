@@ -473,6 +473,7 @@ struct ZunRect
 };
 
 f32 AddNormalizeAngle(f32 a, f32 b);
+f32 FUN_0040c7b0(f32 value, f32 exponent);
 void Rotate(Float3 *outVector, Float3 *point, f32 angle);
 
 DIFFABLE_EXTERN(Rng, g_Rng);

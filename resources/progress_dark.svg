@@ -37,7 +37,7 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&amp;display=swap');
     :root {
-      --text-color: black;
+      --text-color: white;
       --percentage: 67.69;
 
       --progress: calc(var(--percentage) * 3px);
