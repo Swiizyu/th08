@@ -1597,7 +1597,7 @@ void __fastcall EclExIns::FUN_004251b0(void *instruction)
         if (bullet->sprites.spriteBullet.activeSpriteIndex >= 96 &&
             bullet->sprites.spriteBullet.activeSpriteIndex <= 111)
         {
-            bullet->sprites.spriteBullet.anmFile->SetSprite(&bullet->sprites.spriteBullet, 111);
+            g_BulletManager.bonusAnm->SetSprite(&bullet->sprites.spriteBullet, 111);
         }
     }
 }
@@ -1622,8 +1622,8 @@ void __fastcall EclExIns::FUN_00425290(void *instruction)
         if (bullet->sprites.spriteBullet.activeSpriteIndex >= 96 &&
             bullet->sprites.spriteBullet.activeSpriteIndex <= 111)
         {
-            bullet->sprites.spriteBullet.anmFile->SetSprite(&bullet->sprites.spriteBullet,
-                                                            bullet->sprites.spriteBullet.baseSpriteIndex);
+            g_BulletManager.bonusAnm->SetSprite(&bullet->sprites.spriteBullet,
+                                                bullet->sprites.spriteBullet.baseSpriteIndex);
         }
     }
     *(f32 *)((u8 *)&g_Supervisor + 0x188) = 1.0f / *(i32 *)((u8 *)instruction + 0x10);
