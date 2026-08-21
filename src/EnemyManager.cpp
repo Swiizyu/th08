@@ -1850,12 +1850,12 @@ ZunResult EffectManager::AddedCallback(EffectManager *effectManager)
     return ZUN_SUCCESS;
 }
 
-static ChainCallbackResult __fastcall EffectManagerUpdateCallback(EffectManager *effectManager)
+ChainCallbackResult EffectManager::OnUpdate(EffectManager *effectManager)
 {
     return effectManager->UpdateEffects();
 }
 
-static ChainCallbackResult __fastcall EffectManagerDrawCallback(EffectManager *effectManager)
+ChainCallbackResult EffectManager::OnDraw(EffectManager *effectManager)
 {
     return effectManager->DrawEffects();
 }
@@ -1867,7 +1867,7 @@ ZunResult EffectManager::RegisterChain()
 
     effectManager = &g_EffectManager;
     effectManager->ResetEffects();
-    g_EffectManagerCalcChain.SetCallback((ChainCallback)EffectManagerUpdateCallback);
+    g_EffectManagerCalcChain.SetCallback((ChainCallback)EffectManager::OnUpdate);
     *(ChainLifetimeCallback *)0x577ec4 = (ChainLifetimeCallback)EffectManager::AddedCallback;
     *(ChainLifetimeCallback *)0x577ec8 = (ChainLifetimeCallback)EffectManager::DeletedCallback;
     *(EffectManager **)0x577ed8 = effectManager;
@@ -1875,7 +1875,7 @@ ZunResult EffectManager::RegisterChain()
     {
         return ZUN_ERROR;
     }
-    g_EffectManagerDrawChain.SetCallback((ChainCallback)EffectManagerDrawCallback);
+    g_EffectManagerDrawChain.SetCallback((ChainCallback)EffectManager::OnDraw);
     *(EffectManager **)0x577ef8 = effectManager;
     g_Chain.AddToDrawChain(&g_EffectManagerDrawChain, 12);
     return ZUN_SUCCESS;
