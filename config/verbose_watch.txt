@@ -1,4 +1,4 @@
-0x43ce60  # Chain::CreateElem (regression-33: operator new call target)
-0x4464c8  # Supervisor::StartupThread (regression-33)
-0x4114e0  # Effect::FUN_00414e0 (batch O: ctor-in-branch + else-nest + literal\)
-0x4117b0  # Effect::FUN_004117b0 (batch O: full rewrite)
+0x43ce60
+0x4464c8
+0x4114e0
+0x4117b0
