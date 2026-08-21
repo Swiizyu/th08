@@ -30,6 +30,7 @@ DIFFABLE_STATIC(i32, g_EffectManagerState);
 void FUN_004235a0();
 
 DIFFABLE_EXTERN(i32, g_GameManagerUnknown4e3d28);
+DIFFABLE_STATIC(void *, g_EclUnknown4ea28c);
 DIFFABLE_STATIC(AnmVm, g_EclEffectVm0);
 DIFFABLE_STATIC(AnmVm, g_EclEffectVm1);
 DIFFABLE_STATIC_ARRAY_ASSIGN(const char *, 9, g_StageEnemyAnms) = {
@@ -1102,7 +1103,7 @@ void __fastcall EclExIns::FUN_00424170(void *)
     effect = g_EffectManager.SpawnSpecialEffect(58, (Float3 *)((u8 *)this + 0x2d34), 9, 1, -1);
     effect = g_EffectManager.SpawnSpecialEffect(58, (Float3 *)((u8 *)this + 0x2d34), 10, 1, -1);
     g_EffectManager.effectAnm->SetAndExecuteScriptIdx(&effect->vm, 101);
-    *(void (**)())0x4ea28c = FUN_004235a0;
+    g_EclUnknown4ea28c = (void *)FUN_004235a0;
 }
 
 // FUNCTION: th08 0x424130
