@@ -26,7 +26,7 @@ th08::PauseMenu::OnUpdate,0x4037b0,function
 th08::Float3::Float3,0x404720,function
 th08::PauseMenu::OnDraw,0x404750,function
 th08::RetryMenu::OnUpdate,0x404890,function
-th08::Spellcard::FUN_00405260,0x405260,function
+th08::Spellcard::IsCaptured,0x405260,function
 th08::PlstPlayCounts::IncrementTotalAttempts,0x405280,function
 th08::RetryMenu::OnDraw,0x4052b0,function
 th08::AsciiManager::OnDrawHighPrioImpl,0x405420,function
