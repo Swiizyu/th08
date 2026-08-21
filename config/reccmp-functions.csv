@@ -502,8 +502,8 @@ th08::Supervisor::IsHUDRedrawEnabled,0x438a71,function
 th08::Gui::FUN_00438a89,0x438a89,function
 th08::Gui::FUN_00438f58,0x438f58,function
 th08::IsInitialStageLoad,0x438fe9,function
-FUN_00438ff3,0x438ff3,function
-th08::IsDisableResourceReload,0x438ffd,function
+th08::GuiReleaseResourcesOnRestart,0x438ff3,function
+th08::GuiKeepStageResources,0x438ffd,function
 FUN_00439007,0x439007,function
 FUN_00439050,0x439050,function
 FUN_00439093,0x439093,function
