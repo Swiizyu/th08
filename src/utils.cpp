@@ -81,6 +81,7 @@ D3DXVECTOR3 *WINAPI D3DXVec3CatmullRom(D3DXVECTOR3 *out, const D3DXVECTOR3 *v0, 
     return out;
 }
 
+#pragma function(memset, strcpy)
 char *__fastcall ConvertToFullWidthDigits(i32 value, i32 digits)
 {
     i32 place;
