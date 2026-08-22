@@ -190,7 +190,7 @@ struct EnemyManager
 
     i32 DespawnAllEnemies(i32 param_1, i32 param_2);
     Enemy *SpawnEnemy1(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08, i32 flag);
-    Enemy *SpawnEnemy2(i32 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08, void *eclData);
+    Enemy *SpawnEnemy2(i32 timeline, Float3 *position, i32 health, i32 arg4, i32 field2e08, void *eclData);
     void FUN_0042c3b0();
 
     Enemy enemyTemplate;
