@@ -2889,12 +2889,18 @@ void __fastcall Enemy::FUN_00421300(void *instruction)
     *this->FUN_00420950((u8 *)instruction + 0xc, *(u16 *)((u8 *)instruction + 0xa), 0) = result;
 }
 
-// FUNCTION: th08 0x4213f0
-#pragma var_order(i, entry)
+#pragma var_order(i, entry, v0x14, v0x18, v0x1c, v0x20, v0x24, v0x28, v0x10)
 void __fastcall Enemy::FUN_004213f0(void *instruction)
 {
     i32 i;
     u8 *entry;
+    i32 v0x10;
+    i32 v0x14;
+    i32 v0x18;
+    i32 v0x1c;
+    i32 v0x20;
+    i32 v0x24;
+    i32 v0x28;
 
     entry = *(u8 **)((u8 *)this + 0x2ca0) + 0x9c;
     for (i = 0; i < 8; i++, entry += 0x30)
@@ -2905,72 +2911,70 @@ void __fastcall Enemy::FUN_004213f0(void *instruction)
         }
         *(ZunTimer *)(entry + 4) = 0;
         *(f32 *)(entry + 0x2c) = *(f32 *)((u8 *)instruction + 0xc);
-        i32 intVal;
-        f32 floatVal;
         if ((*(u16 *)((u8 *)instruction + 0xa) & 2) != 0)
         {
-            intVal = this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x10));
+            v0x10 = this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x10));
         }
         else
         {
-            intVal = *(i32 *)((u8 *)instruction + 0x10);
+            v0x10 = *(i32 *)((u8 *)instruction + 0x10);
         }
-        *(i32 *)(entry + 0x10) = intVal;
+        *(i32 *)(entry + 0x10) = v0x10;
         if ((*(u16 *)((u8 *)instruction + 0xa) & 4) != 0)
         {
-            intVal = this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x14));
+            v0x14 = this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x14));
         }
         else
         {
-            intVal = *(i32 *)((u8 *)instruction + 0x14);
+            v0x14 = *(i32 *)((u8 *)instruction + 0x14);
         }
-        *(i32 *)(entry + 0x14) = intVal;
+        *(i32 *)(entry + 0x14) = v0x14;
         if ((*(u16 *)((u8 *)instruction + 0xa) & 8) != 0)
         {
-            intVal = this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x18));
+            v0x18 = this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x18));
         }
         else
         {
-            intVal = *(i32 *)((u8 *)instruction + 0x18);
+            v0x18 = *(i32 *)((u8 *)instruction + 0x18);
         }
-        *(i32 *)(entry + 0x18) = intVal;
+        *(i32 *)(entry + 0x18) = v0x18;
         *(i32 *)entry = *(i32 *)(0x4c6c90 + *(i32 *)(entry + 0x14) * 4);
         if ((*(u16 *)((u8 *)instruction + 0xa) & 0x10) != 0)
         {
-            floatVal = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x1c));
+            v0x1c = *(i32 *)&this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x1c));
         }
         else
         {
-            floatVal = *(f32 *)((u8 *)instruction + 0x1c);
+            v0x1c = *(i32 *)((u8 *)instruction + 0x1c);
         }
-        *(f32 *)(entry + 0x1c) = floatVal;
+        *(i32 *)(entry + 0x1c) = v0x1c;
         if ((*(u16 *)((u8 *)instruction + 0xa) & 0x20) != 0)
         {
-            floatVal = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x20));
+            v0x20 = *(i32 *)&this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x20));
         }
         else
         {
-            floatVal = *(f32 *)((u8 *)instruction + 0x20);
+            v0x20 = *(i32 *)((u8 *)instruction + 0x20);
         }
-        *(f32 *)(entry + 0x20) = floatVal;
+        *(i32 *)(entry + 0x20) = v0x20;
         if ((*(u16 *)((u8 *)instruction + 0xa) & 0x40) != 0)
         {
-            floatVal = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x24));
+            v0x24 = *(i32 *)&this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x24));
         }
         else
         {
-            floatVal = *(f32 *)((u8 *)instruction + 0x24);
+            v0x24 = *(i32 *)((u8 *)instruction + 0x24);
         }
-        *(f32 *)(entry + 0x24) = floatVal;
+        *(i32 *)(entry + 0x24) = v0x24;
         if ((*(u16 *)((u8 *)instruction + 0xa) & 0x80) != 0)
         {
-            floatVal = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x28));
+            v0x28 = *(i32 *)&this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x28));
         }
         else
         {
-            floatVal = *(f32 *)((u8 *)instruction + 0x28);
+            v0x28 = *(i32 *)((u8 *)instruction + 0x28);
         }
-        *(f32 *)(entry + 0x28) = floatVal;
+        *(i32 *)(entry + 0x28) = v0x28;
         *(i32 *)entry = 1;
         break;
     }
