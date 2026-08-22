@@ -437,14 +437,13 @@ i32 Effect::FUN_00410bb0()
 }
 
 // FUNCTION: th08 0x4114e0
-#pragma var_order(factor, i, obj, angle, dir, speed)
+#pragma var_order(factor, i, obj, angle)
 i32 Effect::FUN_004114e0()
 {
     f32 factor;
     i32 i;
     void *obj;
     f32 angle;
-    f32 speed;
 
     if (this->timer < 40)
     {
@@ -460,7 +459,6 @@ i32 Effect::FUN_004114e0()
         {
             ScreenEffect::RegisterChain(SCREEN_EFFECT_PULSE, 8, 1, 0x8ff08080, 0, 21);
             angle = *(f32 *)((u8 *)this + 0x318) + ZUN_PI / 4.0f;
-            speed = *(f32 *)((u8 *)this + 0x314) * 0.7071067f;
             Float3 dir;
 
             g_AnmManager->FUN_00464b00((AnmVm *)this, *(VertexTex1DiffuseXyzrhw **)((u8 *)this + 0x358),
@@ -471,13 +469,13 @@ i32 Effect::FUN_004114e0()
                 {
                     angle -= ZUN_2PI;
                 }
-                dir.FromAngleMagnitude(angle, speed);
+                dir.FromAngleMagnitude(angle, *(f32 *)((u8 *)this + 0x314) * 0.7071067f);
                 dir += *(Float3 *)((u8 *)this + 0x2e0);
-                obj = g_Player.FUN_0044dfa0((Float2 *)&dir, speed * 8.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 60, 70);
+                obj = g_Player.FUN_0044dfa0((Float2 *)&dir, dir.y * 8.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 60, 70);
                 *(i32 *)((u8 *)obj + 0x38) = 4;
                 *(f32 *)((u8 *)obj + 0x20) = AddNormalizeAngle(angle, ZUN_PI / 2.0f);
                 angle = *(f32 *)((u8 *)obj + 0x20);
-                obj = g_Player.FUN_0044de60((Float2 *)&dir, speed * 4.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 6, 100);
+                obj = g_Player.FUN_0044de60((Float2 *)&dir, dir.y * 4.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 6, 100);
                 *(f32 *)((u8 *)obj + 0x20) = angle;
             }
         }
@@ -487,7 +485,7 @@ i32 Effect::FUN_004114e0()
 }
 
 // FUNCTION: th08 0x4117b0
-#pragma var_order(factor, radius, i, obj, angle, dir, speed)
+#pragma var_order(factor, radius, i, obj, angle)
 i32 Effect::FUN_004117b0()
 {
     f32 factor;
@@ -495,7 +493,6 @@ i32 Effect::FUN_004117b0()
     i32 i;
     void *obj;
     f32 angle;
-    f32 speed;
 
     *(f32 *)((u8 *)this + 0x318) = AddNormalizeAngle(*(f32 *)((u8 *)this + 0x318),
         (*(i32 *)((u8 *)this + 0x328) & 1) ? 0.03926991f : -0.03926991f);
@@ -516,7 +513,6 @@ i32 Effect::FUN_004117b0()
             ScreenEffect::RegisterChain(SCREEN_EFFECT_SHAKE, 16, 8, 0, 0, 21);
             ScreenEffect::RegisterChain(SCREEN_EFFECT_PULSE, 8, 1, 0x8f6060f0, 0, 21);
             angle = *(f32 *)((u8 *)this + 0x318) + ZUN_PI / 4.0f;
-            speed = *(f32 *)((u8 *)this + 0x314) * 0.7071067f;
             Float3 dir;
 
             g_AnmManager->FUN_00464b00((AnmVm *)this, *(VertexTex1DiffuseXyzrhw **)((u8 *)this + 0x358),
@@ -527,13 +523,13 @@ i32 Effect::FUN_004117b0()
                 {
                     angle -= ZUN_2PI;
                 }
-                dir.FromAngleMagnitude(angle, speed);
+                dir.FromAngleMagnitude(angle, *(f32 *)((u8 *)this + 0x314) * 0.7071067f);
                 dir += *(Float3 *)((u8 *)this + 0x2e0);
-                obj = g_Player.FUN_0044dfa0((Float2 *)&dir, speed * 8.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 60, 100);
+                obj = g_Player.FUN_0044dfa0((Float2 *)&dir, dir.y * 8.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 60, 100);
                 *(i32 *)((u8 *)obj + 0x38) = 2;
                 *(f32 *)((u8 *)obj + 0x20) = AddNormalizeAngle(angle, ZUN_PI / 2.0f);
                 angle = *(f32 *)((u8 *)obj + 0x20);
-                obj = g_Player.FUN_0044de60((Float2 *)&dir, speed * 4.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 6, 150);
+                obj = g_Player.FUN_0044de60((Float2 *)&dir, dir.y * 4.0f, *(f32 *)((u8 *)this + 0x320) * 4.0f, 6, 150);
                 *(f32 *)((u8 *)obj + 0x20) = angle;
             }
         }
@@ -1575,7 +1571,11 @@ void __fastcall Enemy::FUN_00424c40(void *)
     bullet = (Bullet *)0xf6f710;
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
-        if (bullet->state == 0 || (bullet->flags & *(u32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x18)) == 0)
+        if (bullet->state == 0)
+        {
+            continue;
+        }
+        if ((bullet->flags & *(u32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x18)) == 0)
         {
             continue;
         }
@@ -1622,7 +1622,11 @@ void __fastcall EclExIns::ReisenFreezeBullets(void *)
     bullet = (Bullet *)0xf6f710;
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
-        if (bullet->state == 0 || (bullet->flags & *(u32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x18)) == 0)
+        if (bullet->state == 0)
+        {
+            continue;
+        }
+        if ((bullet->flags & *(u32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x18)) == 0)
         {
             continue;
         }
