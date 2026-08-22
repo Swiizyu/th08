@@ -116,7 +116,11 @@ struct AsciiManager
         this->isSelected = selected;
     }
 
-    void SetScale(float scaleX, float scaleY);
+    void SetScale(float scaleX, float scaleY)
+    {
+        this->scaleX = scaleX;
+        this->scaleY = scaleY;
+    }
 
     void UpdateVms()
     {

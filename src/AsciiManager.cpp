@@ -156,13 +156,6 @@ ZunBool GameManager::IsSpellNumberInRange(i32 firstSpellNumber, i32 lastSpellNum
                : 0;
 }
 
-// FUNCTION: th08 0x42f2f0
-void AsciiManager::SetScale(float scaleX, float scaleY)
-{
-    this->scaleX = scaleX;
-    this->scaleY = scaleY;
-}
-
 // FUNCTION: th08 0x402130
 AsciiManagerString::AsciiManagerString()
 {
