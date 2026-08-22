@@ -347,7 +347,7 @@ void Item::CollectPowerSmall()
             i++;
         }
         oldPowerLevel = i;
-        g_Gui.flags.powerDisplayUpdateFrames = 0;
+        *(u8 *)((u8 *)&g_GameManager + 0x3dba8) = 0;
         g_GameManager.AddPower(1);
         if (g_GameManager.GetPower() >= 128)
         {
