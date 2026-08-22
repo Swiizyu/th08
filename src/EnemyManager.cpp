@@ -2553,10 +2553,7 @@ Effect *EffectManager::SpawnSpecialEffect2(i32 effectId, Float3 *position, Float
     {
         effect->active = 0;
     }
-    if (g_ReplayManager != NULL)
-    {
-        g_ReplayManager->inputFlags |= 0x400;
-    }
+    g_ReplayManager->inputFlags |= 0x400;
     return effect;
 }
 
