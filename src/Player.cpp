@@ -3741,10 +3741,9 @@ void __fastcall Player::FUN_0044fb70(u8 *data, void *shotData)
 // FUNCTION: th08 0x44fd80
 i32 __fastcall Player::FUN_0044fd80(u8 *data, i32 frame, void *shotData)
 {
-    PlayerShotData *shot = (PlayerShotData *)shotData;
-    if (frame % shot->interval == shot->phase)
+    if (frame % ((PlayerShotData *)shotData)->interval == ((PlayerShotData *)shotData)->phase)
     {
-        this->FUN_0044fb70(data, shot);
+        this->FUN_0044fb70(data, (PlayerShotData *)shotData);
         return 1;
     }
     return 0;
