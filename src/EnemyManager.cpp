@@ -2888,24 +2888,72 @@ void __fastcall Enemy::FUN_00421300(void *instruction)
 // FUNCTION: th08 0x4213f0
 void __fastcall Enemy::FUN_004213f0(void *instruction)
 {
-    u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
-    u8 *entry = context + 0x9c;
-    f32 key = *(f32 *)((u8 *)instruction + 0xc);
+    u8 *entry = *(u8 **)((u8 *)this + 0x2ca0) + 0x9c;
     for (i32 i = 0; i < 8; i++, entry += 0x30)
     {
-        if (*(i32 *)entry != 0 && *(f32 *)(entry + 0x2c) != key)
+        if (*(i32 *)entry != 0 && *(f32 *)(entry + 0x2c) != *(f32 *)((u8 *)instruction + 0xc))
         {
             continue;
         }
-        ((ZunTimer *)(entry + 4))->SetCurrent(0);
-        *(f32 *)(entry + 0x2c) = key;
-        *(i32 *)(entry + 0x10) = (i32)this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x10));
-        *(i32 *)(entry + 0x14) = (i32)this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x14));
-        *(i32 *)(entry + 0x18) = (i32)this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x18));
-        *(f32 *)(entry + 0x1c) = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x1c));
-        *(f32 *)(entry + 0x20) = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x20));
-        *(f32 *)(entry + 0x24) = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x24));
-        *(f32 *)(entry + 0x28) = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x28));
+        *(ZunTimer *)(entry + 4) = 0;
+        *(f32 *)(entry + 0x2c) = *(f32 *)((u8 *)instruction + 0xc);
+        if ((*(u16 *)((u8 *)instruction + 0xa) & 2) != 0)
+        {
+            *(i32 *)(entry + 0x10) = this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x10));
+        }
+        else
+        {
+            *(i32 *)(entry + 0x10) = *(i32 *)((u8 *)instruction + 0x10);
+        }
+        if ((*(u16 *)((u8 *)instruction + 0xa) & 4) != 0)
+        {
+            *(i32 *)(entry + 0x14) = this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x14));
+        }
+        else
+        {
+            *(i32 *)(entry + 0x14) = *(i32 *)((u8 *)instruction + 0x14);
+        }
+        if ((*(u16 *)((u8 *)instruction + 0xa) & 8) != 0)
+        {
+            *(i32 *)(entry + 0x18) = this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x18));
+        }
+        else
+        {
+            *(i32 *)(entry + 0x18) = *(i32 *)((u8 *)instruction + 0x18);
+        }
+        *(i32 *)entry = *(i32 *)(0x4c6c90 + *(i32 *)(entry + 0x14) * 4);
+        if ((*(u16 *)((u8 *)instruction + 0xa) & 0x10) != 0)
+        {
+            *(f32 *)(entry + 0x1c) = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x1c));
+        }
+        else
+        {
+            *(f32 *)(entry + 0x1c) = *(f32 *)((u8 *)instruction + 0x1c);
+        }
+        if ((*(u16 *)((u8 *)instruction + 0xa) & 0x20) != 0)
+        {
+            *(f32 *)(entry + 0x20) = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x20));
+        }
+        else
+        {
+            *(f32 *)(entry + 0x20) = *(f32 *)((u8 *)instruction + 0x20);
+        }
+        if ((*(u16 *)((u8 *)instruction + 0xa) & 0x40) != 0)
+        {
+            *(f32 *)(entry + 0x24) = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x24));
+        }
+        else
+        {
+            *(f32 *)(entry + 0x24) = *(f32 *)((u8 *)instruction + 0x24);
+        }
+        if ((*(u16 *)((u8 *)instruction + 0xa) & 0x80) != 0)
+        {
+            *(f32 *)(entry + 0x28) = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x28));
+        }
+        else
+        {
+            *(f32 *)(entry + 0x28) = *(f32 *)((u8 *)instruction + 0x28);
+        }
         *(i32 *)entry = 1;
         break;
     }
