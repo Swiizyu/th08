@@ -580,7 +580,8 @@ i32 Effect::FUN_00413070()
     else
     {
         factor = ((f32)this->timer - 30.0f) / 30.0f;
-        factor = factor * factor * factor;
+        factor = factor * factor;
+        factor = factor * factor;
         *(f32 *)((u8 *)this + 0x32c) = 192.0f * factor + 0.0001f;
         *(f32 *)((u8 *)this + 0x320) = 80.0f * factor + 3.0f;
     }
@@ -1857,7 +1858,7 @@ void EclExIns::FUN_0042deb0()
         *(Float3 *)((u8 *)this + 0x2d34) - *(Float3 *)((u8 *)this + 0x2d58);
     *(Float3 *)((u8 *)this + 0x2d58) = *(Float3 *)((u8 *)this + 0x2d34);
 
-    if ((*(u32 *)((u8 *)this + 0x3324) & 0x40000) == 0)
+    if (((*(u32 *)((u8 *)this + 0x3324) >> 18) & 1) == 0)
     {
         *(f32 *)((u8 *)this + 0x2d34) +=
             *(f32 *)((u8 *)&g_Supervisor + 0x188) * *(f32 *)((u8 *)this + 0x2d4c);
