@@ -46,6 +46,7 @@ th08::g_SpellcardCountPerStage,0x4c6c68,global
 th08::g_EclExInsn,0x4c6cb0,global
 th08::g_EffectTemplates,0x4c6d30,global
 th08::g_ClearStageBonuses,0x4c7158,global
+th08::g_SpellcardMusicInfo,0x4c7670,global
 th08::g_StageBgmIndices,0x4c7240,global
 th08::g_AmPmStrings,0x4c72bc,global
 th08::g_LoadingAnms,0x4c72c4,global
