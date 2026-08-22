@@ -3125,7 +3125,7 @@ ZunBool Enemy::FUN_0041fd90()
 {
     ZunBool result;
 
-    if (((*(u32 *)this & 1) != 0) && ((*(u32 *)this >> 2) & 1) != 0)
+    if (((Spellcard *)this)->spellcard_fun_004178a0() && ((*(u32 *)this >> 2) & 1) != 0)
     {
         result = true;
     }
