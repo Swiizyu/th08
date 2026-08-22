@@ -3330,24 +3330,21 @@ void Player::ScoreGraze(Float3 *position, i32 suppressTimeOrbEffects)
         g_GameManager.AddToYoukaiGauge(100, 0);
     }
 
-    if (g_GameManager.IsSoloHuman())
+    if (!g_GameManager.IsSoloHuman() || g_GameManager.shotType == 0xa)
     {
-        if (g_GameManager.shotType == 0xa)
+        if (FUN_0042f1f0(&g_EnemyManager) != 0)
         {
-            if (FUN_0042f1f0(&g_EnemyManager) != 0)
+            if (g_GameManager.GaugeIsExtremelyYoukai())
             {
-                if (g_GameManager.GaugeIsExtremelyYoukai())
+                g_ItemManager.SpawnItem(position, ITEM_TIME2, 1);
+                if (suppressTimeOrbEffects == 0)
                 {
-                    g_ItemManager.SpawnItem(position, ITEM_TIME2, 1);
-                    if (suppressTimeOrbEffects == 0)
+                    if (g_Spellcard.IsActive())
                     {
-                        if (g_Spellcard.IsActive())
+                        g_ItemManager.SpawnItem(position, ITEM_TIME2, 1);
+                        if (!g_GameManager.IsSoloYoukai())
                         {
                             g_ItemManager.SpawnItem(position, ITEM_TIME2, 1);
-                            if (!g_GameManager.IsSoloYoukai())
-                            {
-                                g_ItemManager.SpawnItem(position, ITEM_TIME2, 1);
-                            }
                         }
                     }
                 }
