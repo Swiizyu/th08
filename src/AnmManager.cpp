@@ -340,8 +340,8 @@ void AnmVm::SetZRotation(f32 rotation)
 // FUNCTION: th08 0x40ec30
 void AnmVm::FUN_0040ec30(i32 duration, u8 mode, Float3 *initial, Float3 *final)
 {
-    ((ZunTimer *)((u8 *)this + 0x50))->SetCurrent(0);
-    ((ZunTimer *)((u8 *)this + 0xa4))->SetCurrent(duration);
+    *(ZunTimer *)((u8 *)this + 0x50) = 0;
+    *(ZunTimer *)((u8 *)this + 0xa4) = duration;
     *(u8 *)((u8 *)this + 0xf8) = mode;
     *(Float3 *)((u8 *)this + 0x238) = *initial;
     *(Float3 *)((u8 *)this + 0x244) = *final;
@@ -350,8 +350,8 @@ void AnmVm::FUN_0040ec30(i32 duration, u8 mode, Float3 *initial, Float3 *final)
 // FUNCTION: th08 0x40eca0
 void AnmVm::FUN_0040eca0(i32 duration, u8 mode, D3DCOLOR initial, D3DCOLOR final)
 {
-    ((ZunTimer *)((u8 *)this + 0x5c))->SetCurrent(0);
-    ((ZunTimer *)((u8 *)this + 0xb0))->SetCurrent(duration);
+    *(ZunTimer *)((u8 *)this + 0x5c) = 0;
+    *(ZunTimer *)((u8 *)this + 0xb0) = duration;
     *(u8 *)((u8 *)this + 0xf9) = mode;
     *(u8 *)((u8 *)this + 0x27a) = (initial >> 16) & 0xff;
     *(u8 *)((u8 *)this + 0x279) = (initial >> 8) & 0xff;
@@ -364,8 +364,8 @@ void AnmVm::FUN_0040eca0(i32 duration, u8 mode, D3DCOLOR initial, D3DCOLOR final
 // FUNCTION: th08 0x40ed50
 void AnmVm::FUN_0040ed50(i32 duration, u8 mode, u8 initial, u8 final)
 {
-    ((ZunTimer *)((u8 *)this + 0x68))->SetCurrent(0);
-    ((ZunTimer *)((u8 *)this + 0xbc))->SetCurrent(duration);
+    *(ZunTimer *)((u8 *)this + 0x68) = 0;
+    *(ZunTimer *)((u8 *)this + 0xbc) = duration;
     *(u8 *)((u8 *)this + 0xfa) = mode;
     *(u8 *)((u8 *)this + 0x27b) = initial;
     *(u8 *)((u8 *)this + 0x27f) = final;
@@ -374,8 +374,8 @@ void AnmVm::FUN_0040ed50(i32 duration, u8 mode, u8 initial, u8 final)
 // FUNCTION: th08 0x40eda0
 void AnmVm::FUN_0040eda0(i32 duration, u8 mode, Float2 *initial, Float2 *final)
 {
-    ((ZunTimer *)((u8 *)this + 0x80))->SetCurrent(0);
-    ((ZunTimer *)((u8 *)this + 0xd4))->SetCurrent(duration);
+    *(ZunTimer *)((u8 *)this + 0x80) = 0;
+    *(ZunTimer *)((u8 *)this + 0xd4) = duration;
     *(u8 *)((u8 *)this + 0xfc) = mode;
     *(Float2 *)((u8 *)this + 0x268) = *initial;
     *(Float2 *)((u8 *)this + 0x270) = *final;

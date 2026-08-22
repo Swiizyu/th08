@@ -3090,7 +3090,7 @@ i32 __fastcall Enemy::FUN_00421cb0(void *)
 }
 
 // FUNCTION: th08 0x421de0
-void Enemy::FUN_00421de0(i16 a, i16 b, i16 c, i16 d, i16 e, i16 f)
+void __fastcall Enemy::FUN_00421de0(void *unused, i16 a, i16 b, i16 c, i16 d, i16 e, i16 f)
 {
     *(i16 *)((u8 *)this + 0x3332) = a;
     *(i16 *)((u8 *)this + 0x3338) = b;
