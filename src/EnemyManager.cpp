@@ -695,8 +695,8 @@ i32 Effect::FUN_00426280()
 {
     Float3 cameraLookAtInverse;
 
-    cameraLookAtInverse = -*(Float3 *)0x4ea3d0;
-    this->basePosition = *(Float3 *)0x4ea3d0 + *(Float3 *)0x4ea3c4;
+    cameraLookAtInverse = -g_Background.vectors0x6394.vector1;
+    this->basePosition = g_Background.vectors0x6394.vector1 + g_Background.vectors0x6394.vector0;
     this->basePosition.x += g_Rng.GetRandomF32SignedInRange(60.0f) + cameraLookAtInverse.x / 2.0f;
     this->basePosition.y += g_Rng.GetRandomF32SignedInRange(100.0f) - 50.0f + cameraLookAtInverse.y / 2.0f;
     this->basePosition.z += g_Rng.GetRandomF32InRange(100.0f) - 100.0f + cameraLookAtInverse.z / 2.0f;
@@ -767,8 +767,8 @@ i32 Effect::FUN_00426720()
 {
     Float3 cameraLookAtInverse;
 
-    cameraLookAtInverse = -*(Float3 *)0x4ea3d0;
-    this->basePosition = *(Float3 *)0x4ea3d0 + *(Float3 *)0x4ea3c4;
+    cameraLookAtInverse = -g_Background.vectors0x6394.vector1;
+    this->basePosition = g_Background.vectors0x6394.vector1 + g_Background.vectors0x6394.vector0;
     this->basePosition.x += g_Rng.GetRandomF32SignedInRange(60.0f) + cameraLookAtInverse.x / 2.0f;
     this->basePosition.y += g_Rng.GetRandomF32SignedInRange(200.0f) - 200.0f + cameraLookAtInverse.y / 2.0f;
     this->basePosition.z += g_Rng.GetRandomF32InRange(100.0f) - 100.0f + cameraLookAtInverse.z / 2.0f;
@@ -905,8 +905,8 @@ i32 Effect::FUN_00426e70()
 {
     Float3 cameraLookAtInverse;
 
-    cameraLookAtInverse = -*(Float3 *)0x4ea3d0;
-    this->basePosition = *(Float3 *)0x4ea3d0 + *(Float3 *)0x4ea3c4;
+    cameraLookAtInverse = -g_Background.vectors0x6394.vector1;
+    this->basePosition = g_Background.vectors0x6394.vector1 + g_Background.vectors0x6394.vector0;
     this->basePosition.x += g_Rng.GetRandomF32InRange(120.0f) - 60.0f + cameraLookAtInverse.x / 2.0f;
     this->basePosition.y += g_Rng.GetRandomF32InRange(200.0f) - 100.0f + cameraLookAtInverse.y / 2.0f;
     this->basePosition.z += g_Rng.GetRandomF32InRange(100.0f) - 100.0f + cameraLookAtInverse.z / 2.0f;
@@ -1404,12 +1404,12 @@ void __fastcall Enemy::FUN_00423e20(void *)
 void __fastcall Enemy::FUN_004241e0(void *)
 {
     Bullet *bullet;
-    Float3 delta;
     i32 zoneCur;
     i32 zonePrev;
     i32 i;
 
     bullet = &g_BulletManager.bullets[0];
+    Float3 delta;
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
         if (bullet->state == 0)
