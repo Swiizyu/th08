@@ -2221,13 +2221,12 @@ ChainCallbackResult EffectManager::FUN_004281e0()
 }
 
 // FUNCTION: th08 0x428310
-#pragma var_order(delta, transformed)
 void __fastcall FUN_00428310(Effect *effect, Float3 *position)
 {
     Float3 delta;
     Float3 transformed;
 
-    if (*(u8 *)((u8 *)&g_GameManager + 0x12) == 0 && *(u8 *)((u8 *)&g_GameManager + 0x13) == 0)
+    if (g_GameManager.showPauseMenu == 0 && g_GameManager.showRetryMenu == 0)
     {
         transformed = *position + effect->vm.posFinal;
         delta = effect->vm.pos2 - transformed;
@@ -2236,7 +2235,7 @@ void __fastcall FUN_00428310(Effect *effect, Float3 *position)
             delta.x += 32.0f;
             delta.y += 16.0f;
             delta.z = 0.0f;
-            if (!(delta.FUN_0040b500() < 25600.0f))
+            if (delta.FUN_0040b500() < 25600.0f)
             {
                 effect->vm.posInitial.x += 0.0005f;
                 effect->vm.posFinal += delta * effect->vm.posInitial.x;
@@ -2247,7 +2246,7 @@ void __fastcall FUN_00428310(Effect *effect, Float3 *position)
         delta.x -= 32.0f;
         delta.y -= 16.0f;
         delta.z = 0.0f;
-        if (delta.FUN_0040b500() >= 7744.0f)
+        if (delta.FUN_0040b500() < 7744.0f)
         {
             effect->vm.posFinal += delta * 0.02f;
         }
