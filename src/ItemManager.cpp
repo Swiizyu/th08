@@ -516,6 +516,7 @@ void Item::CollectPowerBig()
 }
 
 // FUNCTION: th08 0x4412b0
+#pragma var_order(score, gaugeAmount)
 void Item::CollectTimeOrb()
 {
     i32 score;
