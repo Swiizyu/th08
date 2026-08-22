@@ -1187,7 +1187,7 @@ void __fastcall EclExIns::FUN_00424730(void *)
                   *(f32 *)((u8 *)this + 0x2d8c) - *(f32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x3c), 0.0f);
     Float3 collisionSize(590.0f, 160.0f, 0.0f);
     Float3 grazeSize(590.0f, 128.0f, 0.0f);
-    Float3 center(origin.x + collisionSize.x / 2.0f, origin.y, 0.0f);
+    Float3 center(origin.x + collisionSize.x / 2.0f, grazeSize.z, 0.0f);
 
     if (((ZunTimer *)((u8 *)this + 0x2e14))->FUN_0040ebc0(12))
     {
@@ -1204,7 +1204,7 @@ void __fastcall EclExIns::FUN_00424820(void *)
                   *(f32 *)((u8 *)this + 0x2d38) - *(f32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x3c), 0.0f);
     Float3 collisionSize(590.0f, 240.0f, 0.0f);
     Float3 grazeSize(590.0f, 192.0f, 0.0f);
-    Float3 center(origin.x + collisionSize.x / 2.0f, origin.y, 0.0f);
+    Float3 center(origin.x + collisionSize.x / 2.0f, grazeSize.z, 0.0f);
 
     if (((ZunTimer *)((u8 *)this + 0x2e14))->FUN_0040ebc0(12))
     {
@@ -1221,7 +1221,7 @@ void __fastcall EclExIns::FUN_00424910(void *)
                   *(f32 *)((u8 *)this + 0x2d8c) - *(f32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x3c), 0.0f);
     Float3 collisionSize(590.0f, 288.0f, 0.0f);
     Float3 grazeSize(590.0f, 224.0f, 0.0f);
-    Float3 center(origin.x + collisionSize.x / 2.0f, origin.y, 0.0f);
+    Float3 center(origin.x + collisionSize.x / 2.0f, grazeSize.z, 0.0f);
 
     if (((ZunTimer *)((u8 *)this + 0x2e14))->FUN_0040ebc0(12))
     {
@@ -1578,37 +1578,36 @@ void __fastcall Enemy::FUN_00424c40(void *)
         {
             continue;
         }
-        if ((bullet->flags & *(u32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x18)) == 0)
+        if ((bullet->flags & *(u32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x18)) != 0)
         {
-            continue;
-        }
-        if (*(i16 *)((u8 *)bullet + 0x1fc) == 1)
-        {
-            *(i16 *)((u8 *)bullet + 0x1fc) = 0;
-            *(u32 *)((u8 *)bullet + 0x1f8) = (*(u32 *)((u8 *)bullet + 0x1f8) & ~0x30) | 0x10;
-            *(i8 *)((u8 *)bullet + 0x1f3) = 0;
-            g_BulletManager.bonusAnm->SetSprite((AnmVm *)bullet, *(i16 *)((u8 *)bullet + 0x214) + 16);
-            *(i8 *)((u8 *)bullet + 0x10b4) = 1;
-            ((Float3 *)((u8 *)bullet + 0xd50))
-                ->FromAngleMagnitude(*(f32 *)((u8 *)bullet + 0xd74),
-                                     *(f32 *)((u8 *)&g_Supervisor + 0x188) *
-                                         *(f32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x3c));
-        }
-        else if (*(i16 *)((u8 *)bullet + 0x1fc) == 0)
-        {
-            *(i16 *)((u8 *)bullet + 0x1fc) = 2;
-            *(i8 *)((u8 *)bullet + 0x1f3) = 0;
-            ((AnmVm *)bullet)->FUN_0040ed50(15, 0, 0, 255);
-        }
-        else
-        {
-            *(i16 *)((u8 *)bullet + 0x1fc) = 1;
-            *(u32 *)((u8 *)bullet + 0x1f8) &= ~0x30;
-            g_BulletManager.bonusAnm->SetSprite((AnmVm *)bullet, *(i16 *)((u8 *)bullet + 0x214) - 16);
-            *(i8 *)((u8 *)bullet + 0x10b4) = 0;
-            ((Float3 *)((u8 *)bullet + 0xd50))
-                ->FromAngleMagnitude(*(f32 *)((u8 *)bullet + 0xd74),
-                                     *(f32 *)((u8 *)&g_Supervisor + 0x188) * *(f32 *)((u8 *)bullet + 0xd68));
+            if (*(i16 *)((u8 *)bullet + 0x1fc) == 1)
+            {
+                *(i16 *)((u8 *)bullet + 0x1fc) = 0;
+                *(u32 *)((u8 *)bullet + 0x1f8) = (*(u32 *)((u8 *)bullet + 0x1f8) & ~0x30) | 0x10;
+                *(i8 *)((u8 *)bullet + 0x1f3) = 0;
+                g_BulletManager.bonusAnm->SetSprite((AnmVm *)bullet, *(i16 *)((u8 *)bullet + 0x214) + 16);
+                *(i8 *)((u8 *)bullet + 0x10b4) = 1;
+                ((Float3 *)((u8 *)bullet + 0xd50))
+                    ->FromAngleMagnitude(*(f32 *)((u8 *)bullet + 0xd74),
+                                         *(f32 *)((u8 *)&g_Supervisor + 0x188) *
+                                             *(f32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x3c));
+            }
+            else if (*(i16 *)((u8 *)bullet + 0x1fc) == 0)
+            {
+                *(i16 *)((u8 *)bullet + 0x1fc) = 2;
+                *(i8 *)((u8 *)bullet + 0x1f3) = 0;
+                ((AnmVm *)bullet)->FUN_0040ed50(15, 0, 0, 255);
+            }
+            else
+            {
+                *(i16 *)((u8 *)bullet + 0x1fc) = 1;
+                *(u32 *)((u8 *)bullet + 0x1f8) &= ~0x30;
+                g_BulletManager.bonusAnm->SetSprite((AnmVm *)bullet, *(i16 *)((u8 *)bullet + 0x214) - 16);
+                *(i8 *)((u8 *)bullet + 0x10b4) = 0;
+                ((Float3 *)((u8 *)bullet + 0xd50))
+                    ->FromAngleMagnitude(*(f32 *)((u8 *)bullet + 0xd74),
+                                         *(f32 *)((u8 *)&g_Supervisor + 0x188) * *(f32 *)((u8 *)bullet + 0xd68));
+            }
         }
     }
 }
@@ -1629,30 +1628,29 @@ void __fastcall EclExIns::ReisenFreezeBullets(void *)
         {
             continue;
         }
-        if ((bullet->flags & *(u32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x18)) == 0)
+        if ((bullet->flags & *(u32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x18)) != 0)
         {
-            continue;
-        }
-        if (*(i16 *)((u8 *)bullet + 0x1fc) == 1)
-        {
-            *(i16 *)((u8 *)bullet + 0x1fc) = 0;
-            *(u32 *)((u8 *)bullet + 0x1f8) = (*(u32 *)((u8 *)bullet + 0x1f8) & ~0x30) | 0x10;
-            g_BulletManager.bonusAnm->SetSprite((AnmVm *)bullet, *(i16 *)((u8 *)bullet + 0x214) + 16);
-            *(i8 *)((u8 *)bullet + 0x10b4) = 1;
-            ((Float3 *)((u8 *)bullet + 0xd50))
-                ->FromAngleMagnitude(*(f32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x38),
-                                     *(f32 *)((u8 *)&g_Supervisor + 0x188) *
-                                         *(f32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x3c));
-        }
-        else
-        {
-            *(i16 *)((u8 *)bullet + 0x1fc) = 1;
-            *(u32 *)((u8 *)bullet + 0x1f8) &= ~0x30;
-            g_BulletManager.bonusAnm->SetSprite((AnmVm *)bullet, *(i16 *)((u8 *)bullet + 0x214) - 16);
-            *(i8 *)((u8 *)bullet + 0x10b4) = 0;
-            ((Float3 *)((u8 *)bullet + 0xd50))
-                ->FromAngleMagnitude(*(f32 *)((u8 *)bullet + 0xd74),
-                                     *(f32 *)((u8 *)&g_Supervisor + 0x188) * *(f32 *)((u8 *)bullet + 0xd68));
+            if (*(i16 *)((u8 *)bullet + 0x1fc) == 1)
+            {
+                *(i16 *)((u8 *)bullet + 0x1fc) = 0;
+                *(u32 *)((u8 *)bullet + 0x1f8) = (*(u32 *)((u8 *)bullet + 0x1f8) & ~0x30) | 0x10;
+                g_BulletManager.bonusAnm->SetSprite((AnmVm *)bullet, *(i16 *)((u8 *)bullet + 0x214) + 16);
+                *(i8 *)((u8 *)bullet + 0x10b4) = 1;
+                ((Float3 *)((u8 *)bullet + 0xd50))
+                    ->FromAngleMagnitude(*(f32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x38),
+                                         *(f32 *)((u8 *)&g_Supervisor + 0x188) *
+                                             *(f32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x3c));
+            }
+            else
+            {
+                *(i16 *)((u8 *)bullet + 0x1fc) = 1;
+                *(u32 *)((u8 *)bullet + 0x1f8) &= ~0x30;
+                g_BulletManager.bonusAnm->SetSprite((AnmVm *)bullet, *(i16 *)((u8 *)bullet + 0x214) - 16);
+                *(i8 *)((u8 *)bullet + 0x10b4) = 0;
+                ((Float3 *)((u8 *)bullet + 0xd50))
+                    ->FromAngleMagnitude(*(f32 *)((u8 *)bullet + 0xd74),
+                                         *(f32 *)((u8 *)&g_Supervisor + 0x188) * *(f32 *)((u8 *)bullet + 0xd68));
+            }
         }
     }
     if (*(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x1c) == 0)
