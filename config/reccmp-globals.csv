@@ -125,7 +125,6 @@ th08::g_EffectManagerCalcChain,0x577ebc,global
 th08::g_EffectManagerDrawChain,0x577edc,global
 th08::g_EnemyManagerDrawChainHighPrio,0x577f00,global
 th08::g_EnemyManager,0x577f20,global
-th08::g_EnemyBossIds,0x9dcda0,global
 th08::g_Gap80A0C0,0x80a0c0,global
 th08::g_GapC0E0FF,0xc0e0ff,global
 th08::g_PlayerObjPtrs,0xf54cc0,global

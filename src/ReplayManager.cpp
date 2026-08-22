@@ -56,8 +56,6 @@ char *SprintfReturnEnd(char *dst, const char *fmt, ...)
     return dst + len;
 }
 
-DIFFABLE_STATIC(i32, g_EnemyBossIds);
-
 // FUNCTION: th08 0x42f1f0
 i32 __fastcall FUN_0042f1f0(th08::EnemyManager *enemyManager)
 {
@@ -65,7 +63,7 @@ i32 __fastcall FUN_0042f1f0(th08::EnemyManager *enemyManager)
 
     for (i = 0; i < 8; i++)
     {
-        if (((i32 *)&g_EnemyBossIds)[i] != 0)
+        if (*(i32 *)((u8 *)enemyManager + i * 4 + 0x9dcda0) != 0)
         {
             return 1;
         }
