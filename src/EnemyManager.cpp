@@ -2014,14 +2014,14 @@ ZunResult EffectManager::AddedCallback(EffectManager *effectManager)
     g_EffectManagerState = 2;
     if (!IsDisableResourceReload())
     {
-        if (!g_GameManager.IsSpellPractice() || *(i16 *)((u8 *)&g_GameManager + 0xdbb0) < 0xd8)
+        if (!g_GameManager.IsSpellPractice() || g_GameManager.currentSpellCardNumber < 0xd8)
         {
             effectManager->effectAnm2 = g_AnmManager->PreloadAnm(9, g_EffectAnms[g_GameManager.currentStage]);
         }
         else
         {
             effectManager->effectAnm2 = g_AnmManager->PreloadAnm(
-                9, *(const char **)(0x4c7144 + *(i16 *)((u8 *)&g_GameManager + 0xdbb0) * 4));
+                9, *(const char **)(0x4c7144 + g_GameManager.currentSpellCardNumber * 4));
         }
         if (effectManager->effectAnm2 == NULL)
         {
