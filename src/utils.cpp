@@ -81,14 +81,8 @@ D3DXVECTOR3 *WINAPI D3DXVec3CatmullRom(D3DXVECTOR3 *out, const D3DXVECTOR3 *v0, 
     return out;
 }
 
-char *__fastcall ConvertToFullWidthDigits(i32 value, i32 digits)
-{
-    static char buffer[64];
-    if (digits < 1) digits = 1;
-    if (digits > 30) digits = 30;
-    sprintf(buffer, "%0*d", digits, value);
-    return buffer;
-}
+// Converted to full-width digits -- moved to TitleScreen.cpp (orig sits in the
+// TitleScreen TU and was compiled with the /Os flags used there).
 
 // FUNCTION: th08 0x477024
 D3DXVECTOR3 *WINAPI FUN_00477024(D3DXVECTOR3 *out, const D3DXVECTOR3 *v1, const D3DXVECTOR3 *v2,

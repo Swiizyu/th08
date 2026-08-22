@@ -102,7 +102,7 @@ SpellcardMusicEntry g_SpellcardMusicInfo[] = {{1, 1, "th08_00.mid", 0, FALSE},
                                               {-1, 0, " ", 0, FALSE}};
 
 // FUNCTION: th08 0x439916
-ZunBool GameManager::ShouldPauseMusicInSpellPractice(i32 spellcardNumber)
+ZunBool __fastcall GameManager::ShouldPauseMusicInSpellPractice(i32 spellcardNumber)
 {
     i32 i = 0;
 
@@ -120,7 +120,7 @@ ZunBool GameManager::ShouldPauseMusicInSpellPractice(i32 spellcardNumber)
 }
 
 // FUNCTION: th08 0x439961
-i32 GameManager::GetSongNameSpriteIdx(i32 spellcardNumber)
+i32 __fastcall GameManager::GetSongNameSpriteIdx(i32 spellcardNumber)
 {
     i32 i = 0;
 
@@ -435,14 +435,14 @@ ZunResult GameManager::DeletedCallback(GameManager *gameManager)
         g_Supervisor.curState != SupervisorState_SpellcardPracticeRestart &&
         g_Supervisor.curState != SupervisorState_GameManagerNextStageWeird)
     {
-        g_Supervisor.keepStageResources = TRUE;
+        g_Supervisor.unk168 = TRUE;
     }
     else
     {
-        g_Supervisor.keepStageResources = FALSE;
+        g_Supervisor.unk168 = FALSE;
     }
 
-    if (!g_GameManager.flags.isSpellPractice || g_Supervisor.keepStageResources)
+    if (!g_GameManager.flags.isSpellPractice || g_Supervisor.unk168)
     {
         g_Supervisor.StopAudio();
         if (g_Supervisor.cfg.musicMode == 2 && g_Supervisor.midiOutput != NULL)
@@ -572,17 +572,7 @@ ZunBool GameManager::IsPhantasmUnlocked()
 // FUNCTION: th08 0x43c322
 ZunBool GameManager::IsReplayPractice()
 {
-    ZunBool result;
-
-    if (this->flags.isReplay && g_ReplayManager->replayData->isPractice)
-    {
-        result = TRUE;
-    }
-    else
-    {
-        result = FALSE;
-    }
-    return result;
+    return this->flags.isReplay && g_ReplayManager->replayData->isPractice != 0;
 }
 
 void GameManager::CutChain()

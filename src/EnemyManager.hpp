@@ -95,7 +95,6 @@ struct Enemy
     void __fastcall FUN_00420f40(void *instruction);
     void __fastcall FUN_00421120(void *instruction, f32 interpolation);
     void __fastcall FUN_00421180(void *instruction, f32 interpolation);
-    void __fastcall FUN_00421280(void *instruction);
     void __fastcall FUN_00421300(void *instruction);
     void __fastcall FUN_004213f0(void *instruction);
     void *__fastcall FUN_004215f0(void *instruction);
@@ -109,13 +108,12 @@ struct Enemy
     void __fastcall FUN_00423e20(void *instruction);
     void __fastcall FUN_004241e0(void *instruction);
     void __fastcall FUN_00421e50(void *instruction);
-    void __fastcall FUN_00424a20(void *instruction);
     void __fastcall FUN_00424c40(void *instruction);
     ZunBool FUN_0041f000();
     void FUN_0041f040(i32 x, i32 y, i32 z);
     void FUN_0041f0b0(i32 value);
     void FUN_0041f0e0(i32 value);
-    void FUN_00421de0(i16 a, i16 b, i16 c, i16 d, i16 e, i16 f);
+    void __fastcall FUN_00421de0(void *unused, i16 a, i16 b, i16 c, i16 d, i16 e, i16 f);
     void __fastcall FUN_00421bd0(void *instruction, i16 timelineIndex);
     i32 __fastcall FUN_00421cb0(void *instruction);
     ZunBool FUN_0041fd20();
@@ -128,9 +126,8 @@ struct Enemy
     void FUN_0042bc50();
     void FUN_0042bc90();
     void FUN_0042c180();
-    void FUN_004244f0(void *instruction);
-    void FUN_00424e50(void *instruction);
-    void FUN_004250d0(void *instruction);
+    void __fastcall FUN_004244f0(void *instruction);
+    void __fastcall FUN_00424e50(void *instruction);
     void FUN_0042bcf0();
     void FUN_0042bea0(i32 itemState);
     void FUN_0042c290(Float3 *position, Float3 *hitbox);
@@ -192,8 +189,8 @@ struct EnemyManager
     static void CutChain();
 
     i32 DespawnAllEnemies(i32 param_1, i32 param_2);
-    Enemy *FUN_0042a4e0(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08, i32 flag);
-    Enemy *FUN_0042a680(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08, void *eclData);
+    Enemy *SpawnEnemy1(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08, i32 flag);
+    Enemy *SpawnEnemy2(i32 timeline, Float3 *position, i32 health, i32 arg4, i32 field2e08, void *eclData);
     void FUN_0042c3b0();
 
     Enemy enemyTemplate;

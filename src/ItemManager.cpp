@@ -122,8 +122,8 @@ Item *ItemManager::SpawnItem(Float3 *position, ItemType itemType, i32 state)
             }
         }
 
-        // TODO: Uncomment this when BulletManager is actually done
-        // g_BulletManager.bulletAnm->SetAndExecuteScriptIdx(&item->sprite, itemType + 61);
+        // 0x4403b9: bonusAnm is BulletManager's LAST member (ds:0x160f404 = +0x6ba574).
+        g_BulletManager.bonusAnm->SetAndExecuteScriptIdx(&item->sprite, itemType + 61);
 
         item->sprite.color1.d3dColor = 0xFFFFFFFF;
         item->sprite.zWriteDisabled = true;
@@ -145,7 +145,7 @@ void ItemManager::UpdatePointItemExtendThreshold()
 {
     if (g_GameManager.difficulty < 4)
     {
-        if (g_GameManager.globals->pointItemExtendsSoFar < 6)
+        if ((u32)g_GameManager.globals->pointItemExtendsSoFar < 6)
         {
             g_GameManager.globals->nextPointItemExtendThreshold =
                 g_PointItemExtendThresholds[g_GameManager.globals->pointItemExtendsSoFar];
@@ -158,7 +158,7 @@ void ItemManager::UpdatePointItemExtendThreshold()
     }
     else
     {
-        if (g_GameManager.globals->pointItemExtendsSoFar < 3)
+        if ((u32)g_GameManager.globals->pointItemExtendsSoFar < 3)
         {
             g_GameManager.globals->nextPointItemExtendThreshold =
                 g_ExPointItemExtendThresholds[g_GameManager.globals->pointItemExtendsSoFar];
@@ -339,15 +339,19 @@ void Item::CollectPowerSmall()
     i32 i;
     i32 oldPowerLevel;
 
-    if (g_GameManager.GetPower() < 128)
+    // Orig: cmp/jl+5/jmp over an unconditional jmp = "if (cond) goto" form
+    // (cf. CollectPowerBig's early return, which compiles identically).
+    if (g_GameManager.GetPower() >= 128)
     {
-        i = 0;
+        goto collect_power_small_end;
+    }
+    i = 0;
         while (g_GameManager.GetPower() >= g_PowerUpThresholds[i])
         {
             i++;
         }
         oldPowerLevel = i;
-        g_Gui.flags.powerDisplayUpdateFrames = 0;
+        *(u8 *)((u8 *)&g_GameManager + 0x3dba8) = 0;
         g_GameManager.AddPower(1);
         if (g_GameManager.GetPower() >= 128)
         {
@@ -374,21 +378,21 @@ void Item::CollectPowerSmall()
         {
             g_AsciiManager.CreateScorePopup(&this->currentPosition, 10, 0xffffffff);
         }
-    }
+collect_power_small_end:
     g_GameManager.IncreaseSubrank(1);
 }
 
 // FUNCTION: th08 0x440e40
-#pragma var_order(maximumValue, value, isAbovePoc)
+#pragma var_order(maximumValue, value)
 void Item::CollectPoint()
 {
     i32 maximumValue;
     i32 value;
-    ZunBool isAbovePoc;
 
     maximumValue = g_GameManager.globals->pointItemValue;
-    isAbovePoc = this->currentPosition.y < *(f32 *)((u8 *)g_Player.player1ShtFile + 0x1c);
-    value = isAbovePoc
+    // NB: no declared bool local in orig -- the FP compare gets materialized by
+    // the compiler into an unnamed i32 temp below the this-spill, then tested.
+    value = (this->currentPosition.y < *(f32 *)((u8 *)g_Player.player1ShtFile + 0x1c))
                 ? maximumValue
                 : maximumValue / 2 -
                       (i32)(this->currentPosition.y - *(f32 *)((u8 *)g_Player.player1ShtFile + 0x1c)) *
@@ -422,9 +426,10 @@ void Item::CollectPoint()
     }
     if (g_GameManager.globals->pointItemExtendsSoFar >= 0)
     {
-        ItemManager::UpdatePointItemExtendThreshold();
-        while (g_GameManager.globals->pointItemsCollected >=
-               g_GameManager.globals->nextPointItemExtendThreshold)
+        // Orig loop shape: call at loop top + single jl exit = comma-operator condition.
+        while (ItemManager::UpdatePointItemExtendThreshold(),
+               g_GameManager.globals->pointItemsCollected >=
+                   g_GameManager.globals->nextPointItemExtendThreshold)
         {
             g_GameManager.CollectExtend();
             g_GameManager.globals->pointItemExtendsSoFar++;
@@ -435,16 +440,14 @@ void Item::CollectPoint()
 }
 
 // FUNCTION: th08 0x441020
-#pragma var_order(maximumValue, value, isAbovePoc)
+#pragma var_order(maximumValue, value)
 void Item::CollectPointSmall()
 {
     i32 maximumValue;
     i32 value;
-    ZunBool isAbovePoc;
 
     maximumValue = g_GameManager.globals->pointItemValue;
-    isAbovePoc = this->currentPosition.y < *(f32 *)((u8 *)g_Player.player1ShtFile + 0x1c);
-    value = isAbovePoc
+    value = (this->currentPosition.y < *(f32 *)((u8 *)g_Player.player1ShtFile + 0x1c))
                 ? maximumValue
                 : maximumValue / 2 -
                       (i32)(this->currentPosition.y - *(f32 *)((u8 *)g_Player.player1ShtFile + 0x1c)) *
@@ -519,7 +522,6 @@ void Item::CollectPowerBig()
 void Item::CollectTimeOrb()
 {
     i32 score;
-    i32 gaugeAmount;
 
     if (*(i32 *)((u8 *)&g_Player + 0xe2a7c) == 0)
     {
@@ -554,15 +556,7 @@ void Item::CollectTimeOrb()
     if (*(ZunTimer *)((u8 *)&g_Player + 0xe2adc) == 0)
     {
         score = 111;
-        if (g_Player.isFocus)
-        {
-            gaugeAmount = score;
-        }
-        else
-        {
-            gaugeAmount = -score;
-        }
-        g_GameManager.AddToYoukaiGauge(gaugeAmount, 0);
+        g_GameManager.AddToYoukaiGauge(g_Player.isFocus ? score : -score, 0);
     }
 }
 

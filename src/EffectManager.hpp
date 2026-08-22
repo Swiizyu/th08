@@ -90,6 +90,8 @@ struct EffectManager
     static ZunResult AddedCallback(EffectManager *effectManager);
     static ZunResult DeletedCallback(EffectManager *effectManager);
     static ZunResult RegisterChain();
+    static ChainCallbackResult OnUpdate(EffectManager *effectManager);
+    static ChainCallbackResult OnDraw(EffectManager *effectManager);
     Effect *FUN_004253e0(i32 index);
     Effect *SpawnEffect(i32 effectId, Float3 *position, i32 count, D3DCOLOR color);
     Effect *FUN_00425650(i32 effectId, Float3 *position, Float3 *custom, i32 count, D3DCOLOR color);

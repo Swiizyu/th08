@@ -133,7 +133,7 @@ struct Supervisor
     static ChainCallbackResult DrawFpsCounter(Supervisor *s);
     static ChainCallbackResult OnDraw2(Supervisor *s);
     static ChainCallbackResult DrawLoadingVms(Supervisor *s);
-    void CalculateFps(ZunBool shouldDraw);
+    static void CalculateFps(ZunBool shouldDraw);
     void FUN_00448972();
     ZunResult CheckVersion(const char *version, i32 exeSize, i32 exeChecksum);
 
@@ -177,11 +177,6 @@ struct Supervisor
     }
 
     ZunBool IsSpeedhackDetected()
-    {
-        return this->flags.speedhackDetected;
-    }
-
-    ZunBool IsClearBackBufferOnRefreshEnabled()
     {
         return this->flags.speedhackDetected;
     }
@@ -292,8 +287,8 @@ struct Supervisor
     i32 curState;
     i32 wantedState2;
     ZunBool isInitialStageLoad;
-    ZunBool releaseResourcesOnRestart;
-    ZunBool keepStageResources;
+    ZunBool unk168; // Written by GameManager::DeletedCallback; read by the 0x438ff3 helper
+    ZunBool keepStageResources; // Set on spell practice restart; read by the 0x438ffd helper
     i32 unk170;
     i32 unk174; // Commonly set for screen transitions and decremented once per frame, but never actually used for
                 // anything
@@ -322,11 +317,16 @@ struct Supervisor
     u8 lockCounts[4];
     i32 loadingVmsHaveBeenSetup;
 
+    // These are stored as QPC/GTC outputs in the 0x300..0x338 region.
+    // Packed to 4 so the struct keeps its original 4-byte alignment
+    // (otherwise 64-bit LARGE_INTEGER members add 4 bytes of tail padding).
+#pragma pack(push, 4)
     LARGE_INTEGER perfFrequency;
     LARGE_INTEGER prevPerfCounter;
     LARGE_INTEGER curPerfCounter;
     SYSTEMTIME prevTime;
     SYSTEMTIME curTime;
+#pragma pack(pop)
 
     u32 unk0x338;
     u32 unk0x33c;
@@ -372,10 +372,11 @@ struct ZunTimer
         this->previous = -999;
     }
 
-    void Tick()
+    i32 Tick()
     {
         this->previous = this->current;
         g_Supervisor.TickTimer(&this->current, &this->subFrame);
+        return this->current;
     }
 
     void operator=(i32 value)
@@ -429,6 +430,7 @@ struct ZunTimer
     }
 
     i32 AsFrames();
+    ZunBool FUN_0040d3d0();
     ZunBool FUN_0040e350(i32 value);
     ZunBool FUN_0040ebc0(i32 value);
     i32 operator%(i32 value);
@@ -452,9 +454,8 @@ inline ZunBool IsInitialStageLoad()
 
 inline ZunBool ReleaseResourcesOnRestart()
 {
-    return g_Supervisor.releaseResourcesOnRestart;
+    return g_Supervisor.unk168;
 }
 
-ZunBool KeepStageResources();
 
 }; // namespace th08

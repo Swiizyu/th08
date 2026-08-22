@@ -86,19 +86,6 @@
 namespace th08
 {
 
-DIFFABLE_STATIC_ASSIGN(i32, g_ResultStageNumbers[]) = {1, 2, 3, 4, 4, 5, 6, 6, 1, 1, 1};
-
-DIFFABLE_STATIC_ASSIGN(const char *, g_ResultsStageList[]) = {
-    "Stage 1", "Stage 2",       "Stage 3",        "Stage 4-uncanny", "Stage 4-powerful",
-    "Stage 5", "Stage 6-Eirin", "Stage 6-Kaguya", "Extra Stage",     "Last Word",
-};
-
-DIFFABLE_STATIC_ASSIGN(float, g_SpellcardsWeightList[]) = {1.0f, 1.5f, 1.5f, 2.0f, 2.5f};
-
-DIFFABLE_STATIC_ASSIGN(const char *, g_RightAlignedDifficultyList[]) = {
-    "      Easy", "    Normal", "      Hard", "   Lunatic", "     Extra",
-};
-
 const char *g_AlphabetList = "ABCDEFGHIJKLMNOP"
                              "QRSTUVWXYZ.,:;_@"
                              "abcdefghijklmnop"
@@ -112,6 +99,23 @@ DIFFABLE_STATIC_ASSIGN(const char *, g_CharacterList[]) = {
     TH_RESULT_SHOT_MARISA,       TH_RESULT_SHOT_ALICE,        TH_RESULT_SHOT_SAKUYA,
     TH_RESULT_SHOT_REMILIA,      TH_RESULT_SHOT_YOUMU,        TH_RESULT_SHOT_YUYUKO,
     TH_RESULT_SHOT_ALL};
+
+DIFFABLE_STATIC_ASSIGN(i32, g_ResultStageNumbers[]) = {1, 2, 3, 4, 4, 5, 6, 6, 1, 1, 1};
+
+DIFFABLE_STATIC_ASSIGN(const char *, g_ResultsStageList[]) = {
+    "Stage 1", "Stage 2",       "Stage 3",        "Stage 4-uncanny", "Stage 4-powerful",
+    "Stage 5", "Stage 6-Eirin", "Stage 6-Kaguya", "Extra Stage",     "Last Word",
+};
+
+DIFFABLE_STATIC_ASSIGN(const char *, g_ResultsDifficultyList[]) = {
+    "Easy", "Normal", "Hard", "Lunatic", "Extra",
+};
+
+DIFFABLE_STATIC_ASSIGN(float, g_SpellcardsWeightList[]) = {1.0f, 1.5f, 1.5f, 2.0f, 2.5f};
+
+DIFFABLE_STATIC_ASSIGN(const char *, g_RightAlignedDifficultyList[]) = {
+    "      Easy", "    Normal", "      Hard", "   Lunatic", "     Extra",
+};
 
 DIFFABLE_STATIC_ASSIGN(const char *, g_ResultsCharacterNames[]) = {
     "Rm & Yk", "Ms & Al", "Sk & Rr", "Ym & Yy", "Reimu  ", "Yukari ",
