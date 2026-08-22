@@ -106,6 +106,7 @@ FLOAT_3.0_004c9fe0,0x4c9fe0,global,
 th08::g_AsciiManagerDrawChainLowPrio,0x4cce00,global,
 th08::g_AsciiManager,0x4cce20,global,
 th08::g_EndingFiles,0x4c7048,global,0x90
+th08::g_GuiTextColors,0x4c7180,global,0xc0
 th08::g_StageTextAnms,0x4c745c,global,0x24
 g_MusicRoom,0x17cf4c8,global,
 $S1,0x17d5ef0,global,
