@@ -1514,7 +1514,7 @@ void __fastcall Enemy::FUN_00424e50(void *)
     u8 *chain;
     i32 i;
 
-    bullet = (Bullet *)0xf6f710;
+    bullet = &g_BulletManager.bullets[0];
     Float3 delta;
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
@@ -1561,7 +1561,7 @@ void __fastcall EclExIns::FUN_004250d0(void *)
         if ((bullet->flags & 0x100000) != 0)
         {
             *(f32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x38) = bullet->angle;
-            g_EnemyManager.SpawnEnemy2(*(i16 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x60), &bullet->position, 800,
+            g_EnemyManager.SpawnEnemy2(*(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x60), &bullet->position, 800,
                                        -2, 10, *(u8 **)((u8 *)this + 0x2ca0) + 0x18);
             bullet->flags &= ~0x100000;
         }
@@ -2629,7 +2629,7 @@ Enemy *__fastcall Enemy::FUN_0041f110(void *instruction)
     i32 arg4 = (mask & 0x10) ? this->FUN_0041f420(*(i32 *)(ins + 0x1c)) : *(i32 *)(ins + 0x1c);
     i32 field = (mask & 0x20) ? this->FUN_0041f420(*(i32 *)(ins + 0x20)) : *(i32 *)(ins + 0x20);
     u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
-    return g_EnemyManager.SpawnEnemy2(*(i16 *)(ins + 0xc), &position, health, (i8)arg4, field, context + 0x18);
+    return g_EnemyManager.SpawnEnemy2(*(i32 *)(ins + 0xc), &position, health, (i8)arg4, field, context + 0x18);
 }
 
 // FUNCTION: th08 0x41f280
@@ -2648,7 +2648,7 @@ Enemy *__fastcall Enemy::FUN_0041f280(void *instruction)
     i32 arg4 = (mask & 0x10) ? this->FUN_0041f420(*(i32 *)(ins + 0x1c)) : *(i32 *)(ins + 0x1c);
     i32 field = (mask & 0x20) ? this->FUN_0041f420(*(i32 *)(ins + 0x20)) : *(i32 *)(ins + 0x20);
     u8 *context = *(u8 **)((u8 *)this + 0x2ca0);
-    return g_EnemyManager.SpawnEnemy2(*(i16 *)(ins + 0xc), &position, health, (i8)arg4, field, context + 0x18);
+    return g_EnemyManager.SpawnEnemy2(*(i32 *)(ins + 0xc), &position, health, (i8)arg4, field, context + 0x18);
 }
 
 // FUNCTION: th08 0x41f420
