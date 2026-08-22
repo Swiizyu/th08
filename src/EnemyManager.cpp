@@ -2548,9 +2548,6 @@ Effect *EffectManager::SpawnSpecialEffect2(i32 effectId, Float3 *position, Float
     *(i32 *)((u8 *)&effect->vm + 0x28c) = 0;
     *(i32 *)((u8 *)&effect->vm + 0x290) = 0;
     effect->updateCallback = g_EffectTemplates[effectId].updateCallback;
-    effect->timer = 0;
-    *(u8 *)((u8 *)effect + 0x352) = 0;
-    *(u8 *)((u8 *)effect + 0x353) = 0;
     if (g_EffectTemplates[effectId].initCallback != NULL &&
         (effect->*g_EffectTemplates[effectId].initCallback)() != 0)
     {
