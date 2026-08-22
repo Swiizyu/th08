@@ -3110,7 +3110,6 @@ ZunBool Enemy::FUN_0041fd20()
 }
 
 // FUNCTION: th08 0x41fd90
-#pragma var_order(result)
 ZunBool Enemy::FUN_0041fd90()
 {
     return ((Spellcard *)this)->spellcard_fun_004178a0() && ((*(u32 *)this >> 2) & 1) != 0;
