@@ -956,7 +956,6 @@ i32 Effect::FUN_004271a0()
 }
 
 // FUNCTION: th08 0x427260
-#pragma var_order(offset)
 i32 Effect::FUN_00427260()
 {
     Float3 offset;
