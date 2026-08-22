@@ -1187,7 +1187,7 @@ void __fastcall EclExIns::FUN_00424730(void *)
                   *(f32 *)((u8 *)this + 0x2d8c) - *(f32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x3c), 0.0f);
     Float3 collisionSize(590.0f, 160.0f, 0.0f);
     Float3 grazeSize(590.0f, 128.0f, 0.0f);
-    Float3 center(origin.x + collisionSize.x / 2.0f, grazeSize.z, 0.0f);
+    Float3 center(origin.x + collisionSize.x / 2.0f, origin.y, 0.0f);
 
     if (((ZunTimer *)((u8 *)this + 0x2e14))->FUN_0040ebc0(12))
     {
@@ -1204,7 +1204,7 @@ void __fastcall EclExIns::FUN_00424820(void *)
                   *(f32 *)((u8 *)this + 0x2d38) - *(f32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x3c), 0.0f);
     Float3 collisionSize(590.0f, 240.0f, 0.0f);
     Float3 grazeSize(590.0f, 192.0f, 0.0f);
-    Float3 center(origin.x + collisionSize.x / 2.0f, grazeSize.z, 0.0f);
+    Float3 center(origin.x + collisionSize.x / 2.0f, origin.y, 0.0f);
 
     if (((ZunTimer *)((u8 *)this + 0x2e14))->FUN_0040ebc0(12))
     {
@@ -1221,7 +1221,7 @@ void __fastcall EclExIns::FUN_00424910(void *)
                   *(f32 *)((u8 *)this + 0x2d8c) - *(f32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x3c), 0.0f);
     Float3 collisionSize(590.0f, 288.0f, 0.0f);
     Float3 grazeSize(590.0f, 224.0f, 0.0f);
-    Float3 center(origin.x + collisionSize.x / 2.0f, grazeSize.z, 0.0f);
+    Float3 center(origin.x + collisionSize.x / 2.0f, origin.y, 0.0f);
 
     if (((ZunTimer *)((u8 *)this + 0x2e14))->FUN_0040ebc0(12))
     {
@@ -1239,7 +1239,7 @@ void __fastcall EclExIns::FUN_00424a00(void *instruction)
 // FUNCTION: th08 0x4233d0
 void __fastcall EclExIns::FUN_004233d0(void *)
 {
-    ScreenEffect::RegisterChain(SCREEN_EFFECT_FULL_FADE_OUT, 60, 1, -1, 0, 21);
+    ScreenEffect::RegisterChain(SCREEN_EFFECT_PULSE, 60, 1, -1, 0, 21);
 }
 
 // FUNCTION: th08 0x423150
@@ -1529,7 +1529,7 @@ void __fastcall Enemy::FUN_00424e50(void *)
             {
                 if (*(i32 *)(*(u8 **)(chain + 0x2ca0) + 0x60) == 0)
                 {
-                    delta = *(Float3 *)((u8 *)bullet + 0xd44) - *(Float3 *)(*(u8 **)(chain + 0x2ca0) + 0x2d34);
+                    delta = *(Float3 *)((u8 *)bullet + 0xd44) - *(Float3 *)((u8 *)chain + 0x2d34);
                     if (delta.FUN_0040b500() < 4096.0f)
                     {
                         *(i32 *)(*(u8 **)(chain + 0x2ca0) + 0x60) = 60;
