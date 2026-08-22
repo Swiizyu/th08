@@ -1914,25 +1914,25 @@ void AsciiManager::OnDrawHighPrioImpl()
         this->percentageText.pos.z = this->youkaiGaugeCursor.pos.z;
         this->percentageText.color1.a = this->youkaiGauge.color1.a;
 
-        if (g_GameManager.IsGaugeExtremelyHuman())
+        if (g_GameManager.GaugeIsExtremelyHuman())
         {
             this->percentageText.color1.r = 112;
             this->percentageText.color1.g = 112;
             this->percentageText.color1.b = 255;
         }
-        else if (g_GameManager.IsGaugeModeratelyHuman())
+        else if (g_GameManager.GaugeIsModeratelyHuman())
         {
             this->percentageText.color1.r = 176;
             this->percentageText.color1.g = 176;
             this->percentageText.color1.b = 255;
         }
-        else if (g_GameManager.IsGaugeExtremelyYoukai())
+        else if (g_GameManager.GaugeIsExtremelyYoukai())
         {
             this->percentageText.color1.r = 255;
             this->percentageText.color1.g = 112;
             this->percentageText.color1.b = 112;
         }
-        else if (g_GameManager.IsGaugeModeratelyYoukai())
+        else if (g_GameManager.GaugeIsModeratelyYoukai())
         {
             this->percentageText.color1.r = 255;
             this->percentageText.color1.g = 176;
