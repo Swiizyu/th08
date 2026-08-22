@@ -339,7 +339,7 @@ void Item::CollectPowerSmall()
     i32 i;
     i32 oldPowerLevel;
 
-    if (g_GameManager.GetPower() < 128)
+    if (128 > g_GameManager.GetPower())
     {
         i = 0;
         while (g_GameManager.GetPower() >= g_PowerUpThresholds[i])
@@ -379,7 +379,7 @@ void Item::CollectPowerSmall()
 }
 
 // FUNCTION: th08 0x440e40
-#pragma var_order(maximumValue, value, isAbovePoc)
+#pragma var_order(maximumValue, value)
 void Item::CollectPoint()
 {
     i32 maximumValue;
@@ -439,7 +439,7 @@ void Item::CollectPoint()
 }
 
 // FUNCTION: th08 0x441020
-#pragma var_order(maximumValue, value, isAbovePoc)
+#pragma var_order(maximumValue, value)
 void Item::CollectPointSmall()
 {
     i32 maximumValue;
