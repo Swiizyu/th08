@@ -730,12 +730,28 @@ i32 Effect::FUN_004264f0()
     this->velocity += this->acceleration;
     this->basePosition += this->velocity;
     this->position = this->basePosition;
-    localPosition = this->position - g_Background.vectors0x6394.vector0;
+    localPosition = this->position - *(Float3 *)0x4ea3c4;
     D3DXVec3Normalize((D3DXVECTOR3 *)&localPosition, (D3DXVECTOR3 *)&localPosition);
-    dot = g_Background.vectors0x6394.vector3.FUN_0040b540(&localPosition);
+    dot = (*(Float3 *)0x4ea3e8).FUN_0040b540(&localPosition);
     if (dot < 0.94f)
     {
         return 0;
+    }
+    if (FUN_0042f1f0(&g_EnemyManager) != 0)
+    {
+        if (((*(u32 *)((u8 *)g_PlayerObjPtrs[0] + 0x3324) >> 3) & 1) != 0)
+        {
+            if (*(f32 *)((u8 *)&this->vm + 0x288) < 1.81935568245824e-38f)
+            {
+                *(Float3 *)((u8 *)&this->vm + 0x288) =
+                    (*(Float3 *)((u8 *)g_PlayerObjPtrs[0] + 0x2d34) - *(Float3 *)((u8 *)&this->vm + 0x288)) * 0.1f +
+                    *(Float3 *)((u8 *)&this->vm + 0x288);
+            }
+            else
+            {
+                *(Float3 *)((u8 *)&this->vm + 0x288) = *(Float3 *)((u8 *)g_PlayerObjPtrs[0] + 0x2d34);
+            }
+        }
     }
     *(u32 *)((u8 *)&this->vm + 0x1f8) |= 0x20000;
     this->vm.color2.r = (u32)(this->vm.color1.r * g_Background.vm0x844.color1.r) >> 8;
@@ -786,12 +802,28 @@ i32 Effect::FUN_00426990()
     this->velocity += this->acceleration;
     this->basePosition += this->velocity;
     this->position = this->basePosition;
-    localPosition = this->position - g_Background.vectors0x6394.vector0;
+    localPosition = this->position - *(Float3 *)0x4ea3c4;
     D3DXVec3Normalize((D3DXVECTOR3 *)&localPosition, (D3DXVECTOR3 *)&localPosition);
-    dot = g_Background.vectors0x6394.vector3.FUN_0040b540(&localPosition);
+    dot = (*(Float3 *)0x4ea3e8).FUN_0040b540(&localPosition);
     if (dot < 0.94f)
     {
         return 0;
+    }
+    if (g_PlayerObjPtrs[0] != NULL)
+    {
+        if (((*(u32 *)((u8 *)g_PlayerObjPtrs[0] + 0x3324) >> 3) & 1) != 0)
+        {
+            if (*(f32 *)((u8 *)&this->vm + 0x288) < 1.81935568245824e-38f)
+            {
+                *(Float3 *)((u8 *)&this->vm + 0x288) =
+                    (*(Float3 *)((u8 *)g_PlayerObjPtrs[0] + 0x2d34) - *(Float3 *)((u8 *)&this->vm + 0x288)) * 0.1f +
+                    *(Float3 *)((u8 *)&this->vm + 0x288);
+            }
+            else
+            {
+                *(Float3 *)((u8 *)&this->vm + 0x288) = *(Float3 *)((u8 *)g_PlayerObjPtrs[0] + 0x2d34);
+            }
+        }
     }
     return 1;
 }
@@ -852,19 +884,19 @@ i32 Effect::FUN_00426d70()
     this->velocity += this->acceleration;
     this->basePosition += this->velocity;
     this->position = this->basePosition;
-    localPosition = this->position - g_Background.vectors0x6394.vector0;
+    localPosition = this->position - *(Float3 *)0x4ea3c4;
     D3DXVec3Normalize((D3DXVECTOR3 *)&localPosition, (D3DXVECTOR3 *)&localPosition);
-    dot = g_Background.vectors0x6394.vector3.FUN_0040b540(&localPosition);
+    dot = (*(Float3 *)0x4ea3e8).FUN_0040b540(&localPosition);
     if (dot < 0.94f)
     {
         return 0;
     }
     this->vm.SetZRotation(AddNormalizeAngle(this->vm.rotation.z, this->vm.rotation.x));
-    if (this->position.z >= 0.0f)
+    if (this->position.z < 0.0f)
     {
-        return 0;
+        return 1;
     }
-    return 1;
+    return 0;
 }
 
 // FUNCTION: th08 0x426e70

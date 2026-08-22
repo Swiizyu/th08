@@ -57,7 +57,7 @@ char *SprintfReturnEnd(char *dst, const char *fmt, ...)
 }
 
 // FUNCTION: th08 0x42f1f0
-i32 FUN_0042f1f0(th08::EnemyManager *enemyManager)
+i32 __fastcall FUN_0042f1f0(th08::EnemyManager *enemyManager)
 {
     i32 i;
 
