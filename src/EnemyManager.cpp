@@ -2844,11 +2844,45 @@ void __fastcall StartEnemySpell(Enemy *enemy, void *instruction)
 // FUNCTION: th08 0x421300
 void __fastcall Enemy::FUN_00421300(void *instruction)
 {
-    u16 flags = *(u16 *)((u8 *)instruction + 0xa);
-    f32 a = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x10));
-    f32 b = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x14));
-    f32 scale = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x18));
-    *this->FUN_00420950((u8 *)instruction + 0xc, flags, 0) = (a - b) * scale + b;
+    f32 a;
+    f32 b;
+    f32 scale;
+    f32 b2;
+
+    if ((*(u16 *)((u8 *)instruction + 0xa) & 2) != 0)
+    {
+        a = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x10));
+    }
+    else
+    {
+        a = *(f32 *)((u8 *)instruction + 0x10);
+    }
+    if ((*(u16 *)((u8 *)instruction + 0xa) & 4) != 0)
+    {
+        b = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x14));
+    }
+    else
+    {
+        b = *(f32 *)((u8 *)instruction + 0x14);
+    }
+    f32 diff = a - b;
+    if ((*(u16 *)((u8 *)instruction + 0xa) & 8) != 0)
+    {
+        scale = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x18));
+    }
+    else
+    {
+        scale = *(f32 *)((u8 *)instruction + 0x18);
+    }
+    if ((*(u16 *)((u8 *)instruction + 0xa) & 4) != 0)
+    {
+        b2 = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x14));
+    }
+    else
+    {
+        b2 = *(f32 *)((u8 *)instruction + 0x14);
+    }
+    *this->FUN_00420950((u8 *)instruction + 0xc, *(u16 *)((u8 *)instruction + 0xa), 0) = diff * scale + b2;
 }
 
 // FUNCTION: th08 0x4213f0
