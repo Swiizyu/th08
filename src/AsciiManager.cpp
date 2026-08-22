@@ -1836,12 +1836,7 @@ void AsciiManager::OnDrawHighPrioImpl()
             ScreenEffect::DrawSquare(&rect, color.d3dColor);
         }
 
-#if 1
-        // FIXME: regalloc hack, remove when EffectManager is mapped out
-        g_Gui.timesAnm->SetAndExecuteScriptIdx(&this->nightBlindnessSprite, 105);
-#else
-        // g_EffectManager.bulletAnm->SetAndExecuteScriptIdx(&this->nightBlindnessSprite, 105);
-#endif
+        g_EffectManager.effectAnm->SetAndExecuteScriptIdx(&this->nightBlindnessSprite, 105);
 
         this->nightBlindnessSprite.scale.x = this->nightBlindnessSprite.scale.y = this->nightBlindnessRadius / 63.0f;
         this->nightBlindnessSprite.pos = g_Player.position;
