@@ -2842,14 +2842,13 @@ void __fastcall StartEnemySpell(Enemy *enemy, void *instruction)
 }
 
 // FUNCTION: th08 0x421300
-#pragma var_order(diff, a, b, scale, b2, result)
 void __fastcall Enemy::FUN_00421300(void *instruction)
 {
+    f32 diff;
     f32 a;
     f32 b;
     f32 scale;
     f32 b2;
-    f32 diff;
     f32 result;
 
     if ((*(u16 *)((u8 *)instruction + 0xa) & 2) != 0)
