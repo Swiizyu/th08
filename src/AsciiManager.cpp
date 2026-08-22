@@ -610,7 +610,7 @@ void AsciiManager::OnDrawLowPrioImpl()
     {
         if (this->bossMarkers[i].pos.x >= 56.0f && this->bossMarkers[i].pos.x <= 392.0f)
         {
-            spaceWidth = fabsf(this->bossMarkers[i].pos.x - 32.0f - g_Player.position.x);
+            spaceWidth = FUN_004031e0(this->bossMarkers[i].pos.x - 32.0f - g_Player.position.x);
 
             this->bossMarkers[i].loadedSprite = this->asciiAnm->GetSprite(157);
 
