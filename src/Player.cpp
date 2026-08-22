@@ -4134,7 +4134,7 @@ i32 __fastcall Player::FUN_00450ee0(Effect *effect, Float3 *position)
     Float3 spawnPosition;
 
     (*(u8 *)((u8 *)this + 0xe2a94))++;
-    if ((*(u8 *)((u8 *)this + 0xe2a94) & 7) == 0)
+    if ((*(u8 *)((u8 *)this + 0xe2a94) % 8) == 0)
     {
         spawnPosition = *position;
         spawnPosition.x = effect->position.x;
