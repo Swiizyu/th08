@@ -3486,6 +3486,29 @@ i32 TitleScreen::MoveCursorHorizontal(i32 menuLength)
     return 0;
 }
 
+// FUNCTION: th08 0x46d763
+char *__fastcall ConvertToFullWidthDigits(i32 value, i32 digits)
+{
+    i32 place;
+    i32 i;
+
+    place = 1;
+    memset((void *)0x18bddc8, 0, 0x40);
+    for (i = 1; i < digits; i++)
+    {
+        place *= 10;
+    }
+    i = 0;
+    while (place > 0)
+    {
+        strcpy((char *)0x18bddc8 + i, *(const char **)(0x4c829c + (value / place) * 4));
+        value %= place;
+        place /= 10;
+        i += 2;
+    }
+    return (char *)0x18bddc8;
+}
+
 #pragma var_order(spell, i, attemptsTotal, comment, comment1, comment2, catkA, catkB, catkC, catkD,                      \
                   nameStr, mark, ownerName, condA, condB, condC, condText1, condD, condText2)
 // FUNCTION: th08 0x46d7f9
