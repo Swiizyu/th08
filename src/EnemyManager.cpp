@@ -3113,17 +3113,7 @@ ZunBool Enemy::FUN_0041fd20()
 #pragma var_order(result)
 ZunBool Enemy::FUN_0041fd90()
 {
-    ZunBool result;
-
-    if (((Spellcard *)this)->spellcard_fun_004178a0() && ((*(u32 *)this >> 2) & 1) != 0)
-    {
-        result = true;
-    }
-    else
-    {
-        result = false;
-    }
-    return result;
+    return ((Spellcard *)this)->spellcard_fun_004178a0() && ((*(u32 *)this >> 2) & 1) != 0;
 }
 
 // FUNCTION: th08 0x42b370
