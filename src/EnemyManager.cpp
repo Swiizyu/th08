@@ -2447,6 +2447,7 @@ Effect *EffectManager::FUN_00425650(i32 effectId, Float3 *position, Float3 *cust
 }
 
 // FUNCTION: th08 0x425b70
+#pragma var_order(effect, i)
 Effect *EffectManager::FUN_00425b70(i32 effectId, Float3 *position, i32 count, D3DCOLOR color)
 {
     Effect *effect = &this->effects[0x200];
