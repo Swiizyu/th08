@@ -24,8 +24,8 @@ namespace th08 { i32 __fastcall FUN_00450580(void *, void *); }
 
 namespace th08
 {
-    i32 __fastcall FUN_0042f1f0(th08::EnemyManager *enemyManager);
-}
+
+i32 __fastcall FUN_0042f1f0(EnemyManager *enemyManager);
 
 DIFFABLE_STATIC(i32, g_BackgroundTintActive);
 
