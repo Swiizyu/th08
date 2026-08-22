@@ -27,6 +27,8 @@ f32 FUN_004031e0(f32 value);
 DIFFABLE_STATIC(EnemyManager, g_EnemyManager);
 DIFFABLE_STATIC(EclManager, g_EclManager);
 DIFFABLE_STATIC(i32, g_EnemyManagerUnknown);
+DIFFABLE_STATIC(Float3, g_UnknownPos4ea3c4);
+DIFFABLE_STATIC(Float3, g_UnknownVec4ea3e8);
 DIFFABLE_STATIC(EffectManager, g_EffectManager);
 DIFFABLE_STATIC(i32, g_EffectManagerState);
 void FUN_004235a0();
@@ -732,9 +734,9 @@ i32 Effect::FUN_004264f0()
     this->basePosition += this->velocity;
     this->position = this->basePosition;
     Float3 localPosition;
-    localPosition = this->position - *(Float3 *)0x4ea3c4;
+    localPosition = this->position - g_UnknownPos4ea3c4;
     D3DXVec3Normalize((D3DXVECTOR3 *)&localPosition, (D3DXVECTOR3 *)&localPosition);
-    dot = (*(Float3 *)0x4ea3e8).FUN_0040b540(&localPosition);
+    dot = (g_UnknownVec4ea3e8).FUN_0040b540(&localPosition);
     if (dot < 0.94f)
     {
         return 0;
@@ -743,7 +745,7 @@ i32 Effect::FUN_004264f0()
     {
         if (((*(u32 *)((u8 *)g_PlayerObjPtrs[0] + 0x3324) >> 3) & 1) != 0)
         {
-            if (*(f32 *)((u8 *)&this->vm + 0x288) > -9999.0f)
+            if (*(f32 *)((u8 *)&this->vm + 0x288) < -9999.0f)
             {
                 *(Float3 *)((u8 *)&this->vm + 0x288) = *(Float3 *)((u8 *)g_PlayerObjPtrs[0] + 0x2d34);
             }
@@ -804,9 +806,9 @@ i32 Effect::FUN_00426990()
     this->basePosition += this->velocity;
     this->position = this->basePosition;
     Float3 localPosition;
-    localPosition = this->position - *(Float3 *)0x4ea3c4;
+    localPosition = this->position - g_UnknownPos4ea3c4;
     D3DXVec3Normalize((D3DXVECTOR3 *)&localPosition, (D3DXVECTOR3 *)&localPosition);
-    dot = (*(Float3 *)0x4ea3e8).FUN_0040b540(&localPosition);
+    dot = (g_UnknownVec4ea3e8).FUN_0040b540(&localPosition);
     if (dot < 0.94f)
     {
         return 0;
@@ -815,7 +817,7 @@ i32 Effect::FUN_00426990()
     {
         if (((*(u32 *)((u8 *)g_PlayerObjPtrs[0] + 0x3324) >> 3) & 1) != 0)
         {
-            if (*(f32 *)((u8 *)&this->vm + 0x288) > -9999.0f)
+            if (*(f32 *)((u8 *)&this->vm + 0x288) < -9999.0f)
             {
                 *(Float3 *)((u8 *)&this->vm + 0x288) = *(Float3 *)((u8 *)g_PlayerObjPtrs[0] + 0x2d34);
             }
@@ -886,9 +888,9 @@ i32 Effect::FUN_00426d70()
     this->basePosition += this->velocity;
     this->position = this->basePosition;
     Float3 localPosition;
-    localPosition = this->position - *(Float3 *)0x4ea3c4;
+    localPosition = this->position - g_UnknownPos4ea3c4;
     D3DXVec3Normalize((D3DXVECTOR3 *)&localPosition, (D3DXVECTOR3 *)&localPosition);
-    dot = (*(Float3 *)0x4ea3e8).FUN_0040b540(&localPosition);
+    dot = (g_UnknownVec4ea3e8).FUN_0040b540(&localPosition);
     if (dot < 0.94f)
     {
         return 0;
