@@ -19,9 +19,11 @@ DIFFABLE_STATIC_ARRAY(VertexTex1DiffuseXyzrhw, 4, g_QuadVertices);
 DIFFABLE_STATIC_ARRAY(VertexTex1Xyzrhw, 4, g_UnknownQuadVertices);
 DIFFABLE_STATIC_ARRAY(VertexTex1Xyzrhw, 4, g_BackgroundQuadVertices);
 
-AnmVmBase::AnmVmBase()
+// FUNCTION: th08 0x4067c0
+AnmPrefix::AnmPrefix()
 {
 }
+
 
 // FUNCTION: th08 0x4623c0
 void AnmManager::SetRenderStateForVm3D(AnmVm *vm)

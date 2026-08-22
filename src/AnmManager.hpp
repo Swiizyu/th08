@@ -289,9 +289,42 @@ struct AnmRawInstr
     };
 };
 
-struct AnmVmBase
+struct AnmPrefix
 {
-    AnmVmBase();
+    AnmPrefix();
+
+    Float3 rotation;
+    Float3 angleVel;
+    Float2 scale;
+    Float2 scaleGrowth;
+    Float2 spriteSize;
+    Float2 uvScrollPos;
+    ZunTimer currentTimeInScript;
+    ZunTimer waitTimer;
+    ZunTimer interpCurrentTimers[AnmInterp_Last];
+    ZunTimer interpEndTimers[AnmInterp_Last];
+    u8 interpModes[AnmInterp_Last];
+    i32 intVar0;
+    i32 intVar1;
+    i32 intVar2;
+    i32 intVar3;
+    f32 floatVar0;
+    f32 floatVar1;
+    f32 floatVar2;
+    f32 floatVar3;
+    i32 counterVar0;
+    i32 counterVar1;
+    Float2 uvScrollVel;
+    D3DXMATRIX matrix1;
+    D3DXMATRIX matrix2;
+    D3DXMATRIX matrix3;
+};
+
+struct AnmVmBase : AnmPrefix
+{
+    AnmVmBase()
+    {
+    }
 
     void Initialize()
     {
@@ -325,31 +358,6 @@ struct AnmVmBase
         this->pendingInterrupt = interrupt;
     }
 
-    Float3 rotation;
-    Float3 angleVel;
-    Float2 scale;
-    Float2 scaleGrowth;
-    Float2 spriteSize;
-    Float2 uvScrollPos;
-    ZunTimer currentTimeInScript;
-    ZunTimer waitTimer;
-    ZunTimer interpCurrentTimers[AnmInterp_Last];
-    ZunTimer interpEndTimers[AnmInterp_Last];
-    u8 interpModes[AnmInterp_Last];
-    i32 intVar0;
-    i32 intVar1;
-    i32 intVar2;
-    i32 intVar3;
-    f32 floatVar0;
-    f32 floatVar1;
-    f32 floatVar2;
-    f32 floatVar3;
-    i32 counterVar0;
-    i32 counterVar1;
-    Float2 uvScrollVel;
-    D3DXMATRIX matrix1;
-    D3DXMATRIX matrix2;
-    D3DXMATRIX matrix3;
     ZunColor color1;
     ZunColor color2;
     union {
