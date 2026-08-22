@@ -209,13 +209,13 @@ void GuiImpl::MsgRead(i32 msgIdx)
             Gui::CopyEnemyNameTexture(22);
             break;
         case STAGE6A:
-            g_Background.unk_b34 = 2;
+            *(i32 *)((u8 *)&g_EffectManagerState + 4) = 2;
             break;
         case STAGE6B: {
             AnmLoaded *enemyFaceAnm = g_Spellcard.enemyFaceAnm;
             g_Spellcard.enemyFaceAnm = g_Spellcard.enemyFaceAnm2;
             g_Spellcard.enemyFaceAnm2 = enemyFaceAnm;
-            g_Background.unk_b34 = 2;
+            *(i32 *)((u8 *)&g_EffectManagerState + 4) = 2;
             Gui::CopyEnemyNameTexture(24);
             break;
         }
@@ -223,7 +223,7 @@ void GuiImpl::MsgRead(i32 msgIdx)
             AnmLoaded *enemyFaceAnm = g_Spellcard.enemyFaceAnm;
             g_Spellcard.enemyFaceAnm = g_Spellcard.enemyFaceAnm2;
             g_Spellcard.enemyFaceAnm2 = enemyFaceAnm;
-            g_Background.unk_b34 = 2;
+            *(i32 *)((u8 *)&g_EffectManagerState + 4) = 2;
             Gui::CopyEnemyNameTexture(25);
             break;
         }
