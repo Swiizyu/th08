@@ -16,10 +16,11 @@
 
 u32 FUN_004338b0();
 u32 FUN_004338c0();
-i32 __fastcall FUN_0042f1f0(EnemyManager *enemyManager);
 
 namespace th08
 {
+
+i32 __fastcall FUN_0042f1f0(EnemyManager *enemyManager);
 
 u32 IsDisableResourceReload();
 f32 FUN_004031e0(f32 value);
@@ -276,13 +277,7 @@ ZunBool AnmVm::FUN_00428720()
 // FUNCTION: th08 0x42fe70
 void __fastcall AnmVm::FUN_0042fe70(AnmVm *other)
 {
-    __asm
-    {
-        mov esi, other
-        mov edi, this
-        mov ecx, 0xa9
-        rep movsd
-    }
+    memcpy(this, other, sizeof(AnmVm));
 }
 
 // FUNCTION: th08 0x42fea0
