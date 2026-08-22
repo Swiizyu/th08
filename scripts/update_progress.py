@@ -99,30 +99,24 @@ def main():
     with open("PROGRESS.md", "w") as f:
         f.write(doc)
 
-    # Regenerate the SVG progress indicators (GensokyoClub style) from the same verdict.
+    # Regenerate the SVG progress indicators (1:1 GensokyoClub Inkscape design).
     try:
-        import os, re as _re
-        icon_b64 = ""
-        for cand in ("resources/progress.svg", "resources/progress_dark.svg"):
-            if os.path.exists(cand):
-                m = _re.search(r'href="data:image/png;base64,([^"]+)"', open(cand, encoding="utf-8").read())
-                if m:
-                    icon_b64 = m.group(1)
-                    break
+        import re as _re
         tpl = open("resources/progress_template.svg", encoding="utf-8").read()
-        func_pct = "%.2f" % exact
-        byte_pct = "%.2f" % weighted
-        for out, color in (("resources/progress.svg", "#000000"), ("resources/progress_dark.svg", "#ffffff")):
-            svg = tpl
-            svg = svg.replace("{ICON_URL}", "data:image/png;base64," + icon_b64)
-            svg = svg.replace("{FUNC_PROG_PERCENT}", func_pct)
-            svg = svg.replace("{BYTES_PROG_PERCENT}", byte_pct)
-            svg = svg.replace("{FUNC_COUNT}", str(perfect))
-            svg = svg.replace("{TOTAL_COUNT}", str(total))
-            svg = svg.replace("{TEXT_COLOR}", color)
-            with open(out, "w", encoding="utf-8") as f:
-                f.write(svg)
-        print("SVG indicators regenerated")
+        pct_txt = "%.2f%%" % exact
+        acc_txt = "%.2f%%" % weighted
+        bar_w = 127.18422
+        clip_w = bar_w * perfect / total
+        svg = tpl
+        svg = svg.replace("Implemented: 35.46% (723/2039)", "Implemented: %s (%d/%d)" % (pct_txt, perfect, total))
+        svg = svg.replace("Accuracy:    96.33%", "Accuracy:    " + acc_txt)
+        svg = svg.replace(">34.16%</tspan>", ">" + pct_txt + "</tspan>")
+        svg = _re.sub(r'width="43\.44403600744919"', 'width="%.14f"' % clip_w, svg)
+        with open("resources/progress.svg", "w", encoding="utf-8") as f:
+            f.write(svg)
+        with open("resources/progress_dark.svg", "w", encoding="utf-8") as f:
+            f.write(svg)
+        print("SVG indicators regenerated (GensokyoClub 1:1): %s (%d/%d), accuracy %s" % (pct_txt, perfect, total, acc_txt))
     except Exception as e:
         print("SVG regen failed (non-fatal):", e)
 
