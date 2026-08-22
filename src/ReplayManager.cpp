@@ -18,8 +18,6 @@
 namespace th08
 {
 
-DIFFABLE_STATIC(i32, g_EnemyBossIds);
-
 DIFFABLE_STATIC(ReplayManager *, g_ReplayManager);
 
 static const char *g_ReplayDifficultyNames[6] = {"Easy", "Normal", "Hard", "Lunatic", "Extra", "LastWord"};
@@ -57,6 +55,8 @@ char *SprintfReturnEnd(char *dst, const char *fmt, ...)
     len = cur - next;
     return dst + len;
 }
+
+DIFFABLE_STATIC(i32, g_EnemyBossIds);
 
 // FUNCTION: th08 0x42f1f0
 i32 __fastcall FUN_0042f1f0(th08::EnemyManager *enemyManager)
