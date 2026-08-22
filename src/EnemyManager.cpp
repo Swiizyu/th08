@@ -1506,30 +1506,22 @@ void __fastcall Enemy::FUN_004244f0(void *)
     }
     myTimer = *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x5c);
     *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x34) = *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x34) + 1;
-    if (myTimer == 0)
+    if (myTimer != 0)
     {
-        return;
-    }
-    target = AddNormalizeAngle(*(f32 *)(best + 0x2d9c), myTimer * ZUN_2PI / cnt);
-    if (*(i32 *)(*(u8 **)(best + 0x2ca0) + 0x34) != *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x34))
-    {
-        target = AddNormalizeAngle(target, *(f32 *)((u8 *)this + 0x2da0));
-    }
-    diff = AddNormalizeAngle(*(f32 *)((u8 *)this + 0x2d9c), *(f32 *)((u8 *)this + 0x2da0));
-    diff = target - diff;
-    if (FUN_004031e0(diff) > ZUN_PI)
-    {
-        if (diff > 0.0f)
+        target = AddNormalizeAngle(*(f32 *)(best + 0x2d9c), myTimer * ZUN_2PI / cnt);
+        if (*(i32 *)(*(u8 **)(best + 0x2ca0) + 0x34) != *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x34))
         {
-            diff = diff + -ZUN_2PI;
+            target = AddNormalizeAngle(target, *(f32 *)(best + 0x2da0));
         }
-        else
+        diff = AddNormalizeAngle(*(f32 *)((u8 *)this + 0x2d9c), *(f32 *)((u8 *)this + 0x2da0));
+        diff = target - diff;
+        if (FUN_004031e0(diff) > ZUN_PI)
         {
-            diff = diff + ZUN_2PI;
+            diff = (diff > 0.0f) ? (-ZUN_2PI + diff) : (ZUN_2PI + diff);
         }
+        diff = diff * 0.02f;
+        *(f32 *)((u8 *)this + 0x2d9c) = AddNormalizeAngle(*(f32 *)((u8 *)this + 0x2d9c), diff);
     }
-    diff = diff * 0.02f;
-    *(f32 *)((u8 *)this + 0x2d9c) = AddNormalizeAngle(*(f32 *)((u8 *)this + 0x2d9c), diff);
 }
 
 
