@@ -102,7 +102,7 @@ SpellcardMusicEntry g_SpellcardMusicInfo[] = {{1, 1, "th08_00.mid", 0, FALSE},
                                               {-1, 0, " ", 0, FALSE}};
 
 // FUNCTION: th08 0x439916
-ZunBool GameManager::ShouldPauseMusicInSpellPractice(i32 spellcardNumber)
+ZunBool __fastcall GameManager::ShouldPauseMusicInSpellPractice(i32 spellcardNumber)
 {
     i32 i = 0;
 
@@ -120,7 +120,7 @@ ZunBool GameManager::ShouldPauseMusicInSpellPractice(i32 spellcardNumber)
 }
 
 // FUNCTION: th08 0x439961
-i32 GameManager::GetSongNameSpriteIdx(i32 spellcardNumber)
+i32 __fastcall GameManager::GetSongNameSpriteIdx(i32 spellcardNumber)
 {
     i32 i = 0;
 

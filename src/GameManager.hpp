@@ -52,8 +52,8 @@ struct GameManager
 {
     GameManager();
 
-    static ZunBool ShouldPauseMusicInSpellPractice(i32 spellcardNumber);
-    static i32 GetSongNameSpriteIdx(i32 spellcardNumber);
+    static ZunBool __fastcall ShouldPauseMusicInSpellPractice(i32 spellcardNumber);
+    static i32 __fastcall GetSongNameSpriteIdx(i32 spellcardNumber);
     ZunBool IsWithinPlayfield(f32 x, f32 y, f32 width, f32 height);
     i32 CalcAntiTamperChecksum();
     static i32 CalcChecksum(u8 *address, i32 size);
