@@ -2889,6 +2889,7 @@ void __fastcall Enemy::FUN_00421300(void *instruction)
     *this->FUN_00420950((u8 *)instruction + 0xc, *(u16 *)((u8 *)instruction + 0xa), 0) = result;
 }
 
+// FUNCTION: th08 0x4213f0
 #pragma var_order(i, entry, v0x14, v0x18, v0x1c, v0x20, v0x24, v0x28, v0x10)
 void __fastcall Enemy::FUN_004213f0(void *instruction)
 {
