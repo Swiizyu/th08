@@ -2463,7 +2463,6 @@ Effect *EffectManager::FUN_00425b70(i32 effectId, Float3 *position, i32 count, D
         effect->effectId = effectId;
         effect->position = *position;
         this->effectAnm->SetAndExecuteScriptIdx(&effect->vm, g_EffectTemplates[effectId].scriptIdx);
-        effect->vm.zWriteDisabled = true;
         effect->vm.color1.d3dColor = color;
         *(i32 *)((u8 *)&effect->vm + 0x288) = 0;
         *(i32 *)((u8 *)&effect->vm + 0x28c) = 0;
