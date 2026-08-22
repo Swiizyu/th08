@@ -545,7 +545,7 @@ void Item::CollectTimeOrb()
     {
         g_AsciiManager.CreatePlayerPointPopup(
             &this->currentPosition, score,
-            g_GameManager.GetTimeOrbs() >= g_GameManager.GetLastSpellTimeOrbThreshold() ? 0xdfffef80 : 0xdfffffff);
+            g_GameManager.GetTimeOrbs() < g_GameManager.GetLastSpellTimeOrbThreshold() ? 0xdfffffff : 0xdfffef80);
     }
     g_Gui.flags.timeDisplayUpdateFrames = 2;
     g_GameManager.AddScore(score);
