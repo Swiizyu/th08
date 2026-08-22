@@ -2644,68 +2644,60 @@ void Enemy::FUN_0041f0e0(i32 value)
 // FUNCTION: th08 0x41f110
 Enemy *__fastcall Enemy::FUN_0041f110(void *instruction)
 {
-    Enemy *enemy = &g_EnemyManager.enemies[480];
-    if (*(i32 *)((u8 *)this + 0x2dfc) > 0 && ((*(u32 *)((u8 *)this + 0x3324) >> 10) & 1) == 0)
-    {
-        Float3 position;
-        position.x = ((*(u16 *)((u8 *)instruction + 0xa) & 2) != 0)
-            ? this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x10))
-            : *(f32 *)((u8 *)instruction + 0x10);
-        position.y = ((*(u16 *)((u8 *)instruction + 0xa) & 4) != 0)
-            ? this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x14))
-            : *(f32 *)((u8 *)instruction + 0x14);
-        position.z = 0.0f;
-        i32 field = ((*(u16 *)((u8 *)instruction + 0xa) & 0x20) != 0)
-            ? this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x20))
-            : *(i32 *)((u8 *)instruction + 0x20);
-        i32 arg4 = ((*(u16 *)((u8 *)instruction + 0xa) & 0x10) != 0)
-            ? this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x1c))
-            : *(i32 *)((u8 *)instruction + 0x1c);
-        i32 health = ((*(u16 *)((u8 *)instruction + 0xa) & 8) != 0)
-            ? this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x18))
-            : *(i32 *)((u8 *)instruction + 0x18);
-        enemy = g_EnemyManager.SpawnEnemy2(*(i32 *)((u8 *)instruction + 0xc), &position, health, arg4, field,
-                                           *(u8 **)((u8 *)this + 0x2ca0) + 0x18);
-    }
-    else
+    if (*(i32 *)((u8 *)this + 0x2dfc) <= 0 || ((*(u32 *)((u8 *)this + 0x3324) >> 10) & 1) != 0)
     {
         *(i32 *)((u8 *)&g_EnemyManager + 0x9dcef8) = 1;
+        return (Enemy *)0xf4f8f0;
     }
-    return enemy;
+    Float3 position;
+    position.x = ((*(u16 *)((u8 *)instruction + 0xa) & 2) != 0)
+        ? this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x10))
+        : *(f32 *)((u8 *)instruction + 0x10);
+    position.y = ((*(u16 *)((u8 *)instruction + 0xa) & 4) != 0)
+        ? this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x14))
+        : *(f32 *)((u8 *)instruction + 0x14);
+    position.z = 0.0f;
+    i32 field = ((*(u16 *)((u8 *)instruction + 0xa) & 0x20) != 0)
+        ? this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x20))
+        : *(i32 *)((u8 *)instruction + 0x20);
+    i32 arg4 = ((*(u16 *)((u8 *)instruction + 0xa) & 0x10) != 0)
+        ? this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x1c))
+        : *(i32 *)((u8 *)instruction + 0x1c);
+    i32 health = ((*(u16 *)((u8 *)instruction + 0xa) & 8) != 0)
+        ? this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x18))
+        : *(i32 *)((u8 *)instruction + 0x18);
+    return g_EnemyManager.SpawnEnemy2(*(i32 *)((u8 *)instruction + 0xc), &position, health, arg4, field,
+                                      *(u8 **)((u8 *)this + 0x2ca0) + 0x18);
 }
 
 // FUNCTION: th08 0x41f280
 Enemy *__fastcall Enemy::FUN_0041f280(void *instruction)
 {
-    Enemy *enemy = &g_EnemyManager.enemies[480];
-    if (*(i32 *)((u8 *)this + 0x2dfc) > 0 && ((*(u32 *)((u8 *)this + 0x3324) >> 10) & 1) == 0)
-    {
-        Float3 position;
-        position.x = ((*(u16 *)((u8 *)instruction + 0xa) & 2) != 0)
-            ? this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x10))
-            : *(f32 *)((u8 *)instruction + 0x10);
-        position.y = ((*(u16 *)((u8 *)instruction + 0xa) & 4) != 0)
-            ? this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x14))
-            : *(f32 *)((u8 *)instruction + 0x14);
-        position.z = 0.0f;
-        position += this->position0x2d88;
-        i32 field = ((*(u16 *)((u8 *)instruction + 0xa) & 0x20) != 0)
-            ? this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x20))
-            : *(i32 *)((u8 *)instruction + 0x20);
-        i32 arg4 = ((*(u16 *)((u8 *)instruction + 0xa) & 0x10) != 0)
-            ? this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x1c))
-            : *(i32 *)((u8 *)instruction + 0x1c);
-        i32 health = ((*(u16 *)((u8 *)instruction + 0xa) & 8) != 0)
-            ? this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x18))
-            : *(i32 *)((u8 *)instruction + 0x18);
-        enemy = g_EnemyManager.SpawnEnemy2(*(i32 *)((u8 *)instruction + 0xc), &position, health, arg4, field,
-                                           *(u8 **)((u8 *)this + 0x2ca0) + 0x18);
-    }
-    else
+    if (*(i32 *)((u8 *)this + 0x2dfc) <= 0 || ((*(u32 *)((u8 *)this + 0x3324) >> 10) & 1) != 0)
     {
         *(i32 *)((u8 *)&g_EnemyManager + 0x9dcef8) = 1;
+        return (Enemy *)0xf4f8f0;
     }
-    return enemy;
+    Float3 position;
+    position.x = ((*(u16 *)((u8 *)instruction + 0xa) & 2) != 0)
+        ? this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x10))
+        : *(f32 *)((u8 *)instruction + 0x10);
+    position.y = ((*(u16 *)((u8 *)instruction + 0xa) & 4) != 0)
+        ? this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x14))
+        : *(f32 *)((u8 *)instruction + 0x14);
+    position.z = 0.0f;
+    position += this->position0x2d88;
+    i32 field = ((*(u16 *)((u8 *)instruction + 0xa) & 0x20) != 0)
+        ? this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x20))
+        : *(i32 *)((u8 *)instruction + 0x20);
+    i32 arg4 = ((*(u16 *)((u8 *)instruction + 0xa) & 0x10) != 0)
+        ? this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x1c))
+        : *(i32 *)((u8 *)instruction + 0x1c);
+    i32 health = ((*(u16 *)((u8 *)instruction + 0xa) & 8) != 0)
+        ? this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x18))
+        : *(i32 *)((u8 *)instruction + 0x18);
+    return g_EnemyManager.SpawnEnemy2(*(i32 *)((u8 *)instruction + 0xc), &position, health, arg4, field,
+                                      *(u8 **)((u8 *)this + 0x2ca0) + 0x18);
 }
 
 // FUNCTION: th08 0x41f420
