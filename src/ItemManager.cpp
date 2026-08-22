@@ -122,8 +122,8 @@ Item *ItemManager::SpawnItem(Float3 *position, ItemType itemType, i32 state)
             }
         }
 
-        // TODO: Uncomment this when BulletManager is actually done
-        // g_BulletManager.bulletAnm->SetAndExecuteScriptIdx(&item->sprite, itemType + 61);
+        // 0x4403b9: bonusAnm is BulletManager's LAST member (ds:0x160f404 = +0x6ba574).
+        g_BulletManager.bonusAnm->SetAndExecuteScriptIdx(&item->sprite, itemType + 61);
 
         item->sprite.color1.d3dColor = 0xFFFFFFFF;
         item->sprite.zWriteDisabled = true;
