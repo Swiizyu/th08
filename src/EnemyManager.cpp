@@ -1506,22 +1506,30 @@ void __fastcall Enemy::FUN_004244f0(void *)
     }
     myTimer = *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x5c);
     *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x34) = *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x34) + 1;
-    if (myTimer != 0)
+    if (myTimer == 0)
     {
-        target = AddNormalizeAngle(*(f32 *)(best + 0x2d9c), myTimer * ZUN_2PI / cnt);
-        if (*(i32 *)(*(u8 **)(best + 0x2ca0) + 0x34) != *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x34))
-        {
-            target = AddNormalizeAngle(target, *(f32 *)((u8 *)this + 0x2da0));
-        }
-        diff = AddNormalizeAngle(*(f32 *)((u8 *)this + 0x2d9c), *(f32 *)((u8 *)this + 0x2da0));
-        diff = target - diff;
-        if (FUN_004031e0(diff) > ZUN_PI)
-        {
-            diff = (diff > 0.0f) ? (diff + -ZUN_2PI) : (diff + ZUN_2PI);
-        }
-        diff = diff * 0.02f;
-        *(f32 *)((u8 *)this + 0x2d9c) = AddNormalizeAngle(*(f32 *)((u8 *)this + 0x2d9c), diff);
+        return;
     }
+    target = AddNormalizeAngle(*(f32 *)(best + 0x2d9c), myTimer * ZUN_2PI / cnt);
+    if (*(i32 *)(*(u8 **)(best + 0x2ca0) + 0x34) != *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x34))
+    {
+        target = AddNormalizeAngle(target, *(f32 *)((u8 *)this + 0x2da0));
+    }
+    diff = AddNormalizeAngle(*(f32 *)((u8 *)this + 0x2d9c), *(f32 *)((u8 *)this + 0x2da0));
+    diff = target - diff;
+    if (FUN_004031e0(diff) > ZUN_PI)
+    {
+        if (diff > 0.0f)
+        {
+            diff = diff + -ZUN_2PI;
+        }
+        else
+        {
+            diff = diff + ZUN_2PI;
+        }
+    }
+    diff = diff * 0.02f;
+    *(f32 *)((u8 *)this + 0x2d9c) = AddNormalizeAngle(*(f32 *)((u8 *)this + 0x2d9c), diff);
 }
 
 
@@ -2640,50 +2648,22 @@ Enemy *__fastcall Enemy::FUN_0041f110(void *instruction)
     if (*(i32 *)((u8 *)this + 0x2dfc) > 0 && ((*(u32 *)((u8 *)this + 0x3324) >> 10) & 1) == 0)
     {
         Float3 position;
-        if ((*(u16 *)((u8 *)instruction + 0xa) & 2) != 0)
-        {
-            position.x = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x10));
-        }
-        else
-        {
-            position.x = *(f32 *)((u8 *)instruction + 0x10);
-        }
-        if ((*(u16 *)((u8 *)instruction + 0xa) & 4) != 0)
-        {
-            position.y = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x14));
-        }
-        else
-        {
-            position.y = *(f32 *)((u8 *)instruction + 0x14);
-        }
+        position.x = ((*(u16 *)((u8 *)instruction + 0xa) & 2) != 0)
+            ? this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x10))
+            : *(f32 *)((u8 *)instruction + 0x10);
+        position.y = ((*(u16 *)((u8 *)instruction + 0xa) & 4) != 0)
+            ? this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x14))
+            : *(f32 *)((u8 *)instruction + 0x14);
         position.z = 0.0f;
-        i32 field;
-        i32 arg4;
-        i32 health;
-        if ((*(u16 *)((u8 *)instruction + 0xa) & 0x20) != 0)
-        {
-            field = this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x20));
-        }
-        else
-        {
-            field = *(i32 *)((u8 *)instruction + 0x20);
-        }
-        if ((*(u16 *)((u8 *)instruction + 0xa) & 0x10) != 0)
-        {
-            arg4 = this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x1c));
-        }
-        else
-        {
-            arg4 = *(i32 *)((u8 *)instruction + 0x1c);
-        }
-        if ((*(u16 *)((u8 *)instruction + 0xa) & 8) != 0)
-        {
-            health = this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x18));
-        }
-        else
-        {
-            health = *(i32 *)((u8 *)instruction + 0x18);
-        }
+        i32 field = ((*(u16 *)((u8 *)instruction + 0xa) & 0x20) != 0)
+            ? this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x20))
+            : *(i32 *)((u8 *)instruction + 0x20);
+        i32 arg4 = ((*(u16 *)((u8 *)instruction + 0xa) & 0x10) != 0)
+            ? this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x1c))
+            : *(i32 *)((u8 *)instruction + 0x1c);
+        i32 health = ((*(u16 *)((u8 *)instruction + 0xa) & 8) != 0)
+            ? this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x18))
+            : *(i32 *)((u8 *)instruction + 0x18);
         enemy = g_EnemyManager.SpawnEnemy2(*(i32 *)((u8 *)instruction + 0xc), &position, health, arg4, field,
                                            *(u8 **)((u8 *)this + 0x2ca0) + 0x18);
     }
@@ -2701,51 +2681,23 @@ Enemy *__fastcall Enemy::FUN_0041f280(void *instruction)
     if (*(i32 *)((u8 *)this + 0x2dfc) > 0 && ((*(u32 *)((u8 *)this + 0x3324) >> 10) & 1) == 0)
     {
         Float3 position;
-        if ((*(u16 *)((u8 *)instruction + 0xa) & 2) != 0)
-        {
-            position.x = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x10));
-        }
-        else
-        {
-            position.x = *(f32 *)((u8 *)instruction + 0x10);
-        }
-        if ((*(u16 *)((u8 *)instruction + 0xa) & 4) != 0)
-        {
-            position.y = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x14));
-        }
-        else
-        {
-            position.y = *(f32 *)((u8 *)instruction + 0x14);
-        }
+        position.x = ((*(u16 *)((u8 *)instruction + 0xa) & 2) != 0)
+            ? this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x10))
+            : *(f32 *)((u8 *)instruction + 0x10);
+        position.y = ((*(u16 *)((u8 *)instruction + 0xa) & 4) != 0)
+            ? this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x14))
+            : *(f32 *)((u8 *)instruction + 0x14);
         position.z = 0.0f;
         position += this->position0x2d88;
-        i32 field;
-        i32 arg4;
-        i32 health;
-        if ((*(u16 *)((u8 *)instruction + 0xa) & 0x20) != 0)
-        {
-            field = this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x20));
-        }
-        else
-        {
-            field = *(i32 *)((u8 *)instruction + 0x20);
-        }
-        if ((*(u16 *)((u8 *)instruction + 0xa) & 0x10) != 0)
-        {
-            arg4 = this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x1c));
-        }
-        else
-        {
-            arg4 = *(i32 *)((u8 *)instruction + 0x1c);
-        }
-        if ((*(u16 *)((u8 *)instruction + 0xa) & 8) != 0)
-        {
-            health = this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x18));
-        }
-        else
-        {
-            health = *(i32 *)((u8 *)instruction + 0x18);
-        }
+        i32 field = ((*(u16 *)((u8 *)instruction + 0xa) & 0x20) != 0)
+            ? this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x20))
+            : *(i32 *)((u8 *)instruction + 0x20);
+        i32 arg4 = ((*(u16 *)((u8 *)instruction + 0xa) & 0x10) != 0)
+            ? this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x1c))
+            : *(i32 *)((u8 *)instruction + 0x1c);
+        i32 health = ((*(u16 *)((u8 *)instruction + 0xa) & 8) != 0)
+            ? this->FUN_0041f420(*(i32 *)((u8 *)instruction + 0x18))
+            : *(i32 *)((u8 *)instruction + 0x18);
         enemy = g_EnemyManager.SpawnEnemy2(*(i32 *)((u8 *)instruction + 0xc), &position, health, arg4, field,
                                            *(u8 **)((u8 *)this + 0x2ca0) + 0x18);
     }
