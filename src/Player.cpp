@@ -3205,7 +3205,7 @@ i32 Player::FUN_0044a360(Float3 *position, Float3 *hitbox)
 }
 
 // FUNCTION: th08 0x44a470
-#pragma var_order(maxPosition, minPosition)
+#pragma var_order(minPosition, maxPosition)
 i32 Player::FUN_0044a470(Float3 *position, Float3 *hitbox)
 {
     Float3 minPosition;
