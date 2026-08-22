@@ -250,10 +250,10 @@ void GuiImpl::MsgRead(i32 msgIdx)
                     msgIdx = 3;
                     this->msg.selectedOption = 1;
                 }
-                else if (g_GameManager.IsStageClearedWithRetries(STAGE6A, g_GameManager.shotType, EASY) ||
-                         g_GameManager.IsStageClearedWithRetries(STAGE6A, g_GameManager.shotType, NORMAL) ||
-                         g_GameManager.IsStageClearedWithRetries(STAGE6A, g_GameManager.shotType, HARD) ||
-                         g_GameManager.IsStageClearedWithRetries(STAGE6A, g_GameManager.shotType, LUNATIC))
+                else if (g_GameManager.FUN_00439856(STAGE6A, g_GameManager.shotType, EASY) ||
+                         g_GameManager.FUN_00439856(STAGE6A, g_GameManager.shotType, NORMAL) ||
+                         g_GameManager.FUN_00439856(STAGE6A, g_GameManager.shotType, HARD) ||
+                         g_GameManager.FUN_00439856(STAGE6A, g_GameManager.shotType, LUNATIC))
                 {
                     msgIdx = 2;
                     this->msg.selectedOption = 1;
