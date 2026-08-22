@@ -320,44 +320,10 @@ struct AnmPrefix
     D3DXMATRIX matrix3;
 };
 
-struct AnmVmBase : AnmPrefix
+C_ASSERT(sizeof(AnmPrefix) == 0x1f0);
+
+struct AnmVm : AnmPrefix
 {
-    AnmVmBase()
-    {
-    }
-
-    void Initialize()
-    {
-        memset(this, 0, sizeof(AnmVmBase));
-
-        this->scale.x = 1.0f;
-        this->scale.y = 1.0f;
-        this->color1.d3dColor = COLOR_WHITE;
-        D3DXMatrixIdentity(&this->matrix1);
-        this->flags = 7;
-        this->currentTimeInScript.Initialize();
-    }
-
-    ZunBool IsVisible()
-    {
-        return this->visible;
-    }
-
-    void SetInvisible()
-    {
-        this->visible = FALSE;
-    }
-
-    ZunBool IsStopped()
-    {
-        return this->stopped;
-    }
-
-    void SetInterrupt(i16 interrupt)
-    {
-        this->pendingInterrupt = interrupt;
-    }
-
     ZunColor color1;
     ZunColor color2;
     union {
@@ -387,15 +353,10 @@ struct AnmVmBase : AnmPrefix
     i16 pendingInterrupt;
     i32 playerBulletHitAnimationType;
     AnmLoaded *anmFile;
-};
 
-C_ASSERT(sizeof(AnmVmBase) == 0x208);
-
-struct AnmVm : AnmVmBase
-{
     void Initialize()
     {
-        memset(this, 0, sizeof(AnmVmBase));
+        memset(this, 0, 0x208);
         this->scale.x = 1.0f;
         this->scale.y = 1.0f;
         this->color1.d3dColor = COLOR_WHITE;
