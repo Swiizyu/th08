@@ -244,7 +244,6 @@ i32 MusicRoom::ProcessInput()
 ZunResult MusicRoom::RegisterChain()
 {
     static MusicRoom g_MusicRoom;
-
     MusicRoom *musicRoom = &g_MusicRoom;
 
     memset(musicRoom, 0, sizeof(MusicRoom));

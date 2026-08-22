@@ -52,8 +52,8 @@ struct GameManager
 {
     GameManager();
 
-    static ZunBool ShouldPauseMusicInSpellPractice(i32 spellcardNumber);
-    static i32 GetSongNameSpriteIdx(i32 spellcardNumber);
+    static ZunBool __fastcall ShouldPauseMusicInSpellPractice(i32 spellcardNumber);
+    static i32 __fastcall GetSongNameSpriteIdx(i32 spellcardNumber);
     ZunBool IsWithinPlayfield(f32 x, f32 y, f32 width, f32 height);
     i32 CalcAntiTamperChecksum();
     static i32 CalcChecksum(u8 *address, i32 size);
@@ -73,15 +73,9 @@ struct GameManager
 
     void AddTimeOrbs(i32 amount);
 
-    i32 GetTimeOrbs()
-    {
-        return this->globals->currentTimeOrbs;
-    }
+    i32 GetTimeOrbs();
 
-    i32 GetLastSpellTimeOrbThreshold()
-    {
-        return this->globals->lastSpellTimeOrbThreshold;
-    }
+    i32 GetLastSpellTimeOrbThreshold();
 
     i32 GetLives()
     {

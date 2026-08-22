@@ -1,6 +1,7 @@
 #include "th_pch.h"
 
 #include "AsciiManager.hpp"
+#include "EffectManager.hpp"
 #include "Gui.hpp"
 #include "Player.hpp"
 #include "ResultScreen.hpp"
@@ -14,6 +15,20 @@
 
 namespace th08
 {
+
+f32 FUN_004031e0(f32 value);
+// FUNCTION: th08 0x421b60
+i32 GameManager::GetTimeOrbs()
+{
+    return this->globals->currentTimeOrbs;
+}
+
+// FUNCTION: th08 0x421b80
+i32 GameManager::GetLastSpellTimeOrbThreshold()
+{
+    return this->globals->lastSpellTimeOrbThreshold;
+}
+
 
 DIFFABLE_STATIC(ChainElem, g_AsciiManagerDrawChainLowPrio);
 DIFFABLE_STATIC(AsciiManager, g_AsciiManager);
@@ -129,24 +144,16 @@ ZunBool GameManager::IsSoloYoukai()
 // FUNCTION: th08 0x418130
 ZunBool GameManager::IsSpellNumberEqualTo(i32 spellNumber)
 {
-    ZunBool result;
-
-    if (this->flags.isSpellPractice)
-    {
-        result = !(this->currentSpellCardNumber - spellNumber);
-    }
-    else
-    {
-        result = FALSE;
-    }
-    return result;
+    return this->flags.isSpellPractice ? !(this->currentSpellCardNumber - spellNumber) : 0;
 }
 
 // FUNCTION: th08 0x418180
 ZunBool GameManager::IsSpellNumberInRange(i32 firstSpellNumber, i32 lastSpellNumber)
 {
-    return this->flags.isSpellPractice && this->currentSpellCardNumber >= firstSpellNumber &&
-           this->currentSpellCardNumber <= lastSpellNumber;
+    return this->flags.isSpellPractice
+               ? (this->currentSpellCardNumber >= firstSpellNumber &&
+                  this->currentSpellCardNumber <= lastSpellNumber)
+               : 0;
 }
 
 // FUNCTION: th08 0x402130
@@ -606,7 +613,7 @@ void AsciiManager::OnDrawLowPrioImpl()
     {
         if (this->bossMarkers[i].pos.x >= 56.0f && this->bossMarkers[i].pos.x <= 392.0f)
         {
-            spaceWidth = fabsf(this->bossMarkers[i].pos.x - 32.0f - g_Player.position.x);
+            spaceWidth = FUN_004031e0(this->bossMarkers[i].pos.x - 32.0f - g_Player.position.x);
 
             this->bossMarkers[i].loadedSprite = this->asciiAnm->GetSprite(157);
 
@@ -1611,16 +1618,12 @@ i32 RetryMenu::OnUpdate()
 
             g_Supervisor.unk174 = 8;
 
-            IncrementIfBelow(&g_GameManager.plst.playData[g_GameManager.difficulty].attemptsTotal, 999999);
-            IncrementIfBelow(&g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].attemptsTotal, 999999);
-            IncrementIfBelow(
-                &g_GameManager.plst.playData[g_GameManager.difficulty].attemptsPerCharacter[g_GameManager.shotType],
-                999999);
-            IncrementIfBelow(
-                &g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].attemptsPerCharacter[g_GameManager.shotType],
-                999999);
-            IncrementIfBelow(&g_GameManager.plst.playData[g_GameManager.difficulty].continues, 999999);
-            IncrementIfBelow(&g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].continues, 999999);
+            ((PlstPlayCounts *)&(g_GameManager.plst.playData[g_GameManager.difficulty].attemptsTotal))->IncrementTotalAttempts(999999);
+            ((PlstPlayCounts *)&(g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].attemptsTotal))->IncrementTotalAttempts(999999);
+            ((PlstPlayCounts *)&(g_GameManager.plst.playData[g_GameManager.difficulty].attemptsPerCharacter[g_GameManager.shotType]))->IncrementTotalAttempts(999999);
+            ((PlstPlayCounts *)&(g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].attemptsPerCharacter[g_GameManager.shotType]))->IncrementTotalAttempts(999999);
+            ((PlstPlayCounts *)&(g_GameManager.plst.playData[g_GameManager.difficulty].continues))->IncrementTotalAttempts(999999);
+            ((PlstPlayCounts *)&(g_GameManager.plst.playData[MAX_DIFFICULTIES + 1].continues))->IncrementTotalAttempts(999999);
 
             g_SoundPlayer.Unpause();
 
@@ -1834,12 +1837,7 @@ void AsciiManager::OnDrawHighPrioImpl()
             ScreenEffect::DrawSquare(&rect, color.d3dColor);
         }
 
-#if 1
-        // FIXME: regalloc hack, remove when EffectManager is mapped out
-        g_Gui.timesAnm->SetAndExecuteScriptIdx(&this->nightBlindnessSprite, 105);
-#else
-        // g_EffectManager.bulletAnm->SetAndExecuteScriptIdx(&this->nightBlindnessSprite, 105);
-#endif
+        g_EffectManager.effectAnm->SetAndExecuteScriptIdx(&this->nightBlindnessSprite, 105);
 
         this->nightBlindnessSprite.scale.x = this->nightBlindnessSprite.scale.y = this->nightBlindnessRadius / 63.0f;
         this->nightBlindnessSprite.pos = g_Player.position;
@@ -1912,25 +1910,25 @@ void AsciiManager::OnDrawHighPrioImpl()
         this->percentageText.pos.z = this->youkaiGaugeCursor.pos.z;
         this->percentageText.color1.a = this->youkaiGauge.color1.a;
 
-        if (g_GameManager.IsGaugeExtremelyHuman())
+        if (g_GameManager.GaugeIsExtremelyHuman())
         {
             this->percentageText.color1.r = 112;
             this->percentageText.color1.g = 112;
             this->percentageText.color1.b = 255;
         }
-        else if (g_GameManager.IsGaugeModeratelyHuman())
+        else if (g_GameManager.GaugeIsModeratelyHuman())
         {
             this->percentageText.color1.r = 176;
             this->percentageText.color1.g = 176;
             this->percentageText.color1.b = 255;
         }
-        else if (g_GameManager.IsGaugeExtremelyYoukai())
+        else if (g_GameManager.GaugeIsExtremelyYoukai())
         {
             this->percentageText.color1.r = 255;
             this->percentageText.color1.g = 112;
             this->percentageText.color1.b = 112;
         }
-        else if (g_GameManager.IsGaugeModeratelyYoukai())
+        else if (g_GameManager.GaugeIsModeratelyYoukai())
         {
             this->percentageText.color1.r = 255;
             this->percentageText.color1.g = 176;

@@ -184,8 +184,8 @@ struct TitleScreen
     i32 selectedReplay;
     i32 selectedReplayStage;
     i32 idleFrames;
+    i32 unk0xc298;
     i32 currentNumberOfSpellCards;
-    i32 unk0xc29c;
     float percentageCapturedSpellPracticePerShot;
     float percentageCapturedInGamePerShot;
     float percentageCapturedSpellPractice;

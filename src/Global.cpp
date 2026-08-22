@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 // FUNCTION: th08 0x408fc0
-#pragma var_order(factor3, factor2, factor1, factor0)
+#pragma var_order(factor3, factor1, factor2, factor0)
 f32 __stdcall FUN_00408fc0(f32 value0, f32 value1, f32 tangent0, f32 tangent1, f32 time)
 {
     f32 factor0;
