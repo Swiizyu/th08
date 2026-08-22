@@ -2842,12 +2842,15 @@ void __fastcall StartEnemySpell(Enemy *enemy, void *instruction)
 }
 
 // FUNCTION: th08 0x421300
+#pragma var_order(diff, a, b, scale, b2, result)
 void __fastcall Enemy::FUN_00421300(void *instruction)
 {
     f32 a;
     f32 b;
     f32 scale;
     f32 b2;
+    f32 diff;
+    f32 result;
 
     if ((*(u16 *)((u8 *)instruction + 0xa) & 2) != 0)
     {
@@ -2865,7 +2868,7 @@ void __fastcall Enemy::FUN_00421300(void *instruction)
     {
         b = *(f32 *)((u8 *)instruction + 0x14);
     }
-    f32 diff = a - b;
+    diff = a - b;
     if ((*(u16 *)((u8 *)instruction + 0xa) & 8) != 0)
     {
         scale = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x18));
@@ -2882,7 +2885,8 @@ void __fastcall Enemy::FUN_00421300(void *instruction)
     {
         b2 = *(f32 *)((u8 *)instruction + 0x14);
     }
-    *this->FUN_00420950((u8 *)instruction + 0xc, *(u16 *)((u8 *)instruction + 0xa), 0) = diff * scale + b2;
+    result = diff * scale + b2;
+    *this->FUN_00420950((u8 *)instruction + 0xc, *(u16 *)((u8 *)instruction + 0xa), 0) = result;
 }
 
 #pragma var_order(i, entry)
