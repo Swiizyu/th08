@@ -141,14 +141,14 @@ ZunBool GameManager::IsSoloYoukai()
 // FUNCTION: th08 0x418130
 ZunBool GameManager::IsSpellNumberEqualTo(i32 spellNumber)
 {
-    return this->flags.isSpellPractice && !(this->currentSpellCardNumber - spellNumber);
+    return this->flags.isSpellPractice && (this->currentSpellCardNumber - spellNumber) == 0;
 }
 
 // FUNCTION: th08 0x418180
 ZunBool GameManager::IsSpellNumberInRange(i32 firstSpellNumber, i32 lastSpellNumber)
 {
-    return this->flags.isSpellPractice && this->currentSpellCardNumber >= firstSpellNumber &&
-           this->currentSpellCardNumber <= lastSpellNumber;
+    return this->flags.isSpellPractice && (this->currentSpellCardNumber >= firstSpellNumber &&
+                                           this->currentSpellCardNumber <= lastSpellNumber);
 }
 
 // FUNCTION: th08 0x402130

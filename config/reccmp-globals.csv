@@ -131,7 +131,6 @@ th08::g_EnemyManagerCalcChain,0xf54e30,global
 th08::g_EnemyManagerDrawChainLowPrio,0xf54e50,global
 th08::g_BulletManagerDrawChain,0xf54e70,global
 th08::g_BulletManager,0xf54e90,global
-th08::g_BulletArrayBase,0xf6f710,global
 th08::g_BulletManagerCalcChain,0x160f408,global
 th08::g_Gui,0x160f428,global
 th08::g_GuiDrawChain,0x160f4c4,global

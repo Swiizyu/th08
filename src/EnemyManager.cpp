@@ -31,7 +31,6 @@ DIFFABLE_STATIC(i32, g_EffectManagerState);
 void FUN_004235a0();
 
 DIFFABLE_EXTERN(i32, g_GameManagerUnknown4e3d28);
-DIFFABLE_STATIC(i32, g_BulletArrayBase);
 DIFFABLE_STATIC(void *, g_EclUnknown4ea28c);
 DIFFABLE_STATIC(AnmVm, g_EclEffectVm0);
 DIFFABLE_STATIC(AnmVm, g_EclEffectVm1);
@@ -1378,7 +1377,7 @@ void __fastcall Enemy::FUN_004241e0(void *)
     i32 zonePrev;
     i32 i;
 
-    bullet = (Bullet *)&g_BulletArrayBase;
+    bullet = (Bullet *)0xf6f710;
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
         if (bullet->state == 0)
@@ -1513,10 +1512,10 @@ void __fastcall Enemy::FUN_00424e50(void *)
 {
     Bullet *bullet;
     u8 *chain;
-    Float3 delta;
     i32 i;
 
-    bullet = (Bullet *)&g_BulletArrayBase;
+    bullet = (Bullet *)0xf6f710;
+    Float3 delta;
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
         if (bullet->state == 0)
@@ -1552,7 +1551,7 @@ void __fastcall EclExIns::FUN_004250d0(void *)
     Bullet *bullet;
     Float3 state;
 
-    bullet = (Bullet *)&g_BulletArrayBase;
+    bullet = (Bullet *)0xf6f710;
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
         if (bullet->state == 0)
@@ -1575,7 +1574,7 @@ void __fastcall Enemy::FUN_00424c40(void *)
     Bullet *bullet;
     i32 i;
 
-    bullet = (Bullet *)&g_BulletArrayBase;
+    bullet = (Bullet *)0xf6f710;
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
         if (bullet->state == 0)
@@ -1625,7 +1624,7 @@ void __fastcall EclExIns::ReisenFreezeBullets(void *)
     u8 *chain;
     u8 *chain2;
 
-    bullet = (Bullet *)&g_BulletArrayBase;
+    bullet = (Bullet *)0xf6f710;
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
         if (bullet->state == 0)
