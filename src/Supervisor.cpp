@@ -36,11 +36,8 @@ DIFFABLE_STATIC_ARRAY(char, 256, g_ReplayFpsBuffer);
 DIFFABLE_STATIC_ARRAY(char, 256, g_FpsCounterBuffer);
 DIFFABLE_STATIC(u32, g_NumFramesSinceLastTime);
 
-// FUNCTION: th08 0x40b900
-ZunBool KeepStageResources()
-{
-    return g_Supervisor.keepStageResources;
-}
+// NOTE: 0x40b900 is IsDisableResourceReload (Background.cpp); duplicate annotation
+// removed here per trap #24 (reccmp "Dropped duplicate address" error).
 
 // FUNCTION: th08 0x448972
 void Supervisor::FUN_00448972()

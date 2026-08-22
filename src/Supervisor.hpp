@@ -457,6 +457,5 @@ inline ZunBool ReleaseResourcesOnRestart()
     return g_Supervisor.unk168;
 }
 
-ZunBool KeepStageResources();
 
 }; // namespace th08
