@@ -19,7 +19,6 @@ DIFFABLE_STATIC_ARRAY(VertexTex1DiffuseXyzrhw, 4, g_QuadVertices);
 DIFFABLE_STATIC_ARRAY(VertexTex1Xyzrhw, 4, g_UnknownQuadVertices);
 DIFFABLE_STATIC_ARRAY(VertexTex1Xyzrhw, 4, g_BackgroundQuadVertices);
 
-// FUNCTION: th08 0x4067c0
 AnmVmBase::AnmVmBase()
 {
 }
