@@ -19,13 +19,12 @@ u32 FUN_004338b0();
 u32 FUN_004338c0();
 u32 FUN_0044e0e0();
 void FUN_0044e370(void *data);
+i32 __fastcall FUN_0042f1f0(th08::EnemyManager *enemyManager);
 
 namespace th08 { i32 __fastcall FUN_00450580(void *, void *); }
 
 namespace th08
 {
-
-i32 __fastcall FUN_0042f1f0(EnemyManager *enemyManager);
 
 DIFFABLE_STATIC(i32, g_BackgroundTintActive);
 
