@@ -105,6 +105,7 @@ FLOAT_0.5_004c9fd0,0x4c9fd0,global
 FLOAT_3.0_004c9fe0,0x4c9fe0,global
 th08::g_AsciiManagerDrawChainLowPrio,0x4cce00,global
 th08::g_AsciiManager,0x4cce20,global
+th08::g_StageTextAnms,0x4c745c,global,0x24
 g_MusicRoom,0x17cf4c8,global
 $S1,0x17d5ef0,global
 th08::g_UnknownPos4ea3c4,0x4ea3c4,global

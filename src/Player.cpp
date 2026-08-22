@@ -2836,15 +2836,15 @@ void Player::FUN_0044d420()
     *(Float3 *)((u8 *)this + 0xe2ab0) = Float3(-999.0f, -999.0f, 0.0f);
     *(i32 *)((u8 *)this + 0xe2ac0) = 0;
 
-    if (this->position.y >= 0.0f)
+    if (this->position.y >= 400.0f)
     {
-        if (g_AsciiManager.GetGaugeInterrupt() != 2 && this->position.x < 0.0f)
+        if (g_AsciiManager.GetGaugeInterrupt() != 2 && this->position.x < 160.0f)
         {
             g_AsciiManager.SetGaugeInterrupt(2);
         }
         else
         {
-            if (g_AsciiManager.GetGaugeInterrupt() == 2 && this->position.x > 0.0f)
+            if (g_AsciiManager.GetGaugeInterrupt() == 2 && this->position.x > 160.0f)
             {
                 g_AsciiManager.SetGaugeInterrupt(3);
             }
