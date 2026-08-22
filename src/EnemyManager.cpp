@@ -276,15 +276,7 @@ ZunBool AnmVm::FUN_00428720()
 // FUNCTION: th08 0x42fe70
 void __fastcall AnmVm::FUN_0042fe70(AnmVm *other)
 {
-    AnmVm *dst = this;
-    AnmVm *src = other;
-    __asm
-    {
-        mov esi, src
-        mov edi, dst
-        mov ecx, 0xa9
-        rep movsd
-    }
+    memcpy(this, other, sizeof(AnmVm));
 }
 
 // FUNCTION: th08 0x42fea0
