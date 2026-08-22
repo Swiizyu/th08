@@ -11,7 +11,7 @@ import sys
 import datetime
 
 REPO = "Swiizyu/th08"
-BRANCH = "arena/01a01c02-th08"
+BRANCH = "arena/01a026cc-th08"
 
 
 def sh(args):
