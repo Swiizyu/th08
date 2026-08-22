@@ -31,6 +31,7 @@ DIFFABLE_STATIC(i32, g_EffectManagerState);
 void FUN_004235a0();
 
 DIFFABLE_EXTERN(i32, g_GameManagerUnknown4e3d28);
+DIFFABLE_STATIC(i32, g_BulletArrayBase);
 DIFFABLE_STATIC(void *, g_EclUnknown4ea28c);
 DIFFABLE_STATIC(AnmVm, g_EclEffectVm0);
 DIFFABLE_STATIC(AnmVm, g_EclEffectVm1);
@@ -1377,7 +1378,7 @@ void __fastcall Enemy::FUN_004241e0(void *)
     i32 zonePrev;
     i32 i;
 
-    bullet = (Bullet *)0xf6f710;
+    bullet = (Bullet *)&g_BulletArrayBase;
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
         if (bullet->state == 0)
@@ -1515,27 +1516,30 @@ void __fastcall Enemy::FUN_00424e50(void *)
     Float3 delta;
     i32 i;
 
-    bullet = (Bullet *)0xf6f710;
+    bullet = (Bullet *)&g_BulletArrayBase;
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
-        if (bullet->state == 0 || (bullet->flags & 0x100000) == 0)
+        if (bullet->state == 0)
         {
             continue;
         }
-        chain = *(u8 **)((u8 *)this + 8);
-        while (chain != NULL)
+        if ((bullet->flags & 0x100000) != 0)
         {
-            if (*(i32 *)(*(u8 **)(chain + 0x2ca0) + 0x60) == 0)
+            chain = *(u8 **)((u8 *)this + 8);
+            while (chain != NULL)
             {
-                delta = *(Float3 *)((u8 *)bullet + 0xd44) - *(Float3 *)(*(u8 **)(chain + 0x2ca0) + 0x2d34);
-                if (delta.FUN_0040b500() >= 4096.0f)
+                if (*(i32 *)(*(u8 **)(chain + 0x2ca0) + 0x60) == 0)
                 {
-                    *(i32 *)(*(u8 **)(chain + 0x2ca0) + 0x60) = 60;
-                    *(i32 *)(*(u8 **)(chain + 0x2ca0) + 0x34) =
-                        *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x34);
+                    delta = *(Float3 *)((u8 *)bullet + 0xd44) - *(Float3 *)(*(u8 **)(chain + 0x2ca0) + 0x2d34);
+                    if (delta.FUN_0040b500() < 4096.0f)
+                    {
+                        *(i32 *)(*(u8 **)(chain + 0x2ca0) + 0x60) = 60;
+                        *(i32 *)(*(u8 **)(chain + 0x2ca0) + 0x34) =
+                            *(i32 *)(*(u8 **)((u8 *)this + 0x2ca0) + 0x34);
+                    }
                 }
+                chain = *(u8 **)(chain + 8);
             }
-            chain = *(u8 **)(chain + 8);
         }
     }
 }
@@ -1548,7 +1552,7 @@ void __fastcall EclExIns::FUN_004250d0(void *)
     Bullet *bullet;
     Float3 state;
 
-    bullet = &g_BulletManager.bullets[0];
+    bullet = (Bullet *)&g_BulletArrayBase;
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
         if (bullet->state == 0)
@@ -1571,7 +1575,7 @@ void __fastcall Enemy::FUN_00424c40(void *)
     Bullet *bullet;
     i32 i;
 
-    bullet = (Bullet *)0xf6f710;
+    bullet = (Bullet *)&g_BulletArrayBase;
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
         if (bullet->state == 0)
@@ -1621,7 +1625,7 @@ void __fastcall EclExIns::ReisenFreezeBullets(void *)
     u8 *chain;
     u8 *chain2;
 
-    bullet = (Bullet *)0xf6f710;
+    bullet = (Bullet *)&g_BulletArrayBase;
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
         if (bullet->state == 0)
