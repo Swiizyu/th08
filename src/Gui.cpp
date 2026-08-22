@@ -23,7 +23,6 @@ u32 GuiReleaseResourcesOnRestart();
 
 namespace th08
 {
-DIFFABLE_EXTERN(i32, g_EffectManagerState);
 
 // FUNCTION: th08 0x439856
 u32 GameManager::FUN_00439856(i32 bit, i32 entryIdx, i32 valueIdx)
@@ -210,13 +209,13 @@ void GuiImpl::MsgRead(i32 msgIdx)
             Gui::CopyEnemyNameTexture(22);
             break;
         case STAGE6A:
-            *(i32 *)((u8 *)&g_EffectManagerState + 4) = 2;
+            g_Background.unk_b34 = 2;
             break;
         case STAGE6B: {
             AnmLoaded *enemyFaceAnm = g_Spellcard.enemyFaceAnm;
             g_Spellcard.enemyFaceAnm = g_Spellcard.enemyFaceAnm2;
             g_Spellcard.enemyFaceAnm2 = enemyFaceAnm;
-            *(i32 *)((u8 *)&g_EffectManagerState + 4) = 2;
+            g_Background.unk_b34 = 2;
             Gui::CopyEnemyNameTexture(24);
             break;
         }
@@ -224,7 +223,7 @@ void GuiImpl::MsgRead(i32 msgIdx)
             AnmLoaded *enemyFaceAnm = g_Spellcard.enemyFaceAnm;
             g_Spellcard.enemyFaceAnm = g_Spellcard.enemyFaceAnm2;
             g_Spellcard.enemyFaceAnm2 = enemyFaceAnm;
-            *(i32 *)((u8 *)&g_EffectManagerState + 4) = 2;
+            g_Background.unk_b34 = 2;
             Gui::CopyEnemyNameTexture(25);
             break;
         }

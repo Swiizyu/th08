@@ -30,7 +30,6 @@ DIFFABLE_STATIC(i32, g_EnemyManagerUnknown);
 DIFFABLE_STATIC(Float3, g_UnknownPos4ea3c4);
 DIFFABLE_STATIC(Float3, g_UnknownVec4ea3e8);
 DIFFABLE_STATIC(EffectManager, g_EffectManager);
-DIFFABLE_STATIC(i32, g_EffectManagerState);
 void FUN_004235a0();
 
 DIFFABLE_EXTERN(i32, g_GameManagerUnknown4e3d28);
@@ -1204,7 +1203,7 @@ void __fastcall EclExIns::FUN_00424130(void *)
 {
     g_EffectManager.FUN_004253e0(9)->active = 0;
     g_EffectManager.FUN_004253e0(10)->active = 0;
-    g_EffectManagerState = 2;
+    g_Background.unk0xB30 = 2;
 }
 
 // FUNCTION: th08 0x4246e0
@@ -2019,7 +2018,7 @@ ZunResult EffectManager::AddedCallback(EffectManager *effectManager)
     effectManager->ResetEffects();
     effectManager->effectAnm = g_AnmManager->GetAnm(6);
     *(i32 *)0x4e4b64 = 0;
-    g_EffectManagerState = 2;
+    g_Background.unk0xB30 = 2;
     if (!IsDisableResourceReload())
     {
         if (!g_GameManager.IsSpellPractice() || g_GameManager.currentSpellCardNumber < 0xd8)
