@@ -107,8 +107,8 @@ th08::g_AsciiManagerDrawChainLowPrio,0x4cce00,global
 th08::g_AsciiManager,0x4cce20,global
 g_MusicRoom,0x17cf4c8,global
 $S1,0x17d5ef0,global
-g_UnknownPos4ea3c4,0x4ea3c4,global
-g_UnknownVec4ea3e8,0x4ea3e8,global
+th08::g_UnknownPos4ea3c4,0x4ea3c4,global
+th08::g_UnknownVec4ea3e8,0x4ea3e8,global
 th08::g_GameManagerUnknown4e3d28,0x4e3d28,global
 th08::g_AsciiManagerCalcChain,0x4e3fd0,global
 th08::g_AsciiManagerDrawChainHighPrio,0x4e3ff0,global
