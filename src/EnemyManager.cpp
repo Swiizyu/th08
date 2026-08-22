@@ -2898,10 +2898,10 @@ void __fastcall Enemy::FUN_004213f0(void *instruction)
     i32 v0x10;
     i32 v0x14;
     i32 v0x18;
-    i32 v0x1c;
-    i32 v0x20;
-    i32 v0x24;
-    i32 v0x28;
+    f32 v0x1c;
+    f32 v0x20;
+    f32 v0x24;
+    f32 v0x28;
 
     entry = *(u8 **)((u8 *)this + 0x2ca0) + 0x9c;
     for (i = 0; i < 8; i++, entry += 0x30)
@@ -2942,40 +2942,40 @@ void __fastcall Enemy::FUN_004213f0(void *instruction)
         *(i32 *)entry = *(i32 *)(0x4c6c90 + *(i32 *)(entry + 0x14) * 4);
         if ((*(u16 *)((u8 *)instruction + 0xa) & 0x10) != 0)
         {
-            v0x1c = *(i32 *)&this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x1c));
+            v0x1c = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x1c));
         }
         else
         {
-            v0x1c = *(i32 *)((u8 *)instruction + 0x1c);
+            v0x1c = *(f32 *)((u8 *)instruction + 0x1c);
         }
-        *(i32 *)(entry + 0x1c) = v0x1c;
+        *(f32 *)(entry + 0x1c) = v0x1c;
         if ((*(u16 *)((u8 *)instruction + 0xa) & 0x20) != 0)
         {
-            v0x20 = *(i32 *)&this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x20));
+            v0x20 = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x20));
         }
         else
         {
-            v0x20 = *(i32 *)((u8 *)instruction + 0x20);
+            v0x20 = *(f32 *)((u8 *)instruction + 0x20);
         }
-        *(i32 *)(entry + 0x20) = v0x20;
+        *(f32 *)(entry + 0x20) = v0x20;
         if ((*(u16 *)((u8 *)instruction + 0xa) & 0x40) != 0)
         {
-            v0x24 = *(i32 *)&this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x24));
+            v0x24 = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x24));
         }
         else
         {
-            v0x24 = *(i32 *)((u8 *)instruction + 0x24);
+            v0x24 = *(f32 *)((u8 *)instruction + 0x24);
         }
-        *(i32 *)(entry + 0x24) = v0x24;
+        *(f32 *)(entry + 0x24) = v0x24;
         if ((*(u16 *)((u8 *)instruction + 0xa) & 0x80) != 0)
         {
-            v0x28 = *(i32 *)&this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x28));
+            v0x28 = this->FUN_00420120(*(f32 *)((u8 *)instruction + 0x28));
         }
         else
         {
-            v0x28 = *(i32 *)((u8 *)instruction + 0x28);
+            v0x28 = *(f32 *)((u8 *)instruction + 0x28);
         }
-        *(i32 *)(entry + 0x28) = v0x28;
+        *(f32 *)(entry + 0x28) = v0x28;
         *(i32 *)entry = 1;
         break;
     }
