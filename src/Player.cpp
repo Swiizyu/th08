@@ -4128,14 +4128,12 @@ i32 __fastcall Player::FUN_00450c50(u8 *data, Float3 *position)
 }
 
 // FUNCTION: th08 0x450ee0
-#pragma var_order(spawnPosition)
 i32 __fastcall Player::FUN_00450ee0(Effect *effect, Float3 *position)
 {
-    Float3 spawnPosition;
-
     (*(u8 *)((u8 *)this + 0xe2a94))++;
     if ((*(u8 *)((u8 *)this + 0xe2a94) % 8) == 0)
     {
+        Float3 spawnPosition;
         spawnPosition = *position;
         spawnPosition.x = effect->position.x;
         g_EffectManager.SpawnEffect(5, &spawnPosition, 1, -1);
