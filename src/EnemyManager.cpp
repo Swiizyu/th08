@@ -16,6 +16,7 @@
 
 u32 FUN_004338b0();
 u32 FUN_004338c0();
+i32 __fastcall FUN_0042f1f0(EnemyManager *enemyManager);
 
 namespace th08
 {
