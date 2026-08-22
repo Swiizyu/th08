@@ -736,15 +736,15 @@ i32 Effect::FUN_004264f0()
     {
         if (((*(u32 *)((u8 *)g_PlayerObjPtrs[0] + 0x3324) >> 3) & 1) != 0)
         {
-            if (*(f32 *)((u8 *)&this->vm + 0x288) <= -9999.0f)
+            if (*(f32 *)((u8 *)&this->vm + 0x288) > -9999.0f)
+            {
+                *(Float3 *)((u8 *)&this->vm + 0x288) = *(Float3 *)((u8 *)g_PlayerObjPtrs[0] + 0x2d34);
+            }
+            else
             {
                 *(Float3 *)((u8 *)&this->vm + 0x288) =
                     (*(Float3 *)((u8 *)g_PlayerObjPtrs[0] + 0x2d34) - *(Float3 *)((u8 *)&this->vm + 0x288)) * 0.1f +
                     *(Float3 *)((u8 *)&this->vm + 0x288);
-            }
-            else
-            {
-                *(Float3 *)((u8 *)&this->vm + 0x288) = *(Float3 *)((u8 *)g_PlayerObjPtrs[0] + 0x2d34);
             }
         }
     }
@@ -808,15 +808,15 @@ i32 Effect::FUN_00426990()
     {
         if (((*(u32 *)((u8 *)g_PlayerObjPtrs[0] + 0x3324) >> 3) & 1) != 0)
         {
-            if (*(f32 *)((u8 *)&this->vm + 0x288) <= -9999.0f)
+            if (*(f32 *)((u8 *)&this->vm + 0x288) >= -9999.0f)
+            {
+                *(Float3 *)((u8 *)&this->vm + 0x288) = *(Float3 *)((u8 *)g_PlayerObjPtrs[0] + 0x2d34);
+            }
+            else
             {
                 *(Float3 *)((u8 *)&this->vm + 0x288) =
                     (*(Float3 *)((u8 *)g_PlayerObjPtrs[0] + 0x2d34) - *(Float3 *)((u8 *)&this->vm + 0x288)) * 0.1f +
                     *(Float3 *)((u8 *)&this->vm + 0x288);
-            }
-            else
-            {
-                *(Float3 *)((u8 *)&this->vm + 0x288) = *(Float3 *)((u8 *)g_PlayerObjPtrs[0] + 0x2d34);
             }
         }
     }
