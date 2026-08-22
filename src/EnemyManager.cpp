@@ -1466,7 +1466,7 @@ void __fastcall Enemy::FUN_004241e0(void *)
 
 // FUNCTION: th08 0x4244f0
 #pragma var_order(cnt, myTimer, best, diff, target, chain)
-void Enemy::FUN_004244f0(void *)
+void __fastcall Enemy::FUN_004244f0(void *)
 {
     u8 *chain;
     f32 target;
