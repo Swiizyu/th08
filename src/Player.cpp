@@ -3302,22 +3302,17 @@ void Player::ScoreGraze(Float3 *position, i32 suppressTimeOrbEffects)
 
     if (*(i32 *)((u8 *)&g_Player + 0xfdc) == 0)
     {
-        if (g_GameManager.GaugeIsExtremelyHuman())
-        {
-            grazeCount = 3;
-        }
-        else
-        {
-            grazeCount = (g_GameManager.GaugeIsModeratelyHuman() != 0) + 1;
-        }
+        grazeCount = g_GameManager.GaugeIsExtremelyHuman()
+                         ? 3
+                         : (g_GameManager.GaugeIsModeratelyHuman() != 0) + 1;
 
         if (g_GameManager.globals->grazeInStage < 99999)
         {
             g_GameManager.globals->grazeInStage += grazeCount;
         }
-        if (g_GameManager.globals->score < 999999)
+        if (g_GameManager.globals->graze < 999999)
         {
-            g_GameManager.globals->score += grazeCount;
+            g_GameManager.globals->graze += grazeCount;
         }
     }
 
