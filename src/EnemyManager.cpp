@@ -695,8 +695,8 @@ i32 Effect::FUN_00426280()
 {
     Float3 cameraLookAtInverse;
 
-    cameraLookAtInverse = -g_Background.vectors0x6394.vector1;
-    this->basePosition = g_Background.vectors0x6394.vector1 + g_Background.vectors0x6394.vector0;
+    cameraLookAtInverse = -*(Float3 *)0x4ea3d0;
+    this->basePosition = *(Float3 *)0x4ea3d0 + *(Float3 *)0x4ea3c4;
     this->basePosition.x += g_Rng.GetRandomF32SignedInRange(60.0f) + cameraLookAtInverse.x / 2.0f;
     this->basePosition.y += g_Rng.GetRandomF32SignedInRange(100.0f) - 50.0f + cameraLookAtInverse.y / 2.0f;
     this->basePosition.z += g_Rng.GetRandomF32InRange(100.0f) - 100.0f + cameraLookAtInverse.z / 2.0f;
@@ -751,8 +751,8 @@ i32 Effect::FUN_00426720()
 {
     Float3 cameraLookAtInverse;
 
-    cameraLookAtInverse = -g_Background.vectors0x6394.vector1;
-    this->basePosition = g_Background.vectors0x6394.vector1 + g_Background.vectors0x6394.vector0;
+    cameraLookAtInverse = -*(Float3 *)0x4ea3d0;
+    this->basePosition = *(Float3 *)0x4ea3d0 + *(Float3 *)0x4ea3c4;
     this->basePosition.x += g_Rng.GetRandomF32SignedInRange(60.0f) + cameraLookAtInverse.x / 2.0f;
     this->basePosition.y += g_Rng.GetRandomF32SignedInRange(200.0f) - 200.0f + cameraLookAtInverse.y / 2.0f;
     this->basePosition.z += g_Rng.GetRandomF32InRange(100.0f) - 100.0f + cameraLookAtInverse.z / 2.0f;
@@ -873,8 +873,8 @@ i32 Effect::FUN_00426e70()
 {
     Float3 cameraLookAtInverse;
 
-    cameraLookAtInverse = -g_Background.vectors0x6394.vector1;
-    this->basePosition = g_Background.vectors0x6394.vector1 + g_Background.vectors0x6394.vector0;
+    cameraLookAtInverse = -*(Float3 *)0x4ea3d0;
+    this->basePosition = *(Float3 *)0x4ea3d0 + *(Float3 *)0x4ea3c4;
     this->basePosition.x += g_Rng.GetRandomF32InRange(120.0f) - 60.0f + cameraLookAtInverse.x / 2.0f;
     this->basePosition.y += g_Rng.GetRandomF32InRange(200.0f) - 100.0f + cameraLookAtInverse.y / 2.0f;
     this->basePosition.z += g_Rng.GetRandomF32InRange(100.0f) - 100.0f + cameraLookAtInverse.z / 2.0f;
@@ -1377,7 +1377,7 @@ void __fastcall Enemy::FUN_004241e0(void *)
     i32 zonePrev;
     i32 i;
 
-    bullet = (Bullet *)0xf6f710;
+    bullet = &g_BulletManager.bullets[0];
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
         if (bullet->state == 0)
@@ -1549,9 +1549,9 @@ void __fastcall EclExIns::FUN_004250d0(void *)
 {
     i32 i;
     Bullet *bullet;
-    Float3 state;
 
-    bullet = (Bullet *)0xf6f710;
+    bullet = &g_BulletManager.bullets[0];
+    Float3 state;
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
         if (bullet->state == 0)
@@ -1574,7 +1574,7 @@ void __fastcall Enemy::FUN_00424c40(void *)
     Bullet *bullet;
     i32 i;
 
-    bullet = (Bullet *)0xf6f710;
+    bullet = &g_BulletManager.bullets[0];
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
         if (bullet->state == 0)
@@ -1624,7 +1624,7 @@ void __fastcall EclExIns::ReisenFreezeBullets(void *)
     u8 *chain;
     u8 *chain2;
 
-    bullet = (Bullet *)0xf6f710;
+    bullet = &g_BulletManager.bullets[0];
     for (i = 0; i < MAX_BULLETS; i++, bullet++)
     {
         if (bullet->state == 0)
@@ -3618,7 +3618,7 @@ Enemy *EnemyManager::SpawnEnemy1(i16 timeline, Float3 *position, i32 health, i8 
 }
 
 // FUNCTION: th08 0x42a680
-Enemy *EnemyManager::SpawnEnemy2(i16 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08,
+Enemy *EnemyManager::SpawnEnemy2(i32 timeline, Float3 *position, i32 health, i8 arg4, i32 field2e08,
                                    void *eclData)
 {
     Enemy *enemy = this->SpawnEnemy1(timeline, position, health, arg4, field2e08, 0);
