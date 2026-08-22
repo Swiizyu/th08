@@ -3341,7 +3341,7 @@ f32 Player::AngleToPlayer(Float3 *position)
     {
         return 1.5707964f;
     }
-    return atan2f(deltaY, deltaX);
+    return FUN_0040c7b0(deltaY, deltaX);
 }
 
 static void ResetPlayerEffectState(u8 *data)
