@@ -1172,11 +1172,11 @@ void __fastcall EclExIns::FUN_00423530(void *)
 void __fastcall EclExIns::FUN_00423db0(void *)
 {
     Effect *effect;
-    Float3 *position = (Float3 *)((u8 *)this + 0x2d34);
 
-    effect = g_EffectManager.SpawnSpecialEffect(65, position, 9, 1, -1);
-    effect = g_EffectManager.SpawnSpecialEffect(65, position, 10, 1, -1);
+    effect = g_EffectManager.SpawnSpecialEffect(65, (Float3 *)((u8 *)this + 0x2d34), 9, 1, -1);
+    effect = g_EffectManager.SpawnSpecialEffect(65, (Float3 *)((u8 *)this + 0x2d34), 10, 1, -1);
     g_EffectManager.effectAnm->SetAndExecuteScriptIdx(&effect->vm, 99);
+    g_EclUnknown4ea28c = (void *)0x4235a0;
 }
 
 // FUNCTION: th08 0x424170
