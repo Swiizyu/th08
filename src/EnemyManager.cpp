@@ -719,12 +719,12 @@ i32 Effect::FUN_00426280()
 #pragma var_order(localPosition, dot)
 i32 Effect::FUN_004264f0()
 {
-    Float3 localPosition;
     f32 dot;
 
     this->velocity += this->acceleration;
     this->basePosition += this->velocity;
     this->position = this->basePosition;
+    Float3 localPosition;
     localPosition = this->position - *(Float3 *)0x4ea3c4;
     D3DXVec3Normalize((D3DXVECTOR3 *)&localPosition, (D3DXVECTOR3 *)&localPosition);
     dot = (*(Float3 *)0x4ea3e8).FUN_0040b540(&localPosition);
@@ -736,15 +736,15 @@ i32 Effect::FUN_004264f0()
     {
         if (((*(u32 *)((u8 *)g_PlayerObjPtrs[0] + 0x3324) >> 3) & 1) != 0)
         {
-            if (*(f32 *)((u8 *)&this->vm + 0x288) < 1.81935568245824e-38f)
+            if (*(f32 *)((u8 *)&this->vm + 0x288) > -9999.0f)
+            {
+                *(Float3 *)((u8 *)&this->vm + 0x288) = *(Float3 *)((u8 *)g_PlayerObjPtrs[0] + 0x2d34);
+            }
+            else
             {
                 *(Float3 *)((u8 *)&this->vm + 0x288) =
                     (*(Float3 *)((u8 *)g_PlayerObjPtrs[0] + 0x2d34) - *(Float3 *)((u8 *)&this->vm + 0x288)) * 0.1f +
                     *(Float3 *)((u8 *)&this->vm + 0x288);
-            }
-            else
-            {
-                *(Float3 *)((u8 *)&this->vm + 0x288) = *(Float3 *)((u8 *)g_PlayerObjPtrs[0] + 0x2d34);
             }
         }
     }
@@ -791,12 +791,12 @@ i32 Effect::FUN_00426720()
 #pragma var_order(localPosition, dot)
 i32 Effect::FUN_00426990()
 {
-    Float3 localPosition;
     f32 dot;
 
     this->velocity += this->acceleration;
     this->basePosition += this->velocity;
     this->position = this->basePosition;
+    Float3 localPosition;
     localPosition = this->position - *(Float3 *)0x4ea3c4;
     D3DXVec3Normalize((D3DXVECTOR3 *)&localPosition, (D3DXVECTOR3 *)&localPosition);
     dot = (*(Float3 *)0x4ea3e8).FUN_0040b540(&localPosition);
@@ -808,15 +808,15 @@ i32 Effect::FUN_00426990()
     {
         if (((*(u32 *)((u8 *)g_PlayerObjPtrs[0] + 0x3324) >> 3) & 1) != 0)
         {
-            if (*(f32 *)((u8 *)&this->vm + 0x288) < 1.81935568245824e-38f)
+            if (*(f32 *)((u8 *)&this->vm + 0x288) > -9999.0f)
+            {
+                *(Float3 *)((u8 *)&this->vm + 0x288) = *(Float3 *)((u8 *)g_PlayerObjPtrs[0] + 0x2d34);
+            }
+            else
             {
                 *(Float3 *)((u8 *)&this->vm + 0x288) =
                     (*(Float3 *)((u8 *)g_PlayerObjPtrs[0] + 0x2d34) - *(Float3 *)((u8 *)&this->vm + 0x288)) * 0.1f +
                     *(Float3 *)((u8 *)&this->vm + 0x288);
-            }
-            else
-            {
-                *(Float3 *)((u8 *)&this->vm + 0x288) = *(Float3 *)((u8 *)g_PlayerObjPtrs[0] + 0x2d34);
             }
         }
     }
@@ -873,12 +873,12 @@ i32 Effect::FUN_00426c90()
 #pragma var_order(localPosition, dot)
 i32 Effect::FUN_00426d70()
 {
-    Float3 localPosition;
     f32 dot;
 
     this->velocity += this->acceleration;
     this->basePosition += this->velocity;
     this->position = this->basePosition;
+    Float3 localPosition;
     localPosition = this->position - *(Float3 *)0x4ea3c4;
     D3DXVec3Normalize((D3DXVECTOR3 *)&localPosition, (D3DXVECTOR3 *)&localPosition);
     dot = (*(Float3 *)0x4ea3e8).FUN_0040b540(&localPosition);
@@ -887,11 +887,11 @@ i32 Effect::FUN_00426d70()
         return 0;
     }
     this->vm.SetZRotation(AddNormalizeAngle(this->vm.rotation.z, this->vm.rotation.x));
-    if (this->position.z < 0.0f)
+    if (this->position.z >= 0.0f)
     {
-        return 1;
+        return 0;
     }
-    return 0;
+    return 1;
 }
 
 // FUNCTION: th08 0x426e70
@@ -1422,7 +1422,7 @@ void __fastcall Enemy::FUN_004241e0(void *)
         {
             zoneCur = 0;
         }
-        else if (bullet->position.x > -96.0f && bullet->position.x < 416.0f && bullet->position.y > 0.0f &&
+        else if (bullet->position.x > -32.0f && bullet->position.x < 416.0f && bullet->position.y > 0.0f &&
                  bullet->position.y < 448.0f)
         {
             zoneCur = 1;
@@ -1436,7 +1436,7 @@ void __fastcall Enemy::FUN_004241e0(void *)
         {
             zonePrev = 0;
         }
-        else if (delta.x > -96.0f && delta.x < 416.0f && delta.y > 0.0f && delta.y < 448.0f)
+        else if (delta.x > -32.0f && delta.x < 416.0f && delta.y > 0.0f && delta.y < 448.0f)
         {
             zonePrev = 1;
         }
