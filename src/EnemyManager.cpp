@@ -2513,10 +2513,7 @@ Effect *EffectManager::SpawnSpecialEffect(i32 effectId, Float3 *position, i32 sp
     {
         effect->active = 0;
     }
-    if (g_ReplayManager != NULL)
-    {
-        g_ReplayManager->inputFlags |= 0x400;
-    }
+    g_ReplayManager->inputFlags |= 0x400;
     return effect;
 }
 
