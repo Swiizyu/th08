@@ -2221,6 +2221,7 @@ ChainCallbackResult EffectManager::FUN_004281e0()
 }
 
 // FUNCTION: th08 0x428310
+#pragma var_order(delta, transformed)
 void __fastcall FUN_00428310(Effect *effect, Float3 *position)
 {
     Float3 delta;
