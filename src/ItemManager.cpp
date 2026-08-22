@@ -422,10 +422,14 @@ void Item::CollectPoint()
     }
     if (g_GameManager.globals->pointItemExtendsSoFar >= 0)
     {
-        ItemManager::UpdatePointItemExtendThreshold();
-        while (g_GameManager.globals->pointItemsCollected >=
-               g_GameManager.globals->nextPointItemExtendThreshold)
+        while (true)
         {
+            ItemManager::UpdatePointItemExtendThreshold();
+            if (g_GameManager.globals->pointItemsCollected <
+                g_GameManager.globals->nextPointItemExtendThreshold)
+            {
+                break;
+            }
             g_GameManager.CollectExtend();
             g_GameManager.globals->pointItemExtendsSoFar++;
         }
