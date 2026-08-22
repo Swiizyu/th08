@@ -5,7 +5,9 @@
 #include "Background.hpp"
 #include "BulletManager.hpp"
 #include "EffectManager.hpp"
+#include "Gui.hpp"
 #include "ItemManager.hpp"
+#include "ReplayManager.hpp"
 #include "SoundPlayer.hpp"
 #include "ScreenEffect.hpp"
 #include "Spellcard.hpp"
@@ -21,6 +23,8 @@ namespace th08 { i32 __fastcall FUN_00450580(void *, void *); }
 
 namespace th08
 {
+    i32 __fastcall FUN_0042f1f0(th08::EnemyManager *enemyManager);
+}
 
 DIFFABLE_STATIC(i32, g_BackgroundTintActive);
 
@@ -3289,31 +3293,74 @@ laser_collision:
 }
 
 // FUNCTION: th08 0x44a930
-#pragma var_order(score, grazePos)
+#pragma var_order(grazePos, grazeCount, score)
 void Player::ScoreGraze(Float3 *position, i32 suppressTimeOrbEffects)
 {
     Float3 grazePos;
+    i32 grazeCount;
     i32 score;
+
+    if (*(i32 *)((u8 *)&g_Player + 0xfdc) == 0)
+    {
+        if (g_GameManager.GaugeIsExtremelyHuman())
+        {
+            grazeCount = 3;
+        }
+        else
+        {
+            grazeCount = (g_GameManager.GaugeIsModeratelyHuman() != 0) + 1;
+        }
+
+        if (g_GameManager.globals->grazeInStage < 99999)
+        {
+            g_GameManager.globals->grazeInStage += grazeCount;
+        }
+        if (g_GameManager.globals->score < 999999)
+        {
+            g_GameManager.globals->score += grazeCount;
+        }
+    }
 
     grazePos = (this->position + *position) / 2.0f;
     g_EffectManager.SpawnEffect(8, &grazePos, 1, -1);
     g_GameManager.IncreaseSubrank(6);
+    g_Gui.flags.grazeDisplayUpdateFrames = 2;
     g_SoundPlayer.PlaySoundPositionedByIdx(SOUND_GRAZE, position->x);
 
-    if (g_GameManager.GaugeIsModeratelyYoukai())
-    {
-        score = 4000;
-    }
-    else
-    {
-        score = 2000;
-    }
+    score = g_GameManager.GaugeIsModeratelyYoukai() ? 4000 : 2000;
     g_GameManager.AddScore(score);
 
-    if (!suppressTimeOrbEffects && g_GameManager.GaugeIsExtremelyYoukai())
+    if (this->IsYoukai())
     {
-        g_EffectManager.SpawnEffect(10, position, 1, -1);
+        g_GameManager.AddToYoukaiGauge(100, 0);
     }
+
+    if (g_GameManager.IsSoloHuman())
+    {
+        if (g_GameManager.shotType == 0xa)
+        {
+            if (FUN_0042f1f0(&g_EnemyManager) != 0)
+            {
+                if (g_GameManager.GaugeIsExtremelyYoukai())
+                {
+                    g_ItemManager.SpawnItem(position, ITEM_TIME2, 1);
+                    if (suppressTimeOrbEffects == 0)
+                    {
+                        if (g_Spellcard.IsActive())
+                        {
+                            g_ItemManager.SpawnItem(position, ITEM_TIME2, 1);
+                            if (!g_GameManager.IsSoloYoukai())
+                            {
+                                g_ItemManager.SpawnItem(position, ITEM_TIME2, 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    g_ReplayManager->inputFlags |= 0x2000;
 }
 
 // FUNCTION: th08 0x44ab40
