@@ -2591,8 +2591,7 @@ Enemy *Enemy::FUN_0041efc0()
 // FUNCTION: th08 0x41f000
 ZunBool Enemy::FUN_0041f000()
 {
-    ZunBool result = *(i32 *)((u8 *)this + 0x2da4) == 0 && *(Enemy **)((u8 *)this + 8) != NULL;
-    return result;
+    return *(i32 *)((u8 *)this + 0x2da4) == 0 && *(Enemy **)((u8 *)this + 8) != NULL;
 }
 
 // FUNCTION: th08 0x41f040
