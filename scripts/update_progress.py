@@ -98,6 +98,34 @@ def main():
 
     with open("PROGRESS.md", "w") as f:
         f.write(doc)
+
+    # Regenerate the SVG progress indicators (GensokyoClub style) from the same verdict.
+    try:
+        import os, re as _re
+        icon_b64 = ""
+        for cand in ("resources/progress.svg", "resources/progress_dark.svg"):
+            if os.path.exists(cand):
+                m = _re.search(r'href="data:image/png;base64,([^"]+)"', open(cand, encoding="utf-8").read())
+                if m:
+                    icon_b64 = m.group(1)
+                    break
+        tpl = open("resources/progress_template.svg", encoding="utf-8").read()
+        func_pct = "%.2f" % exact
+        byte_pct = "%.2f" % weighted
+        for out, color in (("resources/progress.svg", "#000000"), ("resources/progress_dark.svg", "#ffffff")):
+            svg = tpl
+            svg = svg.replace("{ICON_URL}", "data:image/png;base64," + icon_b64)
+            svg = svg.replace("{FUNC_PROG_PERCENT}", func_pct)
+            svg = svg.replace("{BYTES_PROG_PERCENT}", byte_pct)
+            svg = svg.replace("{FUNC_COUNT}", str(perfect))
+            svg = svg.replace("{TOTAL_COUNT}", str(total))
+            svg = svg.replace("{TEXT_COLOR}", color)
+            with open(out, "w", encoding="utf-8") as f:
+                f.write(svg)
+        print("SVG indicators regenerated")
+    except Exception as e:
+        print("SVG regen failed (non-fatal):", e)
+
     print("PROGRESS.md updated: %d/%d (%.2f%% exact, %.2f%% weighted) @ %s" % (perfect, total, exact, weighted, sha[:7]))
     return 0
 

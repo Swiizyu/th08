@@ -10,8 +10,8 @@
   <image x="105" y="55" href="{ICON_URL}" width="150px"></image>
 
   <text xml:space="preserve">
-    <tspan x="80" y="240">Implemented:   {FUNC_PROG_PERCENT}%</tspan>
-    <tspan x="80" y="260">Byte Accuracy: {BYTES_PROG_PERCENT}%</tspan>
+    <tspan x="80" y="230">Implemented: {FUNC_PROG_PERCENT}% ({FUNC_COUNT}/{TOTAL_COUNT})</tspan>
+    <tspan x="80" y="250">Accuracy:    {BYTES_PROG_PERCENT}%</tspan>
   </text>
 
   <g width="300px" height="20px">
@@ -74,4 +74,3 @@
     }
   </style>
 </svg>
-
