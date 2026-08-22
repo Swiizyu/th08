@@ -12,6 +12,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+f32 FUN_004031e0(f32 value);
+
 namespace th08
 {
 // FUNCTION: th08 0x421b60
