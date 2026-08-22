@@ -384,11 +384,9 @@ void Item::CollectPoint()
 {
     i32 maximumValue;
     i32 value;
-    ZunBool isAbovePoc;
 
     maximumValue = g_GameManager.globals->pointItemValue;
-    isAbovePoc = this->currentPosition.y < *(f32 *)((u8 *)g_Player.player1ShtFile + 0x1c);
-    value = isAbovePoc
+    value = this->currentPosition.y < *(f32 *)((u8 *)g_Player.player1ShtFile + 0x1c)
                 ? maximumValue
                 : maximumValue / 2 -
                       (i32)(this->currentPosition.y - *(f32 *)((u8 *)g_Player.player1ShtFile + 0x1c)) *
@@ -422,7 +420,7 @@ void Item::CollectPoint()
     }
     if (g_GameManager.globals->pointItemExtendsSoFar >= 0)
     {
-        while (true)
+        do
         {
             ItemManager::UpdatePointItemExtendThreshold();
             if (g_GameManager.globals->pointItemsCollected <
@@ -432,7 +430,8 @@ void Item::CollectPoint()
             }
             g_GameManager.CollectExtend();
             g_GameManager.globals->pointItemExtendsSoFar++;
-        }
+        } while (g_GameManager.globals->pointItemsCollected >=
+                 g_GameManager.globals->nextPointItemExtendThreshold);
     }
     (*(i32 *)((u8 *)&g_GameManager + 0x3da94))++;
     g_GameManager.UpdateAntiTamper();
@@ -444,11 +443,9 @@ void Item::CollectPointSmall()
 {
     i32 maximumValue;
     i32 value;
-    u8 isAbovePoc;
 
     maximumValue = g_GameManager.globals->pointItemValue;
-    isAbovePoc = this->currentPosition.y < *(f32 *)((u8 *)g_Player.player1ShtFile + 0x1c);
-    value = isAbovePoc
+    value = this->currentPosition.y < *(f32 *)((u8 *)g_Player.player1ShtFile + 0x1c)
                 ? maximumValue
                 : maximumValue / 2 -
                       (i32)(this->currentPosition.y - *(f32 *)((u8 *)g_Player.player1ShtFile + 0x1c)) *
