@@ -960,7 +960,7 @@ i32 Effect::FUN_00427260()
 {
     Float3 offset;
 
-    offset.FromAngleMagnitude(this->custom.x, 128.0f);
+    offset.FromAngleMagnitude(this->custom.x, 256.0f);
     this->position.x += offset.x;
     this->position.y += offset.y;
     this->vm.rotation.z = AddNormalizeAngle(this->custom.x, ZUN_PI / 2.0f);
