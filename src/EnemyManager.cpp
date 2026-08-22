@@ -1164,7 +1164,7 @@ void __fastcall EclExIns::FUN_00423530(void *)
     effect = g_EffectManager.SpawnSpecialEffect(56, (Float3 *)((u8 *)this + 0x2d34), 9, 1, -1);
     effect = g_EffectManager.SpawnSpecialEffect(56, (Float3 *)((u8 *)this + 0x2d34), 10, 1, -1);
     g_EffectManager.effectAnm->SetAndExecuteScriptIdx(&effect->vm, 97);
-    g_EclUnknown4ea28c = (void *)0x4235a0;
+    g_EclUnknown4ea28c = (void *)FUN_004235a0;
 }
 
 // FUNCTION: th08 0x423db0
@@ -1176,7 +1176,7 @@ void __fastcall EclExIns::FUN_00423db0(void *)
     effect = g_EffectManager.SpawnSpecialEffect(65, (Float3 *)((u8 *)this + 0x2d34), 9, 1, -1);
     effect = g_EffectManager.SpawnSpecialEffect(65, (Float3 *)((u8 *)this + 0x2d34), 10, 1, -1);
     g_EffectManager.effectAnm->SetAndExecuteScriptIdx(&effect->vm, 99);
-    g_EclUnknown4ea28c = (void *)0x4235a0;
+    g_EclUnknown4ea28c = (void *)FUN_004235a0;
 }
 
 // FUNCTION: th08 0x424170
