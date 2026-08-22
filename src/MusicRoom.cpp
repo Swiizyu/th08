@@ -10,6 +10,8 @@
 namespace th08
 {
 
+DIFFABLE_STATIC(MusicRoom, g_MusicRoom);
+
 const char *g_BgmNotUnlockedWarning[] = {
     TH_WARN_BGM_NOT_UNLOCKED0, TH_WARN_BGM_NOT_UNLOCKED1, TH_WARN_BGM_NOT_UNLOCKED2, TH_WARN_BGM_NOT_UNLOCKED3,
     TH_WARN_BGM_NOT_UNLOCKED4, TH_WARN_BGM_NOT_UNLOCKED5, TH_WARN_BGM_NOT_UNLOCKED6, TH_WARN_BGM_NOT_UNLOCKED4};
@@ -243,8 +245,6 @@ i32 MusicRoom::ProcessInput()
 
 ZunResult MusicRoom::RegisterChain()
 {
-    static MusicRoom g_MusicRoom;
-
     MusicRoom *musicRoom = &g_MusicRoom;
 
     memset(musicRoom, 0, sizeof(MusicRoom));
