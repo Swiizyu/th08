@@ -3216,18 +3216,16 @@ i32 Player::FUN_0044a470(Float3 *position, Float3 *hitbox)
     {
         return 2;
     }
-    minPosition = *position - *hitbox / 2.0f;
-    maxPosition = *position + *hitbox / 2.0f;
-    minPosition.x -= 20.0f;
-    minPosition.y -= 20.0f;
-    maxPosition.x += 20.0f;
-    maxPosition.y += 20.0f;
-    if (this->playerState == PLAYER_STATE_DEAD || this->playerState == PLAYER_STATE_SPAWNING)
+    minPosition.x = position->x - hitbox->x / 2.0f - 20.0f;
+    minPosition.y = position->y - hitbox->y / 2.0f - 20.0f;
+    maxPosition.x = position->x + hitbox->x / 2.0f + 20.0f;
+    maxPosition.y = position->y + hitbox->y / 2.0f + 20.0f;
+    if (this->playerState == 2 || this->playerState == 1)
     {
         return 0;
     }
-    if (this->unk0x3A4.x >= maxPosition.x || this->unk0x3A4.y >= maxPosition.y ||
-        this->unk0x3B0.x <= minPosition.x || this->unk0x3B0.y <= minPosition.y)
+    if (this->unk0x3A4.x > maxPosition.x || this->unk0x3B0.x <= minPosition.x ||
+        this->unk0x3A8.y > maxPosition.y || this->unk0x3B4.y <= minPosition.y)
     {
         return 0;
     }
