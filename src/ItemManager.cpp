@@ -516,10 +516,10 @@ void Item::CollectPowerBig()
 }
 
 // FUNCTION: th08 0x4412b0
-#pragma var_order(score)
 void Item::CollectTimeOrb()
 {
     i32 score;
+    i32 gaugeAmount;
 
     if (*(i32 *)((u8 *)&g_Player + 0xe2a7c) == 0)
     {
@@ -553,7 +553,6 @@ void Item::CollectTimeOrb()
     g_Spellcard.FUN_00416b10(8000);
     if (*(ZunTimer *)((u8 *)&g_Player + 0xe2adc) == 0)
     {
-        i32 gaugeAmount;
         score = 111;
         if (g_Player.isFocus)
         {
