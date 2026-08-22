@@ -5,6 +5,7 @@
 #include "Background.hpp"
 #include "BulletManager.hpp"
 #include "EffectManager.hpp"
+#include "EnemyManager.hpp"
 #include "Gui.hpp"
 #include "ItemManager.hpp"
 #include "ReplayManager.hpp"
