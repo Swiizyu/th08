@@ -1,6 +1,7 @@
 #include "th_pch.h"
 
 #include "AsciiManager.hpp"
+#include "EffectManager.hpp"
 #include "Gui.hpp"
 #include "Player.hpp"
 #include "ResultScreen.hpp"
