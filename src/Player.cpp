@@ -3304,7 +3304,7 @@ void Player::ScoreGraze(Float3 *position, i32 suppressTimeOrbEffects)
     {
         grazeCount = g_GameManager.GaugeIsExtremelyHuman()
                          ? 3
-                         : (g_GameManager.GaugeIsModeratelyHuman() != 0) + 1;
+                         : (g_GameManager.GaugeIsModeratelyHuman() != 0 ? 2 : 1);
 
         if (g_GameManager.globals->grazeInStage < 99999)
         {
